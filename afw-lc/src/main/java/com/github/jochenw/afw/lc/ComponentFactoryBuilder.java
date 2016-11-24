@@ -10,11 +10,13 @@ import com.github.jochenw.afw.core.DefaultResourceLoader;
 import com.github.jochenw.afw.core.ResourceLocator;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.util.AbstractBuilder;
+import com.github.jochenw.afw.lc.impl.DbInitializer;
 import com.github.jochenw.afw.lc.impl.DefaultConnectionProvider;
 
 
 public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	public abstract static class Binder {
+		public abstract <T> void bind(Class<T> pType);
 		public abstract <T> void bind(Class<T> pType, String pName, T pInstance);
 		public abstract <T> void bind(Class<T> pType, T pInstance);
 		public abstract <T> void bind(Class<T> pType, String pName, Class<? extends T> pImplClass);
@@ -40,7 +42,7 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		void configure(Binder pBinder);
 	}
 	private String instanceName, applicationName;
-	private boolean useHibernate;
+	private boolean useHibernate, useFlyway;
 	private ILogFactory logFactory;
 	private ResourceLocator resourceLocator;
 	private PropertyLoader propertyLoader;
@@ -118,6 +120,16 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	public ComponentFactoryBuilder usingHibernate(boolean pUsingHibernate) {
 		assertMutable();
 		useHibernate = pUsingHibernate;
+		return this;
+	}
+	
+	public ComponentFactoryBuilder usingFlyway() {
+		return usingFlyway(true);
+	}
+
+	public ComponentFactoryBuilder usingFlyway(boolean pUsingFlyway) {
+		assertMutable();
+		useFlyway = pUsingFlyway;
 		return this;
 	}
 	
@@ -204,6 +216,10 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		return startableObjectProvider;
 	}
 
+	public boolean isUsingFlyway() {
+		return useFlyway;
+	}
+
 	public boolean isUsingHibernate() {
 		return useHibernate;
 	}
@@ -217,6 +233,7 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	
 	public ComponentFactory build() {
 		if (componentFactory == null) {
+			validate();
 			final ComponentFactory cf = newComponentFactory();
 			configure(cf, getModule(cf));
 			componentFactory = cf;
@@ -233,9 +250,14 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 
 	protected List<Object> getStartableObjects(ComponentFactory pComponentFactory) {
 		final List<Object> startableObjects = new ArrayList<>();
-		if (isUsingHibernate()) {
+		if (isUsingHibernate()  ||  isUsingFlyway()) {
 			startableObjects.add(pComponentFactory.requireInstance(IConnectionProvider.class));
+		}
+		if (isUsingHibernate()) {
 			startableObjects.add(pComponentFactory.requireInstance(ISessionProvider.class));
+		}
+		if (isUsingFlyway()) {
+			startableObjects.add(pComponentFactory.requireInstance(DbInitializer.class));
 		}
 		if (startableObjectProvider != null) {
 			startableObjectProvider.addStartableObjects(pComponentFactory, startableObjects);
@@ -259,9 +281,14 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 				Properties props = getDefaultProperties();
 				pBinder.bind(Properties.class, "default", props);
 				pBinder.bind(Properties.class, props);
-				if (isUsingHibernate()) {
+				if (isUsingHibernate()  ||  isUsingFlyway()) {
 					pBinder.bind(IConnectionProvider.class, DefaultConnectionProvider.class);
+				}
+				if (isUsingHibernate()) {
 					pBinder.bind(ISessionProvider.class, DefaultSessionProvider.class);
+				}
+				if (isUsingFlyway()) {
+					pBinder.bind(DbInitializer.class);
 				}
 				for (Map.Entry<Object, Object> en : props.entrySet()) {
 					final String key = en.getKey().toString();

@@ -3,6 +3,7 @@ package com.github.jochenw.afw.lc.impl;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -17,7 +18,7 @@ public class DefaultConnectionProvider implements IConnectionProvider {
 	@Inject private Properties properties;
 	private final String propertyPrefix;
 	private String driverClassName;
-	private String url, shutdownUrl, user, password;
+	private String url, shutdownUrl, user, password, shutdownCommand;
 	private Driver driver;
 
 	DefaultConnectionProvider() {
@@ -29,6 +30,7 @@ public class DefaultConnectionProvider implements IConnectionProvider {
 		driverClassName = requireProperty("jdbc.driver");
 		url = requireProperty("jdbc.url");
 		shutdownUrl = getProperty("jdbc.shutdownUrl");
+		shutdownCommand = getProperty("jdbc.shutdownCommand");
 		user = getProperty("jdbc.user");
 		password = getProperty("jdbc.password");
 		final Class<?> cl;
@@ -59,6 +61,11 @@ public class DefaultConnectionProvider implements IConnectionProvider {
 				if (shutdownUrl != null) {
 					try (Connection conn = DriverManager.getConnection(shutdownUrl, user, password)) {
 						// Do nothing, connection is closed immediately.
+					}
+				} else if (shutdownCommand != null) {
+					try (Connection conn = newConnection();
+						 PreparedStatement stmt = conn.prepareStatement(shutdownCommand)) {
+						stmt.executeUpdate();
 					}
 				}
 				driver = null;

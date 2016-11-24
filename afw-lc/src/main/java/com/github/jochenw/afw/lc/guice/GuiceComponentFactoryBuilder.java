@@ -19,6 +19,10 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder {
 		}
 
 		@Override
+		public <T> void bind(Class<T> pType) {
+			binder.bind(pType).in(Scopes.SINGLETON);
+		}
+		@Override
 		public <T> void bind(Class<T> pType, String pName, T pInstance) {
 			if (pInstance == null) {
 				bind(pType, pInstance);

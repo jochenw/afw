@@ -22,7 +22,9 @@ public abstract class AbstractLog implements ILog {
             sb.append(pMethod);
             sb.append(pSep);
         }
-        sb.append(pMessage);
+        if (pMessage != null) {
+        	sb.append(pMessage);
+        }
         return sb.toString();
     }
 

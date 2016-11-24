@@ -40,9 +40,11 @@ public interface IMLog {
     void fatalf(String pFormat, Object... pArgs);
     void logf(Level pLevel, String pFormat, Object... pArgs);
     
+    void entering();
     void entering(String pMessage);
     void entering(String pMessage, Object... pArgs);
     void enteringf(String pFormat, Object... pArgs);
+    void exiting();
     void exiting(String pMessage);
     void exiting(String pMessage, int pResult);
     void exiting(String pMessage, long pResult);

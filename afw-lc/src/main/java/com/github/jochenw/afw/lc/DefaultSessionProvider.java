@@ -3,7 +3,6 @@ package com.github.jochenw.afw.lc;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -12,15 +11,12 @@ import javax.inject.Inject;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.cfgxml.spi.LoadedConfig;
-import org.hibernate.boot.registry.BootstrapServiceRegistry;
-import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 
 import com.github.jochenw.afw.core.ResourceLocator;
 
@@ -31,27 +27,28 @@ public class DefaultSessionProvider implements ISessionProvider {
 	@Inject Properties properties;
 	private Dialect dialect;
 	private SessionFactory sessionFactory;
+	private Configuration configuration;
 
 	@PostConstruct
 	public void start() {
-		final BootstrapServiceRegistry bsr = new BootstrapServiceRegistryBuilder().build();
-		final StandardServiceRegistryBuilder ssrBuilder = new StandardServiceRegistryBuilder( bsr );
-
-		final MetadataSources metadataSources = new MetadataSources( bsr );
-
 		final URL configUrl = resourceLocator.requireResource("hibernate.cfg.xml");
-		ssrBuilder.configure(configUrl);
-		ssrBuilder.applySettings( getHibernateProperties() );
+		configuration = new Configuration();
+		configuration.configure(configUrl);
+		Properties props = getHibernateProperties();
+		configuration.addProperties( props );
+		
+		final StandardServiceRegistryBuilder ssrBuilder = new StandardServiceRegistryBuilder();
+		ssrBuilder.addService(ConnectionProvider.class, newHibernateConnectionProvider());
+		ssrBuilder.applySettings( props );
 
-		final LoadedConfig loadedConfig = ssrBuilder.getAggregatedCfgXml();
 		final StandardServiceRegistry ssr = ssrBuilder.build();
-		sessionFactory = new MetadataSources().buildMetadata(ssr).buildSessionFactory();
-		dialect = ((SessionFactoryImplementor) sessionFactory).getDialect();
+		sessionFactory = configuration.buildSessionFactory(ssr);
+		dialect = ssr.getService(JdbcServices.class).getDialect();
 	}
 
 	@SuppressWarnings("rawtypes")
-	protected Map getHibernateProperties() {
-		final Map<String,Object> map = new HashMap<>();
+	protected Properties getHibernateProperties() {
+		final Properties map = new Properties();
 		for (Map.Entry en : properties.entrySet()) {
 			final String key = (String) en.getKey();
 			if (key.startsWith("hibernate.")) {
@@ -65,11 +62,12 @@ public class DefaultSessionProvider implements ISessionProvider {
 		return new ConnectionProvider() {
 			private static final long serialVersionUID = -939900633874329194L;
 
-			@Override @SuppressWarnings("rawtypes")
-			public boolean isUnwrappableAs( Class unwrapType) {
+			@Override
+			public boolean isUnwrappableAs(@SuppressWarnings("rawtypes") Class unwrapType) {
 				throw new IllegalStateException("Not implemented");
 			}
 
+			@Override
 			public <T> T unwrap(Class<T> unwrapType) {
 				throw new IllegalStateException("Not implemented");
 			}
@@ -80,8 +78,8 @@ public class DefaultSessionProvider implements ISessionProvider {
 			}
 
 			@Override
-			public void closeConnection(Connection pConnection) throws SQLException {
-				connectionProvider.close(pConnection);
+			public void closeConnection(Connection pConn) throws SQLException {
+				connectionProvider.close(pConn);
 			}
 
 			@Override
@@ -111,4 +109,8 @@ public class DefaultSessionProvider implements ISessionProvider {
 		pSession.close();
 	}
 
+	@Override
+	public Configuration getConfiguration() {
+		return configuration;
+	}
 }

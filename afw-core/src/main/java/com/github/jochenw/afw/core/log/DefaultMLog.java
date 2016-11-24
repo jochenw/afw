@@ -222,6 +222,13 @@ public class DefaultMLog implements IMLog {
     }
 
     @Override
+    public void entering() {
+        if (log.isDebugEnabled()) {
+            log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_ENT, null));
+        }
+    }
+
+    @Override
     public void entering(String pMessage) {
         if (log.isDebugEnabled()) {
             log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_ENT, pMessage));
@@ -239,6 +246,13 @@ public class DefaultMLog implements IMLog {
     public void enteringf(String pFormat, Object... pArgs) {
         if (log.isDebugEnabled()) {
             log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_ENT, pFormat, pArgs));
+        }
+    }
+
+    @Override
+    public void exiting() {
+        if (log.isDebugEnabled()) {
+            log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_EXT, null));
         }
     }
 

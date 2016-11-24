@@ -1,7 +1,5 @@
 package com.github.jochenw.afw.lc;
 
-import java.util.Properties;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -12,4 +10,5 @@ public interface ISessionProvider {
 	Dialect getDialect();
 	Session newSession();
 	void close(Session pSession);
+	Configuration getConfiguration();
 }

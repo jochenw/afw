@@ -56,10 +56,6 @@ public class Log4j2LogFactory extends AbstractLogFactory {
 			final Object configurationSource;
 			try (InputStream istream = url.openStream()) {
 				configurationSource = cons.newInstance(istream, url);
-			} catch (Throwable t) {
-				throw Exceptions.show(t);
-			}
-			try {
 				initializeMethod.invoke(null, null, configurationSource);
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
