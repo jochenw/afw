@@ -1,5 +1,6 @@
 package com.github.jochenw.afw.lc;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,10 +10,12 @@ import java.util.Properties;
 import com.github.jochenw.afw.core.DefaultResourceLoader;
 import com.github.jochenw.afw.core.ResourceLocator;
 import com.github.jochenw.afw.core.log.ILogFactory;
+import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
+import com.github.jochenw.afw.core.props.IPropertyFactory;
 import com.github.jochenw.afw.core.util.AbstractBuilder;
+import com.github.jochenw.afw.lc.LifecycleController;
 import com.github.jochenw.afw.lc.impl.DbInitializer;
 import com.github.jochenw.afw.lc.impl.DefaultConnectionProvider;
-
 
 public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	public abstract static class Binder {
@@ -44,6 +47,7 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	private String instanceName, applicationName;
 	private boolean useHibernate, useFlyway;
 	private ILogFactory logFactory;
+	private IPropertyFactory propertyFactory;
 	private ResourceLocator resourceLocator;
 	private PropertyLoader propertyLoader;
 	private List<Module> modules = new ArrayList<>();
@@ -93,6 +97,12 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		modules.addAll(Arrays.asList(pModules));
 		return this;
 		
+	}
+
+	public ComponentFactoryBuilder propertyFactory(IPropertyFactory pFactory) {
+		assertMutable();
+		propertyFactory = pFactory;
+		return this;
 	}
 
 	public ComponentFactoryBuilder propertyLoader(PropertyLoader pLoader) {
@@ -163,6 +173,10 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		}
 		getInstanceProperties();
 		getDefaultProperties();
+		final IPropertyFactory pf = getPropertyFactory();
+		if (pf == null) {
+			throw new IllegalStateException("No IPropertyFactory has been configured.");
+		}
 	}
 
 	public Properties getDefaultProperties() {
@@ -205,6 +219,13 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		return logFactory;
 	}
 
+	public IPropertyFactory getPropertyFactory() {
+		if (propertyFactory == null) {
+			propertyFactory = newPropertyFactory();
+		}
+		return propertyFactory;
+	}
+	
 	public PropertyLoader getPropertyLoader() {
 		if (propertyLoader == null) {
 			propertyLoader = newPropertyLoader();
@@ -271,7 +292,8 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 			public void configure(Binder pBinder) {
 				pBinder.bind(ComponentFactory.class, pComponentFactory);
 				pBinder.bind(ILogFactory.class, getLogFactory());
-				pBinder.bind(LifecycleController.class, new LifecycleController());
+				pBinder.bind(IPropertyFactory.class, getPropertyFactory());
+				pBinder.bind(LifecycleController.class);
 				pBinder.bindConstant("applicationName", getApplicationName());
 				pBinder.bindConstant("instanceName", getInstanceName());
 				pBinder.bind(ResourceLocator.class, getResourceLocator());
@@ -304,6 +326,14 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		};
 	}
 
+	protected IPropertyFactory newPropertyFactory() {
+		final String factoryPropertiesUri = getFactoryPropertiesUri();
+		final URL factoryPropertiesUrl = getResourceLocator().requireResource(factoryPropertiesUri);
+		final String instancePropertiesUri = getInstancePropertiesUri();
+		final URL instancePropertiesUrl = getResourceLocator().requireResource(instancePropertiesUri);
+		return new DefaultPropertyFactory(instancePropertiesUrl, factoryPropertiesUrl);
+	}
+	
 	protected Properties newDefaultProperties() {
 		final Properties props = new Properties();
 		final Properties fp = getFactoryProperties();
@@ -318,12 +348,22 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	}
 
 	protected Properties newFactoryProperties() {
-		final String uri = getApplicationName() + "-factory.properties";
+		final String uri = getFactoryPropertiesUri();
 		return getPropertyLoader().load(uri);
 	}
 
+	protected String getFactoryPropertiesUri() {
+		final String uri = getApplicationName() + "-factory.properties";
+		return uri;
+	}
+
 	protected Properties newInstanceProperties() {
-		final String uri = getApplicationName() + ".properties";
+		final String uri = getInstancePropertiesUri();
 		return getPropertyLoader().load(uri);
+	}
+
+	protected String getInstancePropertiesUri() {
+		final String uri = getApplicationName() + ".properties";
+		return uri;
 	}
 }

@@ -75,7 +75,7 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder {
 		final com.google.inject.Module module = new com.google.inject.Module() {
 			@Override
 			public void configure(com.google.inject.Binder pBinder) {
-				pBinder.bindListener(Matchers.any(), new GuiceInjLogListener(getLogFactory()));
+				pBinder.bindListener(Matchers.any(), new GuiceInjLogListener(getLogFactory(), getPropertyFactory()));
 				pModule.configure(new AfwBinder(pBinder));
 			}
 		};
