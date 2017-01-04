@@ -27,7 +27,7 @@ public class SimpleResourceWorker {
 			for (int i = resources.size()-1;  i >= 0;  i--) {
 				final Object resource = resources.remove(i);
 				try {
-					closeResource(resource);
+					closeResource(resource, th == null);
 				} catch (Throwable t) {
 					if (th == null) {
 						th = t;
@@ -48,7 +48,7 @@ public class SimpleResourceWorker {
 		}
 	}
 
-	protected void closeResource(Object pResource) throws Throwable {
+	protected void closeResource(Object pResource, boolean pCommit) throws Throwable {
 		if (pResource instanceof AutoCloseable) {
 			((AutoCloseable) pResource).close();
 		} else if (pResource instanceof HttpURLConnection) {
