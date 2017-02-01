@@ -1,0 +1,448 @@
+/*****************************************
+ * OPTIONS *
+ *****************************************/
+
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = true;
+  STATIC = false;
+}
+
+/*****************************************
+ * PARSER JAVA CODE *
+ *****************************************/
+
+PARSER_BEGIN(ELParser)
+
+package com.wmx.javaapis.core.el.jcc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.wmx.javaapis.core.el.tree.AddExpression;
+import com.wmx.javaapis.core.el.tree.AndExpression;
+import com.wmx.javaapis.core.el.tree.ComplexValue;
+import com.wmx.javaapis.core.el.tree.ComplexValue.ArraySuffix;
+import com.wmx.javaapis.core.el.tree.ComplexValue.PropertySuffix;
+import com.wmx.javaapis.core.el.tree.ElExpression;
+import com.wmx.javaapis.core.el.tree.EmptyExpression;
+import com.wmx.javaapis.core.el.tree.EqualityExpression;
+import com.wmx.javaapis.core.el.tree.FunctionInvocation;
+import com.wmx.javaapis.core.el.tree.LiteralFactory;
+import com.wmx.javaapis.core.el.tree.MultiplyExpression;
+import com.wmx.javaapis.core.el.tree.NamedValue;
+import com.wmx.javaapis.core.el.tree.NotExpression;
+import com.wmx.javaapis.core.el.tree.OrExpression;
+import com.wmx.javaapis.core.el.tree.RelationalExpression;
+import com.wmx.javaapis.core.el.tree.UnaryExpression;
+import com.wmx.javaapis.core.el.tree.ValueExpression;
+import com.wmx.javaapis.core.el.tree.VariableReferenceExpression;
+
+/**
+ * Generated EL parser.
+ * 
+ * @author Nathan Abramson
+ * @author Shawn Bayern
+ */
+
+public class ELParser {
+
+   private int numPlaceholders;
+}
+
+PARSER_END(ELParser)
+
+
+/*****************************************
+ * TOKENS *
+ *****************************************/
+
+/* WHITE SPACE */
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN :
+{
+/* Literals */
+
+  < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
+|
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)?
+      | "." (["0"-"9"])+ (<EXPONENT>)?
+      | (["0"-"9"])+ <EXPONENT>
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|
+  < STRING_LITERAL:
+      ("\"" ((~["\"","\\"]) | ("\\" ( ["\\","\""] )))* "\"") |
+      ("\'" ((~["\'","\\"]) | ("\\" ( ["\\","\'"] )))* "\'")
+  >
+|
+  < BADLY_ESCAPED_STRING_LITERAL:
+      ("\"" (~["\"","\\"])* ("\\" ( ~["\\","\""] ))) |
+      ("\'" (~["\'","\\"])* ("\\" ( ~["\\","\'"] )))
+  >
+
+/* Reserved Words and Symbols */
+
+| < TRUE: "true" >
+| < FALSE: "false" >
+| < NULL: "null" >
+| < END_EXPRESSION: "}" > : DEFAULT
+| < DOT: "." >
+| < GT1: ">" >
+| < GT2: "gt" >
+| < LT1: "<" >
+| < LT2: "lt" >
+| < EQ1: "==" >
+| < EQ2: "eq" >
+| < LE1: "<=" >
+| < LE2: "le" >
+| < GE1: ">=" >
+| < GE2: "ge" >
+| < NE1: "!=" >
+| < NE2: "ne" >
+| < LPAREN: "(" >
+| < RPAREN: ")" >
+| < COMMA: "," >
+| < COLON: ":" >
+| < LBRACKET: "[" >
+| < RBRACKET: "]" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < MULTIPLY: "*" >
+| < DIVIDE1: "/" >
+| < DIVIDE2: "div" >
+| < MODULUS1: "%" >
+| < MODULUS2: "mod" >
+| < NOT1: "not" >
+| < NOT2: "!" >
+| < AND1: "and" >
+| < AND2: "&&" >
+| < OR1: "or" >
+| < OR2: "||" >
+| < EMPTY: "empty" >
+
+
+/* Identifiers */
+
+| < IDENTIFIER: (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
+| < #IMPL_OBJ_START: "#" >
+|
+  < #LETTER:
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  >
+|
+  < #DIGIT:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+  >
+| <  PLACEHOLDER: "?" >
+/* This is used to catch any non-matching tokens, so as to avoid any
+   TokenMgrErrors */
+| < ILLEGAL_CHARACTER: (~[]) >
+}
+
+
+/*****************************************
+ * GRAMMAR PRODUCTIONS *
+ *****************************************/
+
+ElExpression ElExpression () :
+{
+  OrExpression ret;
+}
+{
+  ret = OrExpression()
+
+  {
+    return new ElExpression(ret);
+  }
+}
+
+
+OrExpression OrExpression () :
+{
+  AndExpression startExpression;
+  AndExpression expression;
+  List<AndExpression> expressions = null;
+}
+{
+  startExpression = AndExpression ()
+
+    (
+     (
+      (<OR1> | <OR2>)
+      )
+     expression = AndExpression ()
+
+      {
+    if (expressions == null) {
+      expressions = new ArrayList<AndExpression>();
+      expressions.add(startExpression);
+    }
+    expressions.add (expression);
+      }
+     )*
+
+  {
+    if (expressions != null) {
+      return new OrExpression(expressions);
+    }
+    return new OrExpression(startExpression);
+  }
+}
+
+
+AndExpression AndExpression () :
+{
+  EqualityExpression startExpression;
+  EqualityExpression expression;
+  List<EqualityExpression> expressions = null;
+}
+{
+  startExpression = EqualityExpression ()
+
+    (
+     (
+      (<AND1> | <AND2>)
+      )
+     expression = EqualityExpression ()
+
+      {
+    if (expressions == null) {
+      expressions = new ArrayList<EqualityExpression>();
+      expressions.add(startExpression);
+    }
+    expressions.add (expression);
+      }
+     )*
+
+  {
+    if (expressions != null) {
+      return new AndExpression(expressions);
+    }
+    return new AndExpression(startExpression);
+  }
+}
+
+
+EqualityExpression EqualityExpression () :
+{
+  RelationalExpression left, right = null;
+  EqualityExpression.Op op = null;
+}
+{
+  left = RelationalExpression ()
+
+    (
+     (
+      (<EQ1> | <EQ2>) { op = EqualityExpression.Op.EQ; }
+      | (<NE1> | <NE2>) { op = EqualityExpression.Op.NE; }
+      )
+     right = RelationalExpression ()
+     )?
+
+  {
+    if (op == null) {
+        return new EqualityExpression(left);
+    } else {
+        return new EqualityExpression(left, op, right);
+    }
+  }
+}
+
+
+RelationalExpression RelationalExpression () :
+{
+  AddExpression left, right = null;
+  RelationalExpression.Op op = null;
+}
+{
+  left = AddExpression ()
+
+    (
+     (
+      (<LT1> | <LT2>) { op = RelationalExpression.Op.LT; }
+      | (<GT1> | <GT2>) { op = RelationalExpression.Op.GT; }
+      | (<GE1> | <GE2>) { op = RelationalExpression.Op.GE; }
+      | (<LE1> | <LE2>) { op = RelationalExpression.Op.LE; }
+      )
+     right = AddExpression ()
+     )?
+
+  {
+    if (op == null) {
+        return new RelationalExpression(left);
+    } else {
+        return new RelationalExpression(left, op, right);
+    }
+  }
+}
+
+
+AddExpression AddExpression () :
+{
+  Object startExpression;
+  AddExpression.Op operator;
+  Object expression;
+  List<Object> expressions = null;
+}
+{
+  startExpression = MultiplyExpression ()
+
+    (
+     (
+      <PLUS> { operator = AddExpression.Op.PLUS; }
+      | <MINUS> { operator = AddExpression.Op.MINUS; }
+      )
+     expression = MultiplyExpression ()
+
+      {
+    if (expressions == null) {
+      expressions = new ArrayList<Object>();
+      expressions.add(startExpression);
+    }
+    expressions.add(operator);
+    expressions.add(expression);
+      }
+     )*
+
+  {
+    if (expressions != null) {
+      return new AddExpression(expressions);
+    }
+    else {
+      return new AddExpression(startExpression);
+    }
+  }
+}
+
+
+MultiplyExpression MultiplyExpression () :
+{
+  UnaryExpression left, right = null;
+  MultiplyExpression.Op operator = null;
+}
+{
+  left = UnaryExpression ()
+
+    (
+     (
+      <MULTIPLY> { operator = MultiplyExpression.Op.MULTIPLY; }
+      | (<DIVIDE1> | <DIVIDE2>) { operator = MultiplyExpression.Op.DIVIDE; }
+      | (<MODULUS1> | <MODULUS2>) { operator = MultiplyExpression.Op.MODULUS; }
+      )
+     right = UnaryExpression ()
+     )?
+
+  {
+    if (operator == null) {
+        return new MultiplyExpression(left);
+    } else {
+        return new MultiplyExpression(left, operator, right);
+    }
+  }
+}
+
+
+UnaryExpression UnaryExpression () :
+{
+  UnaryExpression.Op op = null;
+  ValueExpression value;
+}
+{
+  (
+    <NOT1> { op = UnaryExpression.Op.NOT; }
+    | <NOT2 >  { op = UnaryExpression.Op.NOT; }
+    | <MINUS> { op = UnaryExpression.Op.MINUS; }
+    | <EMPTY> { op = UnaryExpression.Op.EMPTY; }
+   )?
+
+    value = Value ()
+
+  {
+    if (op == null) {
+      return new UnaryExpression(value);
+    } else {
+      return new UnaryExpression(value, op);
+    }
+  }
+}
+
+String VariableReference() :
+{
+  final StringBuilder sb = new StringBuilder();
+  Token t;
+}
+{
+  (
+    t = <IDENTIFIER> { sb.append(t.image); }
+    ( <DOT> t = <IDENTIFIER> { sb.append('.'); sb.append(t.image); } )*
+  )
+  {
+    return sb.toString();
+  }
+}
+
+      
+
+ValueExpression Value () :
+{
+  Object object;
+  Token t;
+}
+{
+  (
+    ( <LPAREN> { object = ElExpression(); } <RPAREN> )
+    | t = <INTEGER_LITERAL> { object = Long.valueOf(Long.parseLong(t.image)); }
+    | t = <STRING_LITERAL> { object = ValueExpression.ofLiteral(t.image); }
+    | t = <FLOATING_POINT_LITERAL> { object = Double.valueOf(Double.parseDouble(t.image)); }
+    | t = <PLACEHOLDER> { object = Integer.valueOf(numPlaceholders++); }
+    | <FALSE> { object = Boolean.FALSE; }
+    | <TRUE> { object = Boolean.TRUE; }
+    | <NULL> { object = null; }
+    | object = VariableReference() { object = new VariableReferenceExpression((String) object); }
+  )
+
+  {
+     return ValueExpression.valueOf(object);
+  }
+}
