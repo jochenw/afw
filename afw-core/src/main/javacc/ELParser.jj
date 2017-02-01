@@ -14,29 +14,21 @@ options {
 
 PARSER_BEGIN(ELParser)
 
-package com.wmx.javaapis.core.el.jcc;
+package com.github.jochenw.afw.core.el.jcc;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wmx.javaapis.core.el.tree.AddExpression;
-import com.wmx.javaapis.core.el.tree.AndExpression;
-import com.wmx.javaapis.core.el.tree.ComplexValue;
-import com.wmx.javaapis.core.el.tree.ComplexValue.ArraySuffix;
-import com.wmx.javaapis.core.el.tree.ComplexValue.PropertySuffix;
-import com.wmx.javaapis.core.el.tree.ElExpression;
-import com.wmx.javaapis.core.el.tree.EmptyExpression;
-import com.wmx.javaapis.core.el.tree.EqualityExpression;
-import com.wmx.javaapis.core.el.tree.FunctionInvocation;
-import com.wmx.javaapis.core.el.tree.LiteralFactory;
-import com.wmx.javaapis.core.el.tree.MultiplyExpression;
-import com.wmx.javaapis.core.el.tree.NamedValue;
-import com.wmx.javaapis.core.el.tree.NotExpression;
-import com.wmx.javaapis.core.el.tree.OrExpression;
-import com.wmx.javaapis.core.el.tree.RelationalExpression;
-import com.wmx.javaapis.core.el.tree.UnaryExpression;
-import com.wmx.javaapis.core.el.tree.ValueExpression;
-import com.wmx.javaapis.core.el.tree.VariableReferenceExpression;
+import com.github.jochenw.afw.core.el.tree.AddExpression;
+import com.github.jochenw.afw.core.el.tree.AndExpression;
+import com.github.jochenw.afw.core.el.tree.ElExpression;
+import com.github.jochenw.afw.core.el.tree.EqualityExpression;
+import com.github.jochenw.afw.core.el.tree.MultiplyExpression;
+import com.github.jochenw.afw.core.el.tree.OrExpression;
+import com.github.jochenw.afw.core.el.tree.RelationalExpression;
+import com.github.jochenw.afw.core.el.tree.UnaryExpression;
+import com.github.jochenw.afw.core.el.tree.ValueExpression;
+import com.github.jochenw.afw.core.el.tree.VariableReferenceExpression;
 
 /**
  * Generated EL parser.
@@ -45,6 +37,7 @@ import com.wmx.javaapis.core.el.tree.VariableReferenceExpression;
  * @author Shawn Bayern
  */
 
+@SuppressWarnings("unused")
 public class ELParser {
 
    private int numPlaceholders;

@@ -6,10 +6,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
-import javax.annotation.PostConstruct;
 
 public class Reflection {
     public static void setValue(Object pInstance, String pField, Object pValue) {
@@ -138,5 +140,61 @@ public class Reflection {
 			}
 		}
 		return null;
+	}
+
+	private static interface Matcher<T> {
+		boolean isMatching(T pObject);
+	}
+	public static Method getPublicGetter(Class<? extends Object> pClass, String pProperty) {
+		Objects.requireNonNull(pClass, "Class");
+		Objects.requireNonNull(pProperty, "Property");
+		if (pProperty.length() == 0) {
+			throw new IllegalArgumentException("The property name must not be empty.");
+		}
+		String suffix = Character.toUpperCase(pProperty.charAt(0)) + pProperty.substring(1);
+		final String propertyNameUsingGet = "get" + suffix;
+		final String propertyNameUsingIs = "is" + suffix;
+		final String propertyNameUsingHas = "has" + suffix;
+		final Set<String> classIds = new HashSet<>();
+		final Matcher<Method> matcher = new Matcher<Method>(){
+			@Override
+			public boolean isMatching(Method pMethod) {
+				final String methodName = pMethod.getName();
+				final Class<?> type = pMethod.getReturnType();
+				if (propertyNameUsingGet.equals(methodName)
+					  ||  ((propertyNameUsingIs.equals(methodName)  ||  propertyNameUsingHas.equals(methodName))  &&
+						   (type == Boolean.class  ||  type == Boolean.TYPE))) {
+					final Class<?>[] parameterTypes = pMethod.getParameterTypes();
+					if (parameterTypes == null  ||  parameterTypes.length == 0) {
+						final int modifiers = pMethod.getModifiers();
+						if (Modifier.isPublic(modifiers)
+								&&  !Modifier.isAbstract(modifiers)
+								&&  !Modifier.isStatic(modifiers)) {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+		};
+		return findMethodMatching(classIds, matcher, pClass);
+	}
+
+	private static Method findMethodMatching(Set<String> pClassIds, Matcher<Method> pMatcher, Class<?> pClass) {
+		if (pClass == null  ||  pClass == Object.class) {
+			return null;
+		}
+		final String id = pClassIds.getClass().getName();
+		if (pClassIds.contains(id)) {
+			return null;
+		}
+		pClassIds.add(id);
+		final Method[] methods = pClass.getDeclaredMethods();
+		for (Method m : methods) {
+			if (pMatcher.isMatching(m)) {
+				return m;
+			}
+		}
+		return findMethodMatching(pClassIds, pMatcher, pClass.getSuperclass());
 	}
 }
