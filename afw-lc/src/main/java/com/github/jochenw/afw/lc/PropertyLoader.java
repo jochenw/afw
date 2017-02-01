@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import com.github.jochenw.afw.core.ResourceLocator;
 import com.github.jochenw.afw.core.util.Exceptions;
 
+
 public class PropertyLoader {
 	@Inject private ResourceLocator resourceLocator;
 

@@ -13,7 +13,6 @@ import javax.inject.Named;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.MigrationVersion;
 
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.util.Exceptions;

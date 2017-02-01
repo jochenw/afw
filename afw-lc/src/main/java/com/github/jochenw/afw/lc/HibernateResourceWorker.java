@@ -8,7 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.github.jochenw.afw.core.SimpleResourceWorker;
-import com.github.jochenw.afw.lc.JdbcResourceWorker.JdbcResourceTracker;
+
 
 public class HibernateResourceWorker extends SimpleResourceWorker {
 	public abstract static class HibernateResRunnable extends ResRunnable {
