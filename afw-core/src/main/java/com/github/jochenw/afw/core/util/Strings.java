@@ -141,4 +141,12 @@ public class Strings {
 			throw Exceptions.show(t);
 		}
 	}
+
+	public static boolean isEmpty(String pCode) {
+		return pCode == null  ||  pCode.length() == 0;
+	}
+
+	public static boolean isTrimmedEmpty(String pCode) {
+		return pCode == null  ||  pCode.trim().length() == 0;
+	}
 }

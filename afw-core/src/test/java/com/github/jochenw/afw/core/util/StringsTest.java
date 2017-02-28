@@ -25,4 +25,16 @@ public class StringsTest {
         assertEquals("(a, -1, false)", Strings.toString(Collections.unmodifiableCollection(Arrays.asList(array))));
         assertEquals("{a => 2, b => [a, -1, false], c => true}", Strings.toString(map));
     }
+
+    @Test
+    public void testIsEmpty() {
+        assertTrue(Strings.isEmpty(null));
+        assertTrue(Strings.isTrimmedEmpty(null));
+        assertTrue(Strings.isEmpty(""));
+        assertTrue(Strings.isTrimmedEmpty(""));
+        assertFalse(Strings.isEmpty(" \t"));
+        assertTrue(Strings.isTrimmedEmpty(" \t"));
+        assertFalse(Strings.isEmpty(" 0\t"));
+        assertFalse(Strings.isTrimmedEmpty(" 0\t"));
+    }
 }
