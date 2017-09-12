@@ -13,6 +13,7 @@ public interface ITable {
 	}
 
 	Name getName();
+	String getQName();
 	ISchema getSchema();
 	public List<IColumn> getColumns();
 	public IColumn getColumn(IColumn.Name pName);

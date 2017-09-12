@@ -149,4 +149,20 @@ public class Strings {
 	public static boolean isTrimmedEmpty(String pCode) {
 		return pCode == null  ||  pCode.trim().length() == 0;
 	}
+
+	public static void requireNonEmpty(String pValue, String pName) {
+		if (pValue == null) {
+			throw new NullPointerException("String value must not be null: " + pName);
+		}
+		if (pValue.length() == 0) {
+			throw new NullPointerException("String value must not be empty: " + pName);
+		}
+	}
+
+	public static void requireTrimmedNonEmpty(String pValue, String pName) {
+		requireNonEmpty(pValue, pName);
+		if (pValue.trim().length() == 0) {
+			throw new NullPointerException("String value must not be empty (after trimming): " + pName);
+		}
+	}
 }

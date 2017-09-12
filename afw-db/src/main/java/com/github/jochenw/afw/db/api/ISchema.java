@@ -18,4 +18,5 @@ public interface ISchema {
 	public ITable getTable(String pName);
 	public ITable requireTable(ITable.Name pName) throws NoSuchElementException;
 	public ITable requireTable(String pName) throws NoSuchElementException;
+	int compareNames(Object pName1, Object pName2);
 }

@@ -60,14 +60,38 @@ public class Reflection {
         return null;
     }
 
+    public static boolean isPublicGetter(Method pMethod) {
+    	if (!isGetter(pMethod)) {
+    		return false;
+    	}
+    	if (!Modifier.isPublic(pMethod.getModifiers())) {
+    		return false;
+    	}
+		return true;
+	}
+
+    public static boolean isGetter(Method pMethod) {
+    	final int modifiers = pMethod.getModifiers();
+		if (Modifier.isAbstract(modifiers)) {
+    		return false;
+    	}
+		if (Modifier.isStatic(modifiers)) {
+			return false;
+		}
+		if (pMethod.getParameterCount() != 0) {
+			return false;
+		}
+		final Class<?> type = pMethod.getReturnType();
+		return type != Void.TYPE;
+	}
+    
     public static Map<String, Method> getGetters(Class<?> pClass) {
         final Map<String,Method> map = new HashMap<String,Method>();
         findGetters(map, pClass);
         return map;
     }
 
-    private static void findGetters(Map<String,Method> pMap,
-                                                  Class<?> pClass) {
+    private static void findGetters(Map<String,Method> pMap, Class<?> pClass) {
         final Class<?> superClass = pClass.getSuperclass();
         if (superClass != null  &&  superClass != Object.class) {
             findGetters(pMap, superClass);

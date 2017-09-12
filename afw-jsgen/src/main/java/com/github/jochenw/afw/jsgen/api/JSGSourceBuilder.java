@@ -1,6 +1,10 @@
 package com.github.jochenw.afw.jsgen.api;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.github.jochenw.afw.core.util.AbstractBuilder;
 
@@ -10,6 +14,7 @@ public class JSGSourceBuilder extends AbstractBuilder implements IJSGSource {
 	private boolean isStatic, isAbstract, isFinal;
 	private Protection protection = Protection.PACKAGE_PROTECTED;
 	private final DefaultAnnotatable annotatable = new DefaultAnnotatable();
+	private final List<Object> members = new ArrayList<>();
 
 	public JSGSourceBuilder(JSGSourceFactory pFactory, JSGQName pName) {
 		name = pName;
@@ -118,5 +123,25 @@ public class JSGSourceBuilder extends AbstractBuilder implements IJSGSource {
 		assertMutable();
 		protection = pProtection;
 		return this;
+	}
+
+	@Override
+	public List<Object> getMembers() {
+		return members;
+	}
+
+	@Override
+	public List<IJSGMethod> getMethods() {
+		final Function<Object,JSGMethod> f = new Function<Object,JSGMethod>(){
+			@Override
+			public JSGMethod apply(Object t) {
+				if (t instanceof JSGMethod) {
+					return (JSGMethod) t;
+				} else {
+					return null;
+				}
+			}
+		};
+		return members.stream().map(f).filter(o -> o != null).collect(Collectors.toList());
 	}
 }
