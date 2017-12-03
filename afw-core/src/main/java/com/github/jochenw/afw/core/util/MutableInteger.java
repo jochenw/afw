@@ -9,8 +9,9 @@ package com.github.jochenw.afw.core.util;
  *
  * @author jwi
  */
-public class MutableInteger {
-    private int value;
+public class MutableInteger extends Number implements Comparable<MutableInteger> {
+	private static final long serialVersionUID = 5486916587259114022L;
+	private int value;
 
     public int getValue() {
         return value;
@@ -18,4 +19,29 @@ public class MutableInteger {
     public void setValue(int pValue) {
         value = pValue;
     }
+
+    @Override
+	public int compareTo(MutableInteger pOthetMutableInteger) {
+    	return Integer.compare(value, pOthetMutableInteger.getValue());
+	}
+
+    @Override
+	public int intValue() {
+    	return value;
+	}
+
+    @Override
+	public long longValue() {
+		return (long) value;
+	}
+
+    @Override
+	public float floatValue() {
+    	return (float) value;
+	}
+
+    @Override
+	public double doubleValue() {
+    	return (double) value;
+	}
 }

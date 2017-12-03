@@ -5,17 +5,26 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.io.Serializable;
+
 /**
  *
  * @author jwi
  */
-public class MutableBoolean {
-    private boolean value;
+public class MutableBoolean implements Serializable, Comparable<MutableBoolean> {
+	private static final long serialVersionUID = 3402519841525500747L;
+	private boolean value;
 
     public boolean getValue() {
         return value;
     }
+
     public void setValue(boolean pValue) {
         value = pValue;
     }
+
+    @Override
+	public int compareTo(MutableBoolean pOtherMutableBoolean) {
+		return Boolean.compare(value, pOtherMutableBoolean.getValue());
+	}
 }

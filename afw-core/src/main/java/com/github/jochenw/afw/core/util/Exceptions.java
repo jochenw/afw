@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Objects;
 
 /**
  * Utility class for working with Exceptions. Provides static utility methods.
@@ -113,5 +114,28 @@ public class Exceptions {
     	} catch (Throwable t) {
     		throw show(t);
     	}
+    }
+
+    /** Invokes the given {@link Runnable}. If an exception is thrown, the exception is catched, and converted into a
+     * {@link RuntimeException}.
+     */
+    public static void run(Runnable pRunnable) {
+    	try {
+    		pRunnable.run();
+    	} catch (Throwable t) {
+    		throw show(t);
+    	}
+    }
+
+    public static Throwable close(AutoCloseable pCloseable, Throwable pTh) {
+    	Objects.requireNonNull(pCloseable, "Closeable");
+    	try {
+    		pCloseable.close();
+    	} catch (Throwable t) {
+    		if (pTh == null) {
+    			return t;
+    		}
+    	}
+    	return pTh;
     }
 }
