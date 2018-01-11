@@ -8,6 +8,8 @@ import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.components.LifecycleController;
+
 import org.junit.Assert;
 
 public class LifecycleControllerTest {

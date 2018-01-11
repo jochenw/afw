@@ -12,7 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 public class Strings {
-    public static byte[] getBytes(String pContents) {
+	public static String notNull(String pValue) {
+		return notNull(pValue, "");
+	}
+	public static String notNull(String pValue, String pDefault) {
+		return Objects.notNull(pValue, pDefault);
+	}
+	public static String requireNonNull(String pValue, String pMessage) {
+		return Objects.requireNonNull(pValue, pMessage);
+	}
+
+	public static byte[] getBytes(String pContents) {
         return getBytes(pContents, "UTF-8");
     }
 

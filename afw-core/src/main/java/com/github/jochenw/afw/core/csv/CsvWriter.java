@@ -109,6 +109,7 @@ public class CsvWriter implements AutoCloseable {
 			if (v == null) {
 				v = "";
 			}
+			row[i] = v;
 		}
 		try {
 			write(row);

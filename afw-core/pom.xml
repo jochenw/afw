@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.jochenw.afw</groupId>
   <artifactId>afw-core</artifactId>
-  <version>0.1</version>
+  <version>0.1.1-SNAPSHOT</version>
   <name>AFW (Core)</name>
   <description>Application Franework (Core)</description>
   <properties>
@@ -138,6 +138,11 @@
   		<artifactId>servlet-api</artifactId>
   		<version>2.5</version>
   		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>javax.inject</groupId>
+  		<artifactId>javax.inject</artifactId>
+  		<version>1</version>
   	</dependency>
   </dependencies>
 </project>

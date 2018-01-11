@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.lc;
+package com.github.jochenw.afw.core.components;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

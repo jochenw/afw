@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.lc;
+package com.github.jochenw.afw.core.components;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -7,23 +7,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Provider;
+
 import com.github.jochenw.afw.core.DefaultResourceLoader;
 import com.github.jochenw.afw.core.ResourceLocator;
-import com.github.jochenw.afw.core.components.LifecycleController;
 import com.github.jochenw.afw.core.log.ILogFactory;
+import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
 import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
 import com.github.jochenw.afw.core.props.IPropertyFactory;
+import com.github.jochenw.afw.core.props.PropertyLoader;
 import com.github.jochenw.afw.core.util.AbstractBuilder;
-import com.github.jochenw.afw.lc.impl.DbInitializer;
-import com.github.jochenw.afw.lc.impl.DefaultConnectionProvider;
 
 public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	public abstract static class Binder {
-		public abstract <T> void bind(Class<T> pType);
+		public abstract <T> void bindClass(Class<T> pType);
 		public abstract <T> void bind(Class<T> pType, String pName, T pInstance);
 		public abstract <T> void bind(Class<T> pType, T pInstance);
-		public abstract <T> void bind(Class<T> pType, String pName, Class<? extends T> pImplClass);
-		public abstract <T> void bind(Class<T> pType, Class<? extends T> pImplClass);
+		public abstract <T> void bindProvider(Class<T> pType, String pName, Provider<T> pProvider);
+		public abstract <T> void bindProvider(Class<T> pType, String pName, Provider<T> pProvider, boolean pSingleton);
+		public abstract <T> void bindClass(Class<T> pType, String pName, Class<? extends T> pImplClass);
+		public abstract <T> void bindClass(Class<T> pType, String pName, Class<? extends T> pImplClass, boolean pSingleton);
+		public abstract <T> void bindClass(Class<T> pType, Class<? extends T> pImplClass);
+		public abstract <T> void bindClass(Class<T> pType, Class<? extends T> pImplClass, boolean pSingleton);
 		public void bindConstant(String pName, String pValue) {
 			bind(String.class, pName, pValue);
 		}
@@ -44,12 +49,12 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	public interface Module {
 		void configure(Binder pBinder);
 	}
-	private String instanceName, applicationName;
-	private boolean useHibernate, useFlyway;
+
+	private String instanceName, applicationName, resourcePrefix;
 	private ILogFactory logFactory;
 	private IPropertyFactory propertyFactory;
 	private ResourceLocator resourceLocator;
-	private PropertyLoader propertyLoader;
+	private com.github.jochenw.afw.core.props.PropertyLoader propertyLoader;
 	private List<Module> modules = new ArrayList<>();
 	private ComponentFactory componentFactory;
 	private Properties factoryProperties, instanceProperties, defaultProperties;
@@ -73,6 +78,12 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		return this;
 	}
 
+	public ComponentFactoryBuilder resourcePrefix(String pResourcePrefix) {
+		assertMutable();
+		resourcePrefix = pResourcePrefix;
+		return this;
+	}
+	
 	public ComponentFactoryBuilder instanceProperties(Properties pProperties) {
 		assertMutable();
 		instanceProperties = pProperties;
@@ -123,26 +134,6 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 		return this;
 	}
 	
-	public ComponentFactoryBuilder usingHibernate() {
-		return usingHibernate(true);
-	}
-
-	public ComponentFactoryBuilder usingHibernate(boolean pUsingHibernate) {
-		assertMutable();
-		useHibernate = pUsingHibernate;
-		return this;
-	}
-	
-	public ComponentFactoryBuilder usingFlyway() {
-		return usingFlyway(true);
-	}
-
-	public ComponentFactoryBuilder usingFlyway(boolean pUsingFlyway) {
-		assertMutable();
-		useFlyway = pUsingFlyway;
-		return this;
-	}
-	
 	public String getApplicationName() {
 		return applicationName;
 	}
@@ -150,7 +141,11 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	public String getInstanceName() {
 		return instanceName;
 	}
-	
+
+	public String getResourcePrefix() {
+		return resourcePrefix;
+	}
+
 	protected void validate() {
 		if (getApplicationName() == null) {
 			throw new IllegalStateException("The application name must be set.");
@@ -160,9 +155,6 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 			throw new IllegalStateException("Unable to create a resource locator.");
 		}
 		final ILogFactory lf = getLogFactory();
-		if (lf == null) {
-			throw new IllegalStateException("No ILogFactory has been configured.");
-		}
 		lf.setResourceLocator(resLocator);
 		lf.start();
 		if (getPropertyLoader() == null) {
@@ -194,7 +186,7 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	}
 
 	protected ResourceLocator newResourceLocator() {
-		return new DefaultResourceLoader(getApplicationName(), getInstanceName());
+		return new DefaultResourceLoader(getApplicationName(), getInstanceName(), getResourcePrefix());
 	}
 
 	public List<Module> getModules() {
@@ -216,6 +208,9 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	}
 
 	public ILogFactory getLogFactory() {
+		if (logFactory == null) {
+			logFactory = new SimpleLogFactory();
+		}
 		return logFactory;
 	}
 
@@ -235,14 +230,6 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 
 	public StartableObjectProvider getStartableObjectProvider() {
 		return startableObjectProvider;
-	}
-
-	public boolean isUsingFlyway() {
-		return useFlyway;
-	}
-
-	public boolean isUsingHibernate() {
-		return useHibernate;
 	}
 	
 	protected PropertyLoader newPropertyLoader() {
@@ -271,15 +258,6 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 
 	protected List<Object> getStartableObjects(ComponentFactory pComponentFactory) {
 		final List<Object> startableObjects = new ArrayList<>();
-		if (isUsingHibernate()  ||  isUsingFlyway()) {
-			startableObjects.add(pComponentFactory.requireInstance(IConnectionProvider.class));
-		}
-		if (isUsingHibernate()) {
-			startableObjects.add(pComponentFactory.requireInstance(ISessionProvider.class));
-		}
-		if (isUsingFlyway()) {
-			startableObjects.add(pComponentFactory.requireInstance(DbInitializer.class));
-		}
 		if (startableObjectProvider != null) {
 			startableObjectProvider.addStartableObjects(pComponentFactory, startableObjects);
 		}
@@ -293,7 +271,7 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 				pBinder.bind(ComponentFactory.class, pComponentFactory);
 				pBinder.bind(ILogFactory.class, getLogFactory());
 				pBinder.bind(IPropertyFactory.class, getPropertyFactory());
-				pBinder.bind(LifecycleController.class);
+				pBinder.bindClass(LifecycleController.class);
 				pBinder.bindConstant("applicationName", getApplicationName());
 				pBinder.bindConstant("instanceName", getInstanceName());
 				pBinder.bind(ResourceLocator.class, getResourceLocator());
@@ -303,15 +281,6 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 				Properties props = getDefaultProperties();
 				pBinder.bind(Properties.class, "default", props);
 				pBinder.bind(Properties.class, props);
-				if (isUsingHibernate()  ||  isUsingFlyway()) {
-					pBinder.bind(IConnectionProvider.class, DefaultConnectionProvider.class);
-				}
-				if (isUsingHibernate()) {
-					pBinder.bind(ISessionProvider.class, DefaultSessionProvider.class);
-				}
-				if (isUsingFlyway()) {
-					pBinder.bind(DbInitializer.class);
-				}
 				for (Map.Entry<Object, Object> en : props.entrySet()) {
 					final String key = en.getKey().toString();
 					final Object v = en.getValue();
@@ -328,9 +297,22 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 
 	protected IPropertyFactory newPropertyFactory() {
 		final String factoryPropertiesUri = getFactoryPropertiesUri();
-		final URL factoryPropertiesUrl = getResourceLocator().requireResource(factoryPropertiesUri);
+		URL factoryPropertiesUrl;
+		factoryPropertiesUrl = getResourceLocator().getResource(factoryPropertiesUri);
+		if (factoryPropertiesUrl == null  &&  !factoryPropertiesUri.endsWith(".xml")) {
+			factoryPropertiesUrl = getResourceLocator().getResource(factoryPropertiesUri + ".xml");
+			if (factoryPropertiesUrl == null) {
+				throw new IllegalStateException("Unable to locate property file: " + factoryPropertiesUri);
+			}
+		}
 		final String instancePropertiesUri = getInstancePropertiesUri();
-		final URL instancePropertiesUrl = getResourceLocator().requireResource(instancePropertiesUri);
+		URL instancePropertiesUrl= getResourceLocator().getResource(instancePropertiesUri);
+		if (instancePropertiesUrl == null  &&  !instancePropertiesUri.endsWith(".xml")) {
+			instancePropertiesUrl = getResourceLocator().getResource(instancePropertiesUri + ".xml");
+			if (instancePropertiesUrl == null) {
+				throw new IllegalStateException("Unable to locate property file: " + instancePropertiesUri);
+			}
+		}
 		return new DefaultPropertyFactory(instancePropertiesUrl, factoryPropertiesUrl);
 	}
 	
