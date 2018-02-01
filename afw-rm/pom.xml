@@ -45,5 +45,11 @@
   		<artifactId>javax.inject</artifactId>
   		<version>1</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.hsqldb</groupId>
+  		<artifactId>hsqldb</artifactId>
+  		<version>2.4.0</version>
+  		<scope>test</scope>
+  	</dependency>
   </dependencies>
 </project>

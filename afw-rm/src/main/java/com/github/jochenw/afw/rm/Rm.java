@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
+import com.github.jochenw.afw.rm.api.AbstractInitializable;
 import com.github.jochenw.afw.rm.api.ComponentFactory;
 import com.github.jochenw.afw.rm.api.ComponentFactory.Initializable;
 import com.github.jochenw.afw.rm.api.InstalledResourceRegistry;
@@ -22,7 +22,7 @@ import com.github.jochenw.afw.rm.api.RmResourceRefGuesser;
 import com.github.jochenw.afw.rm.api.RmResourceRefGuesser.RmResourceInfoRequest;
 import com.github.jochenw.afw.rm.api.RmResourceRefRepository;
 
-public class Rm implements Initializable {
+public class Rm extends AbstractInitializable {
 	public static class DetectedResourceInfo implements ResourceInstallationRequest {
 		private final RmResourceRefRepository repository;
 		private final RmResourceRef resourceRef;
@@ -54,6 +54,7 @@ public class Rm implements Initializable {
 			return resourceInfo;
 		}
 
+		@Override
 		public RmResourceRef getResourceRef() {
 			return resourceRef;
 		}
@@ -62,9 +63,8 @@ public class Rm implements Initializable {
 	private List<RmResourceRefRepository> resourceRepositories;
 	private List<RmResourceRefGuesser> resourceRefGuessers;
 	private InstalledResourceRegistry installedResourceRegistry;
-	private Map<String,RmResourcePlugin> resourcePlugins;
+	private List<RmResourcePlugin> resourcePlugins;
 	private RmLogger logger;
-	private ComponentFactory componentFactory;
 
 	public static RmBuilder builder() {
 		return new RmBuilder();
@@ -72,18 +72,19 @@ public class Rm implements Initializable {
 
 	@Override
 	public void init(ComponentFactory pComponentFactory) {
-		componentFactory = pComponentFactory;
-		@SuppressWarnings("unchecked")
-		final List<RmResourceRefRepository> repoList = componentFactory.requireInstance(List.class, RmResourceRefRepository.class.getName());
+		super.init(pComponentFactory);
+		final ComponentFactory componentFactory = pComponentFactory;
+		final List<RmResourceRefRepository> repoList = componentFactory.requireList(RmResourceRefRepository.class);
 		resourceRepositories = repoList;
-		@SuppressWarnings("unchecked")
-		List<RmResourceRefGuesser> guesserList = componentFactory.requireInstance(List.class, RmResourceRefGuesser.class.getName());
+		List<RmResourceRefGuesser> guesserList = componentFactory.requireList(RmResourceRefGuesser.class);
 		resourceRefGuessers = guesserList;
 		installedResourceRegistry = componentFactory.requireInstance(InstalledResourceRegistry.class);
 		logger = componentFactory.requireInstance(RmLogger.class);
+		List<RmResourcePlugin> pluginList = componentFactory.requireList(RmResourcePlugin.class);
+		resourcePlugins = pluginList;
 	}
 	
-	public Map<String,RmResourcePlugin> getResourcePlugins() {
+	public List<RmResourcePlugin> getResourcePlugins() {
 		return resourcePlugins;
 	}
 	
@@ -138,7 +139,13 @@ public class Rm implements Initializable {
 		};
 		for (DetectedResourceInfo dri : pResources) {
 			final String type = dri.getResource().getType();
-			final RmResourcePlugin plugin = resourcePlugins.get(type);
+			RmResourcePlugin plugin = null;
+			for (RmResourcePlugin pl : resourcePlugins) {
+				if (pl.isInstallable(dri)) {
+					plugin = pl;
+					break;
+				}
+			}
 			if (plugin == null) {
 				throw new IllegalStateException("No RmResourcePlugin registered for type=" + type);
 			}

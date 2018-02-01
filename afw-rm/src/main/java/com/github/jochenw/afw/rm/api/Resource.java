@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.TYPE)
 public @interface Resource {
-	String type() default "";
+	String type() default "class";
 	String description() default "";
 	String title() default "";
 	String version() default "";

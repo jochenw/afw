@@ -10,6 +10,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -75,6 +76,8 @@ public class XmlFileResourceRegistry extends AbstractInstalledResourceRegistry {
 			}
 			lock.close();
 			return list;
+		} catch (NoSuchFileException e) {
+			return Collections.emptyList();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} catch (SAXException|ParserConfigurationException e) {

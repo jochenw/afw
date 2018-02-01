@@ -68,6 +68,11 @@ public class AnnotationScanningResourceRefGuesser implements RmResourceRefGuesse
 						}
 						
 						@Override
+						public String getLocation() {
+							return pRequest.getResourceRef().getLocation();
+						}
+						
+						@Override
 						public String getType() {
 							return type;
 						}

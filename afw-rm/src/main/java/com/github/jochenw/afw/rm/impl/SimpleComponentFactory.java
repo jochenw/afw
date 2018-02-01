@@ -134,4 +134,11 @@ public class SimpleComponentFactory extends ComponentFactory {
 		wrapper.providing = true;
 		bindings.put(key, wrapper);
 	}
+
+	@Override
+	public void init(Object pObject) {
+		if (pObject != null  &&  pObject instanceof Initializable) {
+			((Initializable) pObject).init(this);
+		}
+	}
 }

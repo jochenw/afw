@@ -7,17 +7,19 @@ import com.github.jochenw.afw.rm.api.RmResourceRef;
 
 public class ClassPathResourceRef implements RmResourceRef {
 	private final File zipFile;
+	private final File file;
 	private final String uri;
-	private final ClassInfo classInfo;
-
-	public ClassPathResourceRef(File pZipFile, String pUri, ClassInfo pClassInfo) {
-		zipFile = pZipFile;
-		uri = pUri;
-		classInfo = pClassInfo;
-	}
 
 	public ClassPathResourceRef(File pZipFile, String pUri) {
-		this(pZipFile, pUri, null);
+		zipFile = pZipFile;
+		file = null;
+		uri = pUri;
+	}
+
+	public ClassPathResourceRef(String pUri, File pFile) {
+		zipFile = null;
+		file = pFile;
+		uri = pUri;
 	}
 
 	@Override
@@ -27,14 +29,18 @@ public class ClassPathResourceRef implements RmResourceRef {
 
 	@Override
 	public String getLocation() {
-		return "zip:file:/" + zipFile.getPath() + "!" + uri;
+		if (zipFile == null) {
+			return file.getPath();
+		} else {
+			return "zip:file:/" + zipFile.getPath() + "!" + uri;
+		}
 	}
 
 	public File getZipFile() {
 		return zipFile;
 	}
 
-	public ClassInfo getClassInfo() {
-		return classInfo;
+	public File getFile() {
+		return file;
 	}
 }

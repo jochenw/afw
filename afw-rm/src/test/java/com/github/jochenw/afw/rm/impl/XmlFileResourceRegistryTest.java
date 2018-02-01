@@ -86,6 +86,11 @@ public class XmlFileResourceRegistryTest {
 			}
 			
 			@Override
+			public String getLocation() {
+				throw new IllegalStateException("Not implemented");
+			}
+			
+			@Override
 			public String getType() {
 				return pType;
 			}

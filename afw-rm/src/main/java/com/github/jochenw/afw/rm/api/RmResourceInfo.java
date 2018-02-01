@@ -4,6 +4,7 @@ public interface RmResourceInfo {
 	String getTitle();
 	String getType();
 	String getDescription();
-	RmVersion getVersion();
 	String getUri();
+	String getLocation();
+	RmVersion getVersion();
 }

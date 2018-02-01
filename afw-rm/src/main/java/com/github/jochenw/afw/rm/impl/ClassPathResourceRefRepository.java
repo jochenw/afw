@@ -31,6 +31,10 @@ public class ClassPathResourceRefRepository implements RmResourceRefRepository {
 	public InputStream open(RmResourceRef pResource) throws IOException {
 		final ClassPathResourceRef cprr = (ClassPathResourceRef) pResource;
 		final File zipFile = cprr.getZipFile();
+		if (zipFile == null) {
+			final File file = cprr.getFile();
+			return new FileInputStream(file);
+		}
 		final String uri = cprr.getUri();
 		@SuppressWarnings("resource")
 		final ZipFile zFile = new ZipFile(zipFile);
@@ -66,6 +70,8 @@ public class ClassPathResourceRefRepository implements RmResourceRefRepository {
 			if (classPathDir == null  ||  !classPathDir.isDirectory()) {
 				throw new IllegalStateException("Unable to locate parent directory for directory: " + metaInfDir);
 			}
+			final StringBuilder sb = new StringBuilder();
+			findResourcesInDir(pLogger, pList, classPathDir, sb);
 		} else if ("zip".equals(protocol)  ||  "jar".equals(protocol)) {
 			final String url = pUrl.toExternalForm();
 			String prefix = protocol + ":file:/";
@@ -101,6 +107,27 @@ public class ClassPathResourceRefRepository implements RmResourceRefRepository {
 			}
 		} else {
 			throw new IllegalStateException("Invalid protocol: " + protocol);
+		}
+	}
+
+	protected void findResourcesInDir(RmLogger pLogger, List<RmResourceRef> pList, File pDir, StringBuilder pPath) {
+		final File[] files = pDir.listFiles();
+		final int len = pPath.length();
+		for (File f : files) {
+			if (len > 0) {
+				pPath.append('/');
+			}
+			pPath.append(f.getName());
+			if (f.isDirectory()) {
+				findResourcesInDir(pLogger, pList, f, pPath);
+			} else if (f.isFile()) {
+				final String name = pPath.toString();
+				if (resourcePrefix == null  ||  name.startsWith(resourcePrefix)) {
+					final ClassPathResourceRef cprr = new ClassPathResourceRef(name, f);
+					pList.add(cprr);
+				}
+			}
+			pPath.setLength(len);
 		}
 	}
 	
