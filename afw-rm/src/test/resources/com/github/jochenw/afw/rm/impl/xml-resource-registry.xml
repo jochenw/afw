@@ -1,6 +1,0 @@
-<xml-resource-registry xmlns="http://namespaces.github.com/jochenw/afw/rm/XmlFileResourceRegistry/1.0.0">
-  <resource version="0.0.2" type="sql" tenant="FooApp" title="Some Resource" description="Description of some resource"/>
-  <resource version="0.0.1" type="sql" tenant="FooApp" title="Other Resource" description="Description of some other resource"/>
-  <resource version="0.0.3" type="unknown" title="Unknown Resource" description="Unknown resource description"/>
-  <resource version="0.0.1" type="sql" tenant="OtherApp" title="Another Resource" description="Description of another resource"/>
-</xml-resource-registry>
