@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.rcm.impl;
+package com.github.jochenw.afw.rcm.plugins;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

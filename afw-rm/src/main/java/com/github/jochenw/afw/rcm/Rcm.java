@@ -193,7 +193,8 @@ public class Rcm extends AbstractInitializable {
 				}
 				dri.setContext(ctx);
 			}
-			getLogger().debug("Installing type=" + dri.resourceInfo.getType() + ", version=" + dri.resourceInfo.getVersion() + ", uri=" + dri.resourceInfo.getUri());
+			getLogger().debug("Installing type=" + dri.resourceInfo.getType()
+			                  + ", version=" + dri.resourceInfo.getVersion().getVersionString() + ", uri=" + dri.resourceInfo.getUri());
 			plugin.install(dri);
 		}
 	}

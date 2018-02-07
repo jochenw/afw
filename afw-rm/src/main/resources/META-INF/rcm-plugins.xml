@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rcm-plugins xmlns="http://namespaces.github.com/jochenw/afw/rcm/RcmPlugins/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://namespaces.github.com/jochenw/afw/rcm/RcmPlugins/1.0.0 ../../xsd/rcm-plugins-schema.xsd ">
+    <rcm-plugin implClass="com.github.jochenw.afw.rcm.plugins.JdbcResourcePlugin"/>
+    <rcm-plugin implClass="com.github.jochenw.afw.rcm.plugins.ClassExecutionPlugin"/>
+    <rcm-plugin implClass="com.github.jochenw.afw.rcm.plugins.JdbcTargetLifecyclePlugin"/>
+    <rcm-plugin implClass="com.github.jochenw.afw.rcm.plugins.AnnotationScanningResourceRefGuesser"/>
+</rcm-plugins>

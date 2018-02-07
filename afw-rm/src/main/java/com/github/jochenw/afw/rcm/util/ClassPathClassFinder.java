@@ -8,17 +8,15 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import com.github.jochenw.afw.rcm.impl.ClassPathResourceRef;
 import com.github.jochenw.afw.rcm.util.AsmClassInfoScanner.Annotation;
+
 
 public class ClassPathClassFinder<T> {
 	public static class ClassInfo {
@@ -106,18 +104,26 @@ public class ClassPathClassFinder<T> {
 	private OtherResourceListener otherResourceListener;
 
 	public List<T> findClasses(ClassLoader pCl) {
-		final List<T> classes = new ArrayList<>();
-		Enumeration<URL> en;
-		try {
-			en = pCl.getResources("META-INF/MANIFEST.MF");
-			while (en.hasMoreElements()) {
-				final URL url = en.nextElement();
-				findClasses(classes, url);
+		final List<T> list = new ArrayList<>();
+		final ClassPathElementIterator cpei = new ClassPathElementIterator() {
+
+			@Override
+			protected void iterateDirectory(File pDirectory, String pUri, URL pUrl) {
+				try {
+					findClassesInDirectory(pDirectory, list);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			}
-		} catch (Throwable t) {
-			throw Exceptions.show(t);
-		}
-		return classes;
+
+			@Override
+			protected void iterateZipFile(File pZipFile, String pUri, URL pLocation) {
+				findClassesInZipFile(list, pZipFile);
+			}
+
+		};
+		cpei.iterate(pCl, "META-INF/MANIFEST.MF", 2);
+		return list;
 	}
 
 	public Predicate<String> getUriFilter() {
@@ -135,71 +141,6 @@ public class ClassPathClassFinder<T> {
 	public void setClassFilter(Function<ClassInfo,T> pClassFilter) {
 		this.classFilter = pClassFilter;
 	}
-	
-	private void findClasses(List<T> pList, URL pUrl) throws IOException {
-		String protocol = pUrl.getProtocol();
-		if ("file".equals(protocol)) {
-			final File manifestFile = new File(pUrl.getFile());
-			final File metaInfDir = manifestFile.getParentFile();
-			if (metaInfDir == null  || !metaInfDir.isDirectory()) {
-				throw new IllegalStateException("Unable to locate parent directory for file: " + manifestFile);
-			}
-			final File classPathDir = metaInfDir.getParentFile();
-			if (classPathDir == null  ||  !classPathDir.isDirectory()) {
-				throw new IllegalStateException("Unable to locate parent directory for directory: " + metaInfDir);
-			}
-			final StringBuilder sb = new StringBuilder();
-			findClassesInDir(pList, classPathDir, sb);
-		} else if ("zip".equals(protocol)  ||  "jar".equals(protocol)) {
-			final String url = pUrl.toExternalForm();
-			String prefix = protocol + ":file:/";
-			if (!url.startsWith(prefix)) {
-				throw new IllegalStateException("Unable to parse URL: " + pUrl);
-			}
-			final String path = url.substring(prefix.length());
-			final int offset = path.indexOf('!');
-			if (offset == -1) {
-				throw new IllegalStateException("Unable to parse file path from URL: " + pUrl);
-			}
-			final String file = path.substring(0, offset);
-			final File zipFile = new File(file);
-			if (!zipFile.isFile()) {
-				throw new IllegalStateException("File " + zipFile + " does not exist for URL: " + pUrl);
-			}
-			try (InputStream is = new FileInputStream(zipFile);
-				 BufferedInputStream bis = new BufferedInputStream(is);
-				 final ZipInputStream zis = new ZipInputStream(bis)) {
-				for (;;) {
-					ZipEntry ze = zis.getNextEntry();
-					if (ze == null) {
-						break;
-					} else if (ze.isDirectory()) {
-						continue;
-					}
-					final String name = ze.getName();
-					if (isAcceptedUri(name)) {
-						if (name.endsWith(".class")) {
-							final com.github.jochenw.afw.rcm.util.AsmClassInfoScanner.ClassInfo clInfo = classScanner.getClassInfo(zis);
-							final ClassInfo classInfo = new ClassInfo(clInfo, zipFile, name);
-							zis.closeEntry();
-							final T t = classFilter.apply(classInfo);
-							if (t != null) {
-								pList.add(t);
-							}
-						} else {
-							if (otherResourceListener != null) {
-								otherResourceListener.zipFileResource(zipFile, name, Strings.getZipEntryLocation(zipFile, name));
-							}
-						}
-					}
-				}
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		} else {
-			throw new IllegalStateException("Invalid protocol: " + protocol);
-		}
-	}
 
 	protected boolean isAcceptedUri(String pUri) {
 		return uriFilter == null  ||  uriFilter.test(pUri);
@@ -209,6 +150,43 @@ public class ClassPathClassFinder<T> {
 		return classFilter.apply(pClass);
 	}
 
+	private void findClassesInZipFile(List<T> pList, File zipFile) {
+		try (InputStream is = new FileInputStream(zipFile);
+			 BufferedInputStream bis = new BufferedInputStream(is);
+			 final ZipInputStream zis = new ZipInputStream(bis)) {
+			for (;;) {
+				ZipEntry ze = zis.getNextEntry();
+				if (ze == null) {
+					break;
+				} else if (ze.isDirectory()) {
+					continue;
+				}
+				final String name = ze.getName();
+				if (isAcceptedUri(name)) {
+					if (name.endsWith(".class")) {
+						final com.github.jochenw.afw.rcm.util.AsmClassInfoScanner.ClassInfo clInfo = classScanner.getClassInfo(zis);
+						final ClassInfo classInfo = new ClassInfo(clInfo, zipFile, name);
+						zis.closeEntry();
+						final T t = classFilter.apply(classInfo);
+						if (t != null) {
+							pList.add(t);
+						}
+					} else {
+						if (otherResourceListener != null) {
+							otherResourceListener.zipFileResource(zipFile, name, Strings.getZipEntryLocation(zipFile, name));
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+	
+	private void findClassesInDirectory(File classPathDir, List<T> pList) throws IOException {
+		final StringBuilder sb = new StringBuilder();
+		findClassesInDir(pList, classPathDir, sb);
+	}
 	
 	protected void findClassesInDir(List<T> pList, File pDir, StringBuilder pPath) throws IOException {
 		final File[] files = pDir.listFiles();

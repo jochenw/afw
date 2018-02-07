@@ -12,8 +12,8 @@ import com.github.jochenw.afw.rcm.api.RmLogger;
 import com.github.jochenw.afw.rcm.api.RmResourceInfo;
 import com.github.jochenw.afw.rcm.api.RmResourceRef;
 import com.github.jochenw.afw.rcm.api.RmResourceRefGuesser.RmResourceInfoRequest;
-import com.github.jochenw.afw.rcm.impl.AnnotationScanningResourceRefGuesser;
 import com.github.jochenw.afw.rcm.impl.SimpleRmLogger;
+import com.github.jochenw.afw.rcm.plugins.AnnotationScanningResourceRefGuesser;
 
 public class AnnotationScanningResourceRefGuesserTest {
 	private static final String SQL_SCRIPT =

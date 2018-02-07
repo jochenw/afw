@@ -4,11 +4,14 @@ import java.util.Arrays;
 
 import com.github.jochenw.afw.rcm.util.Strings;
 
+
 public class RmVersion implements Comparable<RmVersion> {
 	private final int[] versionNumbers;
+	private final String versionString;
 
-	public RmVersion(int[] pVersionNumbers) {
+	public RmVersion(String pVersionStr, int[] pVersionNumbers) {
 		versionNumbers = pVersionNumbers;
+		versionString = pVersionStr;
 	}
 	
 	@Override
@@ -41,8 +44,12 @@ public class RmVersion implements Comparable<RmVersion> {
 		return versionNumbers.length == other.versionNumbers.length  &&  compareTo(other) == 0;
 	}
 
+	public String getVersionString() {
+		return versionString;
+	}
+	
 	public static RmVersion of(String pVersionStr) {
-		return new RmVersion(Strings.parseVersionNumber(pVersionStr));
+		return new RmVersion(pVersionStr, Strings.parseVersionNumber(pVersionStr));
 	}
 
 	public int[] getNumbers() {

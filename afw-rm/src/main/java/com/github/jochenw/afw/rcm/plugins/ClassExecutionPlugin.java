@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.rcm.impl;
+package com.github.jochenw.afw.rcm.plugins;
 
 import com.github.jochenw.afw.rcm.api.AbstractInitializable;
 import com.github.jochenw.afw.rcm.api.AbstractInstallable;

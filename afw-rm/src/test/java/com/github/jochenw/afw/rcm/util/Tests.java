@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import com.github.jochenw.afw.rcm.Rcm;
+import com.github.jochenw.afw.rcm.RcmBuilder;
 import com.github.jochenw.afw.rcm.api.InstalledResourceRegistry;
 import com.github.jochenw.afw.rcm.impl.XmlFileResourceRegistry;
 
@@ -19,8 +20,12 @@ public class Tests {
 	}
 
 	public static Rcm newRcm(Class<?> pTestClass) throws IOException {
+		return newRcmBuilder(pTestClass).build();
+	}
+
+	public static RcmBuilder newRcmBuilder(Class<?> pTestClass) throws IOException {
 		final InstalledResourceRegistry irr = newResourceRegistry(pTestClass);
 		final Properties props = new Properties();
-		return Rcm.builder().properties(props).installedResourceRegistry(irr).build();
+		return Rcm.builder().properties(props).installedResourceRegistry(irr);
 	}
 }

@@ -27,13 +27,14 @@ import com.github.jochenw.afw.rcm.api.RmResourceRefRepository;
 import com.github.jochenw.afw.rcm.api.RmTargetLifecyclePlugin;
 import com.github.jochenw.afw.rcm.api.SqlExecutor;
 import com.github.jochenw.afw.rcm.api.SqlReader;
-import com.github.jochenw.afw.rcm.impl.AnnotationBasedPluginRepository;
 import com.github.jochenw.afw.rcm.impl.ClassPathResourceRefRepository;
 import com.github.jochenw.afw.rcm.impl.DefaultJdbcConnectionProvider;
 import com.github.jochenw.afw.rcm.impl.DefaultSqlReader;
 import com.github.jochenw.afw.rcm.impl.DirectoryResourceRefRepository;
 import com.github.jochenw.afw.rcm.impl.SimpleComponentFactory;
 import com.github.jochenw.afw.rcm.impl.SimpleRmLogger;
+import com.github.jochenw.afw.rcm.plugins.AnnotationBasedPluginRepository;
+import com.github.jochenw.afw.rcm.plugins.XmlBasedPluginRepository;
 
 public class RcmBuilder {
 	protected static class Binding {
@@ -101,7 +102,7 @@ public class RcmBuilder {
 
 	public RmPluginRepository getRmPluginRepository() {
 		if (pluginRepository == null) {
-			pluginRepository = componentFactory.newInstance(AnnotationBasedPluginRepository.class);
+			pluginRepository = componentFactory.requireInstance(RmPluginRepository.class);
 		}
 		return pluginRepository;
 	}
@@ -248,7 +249,7 @@ public class RcmBuilder {
 			logger = new SimpleRmLogger();
 		}
 		cf.setInstanceClass(Rcm.class, Rcm.class);
-		cf.setInstanceClass(RmPluginRepository.class, AnnotationBasedPluginRepository.class);
+		cf.setInstanceClass(RmPluginRepository.class, XmlBasedPluginRepository.class);
 		cf.setInstance(List.class, RmResourceRefRepository.class.getName(), resourceRepositories);
 		cf.setInstance(List.class, RmResourceRefGuesser.class.getName(), resourceGuessers);
 		cf.setInstance(List.class, RmResourcePlugin.class.getName(), resourcePlugins);
@@ -314,6 +315,14 @@ public class RcmBuilder {
 		@SuppressWarnings("unchecked")
 		final Class<Object> cl = (Class<Object>) pType;
 		final Binding binding = new Binding(cl, pName, (Object) pInstance, null, null);
+		bindings.add(binding);
+		return this;
+	}
+
+	public RcmBuilder bindClass(Class<?> pClass) {
+		@SuppressWarnings("unchecked")
+		final Class<Object> cl = (Class<Object>) pClass;
+		final Binding binding = new Binding(cl, null, null, cl, null);
 		bindings.add(binding);
 		return this;
 	}
