@@ -175,4 +175,50 @@ public class Strings {
 			throw new NullPointerException("String value must not be empty (after trimming): " + pName);
 		}
 	}
+
+	public static int[] parseVersionNumber(String pVersionStr) {
+		if (isTrimmedEmpty(pVersionStr)) {
+			throw new IllegalArgumentException("Missing, or empty, version string");
+		}
+		final List<Integer> numbers = new ArrayList<>();
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0;  i < pVersionStr.length();  i++) {
+			final char c = pVersionStr.charAt(i);
+			switch (c) {
+			  case '.':
+				if (sb.length() == 0) {
+					throw new IllegalArgumentException("Invalid version string: " + pVersionStr);
+				} else {
+					final Integer num = Integer.valueOf(sb.toString());
+					numbers.add(num);
+					sb.setLength(0);
+				}
+				break;
+			  case '0':
+			  case '1':
+			  case '2':
+			  case '3':
+			  case '4':
+			  case '5':
+			  case '6':
+			  case '7':
+			  case '8':
+			  case '9':
+				sb.append(c);
+				break;
+			  default:
+				  throw new IllegalStateException("Invalid character in version string: " + pVersionStr);
+			}			
+		}
+		if (sb.length() == 0) {
+			throw new IllegalArgumentException("Invalid version string, ends with '.': " + pVersionStr);
+		}
+		final Integer num = Integer.valueOf(sb.toString());
+		numbers.add(num);
+		final int[] result = new int[numbers.size()];
+		for (int i = 0;  i < result.length;  i++) {
+			result[i] = numbers.get(i).intValue();
+		}
+		return result;
+	}
 }
