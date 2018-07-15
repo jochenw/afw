@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class StringsTest {
@@ -36,5 +37,41 @@ public class StringsTest {
         assertTrue(Strings.isTrimmedEmpty(" \t"));
         assertFalse(Strings.isEmpty(" 0\t"));
         assertFalse(Strings.isTrimmedEmpty(" 0\t"));
+    }
+
+    @Test
+    public void testParseVersionNumber() {
+    	Assert.assertArrayEquals(new int[] {2,3,0}, Strings.parseVersionNumber("2.3.0"));
+    	Assert.assertArrayEquals(new int[] {2,3,0,5,7}, Strings.parseVersionNumber("2.3.0.5.7"));
+    	try {
+    		Strings.parseVersionNumber(null);
+    		Assert.fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		Assert.assertEquals("Missing, or empty, version string", e.getMessage());
+    	}
+    	try {
+    		Strings.parseVersionNumber("");
+    		Assert.fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		Assert.assertEquals("Missing, or empty, version string", e.getMessage());
+    	}
+    	try {
+    		Strings.parseVersionNumber(".2.3.0");
+    		Assert.fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		Assert.assertEquals("Invalid version string: .2.3.0", e.getMessage());
+    	}
+    	try {
+    		Strings.parseVersionNumber("2.3..0");
+    		Assert.fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		Assert.assertEquals("Invalid version string: 2.3..0", e.getMessage());
+    	}
+    	try {
+    		Strings.parseVersionNumber("2.3.0.");
+    		Assert.fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		Assert.assertEquals("Invalid version string, ends with '.': 2.3.0.", e.getMessage());
+    	}
     }
 }

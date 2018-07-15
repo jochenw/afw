@@ -39,6 +39,9 @@ public class LifecycleController {
 		private void invoke(Method pMethod) {
 			if (pMethod != null) {
 				try {
+					if (!pMethod.isAccessible()) {
+						pMethod.setAccessible(true);
+					}
 					pMethod.invoke(object);
 				} catch (Throwable t) {
 					throw Exceptions.show(t);
