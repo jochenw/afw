@@ -6,64 +6,11 @@ import com.github.jochenw.afw.lc.ComponentFactory;
 import com.github.jochenw.afw.lc.ComponentFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Scope;
 import com.google.inject.Scopes;
-import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 
 public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder {
-	private static class AfwBinder extends Binder {
-		private final com.google.inject.Binder binder;
-
-		AfwBinder(com.google.inject.Binder pBinder) {
-			binder = pBinder;
-		}
-
-		@Override
-		public <T> void bind(Class<T> pType) {
-			binder.bind(pType).in(Scopes.SINGLETON);
-		}
-		@Override
-		public <T> void bind(Class<T> pType, String pName, T pInstance) {
-			if (pInstance == null) {
-				bind(pType, pInstance);
-			} else {
-				if (pName == null) {
-					binder.bind(pType).toInstance(pInstance);
-				} else {
-					binder.bind(pType).annotatedWith(Names.named(pName)).toInstance(pInstance);
-				}
-			}
-		}
-
-		@Override
-		public <T> void bind(Class<T> pType, T pInstance) {
-			if (pInstance == null) {
-				final Provider<T> prov = new Provider<T>() {
-					@Override
-					public T get() {
-						return pInstance;
-					}
-				};
-				binder.bind(pType).toProvider(prov).in(Scopes.SINGLETON);;
-			} else {
-				binder.bind(pType).toInstance(pInstance);
-			}
-		}
-
-		@Override
-		public <T> void bind(Class<T> pType, String pName, Class<? extends T> pImplClass) {
-			if (pName == null) {
-				bind(pType, pImplClass);
-			} else {
-				binder.bind(pType).annotatedWith(Names.named(pName)).to(pImplClass).in(Scopes.SINGLETON);
-			}
-		}
-
-		@Override
-		public <T> void bind(Class<T> pType, Class<? extends T> pImplClass) {
-			binder.bind(pType).to(pImplClass).in(Scopes.SINGLETON);
-		}
-	}
 
 	@Override
 	protected ComponentFactory newComponentFactory() {
@@ -71,15 +18,63 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder {
 	}
 
 	@Override
-	protected void configure(final ComponentFactory pComponentFactory, final Module pModule) {
-		final com.google.inject.Module module = new com.google.inject.Module() {
+	protected void configure(ComponentFactory pComponentFactory, Module pModule) {
+		final com.google.inject.Module module = newModule(pModule);
+		final Injector injector = Guice.createInjector(module);
+		((GuiceComponentFactory) pComponentFactory).setInjector(injector);
+	}
+
+	private com.google.inject.Module newModule(Module pModule) {
+		return new com.google.inject.Module() {
 			@Override
-			public void configure(com.google.inject.Binder pBinder) {
-				pBinder.bindListener(Matchers.any(), new GuiceInjLogListener(getLogFactory(), getPropertyFactory()));
-				pModule.configure(new AfwBinder(pBinder));
+			public void configure(final com.google.inject.Binder pGuiceBinder) {
+				final Binder binder = new Binder() {
+					@Override
+					public <T> void bind(Class<T> pType, String pName, T pInstance) {
+						pGuiceBinder.bind(pType).annotatedWith(Names.named(pName)).toInstance(pInstance);
+					}
+
+					@Override
+					public <T> void bind(Class<T> pType, T pInstance) {
+						pGuiceBinder.bind(pType).toInstance(pInstance);
+					}
+
+					@Override
+					public <T> void bindProvider(Class<T> pType, String pName, Provider<T> pProvider,
+							boolean pSingleton) {
+						pGuiceBinder.bind(pType).annotatedWith(Names.named(pName)).toProvider(pProvider).in(asScope(pSingleton));
+					}
+
+					private Scope asScope(boolean pSingleton) {
+						if (pSingleton) {
+							return Scopes.SINGLETON;
+						} else {
+							return Scopes.NO_SCOPE;
+						}
+					}
+					
+					@Override
+					public <T> void bindProvider(Class<T> pType, Provider<T> pProvider, boolean pSingleton) {
+						pGuiceBinder.bind(pType).toProvider(pProvider).in(asScope(pSingleton));
+					}
+
+					@Override
+					public <T> void bindClass(Class<T> pType, String pName, Class<? extends T> pImplClass,
+							boolean pSingleton) {
+						pGuiceBinder.bind(pType).annotatedWith(Names.named(pName)).to(pImplClass).in(asScope(pSingleton));
+					}
+
+					@Override
+					public <T> void bindClass(Class<T> pType, Class<? extends T> pImplClass, boolean pSingleton) {
+						if (pType == pImplClass) {
+							pGuiceBinder.bind(pType).in(asScope(pSingleton));
+						} else {
+							pGuiceBinder.bind(pType).to(pImplClass).in(asScope(pSingleton));
+						}
+					}
+				};
+				pModule.configure(binder);
 			}
 		};
-		final Injector injector = Guice.createInjector(module);
-		((GuiceComponentFactory) injector.getInstance(ComponentFactory.class)).setInjector(injector);
 	}
 }

@@ -30,7 +30,7 @@ public class TableBuilder extends AbstractBuilder implements ITable, ITableBuild
 	}
 
 	@Override
-	public ITableBuilder name(ITable.Name pName) {
+	public TableBuilder name(ITable.Name pName) {
 		Objects.requireNonNull(pName, "Name");
 		final ITable tab = getSchema().getTable(pName);
 		if (tab != null  &&  tab != this) {
@@ -42,14 +42,9 @@ public class TableBuilder extends AbstractBuilder implements ITable, ITableBuild
 	}
 
 	@Override
-	public ITableBuilder name(String pName) {
+	public TableBuilder name(String pName) {
 		Strings.requireTrimmedNonEmpty(pName, "Name");
 		return name(new ITable.Name(pName));
-	}
-
-	@Override
-	public IColumnBuilder column(IColumn.Name pName, IColumn.Type pType) {
-		
 	}
 
 	public String getQName() {

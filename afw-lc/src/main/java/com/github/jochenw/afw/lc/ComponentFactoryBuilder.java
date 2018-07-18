@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Provider;
+
 import com.github.jochenw.afw.core.DefaultResourceLoader;
 import com.github.jochenw.afw.core.ResourceLocator;
 import com.github.jochenw.afw.core.components.LifecycleController;
@@ -19,11 +21,27 @@ import com.github.jochenw.afw.lc.impl.DefaultConnectionProvider;
 
 public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 	public abstract static class Binder {
-		public abstract <T> void bind(Class<T> pType);
+		public <T> void bindClass(Class<T> pType) {
+			bindClass(pType, pType);
+		}
 		public abstract <T> void bind(Class<T> pType, String pName, T pInstance);
 		public abstract <T> void bind(Class<T> pType, T pInstance);
-		public abstract <T> void bind(Class<T> pType, String pName, Class<? extends T> pImplClass);
-		public abstract <T> void bind(Class<T> pType, Class<? extends T> pImplClass);
+		public <T> void bindProvider(Class<T> pType, String pName, Provider<T> pProvider) {
+			bindProvider(pType, pName, pProvider, true);
+		}
+		public abstract <T> void bindProvider(Class<T> pType, String pName, Provider<T> pProvider, boolean pSingleton);
+		public <T> void bindProvider(Class<T> pType, Provider<T> pProvider) {
+			bindProvider(pType, pProvider, true);
+		}
+		public abstract <T> void bindProvider(Class<T> pType, Provider<T> pProvider, boolean pSingleton);
+		public <T> void bindClass(Class<T> pType, String pName, Class<? extends T> pImplClass) {
+			bindClass(pType, pName, pImplClass, false);
+		}
+		public abstract <T> void bindClass(Class<T> pType, String pName, Class<? extends T> pImplClass, boolean pSingleton);
+		public <T> void bindClass(Class<T> pType, Class<? extends T> pImplClass) {
+			bindClass(pType, pImplClass, false);
+		}
+		public abstract <T> void bindClass(Class<T> pType, Class<? extends T> pImplClass, boolean pSingleton);
 		public void bindConstant(String pName, String pValue) {
 			bind(String.class, pName, pValue);
 		}
@@ -293,7 +311,7 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 				pBinder.bind(ComponentFactory.class, pComponentFactory);
 				pBinder.bind(ILogFactory.class, getLogFactory());
 				pBinder.bind(IPropertyFactory.class, getPropertyFactory());
-				pBinder.bind(LifecycleController.class);
+				pBinder.bindClass(LifecycleController.class);
 				pBinder.bindConstant("applicationName", getApplicationName());
 				pBinder.bindConstant("instanceName", getInstanceName());
 				pBinder.bind(ResourceLocator.class, getResourceLocator());
@@ -304,13 +322,13 @@ public abstract class ComponentFactoryBuilder extends AbstractBuilder {
 				pBinder.bind(Properties.class, "default", props);
 				pBinder.bind(Properties.class, props);
 				if (isUsingHibernate()  ||  isUsingFlyway()) {
-					pBinder.bind(IConnectionProvider.class, DefaultConnectionProvider.class);
+					pBinder.bindClass(IConnectionProvider.class, DefaultConnectionProvider.class);
 				}
 				if (isUsingHibernate()) {
-					pBinder.bind(ISessionProvider.class, DefaultSessionProvider.class);
+					pBinder.bindClass(ISessionProvider.class, DefaultSessionProvider.class);
 				}
 				if (isUsingFlyway()) {
-					pBinder.bind(DbInitializer.class);
+					pBinder.bindClass(DbInitializer.class);
 				}
 				for (Map.Entry<Object, Object> en : props.entrySet()) {
 					final String key = en.getKey().toString();

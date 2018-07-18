@@ -1,5 +1,7 @@
 package com.github.jochenw.afw.core.util;
 
+import java.util.function.Consumer;
+
 public class FinalizableConsumer<T> implements Consumer<T> {
 	/** Called for success.
 	 */

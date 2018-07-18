@@ -8,8 +8,9 @@ import com.github.jochenw.afw.db.api.IColumn;
 import com.github.jochenw.afw.db.api.ITable;
 import com.github.jochenw.afw.db.api.IColumn.Name;
 import com.github.jochenw.afw.db.api.IColumn.Type;
+import com.github.jochenw.afw.db.api.Schema.IColumnBuilder;
 
-public class ColumnBuilder extends AbstractBuilder implements IColumn {
+public class ColumnBuilder extends AbstractBuilder implements IColumn, IColumnBuilder {
 	private final TableBuilder tableBuilder;
 	private IColumn.Name name;
 	private IColumn.Type type;
@@ -21,12 +22,14 @@ public class ColumnBuilder extends AbstractBuilder implements IColumn {
 		type = pType;
 	}
 
-	ColumnBuilder name(String pName) {
+	@Override
+	public ColumnBuilder name(String pName) {
 		Strings.requireNonEmpty(pName, "Name");
 		return name(new IColumn.Name(pName));
 	}
 
-	ColumnBuilder name(IColumn.Name pName) {
+	@Override
+	public ColumnBuilder name(IColumn.Name pName) {
 		Objects.requireNonNull(pName, "Name");
 		assertMutable();
 		final IColumn col= tableBuilder.getColumn(pName);
@@ -37,22 +40,26 @@ public class ColumnBuilder extends AbstractBuilder implements IColumn {
 		return this;
 	}
 
-	ColumnBuilder type(Type pType) {
+	@Override
+	public ColumnBuilder type(Type pType) {
 		Objects.requireNonNull(pType, "Type");
 		assertMutable();
 		type = pType;
 		return this;
 	}
 
-	ColumnBuilder nullable() {
+	@Override
+	public ColumnBuilder nullable() {
 		return nullable(true);
 	}
 
-	ColumnBuilder notNull() {
+	@Override
+	public ColumnBuilder notNull() {
 		return nullable(false);
 	}
 
-	ColumnBuilder nullable(boolean pNullable) {
+	@Override
+	public ColumnBuilder nullable(boolean pNullable) {
 		assertMutable();
 		nullable = pNullable;
 		return nullable(true);

@@ -11,7 +11,9 @@ import com.github.jochenw.afw.core.util.AbstractBuilder;
 import com.github.jochenw.afw.db.api.DefaultId;
 import com.github.jochenw.afw.db.api.ISchema;
 import com.github.jochenw.afw.db.api.ITable;
+import com.github.jochenw.afw.db.api.ITable.Name;
 import com.github.jochenw.afw.db.api.Schema.ISchemaBuilder;
+import com.github.jochenw.afw.db.api.Schema.ITableBuilder;
 
 
 public class SchemaBuilder extends AbstractBuilder implements ISchema, ISchemaBuilder {
@@ -28,6 +30,18 @@ public class SchemaBuilder extends AbstractBuilder implements ISchema, ISchemaBu
 	@Override
 	public Name getName() {
 		return name;
+	}
+
+	@Override
+	public ISchemaBuilder name(Name pName) {
+		assertMutable();
+		name = pName;
+		return this;
+	}
+
+	@Override
+	public ISchemaBuilder name(String pName) {
+		return name(new Name(pName));
 	}
 
 	@Override
@@ -99,5 +113,18 @@ public class SchemaBuilder extends AbstractBuilder implements ISchema, ISchemaBu
 			return ((DefaultId) pObject).getId();
 		}
 		return pObject.toString();
+	}
+
+	@Override
+	public ITableBuilder table(com.github.jochenw.afw.db.api.ITable.Name pName) {
+		assertMutable();
+		final TableBuilder tb = new TableBuilder(this, pName);
+		tables.add(tb);
+		return tb;
+	}
+
+	@Override
+	public ITableBuilder table(String pName) {
+		return table(new ITable.Name(pName));
 	}
 }

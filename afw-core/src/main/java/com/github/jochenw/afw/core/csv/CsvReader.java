@@ -7,9 +7,9 @@ import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import com.github.jochenw.afw.core.io.ReadableCharacterStream;
-import com.github.jochenw.afw.core.util.Consumer;
 import com.github.jochenw.afw.core.util.FinalizableConsumer;
 
 

@@ -4,15 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Consumer;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.csv.CsvReader.CsvRow;
-import com.github.jochenw.afw.core.util.Consumer;
 import com.github.jochenw.afw.core.util.FinalizableConsumer;
 import com.github.jochenw.afw.core.util.Tests;
-
-import org.junit.Assert;
 
 
 public class CsvReaderTest {

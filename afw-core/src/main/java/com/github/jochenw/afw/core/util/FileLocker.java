@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class FileLocker {

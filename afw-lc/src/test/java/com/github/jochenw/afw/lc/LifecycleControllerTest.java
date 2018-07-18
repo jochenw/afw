@@ -13,7 +13,7 @@ import com.github.jochenw.afw.core.components.LifecycleController;
 import org.junit.Assert;
 
 public class LifecycleControllerTest {
-	private static class Startable {
+	public static class Startable {
 		private Long startTime, closeTime;
 
 		@PostConstruct
