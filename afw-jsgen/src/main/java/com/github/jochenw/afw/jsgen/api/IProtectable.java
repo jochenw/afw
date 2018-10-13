@@ -1,12 +1,11 @@
 package com.github.jochenw.afw.jsgen.api;
 
+import javax.annotation.Nonnull;
+
 public interface IProtectable {
-	public static enum Protection {
-		PUBLIC,
-		PROTECTED,
-		PACKAGE_PROTECTED,
-		PRIVATE
+	enum Protection {
+		PUBLIC, PROTECTED, PACKAGE, PRIVATE
 	}
 
-	IProtectable.Protection getProtection();
+	@Nonnull Protection getProtection();
 }

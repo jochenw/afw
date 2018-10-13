@@ -1,79 +1,24 @@
 package com.github.jochenw.afw.jsgen.api;
 
-import java.lang.annotation.Annotation;
+import java.util.List;
 
-public class JSGMethod implements IJSGMethod {
-	private final IAnnotatable annotatable = new DefaultAnnotatable();
-	private Protection protection;
-	private final IJSGSource source;
-	private final String name;
-	private final JSGQName type;
-	private final boolean isAbstract, isFinal, isStatic;
+import javax.annotation.Nonnull;
 
-	public JSGMethod(IJSGSource pSource, Protection pProtection, JSGQName pType, String pName,
-			         boolean pAbstract, boolean pFinal, boolean pStatic) {
-		source = pSource;
-		protection = pProtection;
-		type = pType;
-		name = pName;
-		isAbstract = pAbstract;
-		isFinal = pFinal;
-		isStatic = pStatic;
+
+public interface JSGMethod extends IAnnotatable, IProtectable, IBodyProvider {
+	public interface Parameter extends IAnnotatable {
+		@Nonnull String getName();
+		@Nonnull JSGQName getType();
 	}
-	
-	@Override
-	public IAnnotation getAnnotation(JSGQName pName) {
-		return annotatable.getAnnotation(pName);
-	}
-
-	@Override
-	public IAnnotation getAnnotation(Class<? extends Annotation> pName) {
-		return annotatable.getAnnotation(pName);
-	}
-
-	@Override
-	public boolean isAnnotatedWith(JSGQName pName) {
-		return annotatable.isAnnotatedWith(pName);
-	}
-
-	@Override
-	public boolean isAnnotatedWith(Class<? extends Annotation> pName) {
-		return annotatable.isAnnotatedWith(pName);
-	}
-
-	@Override
-	public Protection getProtection() {
-		return protection;
-	}
-
-	@Override
-	public IJSGSource getSource() {
-		return source;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public JSGQName getType() {
-		return type;
-	}
-
-	@Override
-	public boolean isAbstract() {
-		return isAbstract;
-	}
-
-	@Override
-	public boolean isFinal() {
-		return isFinal;
-	}
-
-	@Override
-	public boolean isStatic() {
-		return isStatic;
-	}
-
+	@Nonnull JSGQName getReturnType();
+	@Nonnull IProtectable.Protection getProtection();
+	@Nonnull String getName();
+	@Nonnull List<Parameter> getParameters();
+	@Nonnull List<JSGQName> getExceptions();
+	boolean isAbstract();
+	boolean isStatic();
+	boolean isFinal();
+	boolean isSynchronized();
+	boolean isOverriding();
+	boolean isSuppressing(String pValue);
 }
