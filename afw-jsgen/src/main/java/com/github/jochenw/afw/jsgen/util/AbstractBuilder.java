@@ -1,6 +1,6 @@
 package com.github.jochenw.afw.jsgen.util;
 
-public abstract class AbstractBuilder {
+public abstract class AbstractBuilder<T extends AbstractBuilder<T>> {
 	private boolean immutable;
 
 	protected void makeImmutable() {
@@ -15,12 +15,14 @@ public abstract class AbstractBuilder {
 		return !immutable;
 	}
 
-	public Object build() {
+	public T build() {
 		makeImmutable();
-		return this;
+		return self();
 	}
 
-	public static void assertMutable(AbstractBuilder pBuilder) {
+	protected abstract T self();
+	
+	public static void assertMutable(AbstractBuilder<?> pBuilder) {
 		if (pBuilder.immutable) {
 			throw new IllegalStateException("This object is no longer mutable.");
 		}

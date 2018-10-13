@@ -5,17 +5,12 @@ import javax.annotation.Nonnull;
 import com.github.jochenw.afw.jsgen.util.AbstractBuilder;
 
 
-public class JSGFieldBuilder extends AbstractBuilder implements JSGField {
+public class JSGFieldBuilder extends AbstractBuilder<JSGFieldBuilder> implements JSGField {
 	private AnnotationSet annotations = new AnnotationSet();
 	private @Nonnull Protection protection;
 	private @Nonnull JSGQName type;
 	private @Nonnull String name;
 	private boolean isStatic;
-
-	@Override
-	@Nonnull public JSGField build() {
-		return (JSGField) super.build();
-	}
 
 	@Override
 	@Nonnull public AnnotationSet getAnnotations() {
@@ -85,4 +80,7 @@ public class JSGFieldBuilder extends AbstractBuilder implements JSGField {
 	public boolean isStatic() {
 		return isStatic;
 	}
+
+	@Override
+	protected JSGFieldBuilder self() { return this; }
 }

@@ -8,14 +8,15 @@ import java.util.List;
 import com.github.jochenw.afw.jsgen.api.IAnnotatable.Annotation;
 import com.github.jochenw.afw.jsgen.api.IAnnotatable.AnnotationSet;
 import com.github.jochenw.afw.jsgen.api.IProtectable;
+import com.github.jochenw.afw.jsgen.api.JSGConstructor;
 import com.github.jochenw.afw.jsgen.api.JSGField;
 import com.github.jochenw.afw.jsgen.api.JSGImportSorter;
 import com.github.jochenw.afw.jsgen.api.JSGInnerClass;
 import com.github.jochenw.afw.jsgen.api.JSGMethod;
-import com.github.jochenw.afw.jsgen.api.JSGMethod.Parameter;
 import com.github.jochenw.afw.jsgen.api.JSGQName;
 import com.github.jochenw.afw.jsgen.api.JSGSource;
 import com.github.jochenw.afw.jsgen.api.JSGStaticInitializer;
+import com.github.jochenw.afw.jsgen.api.JSGSubroutine;
 import com.github.jochenw.afw.jsgen.util.Objects;
 
 
@@ -92,27 +93,51 @@ public class DefaultJavaSourceFormatter implements JSGSourceFormatter {
 			data.newLine();
 		}
 		write(pSource.getProtection(), data);
-		data.write("class");
+		if (pSource.isInterface()) {
+			data.write("interface ");
+		} else {
+			data.write("class");
+		}
 		data.write(" ");
 		data.write(pSource.getType().getClassName());
+		final List<JSGQName> extendedClasses = pSource.getExtendedClasses();
+		if (!extendedClasses.isEmpty()) {
+			for (int i = 0;  i < extendedClasses.size();  i++) {
+				if (i == 0) {
+					data.write(" extends ");
+				} else {
+					data.write(", ");
+				}
+				data.write(extendedClasses.get(i));
+			}
+		}
+		final List<JSGQName> implementedInterfaces = pSource.getImplementedInterfaces();
+		if (!implementedInterfaces.isEmpty()) {
+			for (int i = 0;  i < implementedInterfaces.size();  i++) {
+				if (i == 0) {
+					data.write(" implements");
+				} else {
+					data.write(", ");
+				}
+				data.write(implementedInterfaces.get(i));
+			}
+		}
 		data.write(" {");
 		data.incIndent();
 		data.newLine();
 		pSource.getContent().forEach((o) -> {
-			try {
-				if (o instanceof JSGMethod) {
-					write((JSGMethod) o, data);
-				} else if (o instanceof JSGField) {
-					write((JSGField) o, data);
-				} else if (o instanceof JSGInnerClass) {
-					write((JSGInnerClass) o, data);
-				} else if (o instanceof JSGStaticInitializer) {
-					write((JSGStaticInitializer) o, data);
-				} else {
-					throw new IllegalStateException("Invalid object type: " + o.getClass().getName());
-				}
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+			if (o instanceof JSGMethod) {
+				write((JSGMethod) o, data);
+			} else if (o instanceof JSGConstructor) {
+				write((JSGConstructor) o, data);
+			} else if (o instanceof JSGField) {
+				write((JSGField) o, data);
+			} else if (o instanceof JSGInnerClass) {
+				write((JSGInnerClass) o, data);
+			} else if (o instanceof JSGStaticInitializer) {
+				write((JSGStaticInitializer) o, data);
+			} else {
+				throw new IllegalStateException("Invalid object type: " + o.getClass().getName());
 			}
 		});
 		data.decIndent();
@@ -183,31 +208,39 @@ public class DefaultJavaSourceFormatter implements JSGSourceFormatter {
 		throw new IllegalStateException("Not implemented");
 	}
 
-	protected void write(JSGMethod pMethod, Data pTarget) throws IOException {
+	protected void write(JSGSubroutine pSubroutine, Data pTarget) {
 		pTarget.indent();
-		write(pMethod.getAnnotations(), pTarget);
-		if (!pMethod.getAnnotations().isEmpty()) {
+		write(pSubroutine.getAnnotations(), pTarget);
+		if (!pSubroutine.getAnnotations().isEmpty()) {
 			pTarget.newLine();
 		}
-		write(pMethod.getProtection(), pTarget);
-		if (pMethod.isAbstract()) {
-			pTarget.write("abstract ");
+		write(pSubroutine.getProtection(), pTarget);
+		if (pSubroutine instanceof JSGMethod) {
+			final JSGMethod method = (JSGMethod) pSubroutine;
+			if (method.isAbstract()) {
+				pTarget.write("abstract ");
+			}
+			if (method.isStatic()) {
+				pTarget.write("static ");
+			}
+			if (method.isFinal()) {
+				pTarget.write("final ");
+			}
+			if (method.isSynchronized()) {
+				pTarget.write("synchronized ");
+			}
+			pTarget.write(method.getReturnType());
 		}
-		if (pMethod.isStatic()) {
-			pTarget.write("static ");
-		}
-		if (pMethod.isFinal()) {
-			pTarget.write("final ");
-		}
-		if (pMethod.isSynchronized()) {
-			pTarget.write("synchronized ");
-		}
-		pTarget.write(pMethod.getReturnType());
 		pTarget.write(" ");
-		pTarget.write(pMethod.getName());
+		if (pSubroutine instanceof JSGMethod) {
+			final JSGMethod method = (JSGMethod) pSubroutine;
+			pTarget.write(method.getName());
+		} else {
+			pTarget.write(pSubroutine.getSourceClass().getType().getClassName());
+		}
 		pTarget.write("(");
-		for (int i = 0;  i < pMethod.getParameters().size();  i++) {
-			final Parameter param = pMethod.getParameters().get(i);
+		for (int i = 0;  i < pSubroutine.getParameters().size();  i++) {
+			final JSGSubroutine.Parameter param = pSubroutine.getParameters().get(i);
 			if (i > 0) {
 				pTarget.write(", ");
 			}
@@ -220,7 +253,7 @@ public class DefaultJavaSourceFormatter implements JSGSourceFormatter {
 			pTarget.write(param.getName());
 		}
 		pTarget.write(") ");
-		final List<JSGQName> exceptions = pMethod.getExceptions();
+		final List<JSGQName> exceptions = pSubroutine.getExceptions();
 		if (!exceptions.isEmpty()) {
 			for (int i = 0;  i < exceptions.size();  i++) {
 				if (i == 0) {
@@ -234,7 +267,7 @@ public class DefaultJavaSourceFormatter implements JSGSourceFormatter {
 		pTarget.write(" {");
 		pTarget.incIndent();
 		pTarget.newLine();
-		pMethod.body().getContents().forEach((o) -> {
+		pSubroutine.body().getContents().forEach((o) -> {
 			writeLine(o, pTarget);
 		});
 		pTarget.decIndent();
