@@ -1,11 +1,12 @@
 package com.github.jochenw.afw.jsgen.api;
 
-import javax.annotation.Nonnull;
+public class JSGSourceBuilder extends JSGClassBuilder<JSGSourceBuilder> implements JSGSource {
+	public JSGSourceBuilder(JSGQName pType) {
+		super(pType);
+	}
 
-import com.github.jochenw.afw.jsgen.impl.Quoter;
-
-public interface JSGSource extends JSGClass {
-	@Nonnull public static String q(@Nonnull String pValue) {
-		return Quoter.valueOf(pValue);
+	@Override
+	protected JSGSourceBuilder self() {
+		return this;
 	}
 }

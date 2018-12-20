@@ -19,4 +19,5 @@ public interface IPropertyFactory {
     IBooleanProperty getBooleanProperty(String pKey, boolean pDefaultValue, IProperty.ChangeListener<Boolean> pListener);
     IBooleanProperty getBooleanProperty(String pKey);
     IBooleanProperty getBooleanProperty(String pKey, IProperty.ChangeListener<Boolean> pListener);
+	String getPropertyValue(String pKey);
 }

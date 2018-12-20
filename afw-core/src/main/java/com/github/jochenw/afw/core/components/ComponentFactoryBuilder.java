@@ -1,351 +1,141 @@
 package com.github.jochenw.afw.core.components;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
 import javax.inject.Provider;
 
-import com.github.jochenw.afw.core.DefaultResourceLoader;
-import com.github.jochenw.afw.core.ResourceLocator;
-import com.github.jochenw.afw.core.log.ILogFactory;
-import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
-import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
-import com.github.jochenw.afw.core.props.IPropertyFactory;
-import com.github.jochenw.afw.core.props.PropertyLoader;
+import com.github.jochenw.afw.core.components.IComponentFactory.Key;
 import com.github.jochenw.afw.core.util.AbstractBuilder;
+import com.github.jochenw.afw.core.util.Exceptions;
 
-public abstract class ComponentFactoryBuilder extends AbstractBuilder {
-	public abstract static class Binder {
-		public abstract <T> void bindClass(Class<T> pType);
-		public abstract <T> void bind(Class<T> pType, String pName, T pInstance);
-		public abstract <T> void bind(Class<T> pType, T pInstance);
-		public abstract <T> void bindProvider(Class<T> pType, String pName, Provider<T> pProvider);
-		public abstract <T> void bindProvider(Class<T> pType, String pName, Provider<T> pProvider, boolean pSingleton);
-		public abstract <T> void bindClass(Class<T> pType, String pName, Class<? extends T> pImplClass);
-		public abstract <T> void bindClass(Class<T> pType, String pName, Class<? extends T> pImplClass, boolean pSingleton);
-		public abstract <T> void bindClass(Class<T> pType, Class<? extends T> pImplClass);
-		public abstract <T> void bindClass(Class<T> pType, Class<? extends T> pImplClass, boolean pSingleton);
-		public void bindConstant(String pName, String pValue) {
-			bind(String.class, pName, pValue);
+public class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<T>> extends AbstractBuilder<T> {
+	public interface Binder {
+		<O extends Object> void bind(Class<O> pType, String pName, Class<? extends O> pImplementationClass);
+		<O extends Object> void bind(Class<O> pType, String pName, O pSingleton);
+		<O extends Object> void bind(Class<O> pType, String pName, Provider<? extends O> pProvider);
+		<O extends Object> void bind(Class<O> pType, String pName, Supplier<? extends O> pSupplier);
+		public default <O extends Object> void bind(Class<O> pType, Class<? extends O> pImplementationClass) {
+			bind(pType, "", pImplementationClass);
 		}
-		void bindConstant(String pName, int pValue) {
-			bind(Integer.class, pName, Integer.valueOf(pValue));
+		public default <O extends Object> void bind(Class<O> pType, O pSingleton) {
+			bind(pType, "", pSingleton);
 		}
-		void bindConstant(String pName, long pValue) {
-			bind(Long.class, pName, Long.valueOf(pValue));
+		public default <O extends Object> void bind(Class<O> pType, Provider<? extends O> pSingleton) {
+			bind(pType, "", pSingleton);
 		}
-		void bindConstant(String pName, boolean pValue) {
-			bind(Boolean.class, pName, Boolean.valueOf(pValue));
-		}
-	}
-	public abstract static class StartableObjectProvider {
-		public void addStartableObjects(ComponentFactory pComponentFactory, List<Object> pList) {
+		public default <O extends Object> void bind(Class<O> pType, Supplier<? extends O> pSingleton) {
+			bind(pType, "", pSingleton);
 		}
 	}
 	public interface Module {
-		void configure(Binder pBinder);
+		void bind(Binder pBinder);
 	}
 
-	private String instanceName, applicationName, resourcePrefix;
-	private ILogFactory logFactory;
-	private IPropertyFactory propertyFactory;
-	private ResourceLocator resourceLocator;
-	private com.github.jochenw.afw.core.props.PropertyLoader propertyLoader;
-	private List<Module> modules = new ArrayList<>();
-	private ComponentFactory componentFactory;
-	private Properties factoryProperties, instanceProperties, defaultProperties;
-	private StartableObjectProvider startableObjectProvider;
+	private IComponentFactory instance;
+	private final List<Module> modules = new ArrayList<>();
+	private Function<Map<Key,Supplier<Object>>,IComponentFactory> constructor;
 
-	public ComponentFactoryBuilder applicationName(String pName) {
-		assertMutable();
-		applicationName = pName;
-		return this;
-	}
-
-	public ComponentFactoryBuilder factoryProperties(Properties pProperties) {
-		assertMutable();
-		factoryProperties = pProperties;
-		return this;
-	}
-	
-	public ComponentFactoryBuilder instanceName(String pName) {
-		assertMutable();
-		instanceName = pName;
-		return this;
-	}
-
-	public ComponentFactoryBuilder resourcePrefix(String pResourcePrefix) {
-		assertMutable();
-		resourcePrefix = pResourcePrefix;
-		return this;
-	}
-	
-	public ComponentFactoryBuilder instanceProperties(Properties pProperties) {
-		assertMutable();
-		instanceProperties = pProperties;
-		return this;
-	}
-
-	public ComponentFactoryBuilder logFactory(ILogFactory pFactory) {
-		assertMutable();
-		logFactory = pFactory;
-		return this;
-	}
-
-	public ComponentFactoryBuilder module(Module pModule) {
+	public @Nonnull T module(@Nonnull Module pModule) {
 		assertMutable();
 		modules.add(pModule);
-		return this;
-		
+		return self();
 	}
 
-	public ComponentFactoryBuilder modules(Module... pModules) {
+	public @Nonnull T modules(@Nonnull Module... pModules) {
 		assertMutable();
-		modules.addAll(Arrays.asList(pModules));
-		return this;
-		
+		if (pModules != null) {
+			for (Module m : pModules) {
+				modules.add(m);
+			}
+		}
+		return self();
 	}
 
-	public ComponentFactoryBuilder propertyFactory(IPropertyFactory pFactory) {
+	public @Nonnull T modules(@Nonnull Iterable<Module> pModules) {
 		assertMutable();
-		propertyFactory = pFactory;
-		return this;
-	}
-
-	public ComponentFactoryBuilder propertyLoader(PropertyLoader pLoader) {
-		assertMutable();
-		propertyLoader = pLoader;
-		return this;
-	}
-
-	public ComponentFactoryBuilder resourceLocator(ResourceLocator pLocator) {
-		assertMutable();
-		resourceLocator = pLocator;
-		return this;
-	}
-
-	public ComponentFactoryBuilder startableObjectProvider(StartableObjectProvider pProvider) {
-		assertMutable();
-		startableObjectProvider = pProvider;
-		return this;
-	}
-	
-	public String getApplicationName() {
-		return applicationName;
-	}
-
-	public String getInstanceName() {
-		return instanceName;
-	}
-
-	public String getResourcePrefix() {
-		return resourcePrefix;
-	}
-
-	protected void validate() {
-		if (getApplicationName() == null) {
-			throw new IllegalStateException("The application name must be set.");
+		if (pModules != null) {
+			for (Module m : pModules) {
+				modules.add(m);
+			}
 		}
-		final ResourceLocator resLocator = getResourceLocator();
-		if (resLocator == null) {
-			throw new IllegalStateException("Unable to create a resource locator.");
-		}
-		final ILogFactory lf = getLogFactory();
-		lf.setResourceLocator(resLocator);
-		lf.start();
-		if (getPropertyLoader() == null) {
-			throw new IllegalStateException("Unable to create a property loader.");
-		}
-		if (getFactoryProperties() == null) {
-			throw new IllegalStateException("Factory properties not found.");
-		}
-		getInstanceProperties();
-		getDefaultProperties();
-		final IPropertyFactory pf = getPropertyFactory();
-		if (pf == null) {
-			throw new IllegalStateException("No IPropertyFactory has been configured.");
-		}
-	}
-
-	public Properties getDefaultProperties() {
-		if (defaultProperties == null) {
-			defaultProperties = newDefaultProperties();
-		}
-		return defaultProperties;
-	}
-
-	public ResourceLocator getResourceLocator() {
-		if (resourceLocator == null) {
-			resourceLocator = newResourceLocator();
-		}
-		return resourceLocator;
-	}
-
-	protected ResourceLocator newResourceLocator() {
-		return new DefaultResourceLoader(getApplicationName(), getInstanceName(), getResourcePrefix());
+		return self();
 	}
 
 	public List<Module> getModules() {
 		return modules;
 	}
 
-	public Properties getFactoryProperties() {
-		if (factoryProperties == null) {
-			factoryProperties = newFactoryProperties();
-		}
-		return factoryProperties;
+	public @Nonnull T constructor(Function<Map<Key,Supplier<Object>>,IComponentFactory> pConstructor) {
+		assertMutable();
+		constructor = pConstructor;
+		return self();
 	}
 
-	public Properties getInstanceProperties() {
-		if (instanceProperties == null) {
-			instanceProperties = newInstanceProperties();
-		}
-		return instanceProperties;
-	}
-
-	public ILogFactory getLogFactory() {
-		if (logFactory == null) {
-			logFactory = new SimpleLogFactory();
-		}
-		return logFactory;
-	}
-
-	public IPropertyFactory getPropertyFactory() {
-		if (propertyFactory == null) {
-			propertyFactory = newPropertyFactory();
-		}
-		return propertyFactory;
+	public Function<Map<Key,Supplier<Object>>,IComponentFactory> getConstructor() {
+		return constructor;
 	}
 	
-	public PropertyLoader getPropertyLoader() {
-		if (propertyLoader == null) {
-			propertyLoader = newPropertyLoader();
+	protected IComponentFactory newInstance() {
+		final Map<Key,Supplier<Object>> bindings = getBindings();
+		if (constructor == null) {
+			final SimpleComponentFactory cf = new SimpleComponentFactory();
+			cf.setBindings(bindings);
+			cf.setOnTheFlyBinder(new SimpleOnTheFlyBinder());
+			return cf;
+		} else {
+			return constructor.apply(bindings);
 		}
-		return propertyLoader;
 	}
 
-	public StartableObjectProvider getStartableObjectProvider() {
-		return startableObjectProvider;
-	}
-	
-	protected PropertyLoader newPropertyLoader() {
-		return new PropertyLoader(getResourceLocator());
-	}
-
-	protected abstract ComponentFactory newComponentFactory();
-	protected abstract void configure(ComponentFactory pComponentFactory, Module pModule);
-	
-	public ComponentFactory build() {
-		if (componentFactory == null) {
-			validate();
-			final ComponentFactory cf = newComponentFactory();
-			configure(cf, getModule(cf));
-			componentFactory = cf;
-			final LifecycleController lc = cf.getInstance(LifecycleController.class);
-			final List<Object> startableObjects = getStartableObjects(cf);
-			for (Object o : startableObjects) {
-				lc.addListener(o);
-			}
-			lc.start();
+	public IComponentFactory build() {
+		if (isMutable()) {
 			makeImmutable();
+			instance = newInstance();
 		}
-		return componentFactory;
-	}
-
-	protected List<Object> getStartableObjects(ComponentFactory pComponentFactory) {
-		final List<Object> startableObjects = new ArrayList<>();
-		if (startableObjectProvider != null) {
-			startableObjectProvider.addStartableObjects(pComponentFactory, startableObjects);
-		}
-		return startableObjects;
+		return instance;
 	}
 	
-	protected Module getModule(final ComponentFactory pComponentFactory) {
-		return new Module() {
+	protected Map<Key,Supplier<Object>> getBindings() {
+		final Map<Key,Supplier<Object>> bindings = new HashMap<>();
+		final Binder binder = new Binder() {
 			@Override
-			public void configure(Binder pBinder) {
-				pBinder.bind(ComponentFactory.class, pComponentFactory);
-				pBinder.bind(ILogFactory.class, getLogFactory());
-				pBinder.bind(IPropertyFactory.class, getPropertyFactory());
-				pBinder.bindClass(LifecycleController.class);
-				pBinder.bindConstant("applicationName", getApplicationName());
-				pBinder.bindConstant("instanceName", getInstanceName());
-				pBinder.bind(ResourceLocator.class, getResourceLocator());
-				pBinder.bind(PropertyLoader.class, getPropertyLoader());
-				pBinder.bind(Properties.class, "factory", getFactoryProperties());
-				pBinder.bind(Properties.class, "instance", getInstanceProperties());
-				Properties props = getDefaultProperties();
-				pBinder.bind(Properties.class, "default", props);
-				pBinder.bind(Properties.class, props);
-				for (Map.Entry<Object, Object> en : props.entrySet()) {
-					final String key = en.getKey().toString();
-					final Object v = en.getValue();
-					final String value = (v == null) ? (String) null : v.toString();
-					pBinder.bindConstant(key, value);
-				}
+			public <O extends Object> void bind(Class<O> pType, String pName, Class<? extends O> pImplementationClass) {
+				bindings.put(new Key(pType, pName), () -> {
+					try {
+						return pImplementationClass.newInstance();
+					} catch (Throwable t) {
+						throw Exceptions.show(t);
+					}
+				});
+			}
 
-				for (Module customModule : getModules()) {
-					customModule.configure(pBinder);
-				}
+			@Override
+			public <O extends Object> void bind(Class<O> pType, String pName, O pSingleton) {
+				final Key key = new Key(pType, pName);
+				bindings.put(key, () -> { return pSingleton; });
+			}
+
+			@Override
+			public <O extends Object> void bind(Class<O> pType, String pName, Provider<? extends O> pProvider) {
+				final Key key = new Key(pType, pName);
+				bindings.put(key, () -> { return pProvider.get(); });
+			}
+
+			@Override
+			public <O extends Object> void bind(Class<O> pType, String pName, Supplier<? extends O> pSupplier) {
+				final Key key = new Key(pType, pName);
+				bindings.put(key, () -> { return pSupplier.get(); });
 			}
 		};
-	}
-
-	protected IPropertyFactory newPropertyFactory() {
-		final String factoryPropertiesUri = getFactoryPropertiesUri();
-		URL factoryPropertiesUrl;
-		factoryPropertiesUrl = getResourceLocator().getResource(factoryPropertiesUri);
-		if (factoryPropertiesUrl == null  &&  !factoryPropertiesUri.endsWith(".xml")) {
-			factoryPropertiesUrl = getResourceLocator().getResource(factoryPropertiesUri + ".xml");
-			if (factoryPropertiesUrl == null) {
-				throw new IllegalStateException("Unable to locate property file: " + factoryPropertiesUri);
-			}
+		for (Module m : getModules()) {
+			m.bind(binder);
 		}
-		final String instancePropertiesUri = getInstancePropertiesUri();
-		URL instancePropertiesUrl= getResourceLocator().getResource(instancePropertiesUri);
-		if (instancePropertiesUrl == null  &&  !instancePropertiesUri.endsWith(".xml")) {
-			instancePropertiesUrl = getResourceLocator().getResource(instancePropertiesUri + ".xml");
-			if (instancePropertiesUrl == null) {
-				throw new IllegalStateException("Unable to locate property file: " + instancePropertiesUri);
-			}
-		}
-		return new DefaultPropertyFactory(instancePropertiesUrl, factoryPropertiesUrl);
-	}
-	
-	protected Properties newDefaultProperties() {
-		final Properties props = new Properties();
-		final Properties fp = getFactoryProperties();
-		final Properties ip = getInstanceProperties();
-		if (fp != null) {
-			props.putAll(fp);
-		}
-		if (ip != null) {
-			props.putAll(ip);
-		}
-		return props;
-	}
-
-	protected Properties newFactoryProperties() {
-		final String uri = getFactoryPropertiesUri();
-		return getPropertyLoader().load(uri);
-	}
-
-	protected String getFactoryPropertiesUri() {
-		final String uri = getApplicationName() + "-factory.properties";
-		return uri;
-	}
-
-	protected Properties newInstanceProperties() {
-		final String uri = getInstancePropertiesUri();
-		return getPropertyLoader().load(uri);
-	}
-
-	protected String getInstancePropertiesUri() {
-		final String uri = getApplicationName() + ".properties";
-		return uri;
+		return bindings;
 	}
 }

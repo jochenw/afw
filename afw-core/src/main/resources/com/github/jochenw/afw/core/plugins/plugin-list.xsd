@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://namespaces.github.com/jochenw/afw/core/plugins/list/1.0.0"
+              xmlns:tns="http://namespaces.github.com/jochenw/afw/core/plugins/list/1.0.0"
+     elementFormDefault="qualified">
+  <xs:element name="pluginList">
+    <xs:complexType>
+      <xs:sequence minOccurs="1" maxOccurs="unbounded">
+        <xs:element name="plugin">
+          <xs:complexType>
+            <xs:attribute name="class" type="xs:string" use="required"/>
+      		<xs:attribute name="id" use="optional" type="xs:NCName"/>
+            <xs:attribute name="dependsOn" use="optional">
+              <xs:simpleType>
+                <xs:list itemType="xs:NCName"/>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

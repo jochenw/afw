@@ -1,0 +1,112 @@
+package com.github.jochenw.afw.core.plugins;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.github.jochenw.afw.core.plugins.DependencyResolver.CircularDependencyException;
+import com.github.jochenw.afw.core.plugins.DependencyResolver.DuplicateNodeIdException;
+import com.github.jochenw.afw.core.plugins.DependencyResolver.Node;
+import com.github.jochenw.afw.core.plugins.DependencyResolver.UnknownNodeIdException;
+
+public class DependencyResolverTest {
+	@Test
+	public void testDuplicateId() {
+		final Object object0 = new Object();
+		final Object object1 = new Object();
+		final Object object2 = new Object();
+		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
+		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
+		final Node<Object> node2 = new Node<Object>("a", Arrays.asList(), object2);
+		try {
+			new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
+			Assert.fail("Expected Exception");
+		} catch (DuplicateNodeIdException e) {
+			Assert.assertEquals("a", e.getId());
+			Assert.assertSame(node0, e.getNode0());
+			Assert.assertSame(node2, e.getNode1());
+		}
+	}
+
+	@Test
+	public void testUnknownId() {
+		final Object object0 = new Object();
+		final Object object1 = new Object();
+		final Object object2 = new Object();
+		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
+		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("d"), object1);
+		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		try {
+			new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
+			Assert.fail("Expected Exception");
+		} catch (UnknownNodeIdException e) {
+			Assert.assertEquals("d", e.getId());
+			Assert.assertSame(node1, e.getNode());
+		}
+	}
+
+	@Test
+	public void testCircularDependency() {
+		final Object object0 = new Object();
+		final Object object1 = new Object();
+		final Object object2 = new Object();
+		final Node<Object> node0 = new Node<Object>("a", Arrays.asList("c"), object0);
+		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
+		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		try {
+			new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
+			Assert.fail("Expected Exception");
+		} catch (CircularDependencyException e) {
+			final List<String> ids = e.getIds();
+			Assert.assertEquals(3, ids.size());
+			Assert.assertTrue(ids.contains("a"));
+			Assert.assertTrue(ids.contains("b"));
+			Assert.assertTrue(ids.contains("c"));
+		}
+	}
+
+	@Test
+	public void testSuccess() {
+		final Object object0 = new Object();
+		final Object object1 = new Object();
+		final Object object2 = new Object();
+		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
+		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
+		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		final List<Node<Object>> nodes;
+		nodes = new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
+		Assert.assertEquals(3, nodes.size());
+		assertNode(nodes.get(0), "a", node0.getDependsOn(), object0);
+		assertNode(nodes.get(1), "b", node1.getDependsOn(), object1);
+		assertNode(nodes.get(2), "c", node2.getDependsOn(), object2);
+	}
+
+	@Test
+	public void testSuccessAfterReverse() {
+		final Object object0 = new Object();
+		final Object object1 = new Object();
+		final Object object2 = new Object();
+		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
+		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
+		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		final List<Node<Object>> nodes;
+		nodes = new DependencyResolver().resolve(Arrays.asList(node2, node1, node0));
+		Assert.assertEquals(3, nodes.size());
+		assertNode(nodes.get(0), "a", node0.getDependsOn(), object0);
+		assertNode(nodes.get(1), "b", node1.getDependsOn(), object1);
+		assertNode(nodes.get(2), "c", node2.getDependsOn(), object2);
+	}
+
+	private void assertNode(Node<Object> pNode, String pId, List<String> pDependsOn, Object pObject) {
+		Assert.assertNotNull(pNode);
+		Assert.assertEquals(pId, pNode.getId());
+		Assert.assertSame(pObject, pNode.getObject());
+		int dependsOnSize = pDependsOn.size();
+		Assert.assertEquals(dependsOnSize, pNode.getDependsOn().size());
+		for (int i = 0;  i < dependsOnSize;  i++) {
+			Assert.assertEquals(pDependsOn.get(i), pNode.getDependsOn().get(i));
+		}
+	}
+}

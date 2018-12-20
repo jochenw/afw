@@ -55,7 +55,7 @@ public class CircularBufferInputStream extends InputStream {
 		if (!haveBytes(1)) {
 			return -1;
 		}
-		return buffer.next();
+		return buffer.read();
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class CircularBufferInputStream extends InputStream {
 		}
 		final int result = Math.min(pLength, buffer.getCurrentNumberOfBytes());
 		for (int i = 0;  i < result;  i++) {
-			pBuffer[pOffset+i] = buffer.next();
+			pBuffer[pOffset+i] = buffer.read();
 		}
 		return result;
 	}

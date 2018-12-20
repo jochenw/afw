@@ -123,4 +123,9 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
     public URL getInstanceUrl() {
         return propertyUrl;
     }
+
+	@Override
+	public synchronized String getPropertyValue(String pKey) {
+		return myProperties.get(pKey);
+	}
 }
