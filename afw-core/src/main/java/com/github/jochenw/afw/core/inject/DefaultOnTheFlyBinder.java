@@ -1,0 +1,259 @@
+package com.github.jochenw.afw.core.inject;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.apache.logging.log4j.util.Strings;
+
+import com.github.jochenw.afw.core.ILifefycleController;
+import com.github.jochenw.afw.core.ILifefycleController.TerminableListener;
+import com.github.jochenw.afw.core.log.ILogFactory;
+import com.github.jochenw.afw.core.props.BooleanProperty;
+import com.github.jochenw.afw.core.props.IBooleanProperty;
+import com.github.jochenw.afw.core.props.IIntProperty;
+import com.github.jochenw.afw.core.props.ILongProperty;
+import com.github.jochenw.afw.core.props.IProperty;
+import com.github.jochenw.afw.core.props.IPropertyFactory;
+import com.github.jochenw.afw.core.props.IntProperty;
+import com.github.jochenw.afw.core.props.LongProperty;
+import com.github.jochenw.afw.core.props.StringProperty;
+import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Functions;
+import com.google.inject.Provider;
+
+public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
+	@Override
+	public <O> void findConsumers(IComponentFactory pCf, Class<?> pType, Consumer<Consumer<O>> pConsumerSink) {
+		final List<Method> initMethods = new ArrayList<>();
+		final List<Method> shutdownMethods = new ArrayList<>();
+		for (Method m : pType.getDeclaredMethods()) {
+			if (Modifier.isPublic(m.getModifiers())) {
+				if (!Modifier.isStatic(m.getModifiers())  &&  !Modifier.isAbstract(m.getModifiers())) {
+					if (m.getParameterCount() == 0) {
+						if (m.isAnnotationPresent(PostConstruct.class)) {
+							initMethods.add(m);
+						}
+						if (m.isAnnotationPresent(PreDestroy.class)) {
+							shutdownMethods.add(m);
+						}
+					}
+				}
+			}
+		}
+		if (!initMethods.isEmpty()  ||  !shutdownMethods.isEmpty()) {
+			final Consumer<O>  consumer = (o) -> {
+				final ILifefycleController lcController = pCf.requireInstance(ILifefycleController.class);
+				final TerminableListener tl = new TerminableListener() {
+					@Override
+					public void start() {
+						for (Method m : initMethods) {
+							Functions.run(() -> m.invoke(o));
+						}
+					}
+
+					@Override
+					public void shutdown() {
+						Throwable th = null;
+						for (Method m : shutdownMethods) {
+							try {
+								m.invoke(o);
+							} catch (Throwable t) {
+								if (th == null) {
+									th = t;
+								}
+							}
+						}
+						if (th != null) {
+							throw Exceptions.show(th);
+						}
+					}
+				};
+				lcController.addListener(tl);
+			};
+			pConsumerSink.accept(consumer);
+		}
+	}
+
+	@Override
+	public <O> Provider<O> getProvider(IComponentFactory pCf, Field pField) {
+		for (Annotation a : pField.getAnnotations()) {
+			if (a instanceof LogInject) {
+				return getLogInjectProvider(pCf, pField, (LogInject) a);
+			} else if (a instanceof PropInject) {
+				return getPropInjectProvider(pCf, pField, (PropInject) a);
+			}
+		}
+		return null;
+	}
+
+	protected <O> Provider<O> getPropInjectProvider(IComponentFactory pCf, Field pField, PropInject pPropInject) {
+		final String id;
+		if (Strings.isEmpty(pPropInject.id())) {
+			id = pField.getDeclaringClass().getName() + "." + pField.getName();
+		} else {
+			id = pPropInject.id();
+		}
+		final String defaultValueStr;
+		if (pPropInject.defaultValue() == PropInject.NO_DEFAULT) {
+			defaultValueStr = null;
+		} else {
+			defaultValueStr = pPropInject.defaultValue();
+		}
+		final Class<?> type = pField.getType();
+		if (String.class.equals(type)) {
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				@SuppressWarnings("unchecked")
+				final O o = (O) propFactory.getPropertyValue(id);
+				return o;
+			};
+		} else if (Boolean.class.equals(type)  ||  Boolean.TYPE.equals(type)) {
+			final boolean defaultBool = getDefaultBooleanValue(pField, defaultValueStr);
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				final String s = propFactory.getPropertyValue(id);
+				Boolean b;
+				try {
+					b = Boolean.valueOf(s);
+				} catch (Throwable t) {
+					b = Boolean.valueOf(defaultBool);
+				}
+				@SuppressWarnings("unchecked")
+				final O o = (O) b;
+				return o;
+			};
+		} else if (Integer.class.equals(type)  ||  Integer.TYPE.equals(type)) {
+			final Integer defaultInt = getDefaultIntValue(pField, defaultValueStr);
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				final String s = propFactory.getPropertyValue(id);
+				Integer i;
+				try {
+					i = Integer.valueOf(s);
+				} catch (Throwable t) {
+					i = defaultInt;
+				}
+				@SuppressWarnings("unchecked")
+				final O o = (O) i;
+				return o;
+			};
+		} else if (Long.class.equals(type)  ||  Long.TYPE.equals(type)) {
+			final Long defaultLong = getDefaultLongValue(pField, defaultValueStr);
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				final String s = propFactory.getPropertyValue(id);
+				Long l;
+				try {
+					l = Long.valueOf(s);
+				} catch (Throwable t) {
+					l = defaultLong;
+				}
+				@SuppressWarnings("unchecked")
+				final O o = (O) l;
+				return o;
+			};
+		} else if (IntProperty.class.equals(type)  ||  IIntProperty.class.equals(type)) {
+			final Integer defaultInt = getDefaultIntValue(pField, defaultValueStr);
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				@SuppressWarnings("unchecked")
+				final O o = (O) propFactory.getIntProperty(id, defaultInt.intValue());
+				return o;
+			};
+		} else if (LongProperty.class.equals(type)  ||  ILongProperty.class.equals(type)) {
+			final Long defaultLong = getDefaultLongValue(pField, defaultValueStr);
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				@SuppressWarnings("unchecked")
+				final O o = (O) propFactory.getLongProperty(id, defaultLong.longValue());
+				return o;
+			};
+		} else if (BooleanProperty.class.equals(type)  ||  IBooleanProperty.class.equals(type)) {
+			final Boolean defaultBool = getDefaultBooleanValue(pField, defaultValueStr);
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				@SuppressWarnings("unchecked")
+				final O o = (O) propFactory.getBooleanProperty(id, defaultBool.booleanValue());
+				return o;
+			};
+		} else if (IProperty.class.equals(type)  ||  StringProperty.class.equals(type)) {
+			return () -> {
+				final IPropertyFactory propFactory = pCf.requireInstance(IPropertyFactory.class);
+				@SuppressWarnings("unchecked")
+				final O o = (O) propFactory.getProperty(id, defaultValueStr);
+				return o;
+			};
+		} else {
+			throw new IllegalStateException("Invalid field type for " + pField + ", annotated with @PropInject"
+					+ ". Expected String|Integer|int|Long|long|Boolean|boolean|IIntProperty|ILongProperty|IBooleanProperty|IProperty, got " + type.getName());
+		}
+	}
+
+	protected <O> Provider<O> getLogInjectProvider(IComponentFactory pCf, AnnotatedElement pAnnotatable, LogInject pAnnotation) {
+		final String id;
+		if (Strings.isEmpty(pAnnotation.id())) {
+			if (pAnnotatable instanceof Field) {
+				final Field field = ((Field) pAnnotatable);
+				id = field.getDeclaringClass().getName();
+			} else {
+				throw new IllegalStateException("Unable to generate default Id for @LogInject on " + pAnnotatable);
+			}
+		} else {
+			id = pAnnotation.id();
+		}
+		return () -> {
+			final ILogFactory logFactory = pCf.requireInstance(ILogFactory.class);
+			@SuppressWarnings("unchecked")
+			final O o = (O) logFactory.getLog(id);
+			return o;
+		};
+	}
+
+	protected Long getDefaultLongValue(AnnotatedElement pAnnotatable, final String pDefaultValueStr) {
+		if (pDefaultValueStr == null) {
+			throw new IllegalStateException("@PropInject on " + pAnnotatable + " requires a defaultValue().");
+		}
+		final Long defaultLong;
+		try {
+			defaultLong = Long.valueOf(pDefaultValueStr);
+		} catch (Throwable t) {
+			throw new IllegalStateException("@PropInject on " + pAnnotatable + " has an invalid default value: " + pDefaultValueStr);
+		}
+		return defaultLong;
+	}
+
+	protected Integer getDefaultIntValue(AnnotatedElement pAnnotatable, final String pDefaultValueStr) {
+		if (pDefaultValueStr == null) {
+			throw new IllegalStateException("@PropInject on " + pAnnotatable + " requires a defaultValue().");
+		}
+		final Integer defaultInt;
+		try {
+			defaultInt = Integer.valueOf(pDefaultValueStr);
+		} catch (Throwable t) {
+			throw new IllegalStateException("@PropInject on " + pAnnotatable + " has an invalid default value: " + pDefaultValueStr);
+		}
+		return defaultInt;
+	}
+
+	protected Boolean getDefaultBooleanValue(AnnotatedElement pAnnotatable, final String pDefaultValueStr) {
+		if (pDefaultValueStr == null) {
+			throw new IllegalStateException("@PropInject on " + pAnnotatable + " requires a defaultValue().");
+		}
+		final Boolean defaultBoolean;
+		try {
+			defaultBoolean = Boolean.valueOf(pDefaultValueStr);
+		} catch (Throwable t) {
+			throw new IllegalStateException("@PropInject on " + pAnnotatable + " has an invalid default value: " + pDefaultValueStr);
+		}
+		return defaultBoolean;
+	}
+}

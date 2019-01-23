@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Source;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;

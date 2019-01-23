@@ -27,7 +27,7 @@ import org.xml.sax.SAXParseException;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.AbstractInitializer;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.IExtensionPoint;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.Initializer;
-import com.google.common.collect.ImmutableMap;
+
 
 public class PluginListParserTest {
 	private static final String XML_EMPTY_LIST =

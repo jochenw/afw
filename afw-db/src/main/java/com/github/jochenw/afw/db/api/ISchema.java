@@ -1,22 +1,30 @@
 package com.github.jochenw.afw.db.api;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import com.github.jochenw.afw.db.bldr.SchemaBuilder;
 
-public interface ISchema {
-	public class Name extends DefaultId {
-		private static final long serialVersionUID = 7941990742907771217L;
-
-		public Name(String pId) {
-			super(pId);
-		}
+public class Schema {
+	public interface ISchemaBuilder extends ISchema {
+		ISchemaBuilder name(ISchema.Name pName);
+		ISchemaBuilder name(String pName);
+		ITableBuilder table(ITable.Name pName);
+		ITableBuilder table(String pName);
+	}
+	public interface ITableBuilder extends ITable {
+		ITableBuilder name(ITable.Name pName);
+		ITableBuilder name(String pName);
+		IColumnBuilder column(IColumn.Name pName, IColumn.Type pType);
+		IColumnBuilder column(String pName, IColumn.Type pType);
+	}
+	public interface IColumnBuilder extends IColumn {
+		IColumnBuilder name(IColumn.Name pName);
+		IColumnBuilder name(String pName);
+		IColumnBuilder type(IColumn.Type pType);
+		IColumnBuilder nullable();
+		IColumnBuilder notNull();
+		IColumnBuilder nullable(boolean pNullable);
 	}
 
-	Name getName();
-	public List<ITable> getTables();
-	public ITable getTable(ITable.Name pName);
-	public ITable getTable(String pName);
-	public ITable requireTable(ITable.Name pName) throws NoSuchElementException;
-	public ITable requireTable(String pName) throws NoSuchElementException;
-	int compareNames(Object pName1, Object pName2);
+	public static ISchemaBuilder builder() {
+		return new SchemaBuilder(null);
+	}
 }

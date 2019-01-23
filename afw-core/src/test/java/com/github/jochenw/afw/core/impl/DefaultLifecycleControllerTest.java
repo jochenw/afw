@@ -9,11 +9,14 @@ import javax.annotation.PreDestroy;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.ILifefycleController.Listener;
+import com.github.jochenw.afw.core.ILifefycleController.TerminableListener;
+
 public class DefaultLifecycleControllerTest {
-	private static class Startable {
+	private static class Startable implements TerminableListener {
 		private Long startTime, shutdownTimee;
 
-		@PostConstruct
+		@Override @PostConstruct
 		public void start() {
 			startTime = Long.valueOf(System.currentTimeMillis());
 		}
