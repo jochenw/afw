@@ -27,6 +27,7 @@ import com.github.jochenw.afw.core.inject.OnTheFlyBinder;
 import com.github.jochenw.afw.core.inject.Scope;
 import com.github.jochenw.afw.core.inject.Scopes;
 import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Objects;
 
 public class SimpleComponentFactory implements IComponentFactory {
 	public abstract static class Binding<T> implements Supplier<T> {
@@ -244,6 +245,7 @@ public class SimpleComponentFactory implements IComponentFactory {
 						if (!c.isAccessible()) {
 							c.setAccessible(true);
 						}
+						System.out.println("Constructor: " + c.getName());
 						return c.newInstance(getParameters(bindings));
 					} catch (Throwable t) {
 						throw Exceptions.show(t);
@@ -315,8 +317,18 @@ public class SimpleComponentFactory implements IComponentFactory {
 				if (Modifier.isAbstract(m.getModifiers())) {
 					continue;
 				}
-				final Binding<?>[] bindings = findBindings(m.getParameters(), m.getGenericParameterTypes(), m.getParameterAnnotations(),
-						"Method " + m.getName() + " in class " + pSuperClass.getName());
+				if (isInjectedMethodOverwrittenByInjectedMethod(pType, m)) {
+					continue;
+				}
+				if (isPackagePrivateMethodOverwritten(pType, m)) {
+					continue;
+				}
+				if (isPublicMethodOverwrittenByNotAnnotatedMethod(pType, m)) {
+					continue;
+				}
+				final Method mth = Objects.notNull(findOverridingPublicMethod(pType, m), m);
+				final Binding<?>[] bindings = findBindings(mth.getParameters(), mth.getGenericParameterTypes(), mth.getParameterAnnotations(),
+						"Method " + mth.getName() + " in class " + pSuperClass.getName());
 				final Consumer<Object> consumer = (o) -> {
 					if (!m.isAccessible()) {
 						m.setAccessible(true);
@@ -331,7 +343,93 @@ public class SimpleComponentFactory implements IComponentFactory {
 			}
 		}
 	}
-	
+
+	protected boolean isPublicMethodOverwrittenByNotAnnotatedMethod(Class<?> pType, Method pMethod) {
+		if (!Modifier.isPublic(pMethod.getModifiers())) {
+			return false;
+		}
+		final String name = pMethod.getName();
+		final Class<?>[] paramTypes = pMethod.getParameterTypes();
+		Class<?> cl = pType;
+		while (cl != null  &&  cl != Object.class  &&  !pMethod.getDeclaringClass().equals(cl)) {
+			Method m2;
+			try {
+				m2 = cl.getDeclaredMethod(name, paramTypes);
+			} catch (NoSuchMethodException e) {
+				m2 = null;
+			}
+			if (m2 != null) {
+				return !m2.isAnnotationPresent(Inject.class);
+			}
+			cl = cl.getSuperclass();
+		}
+		return false;
+	}
+
+	protected Method findOverridingPublicMethod(Class<?> pType, Method pMethod) {
+		final int mod = pMethod.getModifiers();
+		if (!Modifier.isPublic(mod)) {
+			return null;
+		}
+		final String name = pMethod.getName();
+		final Class<?>[] paramTypes = pMethod.getParameterTypes();
+		Class<?> cl = pType;
+		while (cl != null  &&  cl != Object.class  &&  !pMethod.getDeclaringClass().equals(cl)) {
+			Method m2;
+			try {
+				m2 = cl.getDeclaredMethod(name, paramTypes);
+			} catch (NoSuchMethodException e) {
+				m2 = null;
+			}
+			if (m2 != null) {
+				return m2;
+			}
+			cl = cl.getSuperclass();
+		}
+		return null;
+	}
+
+	protected boolean isPackagePrivateMethodOverwritten(Class<?> pType, Method pMethod) {
+		final int mod = pMethod.getModifiers();
+		if (Modifier.isPrivate(mod)  ||  Modifier.isProtected(mod)  ||  Modifier.isPublic(mod)) {
+			return false;
+		}
+		final String name = pMethod.getName();
+		final Class<?>[] paramTypes = pMethod.getParameterTypes();
+		Class<?> cl = pType;
+		while (cl != null  &&  cl != Object.class  &&  !pMethod.getDeclaringClass().equals(cl)) {
+			Method m2;
+			try {
+				m2 = cl.getDeclaredMethod(name, paramTypes);
+			} catch (NoSuchMethodException e) {
+				m2 = null;
+			}
+			if (m2 != null) {
+				return true;
+			}
+			cl = cl.getSuperclass();
+		}
+		return false;
+	}
+
+	protected boolean isInjectedMethodOverwrittenByInjectedMethod(Class<?> pType, Method pMethod) {
+		final String name = pMethod.getName();
+		final Class<?>[] paramTypes = pMethod.getParameterTypes();
+		Class<?> cl = pType;
+		while (cl != null  &&  cl != Object.class  &&  !pMethod.getDeclaringClass().equals(cl)) {
+			Method m2;
+			try {
+				m2 = cl.getDeclaredMethod(name, paramTypes);
+			} catch (NoSuchMethodException e) {
+				m2 = null;
+			}
+			if (m2 != null &&  m2.isAnnotationPresent(Inject.class)) {
+				return true;
+			}
+			cl = cl.getSuperclass();
+		}
+		return false;
+	}
 	protected Object[] getParameters(Binding<?>[] pBindings) {
 		final Object[] array = new Object[pBindings.length];
 		for (int i = 0;  i < array.length;  i++) {
@@ -378,8 +476,9 @@ public class SimpleComponentFactory implements IComponentFactory {
 				if (argTypes != null  &&  argTypes.length == 1) {
 					final Binding<?> b = findBinding(pAnnotatable, argTypes[0], pAnnotations);
 					if (b != null) {
-						final Provider<?> prov = () -> b.get();
-						binding = newBinding(prov, Scopes.NO_SCOPE);
+						final Provider<Object> prov = () -> b.get();
+						final Provider<Provider<Object>> prov2 = () -> prov;
+						binding = newBinding(prov2, Scopes.NO_SCOPE);
 					}
 				}
 			}
