@@ -12,7 +12,7 @@ import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory.Binding;
 public class SimpleBindingList {
 	private static class KeyAndBinding {
 		final Key<?> key;
-		final Binding<?> binding;
+		Binding<?> binding;
 
 		KeyAndBinding(Key<?> pKey, Binding<?> pBinding) {
 			key = pKey;
@@ -21,7 +21,17 @@ public class SimpleBindingList {
 	}
 	private final List<KeyAndBinding> bindings = new ArrayList<>();
 
-	public void add(Key<?> pKey, Binding<?> pBinding) {
+	public void add(Key<?> pKey, Binding<?> pBinding, boolean pReplace) {
+		for (KeyAndBinding kab : bindings) {
+			if (pKey.equals(pBinding)) {
+				if (pReplace) {
+					kab.binding = pBinding;
+					return;
+				} else {
+					break;
+				}
+			}
+		}
 		bindings.add(new KeyAndBinding(pKey, pBinding));
 	}
 

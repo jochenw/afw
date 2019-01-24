@@ -97,14 +97,15 @@ public class InjectTests {
 		final Module module = new Module() {
 			@Override
 			public void configure(Binder pBinder) {
+				pBinder.bind(Tire.class, "spare").to(SpareTire.class);
+				pBinder.bind(SpareTire.class);
+                pBinder.bind(Seat.class).annotatedWith(Drivers.class).to(DriversSeat.class);
                 pBinder.bind(Car.class).to(Convertible.class);
                 pBinder.bind(Engine.class).to(V8Engine.class);
-                pBinder.bind(Cupholder.class);
+                pBinder.bind(Cupholder.class).in(Scopes.SINGLETON);
                 pBinder.bind(Tire.class);
                 pBinder.bind(FuelTank.class);
                 pBinder.requestStaticInjection(Convertible.class, SpareTire.class);
-				pBinder.bind(Tire.class, "spare").to(SpareTire.class);
-                pBinder.bind(Seat.class).annotatedWith(Drivers.class).to(DriversSeat.class);
             }
 		};
 		final IComponentFactory cf = pComponentFactoryBuilder.module(module).build();

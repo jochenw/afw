@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,10 +106,10 @@ public class SimpleComponentFactory implements IComponentFactory {
 		return o;
 	}
 
-	public void addBinding(Key<?> pKey, Binding<?> pBinding) {
+	public void addBinding(Key<?> pKey, Binding<?> pBinding, boolean pReplace) {
 		final SimpleBindingList sbl = findBindingList(pKey.getType(), false);
 		synchronized(sbl) {
-			sbl.add(pKey, pBinding);
+			sbl.add(pKey, pBinding, pReplace);
 		}
 	}
 
@@ -138,7 +139,7 @@ public class SimpleComponentFactory implements IComponentFactory {
 
 	protected class SingletonBinding<T> extends Binding<T> {
 		private final Provider<T> provider;
-		private boolean initialized;
+		private boolean created, initialized, initializing;
 		private T instance;
 
 		public SingletonBinding(Provider<T> pProvider) {
@@ -147,15 +148,27 @@ public class SimpleComponentFactory implements IComponentFactory {
 
 		@Override
 		public T get() {
+			final String t = this.toString().replace("com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory$", "");
+			System.out.println("get: -> " + t);
 			if (!initialized) {
 				synchronized(this) {
+					System.out.println("get: " + created + ", " + initialized + ", " + initializing);
+					if (!created) {
+						instance = provider.get();
+						created = true;
+					}
 					if (!initialized) {
 						instance = provider.get();
-						init(instance);
+						System.out.println("get: Created instance");
+						if (!initializing) {
+							initializing = true;
+							init(instance);
+						}
 						initialized = true;
 					}
 				}
 			}
+			System.out.println("get: <- " + t + ", " + instance);
 			return instance;
 		}
 	}
@@ -355,6 +368,19 @@ public class SimpleComponentFactory implements IComponentFactory {
 				final Provider<?> prov = onTheFlyBinder.getProvider(this, (Field) pAnnotatable);
 				if (prov != null) {
 					binding = newBinding(prov, Scopes.NO_SCOPE);
+				}
+			}
+		}
+		if (binding == null  &&  pType instanceof ParameterizedType) {
+			final ParameterizedType ptype = (ParameterizedType) pType;
+			if (Provider.class.equals(ptype.getRawType())) {
+				final Type[] argTypes = ptype.getActualTypeArguments();
+				if (argTypes != null  &&  argTypes.length == 1) {
+					final Binding<?> b = findBinding(pAnnotatable, argTypes[0], pAnnotations);
+					if (b != null) {
+						final Provider<?> prov = () -> b.get();
+						binding = newBinding(prov, Scopes.NO_SCOPE);
+					}
 				}
 			}
 		}

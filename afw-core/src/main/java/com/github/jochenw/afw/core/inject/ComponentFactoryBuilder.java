@@ -140,7 +140,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		}
 
 		protected void assertNotAnnotated() {
-			if (key.getAnnotation() != null  ||  key.getAnnotationClass() != null) {
+			if (annotation != null  ||  annotationClass != null) {
 				throw new IllegalStateException("The methods annotatedWith(Annotation), and annotatedWith(Class), and named(), are mutually exclusive, and may be used only once.");
 			}
 		}
@@ -242,17 +242,19 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 
 		@Override
 		public LinkedBindingBuilder<O> annotatedWith(Class<? extends Annotation> pAnnotationType) {
-			final Class<? extends Annotation> annoClass = pAnnotationType;
+			final Class<? extends Annotation> annoClass = Objects.requireNonNull(pAnnotationType);
 			assertNotAnnotated();
 			annotationClass = annoClass;
+			key = new Key<O>(key.getType(), annotationClass);
 			return this;
 		}
 
 		@Override
 		public LinkedBindingBuilder<O> annotatedWith(Annotation pAnnotation) {
-			final Annotation anno = pAnnotation;
+			final Annotation anno = Objects.requireNonNull(pAnnotation);
 			assertNotAnnotated();
 			annotation = anno;
+			key = new Key<O>(key.getType(), annotation);
 			return this;
 		}
 

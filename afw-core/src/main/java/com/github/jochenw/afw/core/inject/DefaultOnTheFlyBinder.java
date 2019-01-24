@@ -7,10 +7,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Singleton;
 
 import org.apache.logging.log4j.util.Strings;
 
@@ -255,5 +257,30 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 			throw new IllegalStateException("@PropInject on " + pAnnotatable + " has an invalid default value: " + pDefaultValueStr);
 		}
 		return defaultBoolean;
+	}
+
+	@Override
+	public <O> void findBindings(IComponentFactory pCf, Class<?> pType,
+			BiConsumer<Key<O>, ScopedProvider<O>> pBindingSink) {
+		if (pType instanceof Class) {
+			final Class<?> cl = (Class<?>) pType;
+			if (cl.isAnnotationPresent(Singleton.class)) {
+				final ScopedProvider<O> scopedProvider = new ScopedProvider<O>() {
+					@Override
+					public O get() {
+						@SuppressWarnings("unchecked")
+						final O o = (O) pCf.newInstance(cl);
+						return o;
+					}
+
+					@Override
+					public Scope getScope() {
+						return Scopes.SINGLETON;
+					}
+
+				};
+				pBindingSink.accept(new Key<O>(pType), scopedProvider);
+			}
+		}
 	}
 }
