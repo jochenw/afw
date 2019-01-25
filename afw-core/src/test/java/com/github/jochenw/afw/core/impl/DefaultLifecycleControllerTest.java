@@ -16,7 +16,8 @@ public class DefaultLifecycleControllerTest {
 	private static class Startable implements TerminableListener {
 		private Long startTime, shutdownTimee;
 
-		@Override @PostConstruct
+		@Override
+		@PostConstruct
 		public void start() {
 			startTime = Long.valueOf(System.currentTimeMillis());
 		}

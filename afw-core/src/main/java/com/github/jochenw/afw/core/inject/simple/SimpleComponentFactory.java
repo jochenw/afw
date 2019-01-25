@@ -228,10 +228,15 @@ public class SimpleComponentFactory implements IComponentFactory {
 	private Consumer<Object> newInitializer(Class<?> pType) {
 		final List<Consumer<Object>> initializers = new ArrayList<>();
 		final Consumer<Consumer<Object>> initializerSink = (co) -> initializers.add(co);
-		walkToObjectClass(pType, (c) -> {
+		final List<Class<?>> classes = new ArrayList<>();
+		Class<?> cl = pType;
+		while (cl != null &&  !Object.class.equals(cl)) {
+			classes.add(0, cl);
+		}
+		for (Class<?> c : classes) {
 			findFieldInitializers(pType, c, initializerSink);
 			findMethodInitializers(pType, c, initializerSink);
-		});
+		};
 		return (o) -> initializers.forEach((i) -> i.accept(o));
 	}
 
@@ -260,14 +265,6 @@ public class SimpleComponentFactory implements IComponentFactory {
 				throw Exceptions.show(t);
 			}
 		};
-	}
-
-	protected void walkToObjectClass(Class<?> pType, Consumer<Class<?>> pClassConsumer) {
-		Class<?> type = pType;
-		while(type != null  &&  !Object.class.equals(type)) {
-			pClassConsumer.accept(type);
-			type = type.getSuperclass();
-		}
 	}
 
 	protected boolean isStaticInjectionRequested(Class<?> pType) {
