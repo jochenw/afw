@@ -233,4 +233,58 @@ public class Functions {
 			throw Exceptions.show(t);
 		}
 	}
+
+	/**
+	 * Lambda version of try-with-resources.
+	 * The given {@code pAction} is being executed. Afterwards, <em>all</em> of
+	 * the given {@code pResources} are being executed, in the given order.
+	 * If an exception is thrown by either the original action, or by the
+	 * resource actions, then the <em>first</em> exception is being rethrown.
+	 */
+	@SafeVarargs
+	public static void tryWithResources(FailableRunnable<? extends Throwable> pAction,
+			                            FailableRunnable<? extends Throwable>... pResources) {
+		tryWithResources(pAction, null, pResources);
+	}
+
+	/**
+	 * Lambda version of try-with-resources.
+	 * The given {@code pAction} is being executed. Afterwards, <em>all</em> of
+	 * the given {@code pResources} are being executed, in the given order.
+	 * If an exception is thrown by either the original action, or by the
+	 * resource actions, then the <em>first</em> exception is being rethrown.
+	 */
+	@SafeVarargs
+	public static void tryWithResources(FailableRunnable<? extends Throwable> pAction,
+			                            FailableConsumer<Throwable,? extends Throwable> pErrorHandler,
+			                            FailableRunnable<? extends Throwable>... pResources) {
+		Throwable th = null;
+		try {
+			pAction.run();
+		} catch (Throwable t) {
+			th = t;
+		}
+		if (pResources != null) {
+			for (FailableRunnable<? extends Throwable> resource : pResources) {
+				try {
+					resource.run();
+				} catch (Throwable t) {
+					if (th == null) {
+						th = t;
+					}
+				}
+			}
+		}
+		if (th != null) {
+			if (pErrorHandler == null) {
+				throw Exceptions.show(th);
+			} else {
+				try {
+					pErrorHandler.accept(th);
+				} catch (Throwable t) {
+					throw Exceptions.show(th);
+				}
+			}
+		}
+	}
 }
