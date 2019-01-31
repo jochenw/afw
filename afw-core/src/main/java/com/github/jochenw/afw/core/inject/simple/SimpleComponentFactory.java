@@ -1,3 +1,18 @@
+/**
+ * Copyright 2018 Jochen Wiedmann
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jochenw.afw.core.inject.simple;
 
 import java.lang.annotation.Annotation;
@@ -241,26 +256,33 @@ public class SimpleComponentFactory implements IComponentFactory {
 	}
 
 	private Provider<Object> newInstantiator(Class<?> pType) {
+		Constructor<?> constructor = null;
 		for (Constructor<?> c : pType.getDeclaredConstructors()) {
 			if (c.isAnnotationPresent(Inject.class)) {
-				final Binding<?>[] bindings = findBindings(c.getParameters(), c.getGenericParameterTypes(), c.getParameterAnnotations(),
-						"Constructor of class " + c.getName());
-				return () -> {
-					try {
-						if (!c.isAccessible()) {
-							c.setAccessible(true);
-						}
-						System.out.println("Constructor: " + c.getName());
-						return c.newInstance(getParameters(bindings));
-					} catch (Throwable t) {
-						throw Exceptions.show(t);
-					}
-				};
+				constructor = c;
+				break;
 			}
 		}
+		if (constructor == null) {
+			try {
+				constructor = pType.getDeclaredConstructor();
+			} catch (NoSuchMethodException e) {
+				throw new IllegalStateException("The class "
+						+ pType.getName() + " has neither a public default constructor, nor a"
+						+ " constructor annotated with @Inject");
+			}
+		}
+		final Constructor<?> c = constructor;
+		final Binding<?>[] bindings = findBindings(c.getParameters(),
+				                                   c.getGenericParameterTypes(),
+				                                   c.getParameterAnnotations(),
+				                                   "Constructor of class " + pType.getName());
 		return () -> {
 			try {
-				return pType.newInstance();
+				if (!c.isAccessible()) {
+					c.setAccessible(true);
+				}
+				return c.newInstance(getParameters(bindings));
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
 			}

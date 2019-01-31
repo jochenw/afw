@@ -1,3 +1,18 @@
+/**
+ * Copyright 2018 Jochen Wiedmann
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jochenw.afw.core.el.tree;
 
 import java.math.BigDecimal;
@@ -11,7 +26,7 @@ public class LiteralFactory {
     private static final Integer[] lowIntegers = new Integer[128];
     static {
         for (int i = 0;  i < lowIntegers.length;  i++) {
-            lowIntegers[i] = new Integer(i);
+            lowIntegers[i] = Integer.valueOf(i);
         }
     }
 
@@ -22,14 +37,14 @@ public class LiteralFactory {
         if (pValue >= 0  &&  pValue < lowIntegers.length) {
             return lowIntegers[pValue];
         }
-        return new Integer(pValue);
+        return Integer.valueOf(pValue);
     }
 
     /**
      * Creates a new integer value.
      */
     public static Number asInteger(long pValue) {
-        return new Long(pValue);
+        return Long.valueOf(pValue);
     }
 
     /**
@@ -41,7 +56,7 @@ public class LiteralFactory {
             return asInteger(value);
         } catch (Exception e1) {
             try {
-                return new Long(pValue);
+                return Long.valueOf(pValue);
             } catch (Exception e2) {
                 try {
                     return new BigInteger(pValue);
@@ -56,14 +71,14 @@ public class LiteralFactory {
      * Creates a new floating point value.
      */
     public static Number asFloatingPoint(float pValue) {
-        return new Float(pValue);
+        return Float.valueOf(pValue);
     }
 
     /**
      * Creates a new floating point value.
      */
     public static Number asFloatingPoint(double pValue) {
-        return new Double(pValue);
+        return Double.valueOf(pValue);
     }
 
     /**
@@ -71,10 +86,10 @@ public class LiteralFactory {
      */
     public static Number asFloatingPoint(String pValue) {
         try {
-            return new Float(pValue);
+            return Float.valueOf(pValue);
         } catch (Exception e1) {
             try {
-                return new Double(pValue);
+                return Double.valueOf(pValue);
             } catch (Exception e2) {
                 try {
                     return new BigDecimal(pValue);

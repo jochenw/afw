@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.csv;
 
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 
-public class Predicates {
-	/** A {@link Predicate}, which is always true, or false.
+import com.github.jochenw.afw.core.util.Exceptions;
+
+public class FinalizableConsumer<T> implements Consumer<T> {
+	/** Called for success.
 	 */
-	public static <O> Predicate<O> always(final boolean pValue) {
-		return new Predicate<O>() {
-			@Override
-			public boolean test(O pT) {
-				return pValue;
-			}
-		};
+	public void finished() {
 	}
-	/** A {@link Predicate}, which is always true.
+	/**  Called for error.
 	 */
-	public static <O> Predicate<O> alwaysTrue() {
-		return always(true);
+	public void error(Throwable pThrowable) {
+		throw Exceptions.show(pThrowable);
 	}
-	/** A {@link Predicate}, which is always false.
-	 */
-	public static <O> Predicate<O> alwaysFalse() {
-		return always(false);
+	@Override
+	public void accept(T pValue) {
 	}
 }

@@ -1,3 +1,18 @@
+/**
+ * Copyright 2018 Jochen Wiedmann
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jochenw.afw.core.inject;
 
 import java.lang.annotation.Annotation;
@@ -326,7 +341,11 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 	protected IComponentFactory newInstance() {
 		final @Nonnull Class<? extends IComponentFactory> cfClass = getComponentFactoryClass();
 		try {
-			return cfClass.newInstance();
+			final Constructor<? extends IComponentFactory> constructor = cfClass.getDeclaredConstructor();
+			if (!constructor.isAccessible()) {
+				constructor.setAccessible(true);
+			}
+			return constructor.newInstance();
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
@@ -355,18 +374,18 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		final List<BindingBuilder<?>> builders = new ArrayList<>();
 		final Binder binder = new Binder() {
 			@Override
-			public <T> LinkedBindingBuilder<T> bind(Key<T> pKey) {
-				final BindingBuilder<T> builder = new BindingBuilder<T>(pKey);
+			public <O> LinkedBindingBuilder<O> bind(Key<O> pKey) {
+				final BindingBuilder<O> builder = new BindingBuilder<O>(pKey);
 				final BindingBuilder<?> b = builder;
 				builders.add(b);
 				return builder;
 			}
 
 			@Override
-			public <T> AnnotatedBindingBuilder<T> bind(Type<T> pType) {
+			public <O> AnnotatedBindingBuilder<O> bind(Type<O> pType) {
 				final java.lang.reflect.Type type = pType.getRawType();
-				final Key<T> key = new Key<T>(type);
-				final BindingBuilder<T> builder = new BindingBuilder<T>(key);
+				final Key<O> key = new Key<O>(type);
+				final BindingBuilder<O> builder = new BindingBuilder<O>(key);
 				final BindingBuilder<?> b = builder;
 				builders.add(b);
 				return builder;
@@ -487,6 +506,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 			} else if (type instanceof ParameterizedType) {
 				final ParameterizedType ptype = (ParameterizedType) type;
 				if (ptype.getRawType() instanceof Class) {
+					@SuppressWarnings("unchecked")
 					final Class<? extends O> cl = (Class<? extends O>) ptype.getRawType();
 					return () -> {
 						return getInstance().newInstance(cl);
