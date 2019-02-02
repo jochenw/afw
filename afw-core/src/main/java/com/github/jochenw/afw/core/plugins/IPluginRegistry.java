@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+
 public interface IPluginRegistry {
 	public interface IExtensionPoint<O extends Object> {
 		@Nonnull List<O> getPlugins();
@@ -94,5 +95,11 @@ public interface IPluginRegistry {
 	}
 	public default <O extends Object> void addPlugin(Class<O> pType, O pPlugin) {
 		requireExtensionPoint(pType).addPlugin(pPlugin);
+	}
+	public default <O extends Object> List<O> requirePlugins(Class<O> pType) {
+		return requireExtensionPoint(pType).getPlugins();
+	}
+	public default <O extends Object> List<O> requirePlugins(Class<O> pType, String pId) {
+		return requireExtensionPoint(pType, pId).getPlugins();
 	}
 }

@@ -247,6 +247,7 @@ public class SimpleComponentFactory implements IComponentFactory {
 		Class<?> cl = pType;
 		while (cl != null &&  !Object.class.equals(cl)) {
 			classes.add(0, cl);
+			cl = cl.getSuperclass();
 		}
 		for (Class<?> c : classes) {
 			findFieldInitializers(pType, c, initializerSink);
@@ -264,13 +265,13 @@ public class SimpleComponentFactory implements IComponentFactory {
 			}
 		}
 		if (constructor == null) {
-			try {
-				constructor = pType.getDeclaredConstructor();
-			} catch (NoSuchMethodException e) {
-				throw new IllegalStateException("The class "
-						+ pType.getName() + " has neither a public default constructor, nor a"
-						+ " constructor annotated with @Inject");
-			}
+			return () -> {
+				try {
+					return pType.newInstance();
+				} catch (Throwable t) {
+					throw Exceptions.show(t);
+				}
+			};
 		}
 		final Constructor<?> c = constructor;
 		final Binding<?>[] bindings = findBindings(c.getParameters(),
