@@ -43,68 +43,6 @@
              <target>1.8</target>
           </configuration>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-        	<groupId>org.eclipse.m2e</groupId>
-        	<artifactId>lifecycle-mapping</artifactId>
-        	<version>1.0.0</version>
-        	<configuration>
-        		<lifecycleMappingMetadata>
-        			<pluginExecutions>
-        				<pluginExecution>
-        					<pluginExecutionFilter>
-        						<groupId>
-        							org.apache.maven.plugins
-        						</groupId>
-        						<artifactId>
-        							maven-compiler-plugin
-        						</artifactId>
-        						<versionRange>[3.5,)</versionRange>
-        						<goals>
-        							<goal>compile</goal>
-        							<goal>testCompile</goal>
-        						</goals>
-        					</pluginExecutionFilter>
-        					<action>
-        						<execute/>
-        					</action>
-        				</pluginExecution>
-        				<pluginExecution>
-        					<pluginExecutionFilter>
-        						<groupId>
-        							org.apache.maven.plugins
-        						</groupId>
-        						<artifactId>
-        							maven-jar-plugin
-        						</artifactId>
-        						<versionRange>[2.4,)</versionRange>
-        						<goals>
-        							<goal>jar</goal>
-        						</goals>
-        					</pluginExecutionFilter>
-        					<action>
-        						<ignore></ignore>
-        					</action>
-        				</pluginExecution>
-        				<pluginExecution>
-        					<pluginExecutionFilter>
-        						<groupId>org.codehaus.mojo</groupId>
-        						<artifactId>
-        							javacc-maven-plugin
-        						</artifactId>
-        						<versionRange>[2.6,)</versionRange>
-        						<goals>
-        							<goal>javacc</goal>
-        						</goals>
-        					</pluginExecutionFilter>
-        					<action>
-        						<ignore></ignore>
-        					</action>
-        				</pluginExecution>
-        			</pluginExecutions>
-        		</lifecycleMappingMetadata>
-        	</configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -125,6 +63,11 @@
 		  </execution>
 		</executions>
 	  </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.7.1</version>
+        </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -191,4 +134,99 @@
   		<scope>provided</scope>
   	</dependency>
   </dependencies>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changes-plugin</artifactId>
+        <version>2.12.1</version>
+        <configuration>
+          <githubAPIPort>80</githubAPIPort>
+          <githubAPIScheme>http</githubAPIScheme>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.0.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+        <configuration>
+          <excludePackageNames>com.github.jochenw.afw.core.el.jcc</excludePackageNames>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+  <profiles>
+    <profile>
+      <id>eclipse-only</id>
+      <activation>
+        <property><name>m2e.version</name></property>
+      </activation>
+      <build>
+        <plugins>
+          <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+          <plugin>
+        	<groupId>org.eclipse.m2e</groupId>
+        	<artifactId>lifecycle-mapping</artifactId>
+        	<version>1.0.0</version>
+        	<configuration>
+        	  <lifecycleMappingMetadata>
+        		<pluginExecutions>
+        		  <pluginExecution>
+        			<pluginExecutionFilter>
+        			  <groupId>org.apache.maven.plugins</groupId>
+        			  <artifactId>maven-compiler-plugin</artifactId>
+        			  <versionRange>[3.5,)</versionRange>
+        			  <goals>
+        				<goal>compile</goal>
+        				<goal>testCompile</goal>
+        			  </goals>
+        			</pluginExecutionFilter>
+        			<action>
+        			  <execute/>
+        			</action>
+        		  </pluginExecution>
+        		  <pluginExecution>
+        			<pluginExecutionFilter>
+        			  <groupId>org.apache.maven.plugins</groupId>
+					  <artifactId>maven-jar-plugin</artifactId>
+        			  <versionRange>[2.4,)</versionRange>
+        			  <goals>
+        				<goal>jar</goal>
+        			  </goals>
+        			</pluginExecutionFilter>
+        			<action><execute/></action>
+        		  </pluginExecution>
+        		  <pluginExecution>
+        			<pluginExecutionFilter>
+        			  <groupId>org.codehaus.mojo</groupId>
+        			  <artifactId>javacc-maven-plugin</artifactId>
+        		      <versionRange>[2.6,)</versionRange>
+  					  <goals>
+  					    <goal>javacc</goal>
+        			  </goals>
+        			</pluginExecutionFilter>
+        			<action>
+        				<execute/>
+        			</action>
+        		  </pluginExecution>
+        		</pluginExecutions>
+        	  </lifecycleMappingMetadata>
+        	</configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

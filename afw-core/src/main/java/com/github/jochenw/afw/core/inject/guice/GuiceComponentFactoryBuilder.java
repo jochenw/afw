@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,7 +107,6 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder<GuiceC
 
 	protected void configure(GuiceComponentFactory pGcf, com.google.inject.Binder pBinder, BindingBuilder<Object> pBb) {
 		final Key<Object> key = pBb.getKey();
-		System.out.println("kex=" + key);
 		final com.google.inject.Key<Object> gKey = pGcf.asGKey(key);
 		final com.google.inject.binder.ScopedBindingBuilder sbb;
 		if (pBb.hasTarget()) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,7 +70,7 @@ public class InjectTests {
 		}
 	}
 
-	public static void testComponentFactory(ComponentFactoryBuilder pComponentFactoryBuilder) {
+	public static void testComponentFactory(ComponentFactoryBuilder<?> pComponentFactoryBuilder) {
 		final Map<String,Object> map1 = new HashMap<>();
 		final Map<String,Object> map2 = new HashMap<>();
 		final ILogFactory logFactory = new SimpleLogFactory();

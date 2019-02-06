@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -148,6 +148,8 @@ public class Strings {
     }
 
     /** Converts the given String into an array of lines.
+     * @param pValue The string to split into lines.
+     * @return The array of lines, which has been read from the input string.
      */
 	public static String[] toLines(String pValue) {
 		final StringReader sr = new StringReader(pValue);

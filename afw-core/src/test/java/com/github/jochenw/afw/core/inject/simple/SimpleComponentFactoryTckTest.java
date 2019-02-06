@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,6 @@
  */
 package com.github.jochenw.afw.core.inject.simple;
 
-import com.github.jochenw.afw.core.inject.InjectTests;
-
-import junit.framework.Test;
 import junit.framework.TestCase;
 
 public class SimpleComponentFactoryTckTest extends TestCase {

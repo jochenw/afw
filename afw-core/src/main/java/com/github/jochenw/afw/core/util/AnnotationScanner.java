@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * Searches for annotations in a text string. An annotation is something like
- *   @SuppressWarnings(user="jwi", reason="Not Given", rules="rule0, rule1, ...")
+ *   \@SuppressWarnings(user="jwi", reason="Not Given", rules="rule0, rule1, ...")
  * The annotations name ("SuppressWarnings" in the example), and the attribute
  * names ("user", "reason", and "rules" in the example) must be valid Java
  * identifiers. The attribute values must be valid Java strings. In particular,

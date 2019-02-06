@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core.io;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -27,7 +28,9 @@ import java.util.Objects;
 
 import com.github.jochenw.afw.core.util.Streams;
 
-public class WritableCharacterStream implements AutoCloseable {
+
+
+public class WritableCharacterStream implements AutoCloseable, Flushable, Appendable {
 	private Charset charSet;
 	private BufferedWriter bw;
 
@@ -87,10 +90,12 @@ public class WritableCharacterStream implements AutoCloseable {
 		}
 	}
 
+	@Override
 	public void flush() throws IOException {
 		bw.flush();
 	}
 
+	@Override
 	public void close() throws IOException {
 		bw.close();
 	}
@@ -145,5 +150,31 @@ public class WritableCharacterStream implements AutoCloseable {
 
 	public static WritableCharacterStream newInstance(OutputStream pOut, boolean pClose) {
 		return newInstance(pOut, StandardCharsets.UTF_8, pClose);
+	}
+
+	@Override
+	public Appendable append(CharSequence pCsq) throws IOException {
+		return append(pCsq, 0, pCsq.length());
+	}
+
+	@Override
+	public Appendable append(CharSequence pCsq, int pStart, int pEnd) throws IOException {
+		final char[] ch;
+		if (pCsq instanceof String) {
+			ch = ((String) pCsq).toCharArray();
+		} else {
+			ch = new char[pCsq.length()];
+			for (int i = 0;  i < ch.length;  i++) {
+				ch[i] = pCsq.charAt(i);
+			}
+		}
+		bw.write(ch, pStart, pEnd-pStart);
+		return this;
+	}
+
+	@Override
+	public Appendable append(char pC) throws IOException {
+		bw.write((int) pC);
+		return this;
 	}
 }

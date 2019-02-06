@@ -1,0 +1,69 @@
+~~
+~~ Copyright 2018 Jochen Wiedmann
+~~ 
+~~ Licensed under the Apache License, Version 2.0 (the "License");
+~~ you may not use this file except in compliance with the License.
+~~ You may obtain a copy of the License at
+~~ 
+~~   http://www.apache.org/licenses/LICENSE-2.0
+~~ 
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+~~
+	---------------------------
+	AFW (Application Framework)
+	---------------------------
+	         Jochen Wiedmann
+	---------------------------
+	         2018-10-20
+	---------------------------
+
+AFW (Application Framework)
+
+    The application framework aims to provide a standalone tool, which may be used when starting a new application,
+    and allows you to use modern software design principles right from the start. The range of solution begins with
+    simple helper classes in the style of {{{http://commons.apache.org/io}Apache Commons IO}}, {{{http://commons.apache.org/lang}
+    Apache Commons Lang}}, or {{{https://github.com/google/guava}Google Guava}} (for example
+    {{{./apidocs/com/github/jochenw/afw/core/util/Streams.html}Streams}}, or
+    {{{./apidocs/com/github/jochenw/afw/core/util/Strings}Strings}}) over medium complex stuff like a
+    {{{./apidocs/com/github/jochenw/afw/core/log/package-summary.html}logging facade with pluggable logging backends}}
+    (like {{{https://github.com/qos-ch/slf4j}SLF4J}}, or {{{http://commons.apache.org/logging}Apache Commons Logging}}),
+    or a
+    {{{./apidocs/com/github/jochenw/afw/core/props/package-summary.html}property facade with the ability to reconfigure properties at runtime}} up to somewhat complex stuff like a
+    {{{./apidocs/com/github/jochenw/afw/core/plugins/package-summary.html}plugin framework}}, or
+    {{{./apidocs/com/github/jochenw/afw/core/inject/package-summary.html}dependency injection framework with pluggable backends}}.
+    
+    This stuff is the result of 20 years professional work, all the while collecting reusable ideas, solutions, and tools.
+
+* Overview
+
+    *  {{{./apidocs/com/github/jochenw/afw/core/csv/package-summary.html}Parsing, and creating CSV files}}
+
+    * {{{./apidocs/com/github/jochenw/afw/core/el/package-summary.html}An Interpreter of the EL (Expression Language)}}
+
+    *  {{{./apidocs/com/github/jochenw/afw/core/inject/package-summary.html}Dependency injection (DI)}} The DI framework includes
+         the ability to inject loggers, and properties. It also supports the @PostConstruct, and @PreDestroy annotations. 
+
+         * {{{./apidocs/com/github/jochenw/afw/core/inject/simple/package-summary.html}Standalone implementation of the DI framework}}
+         
+         * {{{./apidocs/com/github/jochenw/afw/core/inject/guice/package-summary.html}Alternative implementation of the DI framework, based on Google Guice}}
+
+    *  {{{./apidocs/com/github/jochenw/afw/core/io/package-summary.html}Various I/O related helper classes}}
+
+    *  {{{./apidocs/com/github/jochenw/afw/core/log/package-summary.html}A logging facade with pluggable backends}}
+
+        * {{{./apidocs/com/github/jochenw/afw/core/log/simple/package-summary.html}Simple standalone backend for the logging facade}}
+
+        * {{{./apidocs/com/github/jochenw/afw/core/log/log4j/package-summary.html}Log4J, and Log4J2 backends for the logging facade}}
+
+        * {{{./apidocs/com/github/jochenw/afw/core/log/slf4j/package-summary.html}SLF4J backend for the logging facade}}
+
+    *  {{{./apidocs/com/github/jochenw/afw/core/plugins/package-summary.html}Framework for implementing an application, which is
+          extendable by plugins}}
+
+    *  {{{./apidocs/com/github/jochenw/afw/core/props/package-summary.html}Property framework, including the ability to reconfigure at
+          runtime}}
+    

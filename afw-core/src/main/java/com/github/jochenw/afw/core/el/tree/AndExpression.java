@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ public class AndExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pItems The expressions item list. The expressions result will be built by applying a boolean AND on these items.
      */
     public AndExpression(List<EqualityExpression> pItems) {
         items = pItems;
@@ -38,6 +39,7 @@ public class AndExpression {
 
 	/**
      * Returns the expressions items.
+     * @return The expressions item list. The expressions result will be built by applying a boolean AND on these items.
      */
     public List<EqualityExpression> getEqualityExpressions() {
         return items;

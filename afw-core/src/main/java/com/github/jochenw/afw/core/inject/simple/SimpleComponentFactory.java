@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -164,18 +164,14 @@ public class SimpleComponentFactory implements IComponentFactory {
 
 		@Override
 		public T get() {
-			final String t = this.toString().replace("com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory$", "");
-			System.out.println("get: -> " + t);
 			if (!initialized) {
 				synchronized(this) {
-					System.out.println("get: " + created + ", " + initialized + ", " + initializing);
 					if (!created) {
 						instance = provider.get();
 						created = true;
 					}
 					if (!initialized) {
 						instance = provider.get();
-						System.out.println("get: Created instance");
 						if (!initializing) {
 							initializing = true;
 							init(instance);
@@ -184,7 +180,6 @@ public class SimpleComponentFactory implements IComponentFactory {
 					}
 				}
 			}
-			System.out.println("get: <- " + t + ", " + instance);
 			return instance;
 		}
 	}

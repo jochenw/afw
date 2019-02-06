@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ public class UnaryExpression {
 
     /**
      * Creates a new instance.
+     * @param pValue The expression value.
      */
     public UnaryExpression(ValueExpression pValue) {
     	this(pValue, null);
@@ -42,6 +43,7 @@ public class UnaryExpression {
     
     /**
      * Returns the value, which is being inverted.
+     * @return The expression value.
      */
     public ValueExpression getValue() {
         return value;

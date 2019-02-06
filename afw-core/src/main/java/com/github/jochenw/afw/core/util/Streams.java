@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ import java.io.Writer;
 
 
 /**
- * Utility class for working with Exceptions. Provides static utility methods.
+ * Utility class for working with Exceptions.
  */
 public class Streams {
     /**
@@ -43,7 +43,7 @@ public class Streams {
      * Returns the contents of the given {@link InputStream}, as a byte
      * array. The {@link InputStream} is closed.
      * @param pIn The {@link InputStream} to read from. Will be closed.
-     * @return The contents, which have been read from {@link pIn}.
+     * @return The contents, which have been read from {@code pIn}.
      */
     public static byte[] read(InputStream pIn) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -74,7 +74,7 @@ public class Streams {
      * {@link OutputStream}, using a buffer of {@code pBufSize} bytes.
      * Neither stream is closed.
      * @param pIn The {@link InputStream} to read from.
-     * @param pOut The {@link OutputStream0 to write to.
+     * @param pOut The {@link OutputStream} to write to.
      * @param pBufSize The buffer size to use, in bytes (performance).
      * @see #copy(java.io.InputStream, java.io.OutputStream) 
      * @see #copy(java.io.Reader, java.io.Writer)
@@ -100,7 +100,7 @@ public class Streams {
      * Returns the contents of the given {@link Reader}, as a string.
      * The {@link Reader} is closed.
      * @param pIn The {@link Reader} to read from. This
-     * {@link Reader will be closed, after invoking this method.
+     * {@link Reader} is <em>not</em> closed, after invoking this method.
      * @return The contents, which have been read from {@code pIn}.
      * @see #read(java.io.InputStream) 
      */
@@ -135,9 +135,9 @@ public class Streams {
      * @param pIn The {@link Reader} to read from.
      * @param pOut The {@link Writer} to write to.
      * @param pBufSize The buffer size to use.
-     * @see copy(Reader, Writer)
-     * @see copy(InputStream, OutputStream)
-     * @see copy(InputStream, OutputStream, int)
+     * @see #copy(Reader, Writer)
+     * @see #copy(InputStream, OutputStream)
+     * @see #copy(InputStream, OutputStream, int)
      */
     public static void copy(Reader pIn, Writer pOut, int pBufSize) {
         try {
@@ -155,7 +155,7 @@ public class Streams {
         }
     }
 
-    /** _Returns an {@link InputSteam}, which returns the same
+    /** _Returns an {@link InputStream}, which returns the same
      * contents than the given, but prevents the latter from being
      * closed.
      * @param pIn The {@link InputStream} to read.

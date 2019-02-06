@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,10 @@ public class EqualityExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pLeft The left operand, which is being tested for equality with the right operand.
+     * @param pOp Either of {@link Op#EQ}, or {@link Op#NE}, depending on whether to test for
+     *   "equals", or "not equals".
+     * @param pRight The right operand, which is being tested for equality with the left operand.
      */
     public EqualityExpression(RelationalExpression pLeft, Op pOp, RelationalExpression pRight) {
     	left = pLeft;
@@ -46,6 +50,7 @@ public class EqualityExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pLeft The unary operand.
      */
     public EqualityExpression(RelationalExpression pLeft) {
     	this(pLeft, null, null);

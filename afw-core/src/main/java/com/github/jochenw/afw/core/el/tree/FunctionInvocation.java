@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,8 @@ public class FunctionInvocation {
 
     /**
      * Creates a new instance.
+     * @param pName Name of the function, which is being invoked.
+     * @param pArgs The argument list, which is being passed to the function.
      */
     public FunctionInvocation(String pName, List<Object> pArgs) {
         name = pName;
@@ -35,6 +37,7 @@ public class FunctionInvocation {
 
     /**
      * Returns the functions name.
+     * @return The functions name.
      */
     public String getName() {
         return name;
@@ -42,6 +45,7 @@ public class FunctionInvocation {
 
     /**
      * Returns the functions argument list.
+     * @return The functions argument list.
      */
     public List<Object> getArgs() {
         return args;

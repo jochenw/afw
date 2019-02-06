@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,13 +30,15 @@ public class ComplexValue {
 
         /**
          * Creates a new instance.
+         * @param pIndex The array index.
          */
-        public ArraySuffix(Object pValue) {
-            value = pValue;
+        public ArraySuffix(Object pIndex) {
+            value = pIndex;
         }
 
         /**
-         * Returns the value.
+         * Returns the index value.
+         * @return The index value.
          */
         public Object getValue() {
             return value;
@@ -44,20 +46,22 @@ public class ComplexValue {
     }
 
     /**
-     * A values array suffix.
+     * A values property suffix.
      */
     public static class PropertySuffix {
         private final String value;
 
         /**
          * Creates a new instance.
+         * @param pKey The property key.
          */
-        public PropertySuffix(String pValue) {
-            value = pValue;
+        public PropertySuffix(String pKey) {
+            value = pKey;
         }
 
         /**
-         * Returns the value.
+         * Returns the property key.
+         * @return The property key.
          */
         public String getValue() {
             return value;
@@ -68,6 +72,7 @@ public class ComplexValue {
 
     /**
      * Creates a new instance with the given items.
+     * @param pItems The items, which are building the complex value.
      */
     public ComplexValue(List<Object> pItems) {
         items = pItems;
@@ -75,6 +80,7 @@ public class ComplexValue {
 
     /**
      * Returns the values items.
+     * @return The items, which are building the complex value.
      */
     public List<Object> getItems() {
         return items;

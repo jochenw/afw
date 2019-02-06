@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ public class NotExpression {
 
     /**
      * Creates a new instance.
+     * @param pValue The value, which is being negated.
      */
     public NotExpression(Object pValue) {
         value = pValue;
@@ -32,6 +33,7 @@ public class NotExpression {
 
     /**
      * Returns the value, which is being inverted.
+     * @return The value, which is being negated.
      */
     public Object getValue() {
         return value;
@@ -39,6 +41,9 @@ public class NotExpression {
 
     /**
      * Creates a new instance.
+     * @param pObject Evaluates the given value by negating it.
+     * @return The evaluated value.
+     * @throws IllegalArgumentException The value is a string, or a number, and cannot be negated.
      */
     public static Object valueOf(Object pObject) {
         if (pObject == null) {

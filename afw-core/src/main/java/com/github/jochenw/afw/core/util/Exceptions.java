@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,10 +26,6 @@ import java.util.Objects;
  * Utility class for working with Exceptions. Provides static utility methods.
  */
 public class Exceptions {
-	public static interface ThrowingRunnable {
-		public void run() throws Throwable;
-	}
-
 	/**
      * Private constructor, to prevent accidental instantiation.
      */
@@ -38,8 +34,10 @@ public class Exceptions {
     }
 
     /**
-     * Throws the given {@link Throwable}, or a suitable subclass, which can be thrown
-     * safely, without affecting the calling methods signature.
+     * Rethrows the given {@link Throwable}, either directly, or by wrapping it in a suitable subclass,
+     * which can be thrown safely, without affecting the calling methods signature.
+     * @param pTh The throwable being rethrown.
+     * @return Nothing, this method will <em>always</em> throw an exception.
      */
     public static RuntimeException show(Throwable pTh) {
         if (pTh == null) {
@@ -57,8 +55,16 @@ public class Exceptions {
 
 
     /**
-     * Throws the given {@link Throwable}, or a suitable subclass, which can be thrown
-     * safely, without affecting the calling methods signature.
+     * Rethrows the given {@link Throwable}, either directly, or by wrapping it in a suitable subclass,
+     * which can be thrown safely, without affecting the calling methods signature.
+     * @param pTh The throwable being rethrown.
+     * @param pClass An exception class, which can be thrown without affecting the calling
+     * methods signature.
+     * @return Nothing, this method will <em>always</em> throw an exception.
+     * @throws T Type of an exception, which may be thrown without affecting the calling methods
+     *   signature.
+     * @param <T> Type of an exception, which may be thrown without affecting the calling methods
+     *   signature.
      */
     public static <T extends Throwable> RuntimeException show(Throwable pTh, Class<T> pClass) throws T {
         if (pTh == null) {
@@ -77,20 +83,38 @@ public class Exceptions {
     }
 
     /** Converts the given {@link IOException} into a {@link RuntimeException}.
+     * @param pExc The {@link IOException} being rethrown.
+     * @return Nothing, this method will <em>always</em> throw an exception.
      */
     public static RuntimeException newUncheckedIOException(IOException pExc) {
         return new UncheckedIOException(pExc);
     }
 
-    /** Converts the given {@link Throwable} into a {@link RuntimeException}.
+    /** Converts the given {@link Exception} into a {@link RuntimeException}.
+     * @param pTh The {@link IOException} being rethrown.
+     * @return Nothing, this method will <em>always</em> throw an exception.
      */
     public static RuntimeException newUncheckedException(Throwable pTh) {
         return new UndeclaredThrowableException(pTh);
     }
 
     /**
-     * Throws the given {@link Throwable}, or a suitable subclass, which can be thrown
-     * safely, without affecting the calling methods signature.
+     * Rethrows the given {@link Throwable}, either directly, or by wrapping it in a suitable subclass,
+     * which can be thrown safely, without affecting the calling methods signature.
+     * @param pTh The throwable being rethrown.
+     * @param pClass1 An exception class, which can be thrown without affecting the calling
+     * methods signature.
+     * @param pClass2 Another exception class, which can be thrown without affecting the calling
+     * methods signature.
+     * @return Nothing, this method will <em>always</em> throw an exception.
+     * @throws T1 Type of an exception, which may be thrown without affecting the calling methods
+     *   signature.
+     * @throws T2 Type of another exception, which may be thrown without affecting the calling methods
+     *   signature.
+     * @param <T1> Type of an exception, which may be thrown without affecting the calling methods
+     *   signature.
+     * @param <T2> Type of another exception, which may be thrown without affecting the calling methods
+     *   signature.
      */
     public static <T1 extends Throwable, T2 extends Throwable> RuntimeException show(Throwable pTh, Class<T1> pClass1, Class<T2> pClass2) throws T1, T2 {
         if (pTh == null) {
@@ -111,6 +135,8 @@ public class Exceptions {
     }
 
     /** Returns the given throwables stacktrace as a string.
+     * @param pTh The {@link Throwable} to convert into a stack trace.
+     * @return The given throwables stack trace.
      */
     public static String toString(Throwable pTh) {
     	final StringWriter sw = new StringWriter();
@@ -118,39 +144,5 @@ public class Exceptions {
     	pTh.printStackTrace(pw);
     	pw.close();
     	return sw.toString();
-    }
-
-    /** Invokes the given {@link ThrowingRunnable}. If an exception is thrown, the exception is catched, and converted into a
-     * {@link RuntimeException}.
-     */
-    public static void run(ThrowingRunnable pRunnable) {
-    	try {
-    		pRunnable.run();
-    	} catch (Throwable t) {
-    		throw show(t);
-    	}
-    }
-
-    /** Invokes the given {@link Runnable}. If an exception is thrown, the exception is catched, and converted into a
-     * {@link RuntimeException}.
-     */
-    public static void run(Runnable pRunnable) {
-    	try {
-    		pRunnable.run();
-    	} catch (Throwable t) {
-    		throw show(t);
-    	}
-    }
-
-    public static Throwable close(AutoCloseable pCloseable, Throwable pTh) {
-    	Objects.requireNonNull(pCloseable, "Closeable");
-    	try {
-    		pCloseable.close();
-    	} catch (Throwable t) {
-    		if (pTh == null) {
-    			return t;
-    		}
-    	}
-    	return pTh;
     }
 }

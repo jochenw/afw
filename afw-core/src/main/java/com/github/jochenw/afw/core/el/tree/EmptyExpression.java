@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ public class EmptyExpression {
 
     /**
      * Creates a new instance with the given value.
+     * @param pValue The value, which is being checked as empty.
      */
     public EmptyExpression(Object pValue) {
         value = pValue;
@@ -31,13 +32,17 @@ public class EmptyExpression {
 
     /**
      * Returns the value to check.
+     * @return The value, which is being checked as empty.
      */
     public Object getValue() {
         return value;
     }
 
     /**
-     * Creates a new instance with the given value.
+     * Evaluates the given value.
+     * @param pValue The value, which is being checked as empty. 
+     * @return True, if the value is null, or an empty string.
+     * @throws IllegalArgumentException The value is a number, or a boolean value.
      */
     public static Object valueOf(Object pValue) {
         if (pValue == null) {

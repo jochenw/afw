@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ public class OrExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pItems The expression list.
      */
     public OrExpression(List<AndExpression> pItems) {
         items = pItems;
@@ -34,6 +35,7 @@ public class OrExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pItem The single expression item.
      */
     public OrExpression(AndExpression pItem) {
         items = Collections.singletonList(pItem);
@@ -41,6 +43,7 @@ public class OrExpression {
 
     /**
      * Returns the expressions items.
+     * @return The expression list.
      */
     public List<AndExpression> getAndExpressions() {
         return items;

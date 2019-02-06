@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,7 @@ public class AddExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pItems The expressions item list. The expressions result will be built by adding these items.
      */
     public AddExpression(List<Object> pItems) {
         objects = pItems;
@@ -48,6 +49,7 @@ public class AddExpression {
 
     /**
      * Creates a new instance with the given item.
+     * @param pItem The expressions item. For a single item, this will also be the result.
      */
     public AddExpression(Object pItem) {
     	this(Collections.singletonList(pItem));
@@ -55,6 +57,7 @@ public class AddExpression {
 
     /**
      * Returns the expressions items.
+     * @return The expressions result item.
      */
     public List<Object> getObjects() {
         return objects;

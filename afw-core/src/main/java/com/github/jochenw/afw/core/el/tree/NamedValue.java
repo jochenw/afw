@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ public class NamedValue {
 
     /**
      * Creates a new instance with the given name.
+     * @param pName The name, which is being looked up.
      */
     public NamedValue(String pName) {
         name = pName;
@@ -33,6 +34,7 @@ public class NamedValue {
 
     /**
      * Returns the name.
+     * @return The name, which is being looked up.
      */
     public String getName() {
         return name;

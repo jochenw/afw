@@ -1,3 +1,18 @@
+/*
+ * Copyright 2018 Jochen Wiedmann
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jochenw.afw.core.io;
 
 import java.io.IOException;
@@ -16,16 +31,22 @@ import javax.annotation.Nonnull;
 public class DirectoryScanner {
 	public interface Context {
 		/** Returns the base directory, which is currently being scanned.
+		 * @return The base directory, which is currently being scanned.
 		 */
 		@Nonnull Path getBaseDir();
-		BasicFileAttributes getAttrs();
+		/** Returns the current files attributes.
+		 * @return The current files attributes.
+		 */
+		@Nonnull BasicFileAttributes getAttrs();
 		/** Returns the path of a file, which has been detected within the
 		 * base directory.
+		 * @return Path of the current file.
 		 */
 		@Nonnull Path getFile();
 		/** Returns the relative path of the file, within the base directory.
 		 * The path is in a normalized form, using "/" as the separator, as
 		 * is the case for a Unix file system.
+		 * @return Relative path of the current file, in normalized form.
 		 */
 		@Nonnull String getUri();
 	}

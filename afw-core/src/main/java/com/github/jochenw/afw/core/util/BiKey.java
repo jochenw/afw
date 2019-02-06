@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,8 @@ import java.util.Objects;
 /** A combined key for use in maps. It overwrites {@link Object#hashCode()},
  * and {@link Object#equals(Object)} in a way, that two instances of TwoPartKey
  * are equal, exactly, if the two parts are equal.
+ * @param <O1> Type of the first part of the key.
+ * @param <O2> Type of the second part of the key.
  */
 public class BiKey<O1,O2> {
 	private final O1 part1;

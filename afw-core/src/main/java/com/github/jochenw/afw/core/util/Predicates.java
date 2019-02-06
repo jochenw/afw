@@ -19,6 +19,11 @@ import java.util.function.Predicate;
 
 public class Predicates {
 	/** A {@link Predicate}, which is always true, or false.
+	 * @param pValue The created predicates result.
+	 * @param <O> The predicates argument type.
+	 * @return A predicate returning a constant value, as given by the argument {@code pValue}.
+	 * @see #alwaysTrue()
+	 * @see #alwaysFalse()
 	 */
 	public static <O> Predicate<O> always(final boolean pValue) {
 		return new Predicate<O>() {
@@ -28,12 +33,20 @@ public class Predicates {
 			}
 		};
 	}
-	/** A {@link Predicate}, which is always true.
+	/** A {@link Predicate}, which is always true. Equivalent to {@link #always(boolean)} with the value true.
+	 * @param <O> The predicates argument type.
+	 * @return A predicate returning the constant value true.
+	 * @see #always(boolean)
+	 * @see #alwaysFalse()
 	 */
 	public static <O> Predicate<O> alwaysTrue() {
 		return always(true);
 	}
-	/** A {@link Predicate}, which is always false.
+	/** A {@link Predicate}, which is always false. Equivalent to {@link #always(boolean)} with the value false.
+	 * @param <O> The predicates argument type.
+	 * @return A predicate returning the constant value false.
+	 * @see #always(boolean)
+	 * @see #alwaysTrue()
 	 */
 	public static <O> Predicate<O> alwaysFalse() {
 		return always(false);

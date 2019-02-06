@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,6 +48,9 @@ public class RelationalExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pLeft The left expression, which is being compared against the right expression.
+     * @param pOp The operator to apply
+     * @param pRight The right expression, which is being compared against the left expression.
      */
     public RelationalExpression(AddExpression pLeft, Op pOp, AddExpression pRight) {
     	left = pLeft;
@@ -57,6 +60,7 @@ public class RelationalExpression {
 
     /**
      * Creates a new instance with the given items.
+     * @param pLeft The unary expression item.
      */
     public RelationalExpression(AddExpression pLeft) {
     	this(pLeft, null, null);

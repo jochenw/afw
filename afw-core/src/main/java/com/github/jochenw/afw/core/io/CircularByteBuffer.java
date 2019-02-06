@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ public class CircularByteBuffer {
 
 	/**
 	 * Creates a new instance with the given buffer size.
+	 * @param pSize The circular buffers size.
 	 */
 	public CircularByteBuffer(int pSize) {
 		buffer = new byte[pSize];
@@ -127,9 +128,12 @@ public class CircularByteBuffer {
 	 * {@code pBuffer}, {@code pOffset}, and {@code pLength}. No bytes are being
 	 * removed from the buffer. If the result is true, then the following invocations
 	 * of {@link #read()} are guaranteed to return exactly those bytes.
+	 * @param pBuffer The byte array, which is being searched in the buffer.
+	 * @param pOffset The offset of the first byte in the array, that is being searched.
+	 * @param pLength The number of bytes in the buffer, which are being searched for.
 	 * @return True, if the next invocations of {@link #read()} will return the
 	 * bytes at offsets {@code pOffset}+0, {@code pOffset}+1, ...,
-	 * @code{pOffset}+@code{pLength}-1 of byte array {@code pBuffer}.
+	 * {@code pOffset+pLength-1} of byte array {@code pBuffer}.
 	 * @throws IllegalArgumentException Either of {@code pOffset}, or {@code pLength} is negative.
 	 * @throws NullPointerException The byte array {@code pBuffer} is null.
 	 */
@@ -159,7 +163,10 @@ public class CircularByteBuffer {
 	/**
 	 * Adds the given bytes to the buffer. This is the same as invoking {@link #add(byte)}
 	 * for the bytes at offsets {@code pOffset}+0, {@code pOffset}+1, ...,
-	 * @code{pOffset}+@code{pLength}-1 of byte array {@code pBuffer}.
+	 * {@code pOffset+pLength-1} of byte array {@code pBuffer}.
+	 * @param pBuffer The byte array, which is being added to the buffer.
+	 * @param pOffset The offset of the first byte in the array, that is being added.
+	 * @param pLength The number of bytes in the buffer, which are being added.
 	 * @throws IllegalStateException The buffer doesn't have sufficient space. Use
 	 * {@link #getSpace()} to prevent this exception.
 	 * @throws IllegalArgumentException Either of {@code pOffset}, or {@code pLength} is negative.
@@ -188,6 +195,7 @@ public class CircularByteBuffer {
 	/**
 	 * Returns, whether there is currently room for a single byte in the buffer.
 	 * Same as {@link #hasSpace(int) hasSpace(1)}.
+	 * @return True, if there is room for at least one more byte in the buffer.
 	 * @see #hasSpace(int)
 	 * @see #getSpace()
 	 */
@@ -197,6 +205,8 @@ public class CircularByteBuffer {
 
 	/**
 	 * Returns, whether there is currently room for the given number of bytes in the buffer.
+	 * @param pBytes The number of bytes
+	 * @return True, if there is room for at least the given number of bytes in the buffer.
 	 * @see #hasSpace()
 	 * @see #getSpace()
 	 */
@@ -206,6 +216,7 @@ public class CircularByteBuffer {
 
 	/**
 	 * Returns, whether the buffer is currently holding, at least, a single byte.
+	 * @return True, if there is at least one byte in the buffer.
 	 */
 	public boolean hasBytes() {
 		return currentNumberOfBytes > 0;
@@ -213,6 +224,7 @@ public class CircularByteBuffer {
 
 	/**
 	 * Returns the number of bytes, that can currently be added to the buffer.
+	 * @return The number of bytes, that can be added to the buffer.
 	 */
 	public int getSpace() {
 		return buffer.length - currentNumberOfBytes;
@@ -220,6 +232,7 @@ public class CircularByteBuffer {
 
 	/**
 	 * Returns the number of bytes, that are currently present in the buffer.
+	 * @return The number of bytes, that are currently present in the buffer.
 	 */
 	public int getCurrentNumberOfBytes() {
 		return currentNumberOfBytes;
