@@ -93,10 +93,14 @@ public class DirectoryScanner {
 	}
 
 	public void scan(@Nonnull Path pBaseDir, IMatcher[] pIncludes, IMatcher[] pExcludes, Listener pListener) {
+		final IMatcher matcher = DefaultMatcher.newMatcher(pIncludes, pExcludes);
+		scan(pBaseDir, matcher, pListener);
+	}
+
+	public void scan(@Nonnull Path pBaseDir, Predicate<String> pMatcher, Listener pListener) {
 		if (!Files.isDirectory(pBaseDir)) {
 			throw new IllegalArgumentException("Directory not found, or otherwise unreadable: " + pBaseDir);
 		}
-		final Predicate<String> matcher = newMatcher(pIncludes, pExcludes);
 		final ContextImpl ctx = new ContextImpl();
 		ctx.baseDir = pBaseDir;
 		final FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
@@ -138,7 +142,7 @@ public class DirectoryScanner {
 				ctx.file = pFile;
 				ctx.uri = sb.toString();
 				ctx.attrs = pAttrs;
-				if (matcher.test(ctx.uri)) {
+				if (pMatcher.test(ctx.uri)) {
 					pListener.accept(ctx);
 				}
 				sb.setLength(len);
@@ -173,49 +177,5 @@ public class DirectoryScanner {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-	}
-
-	protected Predicate<String> newMatcher(IMatcher[] pIncludes, IMatcher[] pExcludes) {
-		if (isTrivial(pIncludes)) {
-			if (isTrivial(pExcludes)) {
-				return com.github.jochenw.afw.core.util.Predicates.alwaysTrue();
-			} else {
-				return newPredicate(pExcludes).negate();
-			}
-		} else {
-			if (isTrivial(pExcludes)) {
-				return newPredicate(pIncludes);
-			} else {
-				final Predicate<String> i = newPredicate(pIncludes);
-				final Predicate<String> e = newPredicate(pExcludes);
-				return (s) -> i.test(s)  &&  !e.test(s);
-			}
-		}
-	}
-
-	protected boolean isTrivial(IMatcher[] pMatchers) {
-		if (pMatchers == null) {
-			return true;
-		}
-		if (pMatchers.length == 0) {
-			return true;
-		}
-		for (IMatcher m : pMatchers) {
-			if (!m.isMatchingAll()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	protected Predicate<String> newPredicate(IMatcher[] pMatchers) {
-		return (s) -> {
-			for (IMatcher m : pMatchers) {
-				if (m.matches(s)) {
-					return true;
-				}
-			}
-			return false;
-		};
 	}
 }

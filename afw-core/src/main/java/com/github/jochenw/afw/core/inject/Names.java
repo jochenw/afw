@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core.inject;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
@@ -37,10 +38,33 @@ public class Names {
 		@Override
 		public @Nonnull String value() {
 			return value;
-		}	
+		}
+
+		@Override
+		public boolean equals(Object pOther) {
+			if (pOther == null) {
+				return false;
+			}
+			if (pOther instanceof NamedImpl) {
+				final NamedImpl other = (NamedImpl) pOther;
+				if (value == null) {
+					return other.value == null;
+				} else {
+					return value.equals(other.value);
+				}
+			} else {
+				return false;
+			}
+		}
 	}
 
 	public static javax.inject.Named named(@Nonnull String pValue) {
 		return new NamedImpl(pValue);
+	}
+
+	public static String upperCased(String pPrefix, String pSuffix) {
+		Objects.requireNonNull(pPrefix, "Prefix");
+		Objects.requireNonNull(pSuffix, "Suffix");
+		return pPrefix + Character.toUpperCase(pSuffix.charAt(0)) + pSuffix.substring(1);
 	}
 }

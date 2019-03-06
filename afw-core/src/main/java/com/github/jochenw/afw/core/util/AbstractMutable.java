@@ -17,7 +17,7 @@ package com.github.jochenw.afw.core.util;
 
 public class AbstractMutable {
 	private boolean immutable;
-	protected void assertMutable() {
+	public void assertMutable() {
 		if (immutable) {
 			throw new IllegalStateException("This object is no longer mutable.");
 		}

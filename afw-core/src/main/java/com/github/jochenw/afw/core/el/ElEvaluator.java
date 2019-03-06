@@ -431,6 +431,7 @@ public class ElEvaluator {
 				return pValue;
 			} else if (pValue instanceof Byte
 					     ||  pValue instanceof Short
+					     ||  pValue instanceof Integer
 					     ||  pValue instanceof Long
 					     ||  pValue instanceof AtomicInteger
 					     ||  pValue instanceof AtomicLong) {

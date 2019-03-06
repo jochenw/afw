@@ -197,9 +197,9 @@ public class PluginListParser {
 		}
 
 		@Override
-		public void characters(char[] pChars, int pStart, int pLength) throws SAXException {
+		public void characters(char[] pChars, int pOffset, int pLength) throws SAXException {
 			for (int i = 0;  i < pLength;  i++) {
-				if (!Character.isWhitespace(pChars[pStart+i])) {
+				if (!Character.isWhitespace(pChars[pOffset+i])) {
 					if (getLevel() == 0) {
 						throw error("Unexpected non-whitespace character outside of root element.");
 					} else {
@@ -207,11 +207,12 @@ public class PluginListParser {
 					}
 				}
 			}
+			super.characters(pChars, pOffset, pLength);
 		}
 
 		@Override
-		public void ignorableWhitespace(char[] pChars, int pStart, int pLength) throws SAXException {
-			characters(pChars, pStart, pLength);
+		public void ignorableWhitespace(char[] pChars, int pOffset, int pLength) throws SAXException {
+			super.ignorableWhitespace(pChars, pOffset, pLength);
 		}
 	}
 	public static List<IPluginRegistry.Initializer> parse(File pFile, ClassLoader pClassLoader) {

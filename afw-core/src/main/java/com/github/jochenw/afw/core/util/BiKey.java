@@ -28,7 +28,7 @@ public class BiKey<O1,O2> {
 	private final O1 part1;
 	private final O2 part2;
 
-	BiKey(O1 pPart1, O2 pPart2) {
+	public BiKey(O1 pPart1, O2 pPart2) {
 		Objects.requireNonNull(pPart1, "Part1");
 		Objects.requireNonNull(pPart2, "Part2");
 		part1 = pPart1;

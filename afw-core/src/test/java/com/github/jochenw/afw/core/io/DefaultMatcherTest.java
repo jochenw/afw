@@ -23,27 +23,35 @@ public class DefaultMatcherTest {
 	public void tesCaseSensitive() {
 		final DefaultMatcher dm = new DefaultMatcher("**/*.java");
 		Assert.assertFalse(dm.isMatchingAll());
-		Assert.assertTrue(dm.matches("com/foo/bar.java"));
-		Assert.assertTrue(dm.matches("com/Foo/bar.java"));
-		Assert.assertFalse(dm.matches("com/Foo/bar.javax"));
-		Assert.assertFalse(dm.matches("com/Foo/bar.Java"));
-		Assert.assertFalse(dm.matches("My.java"));
+		Assert.assertTrue(dm.test("com/foo/bar.java"));
+		Assert.assertTrue(dm.test("com/Foo/bar.java"));
+		Assert.assertFalse(dm.test("com/Foo/bar.javax"));
+		Assert.assertFalse(dm.test("com/Foo/bar.Java"));
+		Assert.assertTrue(dm.test("My.java"));
 	}
 
 	@Test
 	public void testCaseInsensitive() {
 		final DefaultMatcher dm = new DefaultMatcher("**/*.java", false);
 		Assert.assertFalse(dm.isMatchingAll());
-		Assert.assertTrue(dm.matches("com/foo/bar.java"));
-		Assert.assertTrue(dm.matches("com/Foo/bar.java"));
-		Assert.assertFalse(dm.matches("com/Foo/bar.javax"));
-		Assert.assertTrue(dm.matches("com/Foo/bar.Java"));
-		Assert.assertFalse(dm.matches("My.java"));
+		Assert.assertTrue(dm.test("com/foo/bar.java"));
+		Assert.assertTrue(dm.test("com/Foo/bar.java"));
+		Assert.assertFalse(dm.test("com/Foo/bar.javax"));
+		Assert.assertTrue(dm.test("com/Foo/bar.Java"));
+		Assert.assertTrue(dm.test("My.java"));
 	}
 
 	@Test
+	public void testNoDirectoryInPath() {
+		final DefaultMatcher dm = new DefaultMatcher("**/.classpath");
+		Assert.assertTrue(dm.test("foo/.classpath"));
+		Assert.assertTrue(dm.test(".classpath"));
+		final DefaultMatcher dm2 = new DefaultMatcher("**/.settings/**/*");
+		Assert.assertTrue(dm2.test(".settings/org.eclipse.core.resources.prefs"));
+	}
+	@Test
 	public void testPrefix() {
 		final DefaultMatcher dm = new DefaultMatcher("main/**/*");
-		Assert.assertTrue(dm.matches("main/java/com/github/jochenw/afw/core/csv/CsvFormatter.java"));
+		Assert.assertTrue(dm.test("main/java/com/github/jochenw/afw/core/csv/CsvFormatter.java"));
 	}
 }

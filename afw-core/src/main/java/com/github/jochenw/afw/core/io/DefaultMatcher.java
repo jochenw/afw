@@ -16,6 +16,7 @@
 package com.github.jochenw.afw.core.io;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 public class DefaultMatcher implements IMatcher {
@@ -66,12 +67,100 @@ public class DefaultMatcher implements IMatcher {
 			}
 		}
 		sb.append('$');
+		if (pPatternStr.startsWith("**/")) {
+			sb.replace(0, "^.*\\/".length(), "^(.*\\/|)");
+		}
+		if (pPatternStr.endsWith("**/*")) {
+			sb.replace(sb.length()-".*\\/[^/]*$".length(), sb.length(), ".*$");
+		}
 		return sb.toString();
 	}
 
 	@Override
-	public boolean matches(String pUri) {
+	public boolean test(String pUri) {
 		return pattern.matcher(pUri).matches();
 	}
 
+	public static IMatcher newMatcher(String[] pIncludes, String[] pExcludes, boolean pCaseSensitive) {
+		final IMatcher[] includes = asMatchers(pIncludes, pCaseSensitive);
+		final IMatcher[] excludes = asMatchers(pExcludes, pCaseSensitive);
+		return newMatcher(includes, excludes);
+	}
+	public static IMatcher newMatcher(IMatcher[] pIncludes, IMatcher[] pExcludes) {
+		if (isTrivial(pIncludes)) {
+			if (isTrivial(pExcludes)) {
+				return new IMatcher() {
+					@Override
+					public boolean isMatchingAll() {
+						return true;
+					}
+
+					@Override
+					public boolean test(String pUri) {
+						return true;
+					}
+				};
+			} else {
+				final Predicate<String> predicate = newPredicate(pExcludes);
+				return new IMatcher() {
+					@Override
+					public boolean test(String pUri) {
+						return !predicate.test(pUri);
+					}
+				};
+			}
+		} else {
+			if (isTrivial(pExcludes)) {
+				final Predicate<String> predicate = newPredicate(pIncludes);
+				return new IMatcher() {
+					@Override
+					public boolean test(String pUri) {
+						return predicate.test(pUri);
+					}
+				};
+			} else {
+				final Predicate<String> i = newPredicate(pIncludes);
+				final Predicate<String> e = newPredicate(pExcludes);
+				return new IMatcher() {
+					@Override
+					public boolean test(String pUri) {
+						return i.test(pUri)  &&  !e.test(pUri);
+					}
+				};
+			}
+		}
+	}
+
+	private static IMatcher[] asMatchers(String[] pPatterns, boolean pCaseSensitive) {
+		if (pPatterns == null  ||  pPatterns.length == 0) {
+			return null;
+		}
+		final IMatcher[] matchers = new IMatcher[pPatterns.length];
+		for (int i = 0;  i < matchers.length;  i++) {
+			matchers[i] = new DefaultMatcher(pPatterns[i], pCaseSensitive);
+		}
+		return matchers;
+	}
+	private static boolean isTrivial(IMatcher[] pMatchers) {
+		if (pMatchers == null  ||  pMatchers.length == 0) {
+			return true;
+		}
+		for (IMatcher m : pMatchers) {
+			if (!m.isMatchingAll()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static Predicate<String> newPredicate(IMatcher[] pMatchers) {
+		return (s) -> {
+			for (IMatcher m : pMatchers) {
+				if (m.test(s)) {
+					return true;
+				}
+			}
+			return false;
+		};
+	}
 }

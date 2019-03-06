@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.logging.log4j.util.Strings;
@@ -45,7 +46,7 @@ import com.github.jochenw.afw.core.props.LongProperty;
 import com.github.jochenw.afw.core.props.StringProperty;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Functions;
-import com.google.inject.Provider;
+
 
 public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 	@Override

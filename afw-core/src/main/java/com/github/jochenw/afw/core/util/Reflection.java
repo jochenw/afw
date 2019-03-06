@@ -223,7 +223,7 @@ public class Reflection {
 		if (pClass == null  ||  pClass == Object.class) {
 			return null;
 		}
-		final String id = pClassIds.getClass().getName();
+		final String id = pClass.getName();
 		if (pClassIds.contains(id)) {
 			return null;
 		}

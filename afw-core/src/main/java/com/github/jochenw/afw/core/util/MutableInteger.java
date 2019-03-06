@@ -54,4 +54,12 @@ public class MutableInteger extends Number implements Comparable<MutableInteger>
 	public double doubleValue() {
     	return (double) value;
 	}
+
+    public void inc() {
+    	setValue(getValue()+1);
+    }
+
+    public void dec() {
+    	setValue(getValue()-1);
+    }
 }

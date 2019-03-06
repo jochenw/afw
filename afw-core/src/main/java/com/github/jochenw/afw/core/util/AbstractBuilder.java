@@ -15,10 +15,23 @@
  */
 package com.github.jochenw.afw.core.util;
 
-public class AbstractBuilder<T extends AbstractBuilder<T>> extends AbstractMutable {
+public abstract class AbstractBuilder<S,T extends AbstractBuilder<S,T>> extends AbstractMutable {
+	private S instance;
+
 	protected T self() {
 		@SuppressWarnings("unchecked")
 		final T t = (T) this;
 		return t;
+	}
+
+	protected abstract S newInstance();
+
+	public S build() {
+		if (isMutable()) {
+			S s = newInstance();
+			makeImmutable();
+			instance = s;
+		}
+		return instance;
 	}
 }

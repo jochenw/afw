@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
+
 public interface IComponentFactory {
 	public default <O> Key<O> asKey(@Nonnull Type pType) {
 		return new Key<O>(pType);
@@ -56,4 +57,20 @@ public interface IComponentFactory {
 		return requireInstance(asKey(pType, pName));
 	}
 	public <O> O newInstance(Class<? extends O> pImplClass);
+	public default <O> O getInstance(@Nonnull Type pType) {
+		final Key<O> key = new Key<O>(pType);
+		return getInstance(key);
+	}
+	public default <O> O requireInstance(@Nonnull Type pType) {
+		final Key<O> key = new Key<O>(pType);
+		return requireInstance(key);
+	}
+	public default <O> O getInstance(@Nonnull Types.Type<O> pType) {
+		final Key<O> key = new Key<O>(pType.getRawType());
+		return getInstance(key);
+	}
+	public default <O> O requireInstance(@Nonnull Types.Type<O> pType) {
+		final Key<O> key = new Key<O>(pType.getRawType());
+		return requireInstance(key);
+	}
 }

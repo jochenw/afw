@@ -15,7 +15,8 @@
  */
 package com.github.jochenw.afw.core.io;
 
-public interface IMatcher {
+import java.util.function.Predicate;
+
+public interface IMatcher extends Predicate<String> {
 	public default boolean isMatchingAll() { return false; }
-	public boolean matches(String pUri);
 }

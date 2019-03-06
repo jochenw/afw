@@ -22,6 +22,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import javax.inject.Named;
+
 public class Key<O extends Object> {
 	private final @Nonnull Type type;
 	private final @Nullable Annotation annotation;
@@ -109,8 +111,14 @@ public class Key<O extends Object> {
 		}
 		final Annotation anno = getAnnotation();
 		if (anno != null) {
-			sb.append(", annotation=");
-			sb.append(anno);
+			if (anno instanceof Named) {
+				final Named named = (Named) anno;
+				sb.append(", name=");
+				sb.append(named.value());
+			} else {
+				sb.append(", annotation=");
+				sb.append(anno);
+			}
 		}
 		final Class<? extends Annotation> annoClass = getAnnotationClass();
 		if (annoClass != null) {

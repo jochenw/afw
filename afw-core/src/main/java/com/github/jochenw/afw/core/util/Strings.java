@@ -33,6 +33,13 @@ public class Strings {
 	public static String notNull(String pValue, String pDefault) {
 		return Objects.notNull(pValue, pDefault);
 	}
+	public static String notEmpty(String pValue, String pDefault) {
+		if (pValue == null  ||  pValue.length() == 0) {
+			return pDefault;
+		} else {
+			return pValue;
+		}
+	}
 	public static String requireNonNull(String pValue, String pMessage) {
 		return Objects.requireNonNull(pValue, pMessage);
 	}
@@ -177,13 +184,14 @@ public class Strings {
 		return pCode == null  ||  pCode.trim().length() == 0;
 	}
 
-	public static void requireNonEmpty(String pValue, String pName) {
+	public static String requireNonEmpty(String pValue, String pName) {
 		if (pValue == null) {
 			throw new NullPointerException("String value must not be null: " + pName);
 		}
 		if (pValue.length() == 0) {
-			throw new NullPointerException("String value must not be empty: " + pName);
+			throw new IllegalArgumentException("String value must not be empty: " + pName);
 		}
+		return pValue;
 	}
 
 	public static void requireTrimmedNonEmpty(String pValue, String pName) {

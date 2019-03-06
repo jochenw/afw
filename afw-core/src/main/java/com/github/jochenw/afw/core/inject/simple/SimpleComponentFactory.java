@@ -248,6 +248,9 @@ public class SimpleComponentFactory implements IComponentFactory {
 			findFieldInitializers(pType, c, initializerSink);
 			findMethodInitializers(pType, c, initializerSink);
 		};
+		if (onTheFlyBinder != null) {
+			onTheFlyBinder.findConsumers(this, pType, initializerSink);
+		}
 		return (o) -> initializers.forEach((i) -> i.accept(o));
 	}
 
@@ -278,7 +281,8 @@ public class SimpleComponentFactory implements IComponentFactory {
 				if (!c.isAccessible()) {
 					c.setAccessible(true);
 				}
-				return c.newInstance(getParameters(bindings));
+				final Object o = c.newInstance(getParameters(bindings));
+				return o;
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
 			}
