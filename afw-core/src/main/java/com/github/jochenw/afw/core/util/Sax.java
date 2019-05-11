@@ -189,6 +189,7 @@ public class Sax {
 			final SAXParserFactory spf = SAXParserFactory.newInstance();
 			spf.setValidating(false);
 			spf.setNamespaceAware(true);
+			spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			final XMLReader xr = spf.newSAXParser().getXMLReader();
 			xr.setContentHandler(pHandler);
 			xr.parse(pSource);

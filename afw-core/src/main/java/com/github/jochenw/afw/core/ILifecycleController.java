@@ -15,7 +15,8 @@
  */
 package com.github.jochenw.afw.core;
 
-public interface ILifefycleController {
+public interface ILifecycleController {
+	@FunctionalInterface
 	public interface Listener {
 		void start();
 	}

@@ -24,30 +24,16 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.w3c.dom.Document;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
 import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Sax;
 
 
 public class XmlParsers {
-	public static void parse(InputSource pSource, ContentHandler pHandler) {
-		try {
-			final SAXParserFactory spf = SAXParserFactory.newInstance();
-			spf.setValidating(false);
-			spf.setNamespaceAware(true);
-			final XMLReader reader = spf.newSAXParser().getXMLReader();
-			reader.setContentHandler(pHandler);
-			reader.parse(pSource);
-		} catch (Throwable t) {
-			throw Exceptions.show(t);
-		}
-	}
-
 	public static void parse(InputSource pSource, Consumer<Document> pDocumentConsumer) {
 		try {
 			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -63,7 +49,7 @@ public class XmlParsers {
 	public static void parse(InputStream pStream, String pSystemId, ContentHandler pHandler) {
 		final InputSource isource = new InputSource(pStream);
 		isource.setSystemId(pSystemId);
-		parse(isource, pHandler);
+		Sax.parse(isource, pHandler);
 	}
 
 	public static void parse(InputStream pStream, String pSystemId, Consumer<Document> pDocumentConsumer) {

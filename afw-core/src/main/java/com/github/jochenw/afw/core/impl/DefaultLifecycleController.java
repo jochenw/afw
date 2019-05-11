@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.jochenw.afw.core.ILifefycleController;
+import com.github.jochenw.afw.core.ILifecycleController;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
-public class DefaultLifecycleController implements ILifefycleController {
+public class DefaultLifecycleController implements ILifecycleController {
 	private List<Listener> startableListeners = new ArrayList<>();
 	private List<Listener> startedListeners = new ArrayList<>();
 	private int state;

@@ -21,14 +21,17 @@ public abstract class AbstractLogFactory implements ILogFactory {
 	private boolean initialized;
 	private ResourceLocator resourceLocator;
 	
+	@Override
 	public ResourceLocator getResourceLocator() {
 		return resourceLocator;
 	}
 
+	@Override
 	public void setResourceLocator(ResourceLocator resourceLocator) {
 		this.resourceLocator = resourceLocator;
 	}
 
+	@Override
 	public void start() {
 		if (!initialized) {
 			initialized = true;
@@ -36,6 +39,7 @@ public abstract class AbstractLogFactory implements ILogFactory {
 		}
 	}
 	protected abstract void init();
+	@Override
 	public void shutdown() {
 		// Does nothing.
 	}

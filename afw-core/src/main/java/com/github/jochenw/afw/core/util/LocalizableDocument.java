@@ -138,13 +138,8 @@ public class LocalizableDocument {
 			dbf.setValidating(false);
 			dbf.setNamespaceAware(true);
 			final Document doc = dbf.newDocumentBuilder().newDocument();
-			final SAXParserFactory spf = SAXParserFactory.newInstance();
-			spf.setValidating(false);
-			spf.setNamespaceAware(true);
 			final Handler h = new Handler(doc);
-			final XMLReader reader = spf.newSAXParser().getXMLReader();
-			reader.setContentHandler(h);
-			reader.parse(pSource);
+			Sax.parse(pSource, h);
 			return new LocalizableDocument(doc);
 		} catch (Throwable t) {
 			throw Exceptions.show(t);

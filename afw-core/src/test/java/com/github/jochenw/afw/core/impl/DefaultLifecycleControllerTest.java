@@ -24,7 +24,7 @@ import javax.annotation.PreDestroy;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.ILifefycleController.TerminableListener;
+import com.github.jochenw.afw.core.ILifecycleController.TerminableListener;
 
 public class DefaultLifecycleControllerTest {
 	private static class Startable implements TerminableListener {

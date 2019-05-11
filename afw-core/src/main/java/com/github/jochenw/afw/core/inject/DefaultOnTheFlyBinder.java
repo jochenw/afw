@@ -32,8 +32,8 @@ import javax.inject.Singleton;
 
 import org.apache.logging.log4j.util.Strings;
 
-import com.github.jochenw.afw.core.ILifefycleController;
-import com.github.jochenw.afw.core.ILifefycleController.TerminableListener;
+import com.github.jochenw.afw.core.ILifecycleController;
+import com.github.jochenw.afw.core.ILifecycleController.TerminableListener;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.props.BooleanProperty;
 import com.github.jochenw.afw.core.props.IBooleanProperty;
@@ -69,7 +69,7 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 		}
 		if (!initMethods.isEmpty()  ||  !shutdownMethods.isEmpty()) {
 			final Consumer<O>  consumer = (o) -> {
-				final ILifefycleController lcController = pCf.requireInstance(ILifefycleController.class);
+				final ILifecycleController lcController = pCf.requireInstance(ILifecycleController.class);
 				final TerminableListener tl = new TerminableListener() {
 					@Override
 					public void start() {
