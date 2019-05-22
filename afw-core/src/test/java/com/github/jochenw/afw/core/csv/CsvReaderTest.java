@@ -260,7 +260,9 @@ public class CsvReaderTest {
 	}
 
 	private File requireTestFile() {
-		final File inputFile = Tests.requireFileResource("com/github/jochenw/afw/core/csv/Lago-Input.csv");
+		final File resourcesDir = new File("src/test/resources");
+		Assert.assertTrue(resourcesDir.isDirectory());
+		final File inputFile = new File(resourcesDir, "com/github/jochenw/afw/core/csv/Lago-Input.csv");
 		return inputFile;
 	}
 }
