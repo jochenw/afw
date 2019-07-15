@@ -1,11 +1,13 @@
 package com.github.jochenw.afw.core.data;
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -66,30 +68,70 @@ public class DefaultObjectComparator implements IObjectComparator {
 	}
 
 	protected void compare(Context pContext, MapWrapper pExpMap, MapWrapper pActMap) {
-		final Map<String,Object> expMap;
-		if (pExpMap.getObject() instanceof Map) {
-			@SuppressWarnings("unchecked")
-			final Map<String,Object> map = (Map<String,Object>) pExpMap.getObject();
-			expMap = map;
-		} else {
-			final Map<String,Object> map = new HashMap<>();
-			expMap = map;
-			pExpMap.forEach((s,o) -> map.put(s, o)); 
-		}
-		final Set<String> expKeys = new HashSet<>(expMap.keySet());
-		pActMap.forEach((s,o) -> {
-			if (expMap.containsKey(s)) {
-				final int ctx = pContext.getContext();
+		final Map<String,Object> expMap = new HashMap<>();
+		pExpMap.forEach((s,o) -> expMap.put(s, o));
+		final Map<String,Object> actMap = new HashMap<>();
+		pActMap.forEach((s,o) -> actMap.put(s, o));
+		final int contextLength = pContext.getContext();
+		final Consumer<String> contextAdder = (s) -> {
+			if (contextLength == 0) {
 				pContext.addContext(s);
-				compare(expMap.get(s), o);
-				pContext.restoreContext(ctx);
 			} else {
-				expKeys.remove(s);
-				pContext.difference("Unexpected value: key=" + s + ", value=" + asString(o));
+				pContext.addContext(".");
+				pContext.addContext(s);
+			}
+		};
+		final List<String> expectedKeysMissing = new ArrayList<String>();
+		expMap.forEach((s,o) -> {
+			if (actMap.containsKey(s)) {
+				final Object actObject = actMap.remove(s);
+				contextAdder.accept(s);
+				compare(pContext, o, actObject);
+				pContext.restoreContext(contextLength);
+				actMap.remove(s);
+			} else {
+				expectedKeysMissing.add(s);
 			}
 		});
-		for (String s : expKeys) {
-			pContext.difference("No value present for key=" + s);
+		for (String s : expectedKeysMissing) {
+			final Object o = expMap.get(s);
+			contextAdder.accept(s);
+			pContext.difference("Expected element not found: " + asString(o));
+			pContext.restoreContext(contextLength);
+		}
+		actMap.forEach((s, o) -> {
+			contextAdder.accept(s);
+			pContext.difference("Unexpected element: " + asString(o));
+			pContext.restoreContext(contextLength);
+		});
+	}
+
+	protected void compare(Context pContext, ListWrapper pExpList, ListWrapper pActList) {
+		final List<Object> expList = new ArrayList<>();
+		pExpList.forEach((o) -> expList.add(o));
+		final List<Object> actList = new ArrayList<>();
+		pActList.forEach((o) -> actList.add(o));
+		final int contextLength = pContext.getContext();
+		final int num = Math.min(expList.size(), actList.size());
+		for (int i = 0;  i < num;  i++) {
+			final Object expObject = expList.get(i);
+			final Object actObject = actList.get(i);
+			pContext.addContext("[" + i + "]");
+			compare(pContext, expObject, actObject);
+			pContext.restoreContext(contextLength);
+		}
+		if (expList.size() > actList.size()) {
+			for (int i = num;  i < expList.size();  i++) {
+				pContext.addContext("[" + i + "]");
+				pContext.difference("Expected object not found: " + asString(expList.get(i)));
+				pContext.restoreContext(contextLength);
+			}
+		} else if (actList.size() > expList.size()) {
+			for (int i = num;  i < actList.size();  i++) {
+				pContext.addContext("[" + i + "]");
+				pContext.difference("Unexpected object found: " + asString(actList.get(i)));
+				pContext.restoreContext(contextLength);
+			}
 		}
 	}
 
@@ -110,6 +152,7 @@ public class DefaultObjectComparator implements IObjectComparator {
 			    } else {
 				    pContext.difference("Expected a map, got " + asString(pActObject));
 			    }
+			    return;
 			} else if (isList(pExpObject)) {
 				if (isList(pActObject)) {
 					final ListWrapper expList = asList(pExpObject);
@@ -118,6 +161,7 @@ public class DefaultObjectComparator implements IObjectComparator {
 				} else {
 					pContext.difference("Expected a list, got " + asString(pActObject));
 				}
+				return;
 			} else if (isAtomic(pExpObject)) {
 				if (isAtomic(pActObject)) {
 					if (!isEqual(pExpObject, pActObject)) {
@@ -127,6 +171,7 @@ public class DefaultObjectComparator implements IObjectComparator {
 				} else {
 					pContext.difference("Expected atomic value, got " + asString(pActObject));
 				}
+				return;
 			} else {
 				pContext.difference("Expected object is not atomic, but "
 						+ pExpObject.getClass().getName());
@@ -157,8 +202,20 @@ public class DefaultObjectComparator implements IObjectComparator {
 			sb.append(pObject);
 			sb.append('"');
 			return sb.toString();
-		} else if (pObject instanceof Number  ||  pObject instanceof Boolean) {
+		} else if (pObject instanceof Boolean) {
 			return pObject.toString();
+		} else if (pObject instanceof Long) {
+			return pObject.toString() + "l";
+		} else if (pObject instanceof Integer) {
+			return pObject.toString() + "i";
+		} else if (pObject instanceof Short) {
+			return pObject.toString() + "s";
+		} else if (pObject instanceof Byte) {
+			return pObject.toString();
+		} else if (pObject instanceof BigInteger) {
+			return pObject.toString() + "bi";
+		} else if (pObject instanceof BigDecimal) {
+			return pObject.toString() + "bd";
 		} else {
 			return pObject.getClass().getName() + ": " + pObject.toString();
 		}
@@ -182,7 +239,9 @@ public class DefaultObjectComparator implements IObjectComparator {
 	}
 
 	protected boolean isList(Object pObject) {
-		return pObject instanceof Iterable  ||  pObject.getClass().isArray();
+		return pObject instanceof Iterable
+				||  pObject instanceof Iterator
+				||  pObject.getClass().isArray();
 	}
 
 	protected ListWrapper asList(Object pObject) {
@@ -209,6 +268,19 @@ public class DefaultObjectComparator implements IObjectComparator {
 					}
 				}
 			};
+		} else if (pObject instanceof Iterator) {
+			@SuppressWarnings("unchecked")
+			final Iterator<Object> iter = (Iterator<Object>) pObject;
+			return new ListWrapper("((", "))") {
+				@Override
+				public void forEach(Consumer<Object> pConsumer) {
+					while (iter.hasNext()) {
+						pConsumer.accept(iter.next());
+					}
+				}
+				
+			};
+			
 		} else {
 			return new ListWrapper("[", "]") {
 				@Override
