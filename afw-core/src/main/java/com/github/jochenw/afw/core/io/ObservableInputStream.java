@@ -35,7 +35,7 @@ public class ObservableInputStream extends InputStream {
 
 	@Override
 	public int read(byte[] pB) throws IOException {
-		final int res = in.read();
+		final int res = in.read(pB);
 		if (res == -1) {
 			listener.endOfFile();
 		} else {
