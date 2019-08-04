@@ -33,7 +33,7 @@ public class ObservableReader extends Reader {
 
 	@Override
 	public int read(char[] pBuffer) throws IOException {
-		final int res = in.read();
+		final int res = in.read(pBuffer);
 		if (res == -1) {
 			listener.endOfFile();
 		} else {
