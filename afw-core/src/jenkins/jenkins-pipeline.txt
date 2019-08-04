@@ -13,9 +13,9 @@ node {
       withEnv(["MVN_HOME=$mvnHome"]) {
          dir("afw-core") {
             if (isUnix()) {
-               sh '"$MVN_HOME/bin/mvn" -Dmaven.test.failure.ignore clean install'
+               sh '"$MVN_HOME/bin/mvn" -Pjacoco -Dmaven.test.failure.ignore clean install'
             } else {
-               bat(/"%MVN_HOME%\bin\mvn" -Dmaven.test.failure.ignore clean install/)
+               bat(/"%MVN_HOME%\bin\mvn" -Pjacoco -Dmaven.test.failure.ignore clean install/)
             }
          }
       }
@@ -24,6 +24,7 @@ node {
       dir("afw-core") {
           junit '**/target/surefire-reports/TEST-*.xml'
           archiveArtifacts 'target/*.jar'
+          step( [ $class: 'JacocoPublisher' ] )
       }
    }
 }
