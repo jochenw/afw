@@ -385,10 +385,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 
 			protected void add(BindingBuilder<?> pBuilder) {
 				final Key<?> key = pBuilder.getKey();
-				final BindingBuilder<?> oldBuilder = builders.put(key, pBuilder);
-				if (oldBuilder != null) {
-					System.err.println("Warning: Existing binding replaced for " + key);
-				}
+				builders.put(key, pBuilder);
 			}
 
 			@Override
