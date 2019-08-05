@@ -19,8 +19,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -371,14 +373,22 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 	}
 
 	protected List<BindingBuilder<?>> createBindingBuilders(IComponentFactory pCf, Set<Class<?>> pStaticInjectionClasses) {
-		final List<BindingBuilder<?>> builders = new ArrayList<>();
+		final Map<Key<?>,BindingBuilder<?>> builders = new HashMap<>();
 		final Binder binder = new Binder() {
 			@Override
 			public <O> LinkedBindingBuilder<O> bind(Key<O> pKey) {
 				final BindingBuilder<O> builder = new BindingBuilder<O>(pKey);
 				final BindingBuilder<?> b = builder;
-				builders.add(b);
+				add(b);
 				return builder;
+			}
+
+			protected void add(BindingBuilder<?> pBuilder) {
+				final Key<?> key = pBuilder.getKey();
+				final BindingBuilder<?> oldBuilder = builders.put(key, pBuilder);
+				if (oldBuilder != null) {
+					System.err.println("Warning: Existing binding replaced for " + key);
+				}
 			}
 
 			@Override
@@ -387,7 +397,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 				final Key<O> key = new Key<O>(type);
 				final BindingBuilder<O> builder = new BindingBuilder<O>(key);
 				final BindingBuilder<?> b = builder;
-				builders.add(b);
+				add(b);
 				return builder;
 			}
 
@@ -398,7 +408,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 				final Key<LT> key = new Key<LT>(type, named);
 				final BindingBuilder<LT> builder = new BindingBuilder<LT>(key);
 				final BindingBuilder<?> b = builder;
-				builders.add(b);
+				add(b);
 				return builder;
 			}
 
@@ -407,7 +417,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 				final Key<AT> key = new Key<AT>(pType);
 				final BindingBuilder<AT> builder = new BindingBuilder<AT>(key);
 				final BindingBuilder<?> b = builder;
-				builders.add(b);
+				add(b);
 				return builder;
 			}
 
@@ -418,7 +428,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 				final Key<LT> key = new Key<LT>(type, named);
 				final BindingBuilder<LT> builder = new BindingBuilder<LT>(key);
 				final BindingBuilder<?> b = builder;
-				builders.add(b);
+				add(b);
 				return builder;
 			}
 
@@ -433,7 +443,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		for (Module module : getModules()) {
 			module.configure(binder);
 		}
-		return builders;
+		return new ArrayList<>(builders.values());
 	}
 
 	protected abstract void createBindings(@Nonnull IComponentFactory pComponentFactory, @Nonnull List<BindingBuilder<?>> pBindings, @Nonnull Set<Class<?>> pStaticInjectionClasses);
