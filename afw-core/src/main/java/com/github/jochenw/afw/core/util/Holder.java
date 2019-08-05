@@ -26,7 +26,7 @@ public class Holder<T> {
 		value = pValue;
 	}
 
-	public <O> Holder<O> synchronizedHolder(Holder<O> pHolder) {
+	public static <O> Holder<O> synchronizedHolder(Holder<O> pHolder) {
 		return new Holder<O>() {
 			@Override
 			public O get() {
