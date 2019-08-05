@@ -15,7 +15,12 @@
  */
 package com.github.jochenw.afw.core.io;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Objects;
+
+import com.github.jochenw.afw.core.util.Exceptions;
 
 /**
  * A buffer, which doesn't need reallocation of byte arrays, because it
@@ -139,13 +144,13 @@ public class CircularByteBuffer {
 	 */
 	public boolean peek(byte[] pBuffer, int pOffset, int pLength) {
 		Objects.requireNonNull(pBuffer, "Buffer");
-		if (pOffset < 0  ||  pOffset >= pBuffer.length) {
+		if (pOffset < 0  ||  (pOffset > 0  &&  pOffset >= pBuffer.length)) {
 			throw new IllegalArgumentException("Invalid offset: " + pOffset);
 		}
 		if (pLength < 0  ||  pLength > buffer.length) {
 			throw new IllegalArgumentException("Invalid length: " + pLength);
 		}
-		if (pLength < currentNumberOfBytes) {
+		if (pLength > currentNumberOfBytes) {
 			return false;
 		}
 		int offset = startOffset;
@@ -245,5 +250,30 @@ public class CircularByteBuffer {
 		startOffset = 0;
 		endOffset = 0;
 		currentNumberOfBytes = 0;
+	}
+
+	public String toString() {
+		return new String(getBytes());
+	}
+	public String toString(String pCharset) {
+		try {
+			return new String(getBytes(), pCharset);
+		} catch (UnsupportedEncodingException e) {
+			throw Exceptions.show(e);
+		}
+	}
+	public String toString(Charset pCharset) {
+		return new String(getBytes(), pCharset);
+	}
+	public byte[] getBytes() {
+		final byte[] bytes = new byte[getCurrentNumberOfBytes()];
+		int offset = 0;
+		for (int i=0;  i < bytes.length;  i++) {
+			bytes[i] = buffer[offset++];
+			if (offset == buffer.length) {
+				offset = 0;
+			}
+		}
+		return bytes;
 	}
 }
