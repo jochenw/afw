@@ -62,7 +62,7 @@ public class CircularBufferReader extends Reader {
 		if (buffer.getCurrentNumberOfChars() < pNumber) {
 			fillBuffer();
 		}
-		return buffer.hasBytes();
+		return buffer.hasChars();
 	}
 
 	@Override

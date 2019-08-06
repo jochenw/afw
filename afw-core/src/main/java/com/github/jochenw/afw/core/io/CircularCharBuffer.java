@@ -57,7 +57,7 @@ public class CircularCharBuffer {
 
 	public boolean peek(char[] pBuffer, int pOffset, int pLength) {
 		Objects.requireNonNull(pBuffer, "Buffer");
-		if (pOffset < 0  ||  pOffset >= pBuffer.length) {
+		if (pOffset < 0  ||  (pOffset > 0  &&  pOffset >= pBuffer.length)) {
 			throw new IllegalArgumentException("Invalid offset: " + pOffset);
 		}
 		if (pLength < 0  ||  pLength > buffer.length) {
@@ -139,7 +139,7 @@ public class CircularCharBuffer {
 		return currentNumberOfChars < buffer.length;
 	}
 
-	public boolean hasBytes() {
+	public boolean hasChars() {
 		return currentNumberOfChars > 0;
 	}
 
@@ -155,5 +155,22 @@ public class CircularCharBuffer {
 		startOffset = 0;
 		endOffset = 0;
 		currentNumberOfChars = 0;
+	}
+
+	public String toString() {
+		final char[] chars = toCharArray();
+		return new String(chars);
+	}
+
+	public char[] toCharArray() {
+		final char[] chars = new char[getCurrentNumberOfChars()];
+		int offset = 0;
+		for (int i=0;  i < chars.length;  i++) {
+			chars[i] = buffer[offset++];
+			if (offset == buffer.length) {
+				offset = 0;
+			}
+		}
+		return chars;
 	}
 }
