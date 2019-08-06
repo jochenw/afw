@@ -91,7 +91,10 @@ public abstract class OptionBuilder<O> {
 	}
 
 	protected void configure(Option<O> pOption) {
-		pOption.setDefaultValue(getDefaultValue());
+		final String defaultValue = getDefaultValue();
+		if (defaultValue != null  &&  pOption.getDefaultValue() == null) {
+			pOption.setDefaultValue(defaultValue);
+		}
 		pOption.setDescription(getDescriptions());
 		pOption.setNames(getNames());
 		pOption.setRequired(isRequired());

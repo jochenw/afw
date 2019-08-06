@@ -25,6 +25,11 @@ public class Options {
 		protected String asValue(String pStrValue) {
 			return pStrValue;
 		}
+
+		@Override
+		protected boolean isValueRequired() {
+			return true;
+		}
 	}
 
 	public static class IntOption extends Option<Integer> {
@@ -49,6 +54,11 @@ public class Options {
 			} else {
 				return value.intValue();
 			}
+		}
+
+		@Override
+		protected boolean isValueRequired() {
+			return true;
 		}
 	}
 
@@ -93,6 +103,11 @@ public class Options {
 		protected Path asValue(String pStrValue) {
 			return Paths.get(pStrValue);
 		}
+
+		@Override
+		protected boolean isValueRequired() {
+			return true;
+		}
 	}
 
 	public static class FileOption extends DiskArtifactOption<File> {
@@ -103,6 +118,11 @@ public class Options {
 		@Override
 		protected File asValue(String pStrValue) {
 			return new File(pStrValue);
+		}
+
+		@Override
+		protected boolean isValueRequired() {
+			return true;
 		}
 	}
 
@@ -121,6 +141,11 @@ public class Options {
 			final Boolean v = getValue();
 			return (v == null ? asValue(getDefaultValue()) : v).booleanValue();
 		}
+
+		@Override
+		protected boolean isValueRequired() {
+			return false;
+		}
 	}
 
 	public OptionBuilder<String> stringOption() {
@@ -135,6 +160,7 @@ public class Options {
 
 			@Override
 			public Options end() {
+				build();
 				return Options.this;
 			}
 		};
@@ -152,6 +178,7 @@ public class Options {
 
 			@Override
 			public Options end() {
+				build();
 				return Options.this;
 			}
 		};
@@ -169,6 +196,7 @@ public class Options {
 
 			@Override
 			public Options end() {
+				build();
 				return Options.this;
 			}
 		};
@@ -186,6 +214,7 @@ public class Options {
 
 			@Override
 			public Options end() {
+				build();
 				return Options.this;
 			}
 		};
@@ -202,6 +231,7 @@ public class Options {
 
 			@Override
 			public Options end() {
+				build();
 				return Options.this;
 			}
 		};
@@ -225,7 +255,7 @@ public class Options {
 		if (o == null) {
 			throw new NoSuchElementException("No such option: " + pName);
 		}
-		return null;
+		return o;
 	}
 	
 	public interface Result {
@@ -338,6 +368,10 @@ public class Options {
 		}
 	}
 	public Result process(String[] pArgs, Function<String,RuntimeException> pErrorHandler) {
+		Function<String,RuntimeException> errorHandler = pErrorHandler;
+		if (errorHandler == null) {
+			errorHandler = (s) -> new IllegalArgumentException(s);
+		}
 		final List<String> args = new ArrayList<>(Arrays.asList(pArgs));
 		final List<String> remainingArgs = new ArrayList<>();
 		while (!args.isEmpty()) {
@@ -351,18 +385,31 @@ public class Options {
 			} else if (arg.startsWith("-")  ||  arg.startsWith("/")) {
 				argOffset = 1;
 			} else {
-				throw pErrorHandler.apply("Invalid option: " + arg);
+				throw errorHandler.apply("Invalid option: " + arg);
 			}
 			String opt = arg.substring(argOffset);
 			final int valueOffset = opt.indexOf('=');
-			final String value;
+			String value;
 			if (valueOffset >= 0) {
 				value = opt.substring(valueOffset+1);
 				opt = opt.substring(0, valueOffset);
 			} else {
 				value = null;
 			}
-			
+			final Option<?> option = getOption(opt);
+			if (option == null) {
+				throw errorHandler.apply("Unknown option: " + opt);
+			}
+			if (option.isValueRequired()) {
+				if (value == null) {
+					if (args.isEmpty()) {
+						throw errorHandler.apply("Option " + opt
+								                 + " requires an argument: " + option.getDescription());
+					}
+					value = args.remove(0);
+				}
+				option.setStrValue(value);
+			}
 		}
 		return new DefaultResult(this, Collections.emptyList());
 	}

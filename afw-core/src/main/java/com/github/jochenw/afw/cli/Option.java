@@ -77,4 +77,6 @@ public abstract class Option<O> {
 	}
 
 	protected abstract O asValue(String pStrValue);
+
+	protected abstract boolean isValueRequired();
 }
