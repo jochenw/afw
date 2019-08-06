@@ -7,7 +7,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-public class CircularBufferTests {
+public class CircularBufferTest {
 	@Test
 	public void testCircularByteBuffer() throws Exception {
 		final CircularByteBuffer cbb = new CircularByteBuffer(20);
