@@ -145,7 +145,14 @@ public class Sax {
 				sb.append(pChars, pOffset, pLength);
 			}
 		}
-		
+
+		protected String asQName(String pUri, String pLocalName) {
+			if (pUri == null  ||  pUri.length() == 0) {
+				return pLocalName;
+			} else {
+				return '{' + pUri + '}' + pLocalName;
+			}
+		}
 	}
 
 	public static void parse(File pFile, ContentHandler pHandler) {

@@ -168,6 +168,19 @@ public class Functions {
 	}
 
 	/**
+	 * Converts the given {@link FailableRunnable} into a standard {@link Runnable}.
+	 */
+	public static Runnable asRunnable(FailableRunnable<?> pRunnable) {
+		return () -> {
+			try {
+				pRunnable.run();
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
+	}
+
+	/**
 	 * Executes the given {@link FailableRunnable}, rethrowing checked
 	 * exceptions, if necessary.
 	 * @param pRunnable The {@link FailableRunnable} to execute.
@@ -178,6 +191,19 @@ public class Functions {
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
+	}
+
+	/**
+	 * Converts the given {@link FailableCallable} into a standard {@link Callable}.
+	 */
+	public static <O extends Object> Callable<O> asCallable(FailableCallable<O,?> pCallable) {
+		return () -> {
+			try {
+				return pCallable.call();
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
 	}
 
 	/**
@@ -197,6 +223,19 @@ public class Functions {
 	}
 
 	/**
+	 * Converts the given {@link FailableFunction} into a standard {@link Function}.
+	 */
+	public static <I,O> Function<I,O> asFunction(FailableFunction<I,O,?> pFunction) {
+		return (pInput) -> {
+			try {
+				return pFunction.apply(pInput);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
+	}
+	
+	/**
 	 * Applies the given {@link FailableFunction}, and returns the result.
 	 * Rethrows checked exceptions, if necessary.
 	 * @param pFunction The {@link FailableFunction} to apply.
@@ -214,6 +253,19 @@ public class Functions {
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
+	}
+
+	/**
+	 * Converts the given {@link FailableBiFunction} into a standard {@link BiFunction}.
+	 */
+	public static <I1,I2,O> BiFunction<I1,I2,O> asBiFunction(FailableBiFunction<I1,I2,O,?> pFunction) {
+		return (pInput1, pInput2) -> {
+			try {
+				return pFunction.apply(pInput1, pInput2);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
 	}
 
 	/**
@@ -239,6 +291,19 @@ public class Functions {
 		}
 	}
 
+	/**
+	 * Converts the given {@link FailableConsumer} into a standard {@link Consumer}.
+	 */
+	public static <I> Consumer<I> asConsumer(FailableConsumer<I,?> pConsumer) {
+		return (pInput) -> {
+			try {
+				pConsumer.accept(pInput);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
+	}
+
 	/** Makes the given {@link FailableConsumer} accept the given object.
 	 * Rethrows checked exceptions, if necessary.
 	 * @param pConsumer The {@link FailableConsumer}, which is to accept the object.
@@ -253,6 +318,26 @@ public class Functions {
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
+	}
+
+	/**
+	 * Converts the given {@link FailableBiConsumer} into a standard {@link BiConsumer}.
+	 */
+	public static <I1,I2> BiConsumer<I1,I2> asConsumer(FailableBiConsumer<I1,I2,?> pConsumer) {
+		return asBiConsumer(pConsumer);
+	}
+
+	/**
+	 * Converts the given {@link FailableBiConsumer} into a standard {@link BiConsumer}.
+	 */
+	public static <I1,I2> BiConsumer<I1,I2> asBiConsumer(FailableBiConsumer<I1,I2,?> pConsumer) {
+		return (pInput1, pInput2) -> {
+			try {
+				pConsumer.accept(pInput1, pInput2);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
 	}
 
 	/** Makes the given {@link FailableBiConsumer} accept the given objects.
@@ -273,6 +358,19 @@ public class Functions {
 		}
 	}
 
+	/**
+	 * Converts the given {@link FailablePredicate} into a standard {@link Predicate}.
+	 */
+	public static <I> Predicate<I> asPredicate(FailablePredicate<I,?> pPredicate) {
+		return (pInput) -> {
+			try {
+				return pPredicate.test(pInput);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
+	}
+
 	/** Tests the given object, using the given {@link FailablePredicate}, and returns the
 	 * result.
 	 * @param pPredicate The {@link FailablePredicate} being applied.
@@ -288,6 +386,19 @@ public class Functions {
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
+	}
+
+	/**
+	 * Converts the given {@link FailableBiPredicate} into a standard {@link BiPredicate}.
+	 */
+	public static <I1,I2> BiPredicate<I1,I2> asBiPredicate(FailableBiPredicate<I1,I2,?> pPredicate) {
+		return (pInput1, pInput2) -> {
+			try {
+				return pPredicate.test(pInput1, pInput2);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
 	}
 
 	/** Tests the given objects, using the given {@link FailableBiPredicate}, and returns the
@@ -307,6 +418,19 @@ public class Functions {
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
+	}
+
+	/**
+	 * Converts the given {@link FailableSupplier} into a standard {@link Supplier}.
+	 */
+	public static <O> Supplier<O> asSupplier(FailableSupplier<O,?> pSupplier) {
+		return () -> {
+			try {
+				return pSupplier.get();
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		};
 	}
 
 	/**
