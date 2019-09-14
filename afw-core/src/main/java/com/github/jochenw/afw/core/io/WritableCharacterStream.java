@@ -30,6 +30,10 @@ import com.github.jochenw.afw.core.util.Streams;
 
 
 
+/**
+ * Implementation of a character stream, which is actually writing to a backing writer.
+ * Guarantees buffering.
+ */
 public class WritableCharacterStream implements AutoCloseable, Flushable, Appendable {
 	private Charset charSet;
 	private BufferedWriter bw;
