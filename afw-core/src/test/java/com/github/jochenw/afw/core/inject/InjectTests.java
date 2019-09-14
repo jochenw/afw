@@ -74,7 +74,7 @@ public class InjectTests {
 		final Map<String,Object> map1 = new HashMap<>();
 		final Map<String,Object> map2 = new HashMap<>();
 		final ILogFactory logFactory = new SimpleLogFactory();
-		pComponentFactoryBuilder.module(new Module() {
+		pComponentFactoryBuilder.modules(new Module() {
 			@Override
 			public void configure(Binder pBinder) {
 				final Type<List<InjectTests.Component>> componentListType = new Type<List<InjectTests.Component>>() {};

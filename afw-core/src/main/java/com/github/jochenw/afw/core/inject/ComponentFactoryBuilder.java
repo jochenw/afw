@@ -102,7 +102,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		final Module[] modules = Objects.requireAllNonNull(pModules, "Module");
 		assertMutable();
 		for (Module m : modules) {
-			this.modules.add(m);
+			module(m);
 		}
 		return self();
 	}
