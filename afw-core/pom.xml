@@ -274,11 +274,6 @@
                 <phase>verify</phase>
               </execution>
             </executions>
-            <configuration>
-              <excludes>
-                <exclude>com.github.jochenw.afw.core.el.jcc.*</exclude>
-              </excludes>
-            </configuration>
           </plugin>
         </plugins>
       </build>
