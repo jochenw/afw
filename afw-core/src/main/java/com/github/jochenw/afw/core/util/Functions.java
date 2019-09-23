@@ -21,6 +21,8 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -134,6 +136,36 @@ public class Functions {
 		public boolean test(O pObject) throws T;
 	}
 
+	/** Failable version of {@link IntPredicate}.
+	 * @param <T> The exception type being thrown by the predicate.
+	 * @see Predicate
+	 */
+	@FunctionalInterface
+	public interface FailableIntPredicate<T extends Throwable> {
+		/**
+		 * @param pValue The predicates argument (The object being tested.)
+		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
+		 * @throws T The exception type being thrown by the predicate.
+		 * @see Predicate#test(Object)
+		 */
+		public boolean test(int pValue) throws T;
+	}
+
+	/** Failable version of {@link LongPredicate}.
+	 * @param <T> The exception type being thrown by the predicate.
+	 * @see Predicate
+	 */
+	@FunctionalInterface
+	public interface FailableLongPredicate<T extends Throwable> {
+		/**
+		 * @param pValue The predicates argument (The object being tested.)
+		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
+		 * @throws T The exception type being thrown by the predicate.
+		 * @see Predicate#test(Object)
+		 */
+		public boolean test(long pValue) throws T;
+	}
+
 	/** Failable version of {@link BiPredicate}.
 	 * @param <O1> The predicates first argument type.
 	 * @param <O2> The predicates second argument type.
@@ -150,6 +182,40 @@ public class Functions {
 		 * @see BiPredicate#test(Object,Object)
 		 */
 		public boolean test(O1 pObject1, O2 pObject2) throws T;
+	}
+
+	/** Failable version of {@link BiPredicate}, with a primitive integer as the first argument type.
+	 * @param <O> The predicates second argument type.
+	 * @param <T> The exception type being thrown by the predicate.
+	 * @see BiPredicate
+	 */
+	@FunctionalInterface
+	public interface FailableBiIntPredicate<O extends Object,T extends Throwable> {
+		/**
+		 * @param pValue1 The predicates first argument (The integer value being tested.)
+		 * @param pObject2 The predicates second argument (The second object being tested.)
+		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
+		 * @throws T The exception type being thrown by the predicate.
+		 * @see BiPredicate#test(Object,Object)
+		 */
+		public boolean test(int pValue1, O pObject2) throws T;
+	}
+
+	/** Failable version of {@link BiPredicate}, with a primitive long as the first argument type.
+	 * @param <O> The predicates second argument type.
+	 * @param <T> The exception type being thrown by the predicate.
+	 * @see BiPredicate
+	 */
+	@FunctionalInterface
+	public interface FailableBiLongPredicate<O extends Object,T extends Throwable> {
+		/**
+		 * @param pValue1 The predicates first argument (The integer value being tested.)
+		 * @param pObject2 The predicates second argument (The second object being tested.)
+		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
+		 * @throws T The exception type being thrown by the predicate.
+		 * @see BiPredicate#test(Object,Object)
+		 */
+		public boolean test(long pValue1, O pObject2) throws T;
 	}
 
 	/** Failable version of {@link Supplier}.
@@ -388,6 +454,38 @@ public class Functions {
 		}
 	}
 
+	/** Tests the given object, using the given {@link FailableIntPredicate}, and returns the
+	 * result.
+	 * @param pPredicate The {@link FailableIntPredicate} being applied.
+	 * @param pValue The value being tested.
+	 * @param <T> The exception type, which may be thrown by the predicate.
+	 * @return The predicates result.
+	 * @see IntPredicate#test(int)
+	 */
+	public static <T extends Throwable> boolean test(FailableIntPredicate<T> pPredicate, int pValue) {
+		try {
+			return pPredicate.test(pValue);
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
+	}
+
+	/** Tests the given object, using the given {@link FailableLongPredicate}, and returns the
+	 * result.
+	 * @param pPredicate The {@link FailableLongPredicate} being applied.
+	 * @param pValue The value being tested.
+	 * @param <T> The exception type, which may be thrown by the predicate.
+	 * @return The predicates result.
+	 * @see LongPredicate#test(long)
+	 */
+	public static <T extends Throwable> boolean test(FailableLongPredicate<T> pPredicate, long pValue) {
+		try {
+			return pPredicate.test(pValue);
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
+	}
+
 	/**
 	 * Converts the given {@link FailableBiPredicate} into a standard {@link BiPredicate}.
 	 */
@@ -415,6 +513,42 @@ public class Functions {
 	public static <O1,O2,T extends Throwable> boolean test(FailableBiPredicate<O1,O2,T> pPredicate, O1 pObject1, O2 pObject2) {
 		try {
 			return pPredicate.test(pObject1, pObject2);
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
+	}
+
+	/** Tests the given objects, using the given {@link FailableBiIntPredicate}, and returns the
+	 * result.
+	 * @param pPredicate The {@link FailableBiIntPredicate} being applied.
+	 * @param pValue1 The first value being tested (the primitive integer value).
+	 * @param pObject2 The second object being tested.
+	 * @param <O> The predicates second argument type (Type of the second object being tested).
+	 * @param <T> The exception type, which may be thrown by the predicate.
+	 * @return The predicates result.
+	 * @see BiPredicate#test(Object, Object)
+	 */
+	public static <O,T extends Throwable> boolean test(FailableBiIntPredicate<O,T> pPredicate, int pValue1, O pObject2) {
+		try {
+			return pPredicate.test(pValue1, pObject2);
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
+	}
+
+	/** Tests the given objects, using the given {@link FailableBiLongPredicate}, and returns the
+	 * result.
+	 * @param pPredicate The {@link FailableBiLongPredicate} being applied.
+	 * @param pValue1 The first value being tested (the primitive long value).
+	 * @param pObject2 The second object being tested.
+	 * @param <O> The predicates second argument type (Type of the second object being tested).
+	 * @param <T> The exception type, which may be thrown by the predicate.
+	 * @return The predicates result.
+	 * @see BiPredicate#test(Object, Object)
+	 */
+	public static <O,T extends Throwable> boolean test(FailableBiLongPredicate<O,T> pPredicate, long pValue1, O pObject2) {
+		try {
+			return pPredicate.test(pValue1, pObject2);
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}

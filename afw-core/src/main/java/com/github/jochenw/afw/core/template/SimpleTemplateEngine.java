@@ -18,66 +18,137 @@ import com.github.jochenw.afw.core.el.PropertyResolver;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
+/** Simple, standalone, implementation of {@link ITemplateEngine}. The main advantage
+ * is, that you don't need Freemarker, or whatever.
+ */
 public class SimpleTemplateEngine implements ITemplateEngine<Map<String,Object>> {
 	private PropertyResolver propertyResolver;
-	private final ElReader elReader = new ElReader();
+	private ElReader elReader;
 	private ElEvaluator elEvalutor;
 	private ClassLoader classLoader;
 	private Charset templateCharset;
 	private String uri;
 
+	/**
+	 * Creates a new instance with the given {@link PropertyResolver}, and the given
+	 * {@link ElEvaluator}.
+	 * @param pPropertyResolver The property resolver to use for 
+	 * @param pEvaluator
+	 */
 	public SimpleTemplateEngine(PropertyResolver pPropertyResolver, ElEvaluator pEvaluator) {
 		propertyResolver = pPropertyResolver;
 		elEvalutor = pEvaluator;
+		elReader = new ElReader();
 	}
 
+	/**
+	 * Creates a new instance with default values for property resolver, and el evaluator.
+	 * {@link ElEvaluator}.
+	 * @see DefaultPropertyResolver
+	 * @see ElEvaluator
+	 */
 	public SimpleTemplateEngine() {
 		this(new DefaultPropertyResolver(), null);
 		elEvalutor = new ElEvaluator(propertyResolver);
+		elReader = new ElReader();
 	}
-	
+
+	/**
+	 * Returns the {@link ClassLoader} to use when loading resources.
+	 * @return The {@link ClassLoader} to use when loading resources.
+	 * @see #setClassLoader(ClassLoader)
+	 */
 	public ClassLoader getClassLoader() {
 		return classLoader;
 	}
 
+	/**
+	 * Sets the {@link ClassLoader} to use when loading resources.
+	 * @param pClassLoader The {@link ClassLoader} to use when loading resources.
+	 * @see #getClassLoader()
+	 */
 	public void setClassLoader(ClassLoader pClassLoader) {
 		classLoader = pClassLoader;
 	}
 
+	/**
+	 * Returns the {@link Charset} to use when reading templates as text files.
+	 * @return The {@link Charset} to use when reading templates as text files.
+	 * @see #setTemplateCharset(Charset)
+	 */
 	public Charset getTemplateCharset() {
 		return templateCharset;
 	}
 
+	/**
+	 * Sets the {@link Charset} to use when reading templates as text files.
+	 * @param pTemplateCharset The {@link Charset} to use when reading templates as text files.
+	 * @see #getTemplateCharset()
+	 */
 	public void setTemplateCharset(Charset pTemplateCharset) {
 		templateCharset = pTemplateCharset;
 	}
 
+	/** Returns the {@link PropertyResolver} to use for interpolation of values.
+	 * @return The {@link PropertyResolver} to use for interpolation of values.
+	 * @see #setPropertyResolver(PropertyResolver)
+	 */
 	public PropertyResolver getPropertyResolver() {
 		return propertyResolver;
 	}
 
+	/** Sets the {@link PropertyResolver} to use for interpolation of values.
+	 * @param pPropertyResolver The {@link PropertyResolver} to use for interpolation of values.
+	 * @see #getPropertyResolver()
+	 */
 	public void setPropertyResolver(PropertyResolver pPropertyResolver) {
 		propertyResolver = pPropertyResolver;
 	}
 
+	/** Returns the {@link ElEvaluator} to use for evaluation of EL expressions.
+	 * @return The {@link ElEvaluator} to use for evaluation of EL expressions.
+	 * @see #setElEvalutor(ElEvaluator)
+	 */
 	public ElEvaluator getElEvalutor() {
 		return elEvalutor;
 	}
 
-	public void setElEvalutor(ElEvaluator pElEvalutor) {
-		elEvalutor = pElEvalutor;
+	/** Sets the {@link ElEvaluator} to use for evaluation of EL expressions.
+	 * @param pElEvaluator The {@link ElEvaluator} to use for evaluation of EL expressions.
+	 * @see #getElEvalutor()
+	 */
+	public void setElEvalutor(ElEvaluator pElEvaluator) {
+		elEvalutor = pElEvaluator;
 	}
-	
+
+	/** Returns the template URI.
+	 * @return The template URI.
+	 * @see #setUri(String)
+	 */
 	public String getUri() {
 		return uri;
 	}
 
+	/** Sets the template URI.
+	 * @param pUri The template URI.
+	 * @see #getUri()
+	 */
 	public void setUri(String pUri) {
 		uri = pUri;
 	}
 
+	/** Returns the {@link ElReader} to use for parsing EL expressions.
+	 * @return The {@link ElReader} to use for parsing EL expressions.
+	 */
 	public ElReader getElReader() {
 		return elReader;
+	}
+
+	/** Sets the {@link ElReader} to use for parsing EL expressions.
+	 * @param pElReader The {@link ElReader} to use for parsing EL expressions.
+	 */
+	public void setElReader(ElReader pElReader) {
+		elReader = pElReader;
 	}
 
 	@Override
@@ -116,7 +187,8 @@ public class SimpleTemplateEngine implements ITemplateEngine<Map<String,Object>>
 		return new SimpleTemplateCompiler<Map<String,Object>>(propertyResolver, elReader, elEvalutor, uri).compile(array);
 	}
 
-	/** Creates a new instance with default settings: A {@link #DefaultPropertyResolver}, the current threads {@link Thread#getContextClassLoader()
+	/** Creates a new instance with default settings: A {@link DefaultPropertyResolver},
+	 * the current threads {@link Thread#getContextClassLoader()
 	 * context class loader}, and the "UTF-8" character set.
 	 * @return The created instance, ready to use.
 	 */
@@ -126,6 +198,7 @@ public class SimpleTemplateEngine implements ITemplateEngine<Map<String,Object>>
 		final ElReader reader = new ElReader();
 		final SimpleTemplateEngine ste = new SimpleTemplateEngine();
 		ste.setElEvalutor(evaluator);
+		ste.setElReader(reader);
 		ste.setPropertyResolver(pr);
 		ste.setTemplateCharset(StandardCharsets.UTF_8);
 		ste.setClassLoader(Thread.currentThread().getContextClassLoader());
