@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import com.github.jochenw.afw.core.io.IResourceRepository;
@@ -25,6 +26,7 @@ public class ZipFileResourceRepository implements IResourceRepository {
 	 */
 	public static class ZipFileResource implements IResource {
 		private final Path zipFile;
+		private final String entry;
 		private final String nameSpace;
 		private final String uri;
 		/** Creates a new instance.
@@ -32,8 +34,9 @@ public class ZipFileResourceRepository implements IResourceRepository {
 		 * @param pNamespace The resources namespace.
 		 * @param pUri The resources URI.
 		 */
-		public ZipFileResource(Path pZipFile, String pNamespace, String pUri) {
+		public ZipFileResource(Path pZipFile, String pEntry, String pNamespace, String pUri) {
 			zipFile = pZipFile;
+			entry = pEntry;
 			nameSpace = pNamespace;
 			uri = pUri;
 		}
@@ -83,7 +86,7 @@ public class ZipFileResourceRepository implements IResourceRepository {
 				}
 				final String nameSpace = asNamespace(ze.getName());
 				final String uri = zipUri + "!" + ze.getName();
-				pConsumer.accept(new ZipFileResource(zipFile, nameSpace, uri));
+				pConsumer.accept(new ZipFileResource(zipFile, ze.getName(), nameSpace, uri));
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -104,9 +107,11 @@ public class ZipFileResourceRepository implements IResourceRepository {
 	public InputStream open(IResource pResource) throws IOException {
 		final IResource resource = Objects.requireNonNull(pResource, "Resource");
 		if (resource instanceof ZipFileResource) {
-			final String uri = ((ZipFileResource) resource).uri;
-			final URL url = new URL(uri);
-			return url.openStream();
+			final ZipFileResource zfr = (ZipFileResource) resource;
+			@SuppressWarnings("resource")
+			final ZipFile zf = new ZipFile(zfr.zipFile.toFile());
+			final ZipEntry ze = zf.getEntry(zfr.entry);
+			return zf.getInputStream(ze);
 		} else {
 			throw new IllegalArgumentException("Invalid resource type: " + resource.getClass().getName());
 		}

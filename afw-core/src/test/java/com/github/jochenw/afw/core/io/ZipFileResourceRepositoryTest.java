@@ -43,14 +43,15 @@ public class ZipFileResourceRepositoryTest {
 			namespaces.add(r.getNamespace());
 			final String uri = r.getUri();
 			if (uri.startsWith(prefix)) {
-				uris.add(uri.substring(prefix.length()));
+				final String subUri = uri.substring(prefix.length());
+				uris.add(subUri);
+				if ("./pom.xml".equals(subUri)) {
+					pomXmlResourceHolder.set(r);
+				}
 			} else {
 				throw new IllegalArgumentException("Expected prefix=" + prefix + ", got " + uri);
 			}
 			uris.add(r.getUri());
-			if ("./pom.xml".equals(uri)) {
-				pomXmlResourceHolder.set(r);
-			}
 		});
 		assertTrue(namespaces.contains("."));
 		assertTrue(namespaces.contains("./docs"));
