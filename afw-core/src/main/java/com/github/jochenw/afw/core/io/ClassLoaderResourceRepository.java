@@ -50,9 +50,7 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 						final String filePart = fileUri.substring(0, offset);
 						if (filePart.startsWith("file:")) {
 							final File file = new File(filePart.substring("file:".length()));
-							if (!file.isFile()) {
-								throw new IllegalStateException("No such zip file: " + file);
-							} else {
+							if (file.isFile()) {
 								final ZipFileResourceRepository zfrr = new ZipFileResourceRepository(file);
 								zfrr.list(pConsumer);
 							}
