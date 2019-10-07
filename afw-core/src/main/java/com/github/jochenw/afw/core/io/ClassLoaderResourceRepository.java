@@ -58,24 +58,23 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 					}
 				} else if ("file".equals(url.getProtocol())) {
 					final File manifestFile = new File(url.getFile());
-					if (!manifestFile.isFile()) {
-						throw new IllegalStateException("Manifest file not found: " + manifestFile);
+					if (manifestFile.isFile()) {
+						File manifestDir = manifestFile.getParentFile();
+						if (manifestDir == null) {
+							manifestDir = manifestFile.getAbsoluteFile().getParentFile();
+						}
+						if (!manifestDir.isDirectory()) {
+							throw new IllegalStateException("Manifest directory not found: " + manifestDir);
+						}
+						File resourceDir = manifestDir.getParentFile();
+						if (resourceDir == null) {
+							resourceDir = manifestDir.getAbsoluteFile().getParentFile();
+						}
+						if (!resourceDir.isDirectory()) {
+							throw new IllegalStateException("Resource directory not found: " + manifestDir);
+						}
+						new DirResourceRepository(resourceDir).list(pConsumer);
 					}
-					File manifestDir = manifestFile.getParentFile();
-					if (manifestDir == null) {
-						manifestDir = manifestFile.getAbsoluteFile().getParentFile();
-					}
-					if (!manifestDir.isDirectory()) {
-						throw new IllegalStateException("Manifest directory not found: " + manifestDir);
-					}
-					File resourceDir = manifestDir.getParentFile();
-					if (resourceDir == null) {
-						resourceDir = manifestDir.getAbsoluteFile().getParentFile();
-					}
-					if (!resourceDir.isDirectory()) {
-						throw new IllegalStateException("Resource directory not found: " + manifestDir);
-					}
-					new DirResourceRepository(resourceDir).list(pConsumer);
 				} else {
 					// Ignore this URL, can't handle it.
 				}
