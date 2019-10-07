@@ -36,33 +36,27 @@ public class ZipFileResourceRepositoryTest {
 		createZipFile(zipFile);
 		final Set<String> namespaces = new HashSet<>();
 		final Set<String> uris = new HashSet<>();
-		final String prefix = "jar:" + zipFile.toUri().toURL().toExternalForm() + "!";
 		final Holder<IResource> pomXmlResourceHolder = new Holder<IResource>();
 		final ZipFileResourceRepository zfrr = new ZipFileResourceRepository(zipFile);
 		zfrr.list((r) -> {
 			namespaces.add(r.getNamespace());
 			final String uri = r.getUri();
-			if (uri.startsWith(prefix)) {
-				final String subUri = uri.substring(prefix.length());
-				uris.add(subUri);
-				if ("./pom.xml".equals(subUri)) {
-					pomXmlResourceHolder.set(r);
-				}
-			} else {
-				throw new IllegalArgumentException("Expected prefix=" + prefix + ", got " + uri);
+			uris.add(uri);
+			if ("pom.xml".equals(uri)) {
+				pomXmlResourceHolder.set(r);
 			}
-			uris.add(r.getUri());
+			uris.add(uri);
 		});
-		assertTrue(namespaces.contains("."));
-		assertTrue(namespaces.contains("./docs"));
-		assertTrue(namespaces.contains("./src/main/java/com/github/jochenw/afw/core/log/simple"));
-		assertTrue(namespaces.contains("./src/test/java/com/github/jochenw/afw/core/log/simple"));
-		assertTrue(uris.contains("./pom.xml"));
-		assertTrue(uris.contains("./docs/dependencies.html"));
-		assertTrue(uris.contains("./src/main/java/com/github/jochenw/afw/core/log/simple/SimpleLog.java"));
-		assertTrue(uris.contains("./target/classes/com/github/jochenw/afw/core/log/simple/SimpleLog.class"));
-		assertTrue(uris.contains("./src/test/java/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.java"));
-		assertTrue(uris.contains("./target/test-classes/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.class"));
+		assertTrue(namespaces.contains(""));
+		assertTrue(namespaces.contains("docs"));
+		assertTrue(namespaces.contains("src/main/java/com/github/jochenw/afw/core/log/simple"));
+		assertTrue(namespaces.contains("src/test/java/com/github/jochenw/afw/core/log/simple"));
+		assertTrue(uris.contains("pom.xml"));
+		assertTrue(uris.contains("docs/dependencies.html"));
+		assertTrue(uris.contains("src/main/java/com/github/jochenw/afw/core/log/simple/SimpleLog.java"));
+		assertTrue(uris.contains("target/classes/com/github/jochenw/afw/core/log/simple/SimpleLog.class"));
+		assertTrue(uris.contains("src/test/java/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.java"));
+		assertTrue(uris.contains("target/test-classes/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.class"));
 		final IResource res = pomXmlResourceHolder.get();
 		assertNotNull(res);
 		try (InputStream in1 = zfrr.open(res);

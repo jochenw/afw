@@ -27,11 +27,11 @@ public class DirResourceRepositoryTest {
 		assertTrue(namespaces.contains("docs"));
 		assertTrue(namespaces.contains("src/main/java/com/github/jochenw/afw/core/log/simple"));
 		assertTrue(namespaces.contains("src/test/java/com/github/jochenw/afw/core/log/simple"));
-		assertTrue(uris.contains("./pom.xml"));
-		assertTrue(uris.contains("./docs/dependencies.html"));
-		assertTrue(uris.contains("./src/main/java/com/github/jochenw/afw/core/log/simple/SimpleLog.java"));
-		assertTrue(uris.contains("./target/classes/com/github/jochenw/afw/core/log/simple/SimpleLog.class"));
-		assertTrue(uris.contains("./src/test/java/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.java"));
-		assertTrue(uris.contains("./target/test-classes/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.class"));
+		assertTrue(uris.contains("pom.xml"));
+		assertTrue(uris.contains("docs/dependencies.html"));
+		assertTrue(uris.contains("src/main/java/com/github/jochenw/afw/core/log/simple/SimpleLog.java"));
+		assertTrue(uris.contains("target/classes/com/github/jochenw/afw/core/log/simple/SimpleLog.class"));
+		assertTrue(uris.contains("src/test/java/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.java"));
+		assertTrue(uris.contains("target/test-classes/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.class"));
 	}
 }

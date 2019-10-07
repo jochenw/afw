@@ -13,6 +13,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 
 /** Implementation of {@link IResourceRepository}, which scans a base directory
  * for files, reporting them as resources.
@@ -41,7 +43,7 @@ public class DirResourceRepository implements IResourceRepository {
 		}
 	}
 		
-	private static class PathResource implements IResource {
+	private static class MutablePathResource implements IResource {
 		private String namespace;
 		private String uri;
 		private Path path;
@@ -90,10 +92,9 @@ public class DirResourceRepository implements IResourceRepository {
 
 	@Override
 	public void list(Consumer<IResource> pConsumer) {
-		final PathResource resource = new PathResource();
+		final MutablePathResource resource = new MutablePathResource();
 		final StringBuilder namespace = new StringBuilder();
 		final StringBuilder uri = new StringBuilder();
-		uri.append(baseDir.toString());
 		final FileVisitor<Path> fileVisitor = new SimpleFileVisitor<Path>() {
 			private int level = 0;
 			@Override
@@ -155,15 +156,40 @@ public class DirResourceRepository implements IResourceRepository {
 
 	@Override
 	public InputStream open(IResource pResource) throws IOException {
-		final Path path;
-		if (pResource instanceof ImmutablePathResource) {
-			path = ((ImmutablePathResource) pResource).path;
-		} else if (pResource instanceof PathResource) {
-			path = ((PathResource) pResource).path;
-		} else {
-			throw new IllegalArgumentException("Invalid resource type: " + pResource.getClass().getName());
-		}
-		return Files.newInputStream(path);
+		return openResource(pResource);
 	}
 
+	/**
+	 * Opens the given resource. Assumes, that the resource is valid, as testable
+	 * by {@link #isValidResource(com.github.jochenw.afw.core.io.IResourceRepository.IResource)}.
+	 * @param pResource The resource being opened.
+	 * @return An opened {@link InputStream}, which allows reading the resource.
+	 * @throws IllegalArgumentException The resource isn't valid.
+	 * @throws UncheckedIOException The resource is valid, but opening the resource failed anyways.
+	 */
+	public static InputStream openResource(IResource pResource) {
+		try {
+			final Path path;
+			if (pResource instanceof ImmutablePathResource) {
+				path = ((ImmutablePathResource) pResource).path;
+			} else if (pResource instanceof MutablePathResource) {
+				path = ((MutablePathResource) pResource).path;
+			} else {
+				throw new IllegalArgumentException("Invalid resource type: " + pResource.getClass().getName());
+			}
+			return Files.newInputStream(path);
+		} catch (IOException e) {
+			throw new UncheckedExecutionException(e);
+		}
+	}
+
+	/** Returns, whether this resource instance can be opened by either
+	 * {@link #open(com.github.jochenw.afw.core.io.IResourceRepository.IResource)}, or
+	 * {@link #openResource(com.github.jochenw.afw.core.io.IResourceRepository.IResource)}.
+	 * @param pResource The resource being tested.
+	 * @return True, if the above methods can open the resource. Otherwise false.
+	 */
+	public static boolean isValidResource(IResource pResource) {
+		return pResource instanceof ImmutablePathResource  ||  pResource instanceof MutablePathResource;
+	}
 }

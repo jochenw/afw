@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -26,19 +25,20 @@ public class ZipFileResourceRepository implements IResourceRepository {
 	 */
 	public static class ZipFileResource implements IResource {
 		private final Path zipFile;
-		private final String entry;
 		private final String nameSpace;
 		private final String uri;
+		private final String entry;
 		/** Creates a new instance.
 		 * @param pZipFile The zip file, from which to read the resource.
 		 * @param pNamespace The resources namespace.
+		 * @param pEntry The zip files entry.
 		 * @param pUri The resources URI.
 		 */
 		public ZipFileResource(Path pZipFile, String pEntry, String pNamespace, String pUri) {
 			zipFile = pZipFile;
-			entry = pEntry;
 			nameSpace = pNamespace;
 			uri = pUri;
+			entry = pEntry;
 		}
 		@Override
 		public String getNamespace() {
@@ -75,7 +75,6 @@ public class ZipFileResourceRepository implements IResourceRepository {
 	public void list(Consumer<IResource> pConsumer) {
 		try (InputStream in = Files.newInputStream(zipFile);
 			 ZipInputStream zin = new ZipInputStream(in)) {
-			final String zipUri = "jar:" + zipFile.toUri().toURL().toExternalForm();
 			for (;;) {
 				final ZipEntry ze = zin.getNextEntry();
 				if (ze == null) {
@@ -85,7 +84,7 @@ public class ZipFileResourceRepository implements IResourceRepository {
 					continue;
 				}
 				final String nameSpace = asNamespace(ze.getName());
-				final String uri = zipUri + "!" + ze.getName();
+				final String uri = asUri(ze.getName());
 				pConsumer.accept(new ZipFileResource(zipFile, ze.getName(), nameSpace, uri));
 			}
 		} catch (IOException e) {
@@ -93,8 +92,19 @@ public class ZipFileResourceRepository implements IResourceRepository {
 		}
 	}
 
+	protected String asUri(String pName) {
+		final String uri = pName.replace('\\', '/');
+		if (uri.startsWith("./")) {
+			return uri.substring(2);
+		} else if (uri.startsWith("/")) {
+			return uri.substring(1);
+		} else {
+			return uri;
+		}
+	}
+
 	protected String asNamespace(String pName) {
-		final String name = pName.replace('\\', '/');
+		final String name = asUri(pName);
 		final int offset = name.lastIndexOf('/');
 		if (offset == -1) {
 			return "";
@@ -115,5 +125,40 @@ public class ZipFileResourceRepository implements IResourceRepository {
 		} else {
 			throw new IllegalArgumentException("Invalid resource type: " + resource.getClass().getName());
 		}
+	}
+
+	/**
+	 * Opens the given resource. Assumes, that the resource is valid, as testable
+	 * by {@link #isValidResource(com.github.jochenw.afw.core.io.IResourceRepository.IResource)}.
+	 * @param pResource The resource being opened.
+	 * @return An opened {@link InputStream}, which allows reading the resource.
+	 * @throws IllegalArgumentException The resource isn't valid.
+	 * @throws UncheckedIOException The resource is valid, but opening the resource failed anyways.
+	 */
+	public static InputStream openResource(IResource pResource) {
+		try {
+			final IResource resource = Objects.requireNonNull(pResource, "Resource");
+			if (resource instanceof ZipFileResource) {
+				final ZipFileResource zfr = (ZipFileResource) resource;
+				@SuppressWarnings("resource")
+				final ZipFile zf = new ZipFile(zfr.zipFile.toFile());
+				final ZipEntry ze = zf.getEntry(zfr.getUri());
+				return zf.getInputStream(ze);
+			} else {
+				throw new IllegalArgumentException("Invalid resource type: " + resource.getClass().getName());
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/** Returns, whether this resource instance can be opened by either
+	 * {@link #open(com.github.jochenw.afw.core.io.IResourceRepository.IResource)}, or
+	 * {@link #openResource(com.github.jochenw.afw.core.io.IResourceRepository.IResource)}.
+	 * @param pResource The resource being tested.
+	 * @return True, if the above methods can open the resource. Otherwise false.
+	 */
+	public static boolean isValidResource(IResource pResource) {
+		return Objects.requireNonNull(pResource, "Resource") instanceof ZipFileResource;
 	}
 }
