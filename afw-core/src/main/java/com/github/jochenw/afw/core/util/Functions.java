@@ -235,6 +235,8 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableRunnable} into a standard {@link Runnable}.
+	 * @param pRunnable The failable runnable being executed.
+	 * @return An instance of {@link Runnable}, which is internally invoking the failable runnable upon execution.
 	 */
 	public static Runnable asRunnable(FailableRunnable<?> pRunnable) {
 		return () -> {

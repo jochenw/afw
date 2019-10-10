@@ -15,11 +15,16 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableBiFunction;
+import com.github.jochenw.afw.core.util.Functions.FailableBiIntPredicate;
+import com.github.jochenw.afw.core.util.Functions.FailableBiLongPredicate;
+import com.github.jochenw.afw.core.util.Functions.FailableBiPredicate;
 import com.github.jochenw.afw.core.util.Functions.FailableCallable;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableFunction;
+import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
 import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
 import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
+
 
 public class FunctionsTest {
     public static class SomeException extends Exception {
@@ -421,5 +426,127 @@ public class FunctionsTest {
     			throw Exceptions.show(t);
     		}
     	}
+    }
+
+    /** Test case for the {@link FailablePredicate}.
+     * @throws IOException The test failed.
+     */
+    @Test
+    public void testTestPredicate() throws IOException {
+    	final FailablePredicate<Integer, IOException> predicate = (i) -> { if (i.intValue() % 2 != 0) { throw new IOException("Expected even number, got " + i); } return true; };
+    	// Successfull execution:
+    	assertTrue(predicate.test(Integer.valueOf(0)));
+    	// Failing execution.
+   		try {
+   			predicate.test(Integer.valueOf(1));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number, got 1", e.getMessage());
+   		}
+    }
+
+    /** Test case for the {@link FailableBiIntPredicate}.
+     * @throws IOException The test failed.
+     */
+    @Test
+    public void testTestBiIntPredicate() throws IOException {
+    	final FailableBiIntPredicate<Integer, IOException> predicate = (i, I) -> {
+    		if (i % 2 != 0) { throw new IOException("Expected even number for parameter 1, got " + i); }
+    		if (I.intValue() % 2 != 0) { throw new IOException("Expected even number for parameter 2, got " + I); }  	
+    		return true;
+    	};
+    	// Successful execution:
+    	assertTrue(predicate.test(0,Integer.valueOf(0)));
+    	// Failing execution (parameter 1)
+   		try {
+   			predicate.test(1,Integer.valueOf(0));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 1, got 1", e.getMessage());
+   		}
+    	// Failing execution (parameter 2)
+   		try {
+   			predicate.test(0,Integer.valueOf(1));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 2, got 1", e.getMessage());
+   		}
+    	// Failing execution (both parameters)
+   		try {
+   			predicate.test(3,Integer.valueOf(1));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 1, got 3", e.getMessage());
+   		}
+    }
+
+    /** Test case for the {@link FailableBiIntPredicate}.
+     * @throws IOException The test failed.
+     */
+    @Test
+    public void testTestBiLongPredicate() throws IOException {
+    	final FailableBiLongPredicate<Long, IOException> predicate = (l, L) -> {
+    		if (l % 2 != 0) { throw new IOException("Expected even number for parameter 1, got " + l); }
+    		if (L.longValue() % 2 != 0) { throw new IOException("Expected even number for parameter 2, got " + L); }  	
+    		return true;
+    	};
+    	// Successful execution:
+    	assertTrue(predicate.test(0l,Long.valueOf(0)));
+    	// Failing execution (parameter 1)
+   		try {
+   			predicate.test(1l,Long.valueOf(0));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 1, got 1", e.getMessage());
+   		}
+    	// Failing execution (parameter 2)
+   		try {
+   			predicate.test(0l,Long.valueOf(1));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 2, got 1", e.getMessage());
+   		}
+    	// Failing execution (both parameters)
+   		try {
+   			predicate.test(3l,Long.valueOf(1));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 1, got 3", e.getMessage());
+   		}
+    }
+
+    /** Test case for the {@link FailableBiPredicate}.
+     * @throws IOException The test failed.
+     */
+    @Test
+    public void testTestBiPredicate() throws IOException {
+    	final FailableBiPredicate<Integer,Long, IOException> predicate = (i, l) -> {
+    		if (i.intValue() % 2 != 0) { throw new IOException("Expected even number for parameter 1, got " + i); }
+    		if (l.longValue() % 2 != 0) { throw new IOException("Expected even number for parameter 2, got " + l); }  	
+    		return true;
+    	};
+    	// Successful execution:
+   		assertTrue(predicate.test(Integer.valueOf(0),Long.valueOf(0)));
+    	// Failing execution (parameter 1)
+   		try {
+   			predicate.test(Integer.valueOf(1),Long.valueOf(0));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 1, got 1", e.getMessage());
+   		}
+    	// Failing execution (parameter 2)
+   		try {
+   			predicate.test(Integer.valueOf(0),Long.valueOf(1));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 2, got 1", e.getMessage());
+   		}
+    	// Failing execution (both parameters)
+   		try {
+   			predicate.test(Integer.valueOf(3),Long.valueOf(1));
+   			fail("Expected IOException");
+   		} catch (IOException e) {
+   			assertEquals("Expected even number for parameter 1, got 3", e.getMessage());
+   		}
     }
 }
