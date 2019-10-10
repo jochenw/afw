@@ -31,6 +31,15 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <id>jwi</id>
+      <email>jochen.wiedmann@softwareag.com</email>
+      <name>Jochen Wiedmann</name>
+      <organization>Organized? Me?</organization>
+      <organizationUrl>https://github.com/jochenw</organizationUrl>
+    </developer>
+  </developers>
   <build>
     <pluginManagement>
       <plugins>
