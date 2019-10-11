@@ -24,13 +24,14 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-<licenses>
+  <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <url>https://github.com/jochenw/afw</url>
   <developers>
     <developer>
       <id>jwi</id>
