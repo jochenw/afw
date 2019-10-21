@@ -52,11 +52,41 @@ public class Functions {
 	public interface FailableBiConsumer<T1 extends Object, T2 extends Object, T3 extends Throwable> {
 		/** Called to consume the given objects.
 		 * @param pObject1 The first object being consumed.
-		 * @param pObject2 The first object being consumed.
+		 * @param pObject2 The second object being consumed.
 		 * @see BiConsumer#accept(Object,Object)
 		 * @throws T3 The exception type being thrown by the consumer.
 		 */
 		public void accept(T1 pObject1, T2 pObject2) throws T3;
+	}
+
+        /** Failable version of {@link BiConsumer}, where the first parameter is a primitive integer.
+	 * @param <I> The first type being consumed.
+	 * @param <T> The exception type being thrown by the consumer.
+	 * @see BiConsumer
+	 */
+	@FunctionalInterface
+	public interface FailableBiIntConsumer<I extends Object, T extends Throwable> {
+		/** Called to consume the given objects.
+		 * @param pObject1 The first input parameter being consumed, a primitive integer.
+		 * @param pObject2 The second input parameter being consumed.
+		 * @throws T The exception type being thrown by the consumer.
+		 */
+		public void accept(int pObject1, I pObject2) throws T;
+	}
+
+        /** Failable version of {@link BiConsumer}, where the first parameter is a primitive long.
+	 * @param <I> The first type being consumed.
+	 * @param <T> The exception type being thrown by the consumer.
+	 * @see BiConsumer
+	 */
+	@FunctionalInterface
+	public interface FailableBiLongConsumer<I extends Object, T extends Throwable> {
+		/** Called to consume the given objects.
+		 * @param pObject1 The first input parameter being consumed, a primitive long.
+		 * @param pObject2 The second input parameter being consumed.
+		 * @throws T The exception type being thrown by the consumer.
+		 */
+		public void accept(long pObject1, I pObject2) throws T;
 	}
 
 	/** Failable version of {@link Function}.
@@ -87,10 +117,44 @@ public class Functions {
 		/** @param pInput1 The functions first input object
 		 * @param pInput2 The functions first input object
 		 * @return The functions result object
-	     * @throws T The exception type being thrown by the function.
+	         * @throws T The exception type being thrown by the function.
 		 * @see Function#apply(Object)
 		 */
 		public O apply(I1 pInput1, I2 pInput2) throws T;
+	}
+
+        /** Failable version of {@link BiFunction}, where one of the arguments is a primitive integer.
+	 * @param <I> The functions input type.
+	 * @param <O> The functions output type (result type).
+	 * @param <T> The exception type being thrown by the function.
+	 * @see BiFunction
+	 */
+	@FunctionalInterface
+	public interface FailableBiIntFunction<I extends Object, O extends Object, T extends Throwable> {
+		/** @param pInput1 The functions first input parameter, a primitive integer.
+		 * @param pInput2 The functions second input parameter, an instance of I.
+		 * @return The functions result object
+	         * @throws T The exception type being thrown by the function.
+		 * @see Function#apply(Object)
+		 */
+		public O apply(int pInput1, I pInput2) throws T;
+	}
+
+        /** Failable version of {@link BiFunction}, where one of the arguments is a primitive long.
+	 * @param <I> The functions input type.
+	 * @param <O> The functions output type (result type).
+	 * @param <T> The exception type being thrown by the function.
+	 * @see BiFunction
+	 */
+	@FunctionalInterface
+	public interface FailableBiLongFunction<I extends Object, O extends Object, T extends Throwable> {
+		/** @param pInput1 The functions first input parameter, a primitive integer.
+		 * @param pInput2 The functions second input parameter, an instance of I.
+		 * @return The functions result object
+	         * @throws T The exception type being thrown by the function.
+		 * @see Function#apply(Object)
+		 */
+		public O apply(long pInput1, I pInput2) throws T;
 	}
 
 	/** Failable version of {@link Runnable}.
@@ -325,6 +389,12 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableBiFunction} into a standard {@link BiFunction}.
+         * @param <I1> The first input parameters type.
+         * @param <I2> The second input parameters type.
+         * @param <O> The output type.
+         * @param pFunction The {@link FailableBiFunction} to convert.
+         * @return A {@link BiFunction}, which is functionally equivalent to the input function, because
+         *   it is implemented by invoking the latter.
 	 */
 	public static <I1,I2,O> BiFunction<I1,I2,O> asBiFunction(FailableBiFunction<I1,I2,O,?> pFunction) {
 		return (pInput1, pInput2) -> {
@@ -360,7 +430,55 @@ public class Functions {
 	}
 
 	/**
+	 * Applies the given {@link FailableBiIntFunction}, and returns the result.
+	 * Rethrows checked exceptions, if necessary.
+	 * @param pBiIntFunction The {@link FailableBiIntFunction} to apply.
+	 * @param pInput1 The first input parameter, on which the {@link FailableFunction}
+	 *   is being applied, a primitive integer.
+	 * @param pInput2 The second input parameter, on which the {@link FailableFunction}
+	 *   is being applied.
+	 * @return The result object, which has been returned by invoking the function.
+	 * @see BiFunction#apply(Object, Object)
+	 * @param <I> The functions second input type.
+	 * @param <O> The functions output type.
+	 * @param <T> The exception type, which may be thrown by the function.
+	 */
+	public static <I,O,T extends Throwable> O apply(FailableBiIntFunction<I,O,T> pBiIntFunction, int pInput1, I pInput2) {
+	    try {
+		return pBiIntFunction.apply(pInput1, pInput2);
+	    } catch (Throwable t) {
+		throw Exceptions.show(t);
+	    }
+	}
+
+        /**
+	 * Applies the given {@link FailableBiIntFunction}, and returns the result.
+	 * Rethrows checked exceptions, if necessary.
+	 * @param pBiLongFunction The {@link FailableBiLongFunction} to apply.
+	 * @param pInput1 The first input parameter, on which the {@link FailableFunction}
+	 *   is being applied, a primitive long.
+	 * @param pInput2 The second input parameter, on which the {@link FailableFunction}
+	 *   is being applied.
+	 * @return The result object, which has been returned by invoking the function.
+	 * @see BiFunction#apply(Object, Object)
+	 * @param <I> The functions second input type.
+	 * @param <O> The functions output type.
+	 * @param <T> The exception type, which may be thrown by the function.
+	 */
+	public static <I,O,T extends Throwable> O apply(FailableBiLongFunction<I,O,T> pBiLongFunction, long pInput1, I pInput2) {
+	    try {
+		return pBiLongFunction.apply(pInput1, pInput2);
+	    } catch (Throwable t) {
+		throw Exceptions.show(t);
+	    }
+	}
+
+	/**
 	 * Converts the given {@link FailableConsumer} into a standard {@link Consumer}.
+	 * @param pConsumer The failable consumer being invoked.
+	 * @param <I> The failable consumers parameter type.
+	 * @return An instance of {@link Consumer}, which is functionally equivalent to
+	 *   the input 
 	 */
 	public static <I> Consumer<I> asConsumer(FailableConsumer<I,?> pConsumer) {
 		return (pInput) -> {
@@ -424,6 +542,40 @@ public class Functions {
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
+	}
+
+        /** Makes the given {@link FailableBiIntConsumer} accept the given parameters.
+	 * Rethrows checked exceptions, if necessary.
+	 * @param pBiIntConsumer The {@link FailableBiIntConsumer}, which is to accept the objects.
+	 * @param pInt The first parameter being consumed, a primitive integer.
+	 * @param pObject The second parameter being consumed, an instance of I.
+	 * @param <I> The consumers first argument type.
+	 * @param <T> The exception type, which may be thrown by the consumer.
+	 * @see BiConsumer#accept(Object, Object)
+	 */
+	public static <I,T extends Throwable> void accept(FailableBiIntConsumer<I,T> pBiIntConsumer, int pInt, I pObject) {
+	    try {
+	        pBiIntConsumer.accept(pInt, pObject);
+	    } catch (Throwable t) {
+		throw Exceptions.show(t);
+	    }
+	}
+
+        /** Makes the given {@link FailableBiIntConsumer} accept the given parameters.
+	 * Rethrows checked exceptions, if necessary.
+	 * @param pBiLongConsumer The {@link FailableBiLongConsumer}, which is to accept the objects.
+	 * @param pLong The first parameter being consumed, a primitive long.
+	 * @param pObject The second parameter being consumed, an instance of I.
+	 * @param <I> The consumers first argument type.
+	 * @param <T> The exception type, which may be thrown by the consumer.
+	 * @see BiConsumer#accept(Object, Object)
+	 */
+	public static <I,T extends Throwable> void accept(FailableBiLongConsumer<I,T> pBiLongConsumer, long pLong, I pObject) {
+	    try {
+	        pBiLongConsumer.accept(pLong, pObject);
+	    } catch (Throwable t) {
+	        throw Exceptions.show(t);
+	    }
 	}
 
 	/**

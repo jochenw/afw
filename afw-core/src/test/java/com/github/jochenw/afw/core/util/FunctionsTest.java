@@ -11,10 +11,13 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableBiFunction;
+import com.github.jochenw.afw.core.util.Functions.FailableBiIntFunction;
 import com.github.jochenw.afw.core.util.Functions.FailableBiIntPredicate;
 import com.github.jochenw.afw.core.util.Functions.FailableBiLongPredicate;
 import com.github.jochenw.afw.core.util.Functions.FailableBiPredicate;
@@ -333,6 +336,68 @@ public class FunctionsTest {
         final Integer i = Functions.apply(Testable::testInt, testable, (Throwable) null);
         assertNotNull(i);
         assertEquals(0, i.intValue());
+    }
+
+    /**
+     * Test case for {@link Functions#test(FailableBiIntPredicate, int, Object)}.
+     * @throws Throwable The test failed.
+     */
+    @Test
+    public void testTestBiIntFunction() throws Throwable {
+    	final RuntimeException rte = new IllegalArgumentException("Odd number");
+    	final Exception oddNumberException = new Exception("Odd number");
+    	final FailableBiIntPredicate<Throwable,Throwable> biIntPredicate = (i, t) -> {
+    		if (i %2 == 1 ) { throw t;
+    		}  else {
+    			return true;
+    		}
+    	};
+    	Functions.test(biIntPredicate, 0, null);
+    	try {
+    		Functions.test(biIntPredicate, 1, rte);
+    		Assert.fail("Expected Exception");
+    	} catch (Exception e) {
+    		Assert.assertSame(rte, e);
+    	}
+    	Functions.test(biIntPredicate, 2, rte);
+    	try {
+    		Functions.test(biIntPredicate, 3, oddNumberException);
+    		Assert.fail("Expected Exception");
+    	} catch (UndeclaredThrowableException ute) {
+    		final Throwable th = ute.getCause();
+    		Assert.assertSame(oddNumberException, th);
+    	}
+    }
+
+    /**
+     * Test case for {@link Functions#test(FailableBiLongPredicate, long, Object)}.
+     * @throws Throwable The test failed.
+     */
+    @Test
+    public void testTestBiLongFunction() throws Throwable {
+    	final RuntimeException rte = new IllegalArgumentException("Odd number");
+    	final Exception oddNumberException = new Exception("Odd number");
+    	final FailableBiLongPredicate<Throwable,Throwable> biIntPredicate = (l, t) -> {
+    		if (l %2 == 1 ) { throw t;
+    		}  else {
+    			return true;
+    		}
+    	};
+    	Functions.test(biIntPredicate, 0l, null);
+    	try {
+    		Functions.test(biIntPredicate, 1l, rte);
+    		Assert.fail("Expected Exception");
+    	} catch (IllegalArgumentException e) {
+    		Assert.assertSame(rte, e);
+    	}
+    	Functions.test(biIntPredicate, 2l, rte);
+    	try {
+    		Functions.test(biIntPredicate, 3l, oddNumberException);
+    		Assert.fail("Expected Exception");
+    	} catch (UndeclaredThrowableException ute) {
+    		final Throwable th = ute.getCause();
+    		Assert.assertSame(oddNumberException, th);
+    	}
     }
 
     @Test

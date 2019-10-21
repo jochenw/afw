@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.core.util;
 
 import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 public class Stax {
@@ -55,8 +56,56 @@ public class Stax {
 		final Location loc = pReader.getLocation();
 		if (loc != null) {
 			sb.append(": ");
-			sb.append(loc.getLineNumber() + ": " + loc.getColumnNumber());
+			sb.append(loc.getLineNumber());
+                        sb.append(": ");
+                        sb.append(loc.getColumnNumber());
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * Creates a new {@link XMLStreamException} with the given readers {@link Location}.
+	 * @param pReader The reader, which is being queried for its location.
+	 * @param pMsg The error message.
+	 * @return An {@link XMLStreamException}, with location information.
+	 */
+	public static XMLStreamException error(XMLStreamReader pReader, String pMsg) {
+		final Location loc = pReader.getLocation();
+		if (loc == null) {
+			return new XMLStreamException(pMsg);
+		} else {
+			return new XMLStreamException(asLocalizedMessage(loc, pMsg), loc);
+		}
+	}
+
+	public static void assertElement(XMLStreamReader pReader, String pTagName) throws XMLStreamException {
+            assertStartElementState(pReader);
+	    if (!isDefaultNamespace(pReader)) {
+		final String uri = pReader.getNamespaceURI();
+		throw error(pReader, "Expected default namespace, got " + uri);
+	    }
+	}
+
+        public static void assertStartElementState(XMLStreamReader pReader) throws XMLStreamException {
+            final int state = pReader.getEventType();
+            if (XMLStreamReader.START_ELEMENT != state) {
+                throw error(pReader, "Expected state START_ELEMENT, got " + state);
+            }
+        }
+
+        public static boolean isDefaultNamespace(XMLStreamReader pReader) throws XMLStreamException {
+            final String uri = pReader.getNamespaceURI();
+            if (uri == null) {
+                return true;
+            } else {
+                return uri.length() == 0;
+            }
+        }
+
+        public static void assertDefaultNamespace(XMLStreamReader pReader) throws XMLStreamException {
+            if (!isDefaultNamespace(pReader)) {
+                final String uri = pReader.getNamespaceURI();
+                throw error(pReader, "Expected default namespace, got " + uri);
+            }
+        }
 }
