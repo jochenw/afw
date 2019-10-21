@@ -29,8 +29,9 @@ public class ClassLoaderResourceRepositoryTest {
 	}
 
 	private void assertResourceFound(final Set<String> pUris, final ClassLoaderResourceRepository pRepository, String pUri, String pMatchString) {
+		assertTrue(pUris.contains(pUri));
+/*
 		if (pUris.contains(pUri)) {
-			assertTrue(pUris.contains(pUri));
 		} else {
 			pRepository.list((r) -> {
 				final String uri = r.getUri();
@@ -39,5 +40,6 @@ public class ClassLoaderResourceRepositoryTest {
 				}
 			});
 		}
+*/
 	}
 }
