@@ -23,17 +23,21 @@ public class ClassLoaderResourceRepositoryTest {
 		clrr.list((r) -> uris.add(r.getUri()));
 		assertTrue(uris.contains("javax/servlet/Filter.class"));  // An entry from Maven's "compile" scope.
 		assertTrue(uris.contains("org/junit/Test.class"));       // An entry from Maven's "test" scope.
-		if (uris.contains("com/github/jochenw/afw/core/plugins/plugin-list.xsd")) {
-			assertTrue(uris.contains("com/github/jochenw/afw/core/plugins/plugin-list.xsd"));
+		assertResourceFound(uris, clrr, "com/github/jochenw/afw/core/plugins/plugin-list.xsd", "xsd");
+		assertResourceFound(uris, clrr, "com/github/jochenw/afw/core/io/ClassLoaderResourceRepositoryTest.class", "ClassLoader"); // An entry from the "target/test-classes" folder.
+		assertFalse(uris.contains("com/github/jochenw/afw/core/io/ClassLoaderResourceRepositoryTest.java"));
+	}
+
+	private void assertResourceFound(final Set<String> pUris, final ClassLoaderResourceRepository pRepository, String pUri, String pMatchString) {
+		if (pUris.contains(pUri)) {
+			assertTrue(pUris.contains(pUri));
 		} else {
-			clrr.list((r) -> {
+			pRepository.list((r) -> {
 				final String uri = r.getUri();
-				if (uri.contains("xsd")) {
+				if (uri.contains(pMatchString)) {
 					System.out.println(uri);
 				}
 			});
 		}
-		assertTrue(uris.contains("com/github/jochenw/afw/core/io/ClassLoaderResourceRepositoryTest.class")); // An entry from the "target/test-classes" folder.
-		assertFalse(uris.contains("com/github/jochenw/afw/core/io/ClassLoaderResourceRepositoryTest.java"));
 	}
 }
