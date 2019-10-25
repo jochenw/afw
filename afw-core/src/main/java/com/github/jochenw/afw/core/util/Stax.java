@@ -4,7 +4,18 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+/**
+ * Utility class for working with Stax parsers.
+ */
 public class Stax {
+	/**
+	 * Returns a string, which includes the given message, and the given location information.
+	 * @param pLoc The object providing the location information. If there is no such object
+	 *   (the value is null), then the message string will be returned, as it is.
+	 * @param pMsg The message string, which is being augmented with location information.
+	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 *   information is provided. Otherwise, returns the message string, as it is.
+	 */
 	public static String asLocalizedMessage(Location pLoc, String pMsg) {
 		if (pLoc == null) {
 			return pMsg;
@@ -13,6 +24,15 @@ public class Stax {
 		}
 	}
 
+	/**
+	 * Returns a string, which includes the given message, and the given location information.
+	 * @param pMsg The message string, which is being augmented with location information.
+	 * @param pSystemId System id of the location information (if available), or null.
+	 * @param pLineNumber Line number of the location information (if available), or -1.
+	 * @param pColumnNumber Column number of the location information (if available), or -1
+	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 *   information is provided. Otherwise, returns the message string, as it is.
+	 */
 	public static String asLocalizedMessage(String pMsg, String pSystemId, int pLineNumber, int pColumnNumber) {
 		if (pSystemId == null  &&  pLineNumber == -1  &&  pColumnNumber == -1) {
 			return pMsg;
@@ -78,34 +98,98 @@ public class Stax {
 		}
 	}
 
+	/** Asserts, that the Stax parser is currently located at an element with the default namespace,
+	 * and the given local name.
+	 * @param pReader The Stax parser being checked.
+	 * @param pTagName The expected local name.
+	 * @throws XMLStreamException The Stax parser is not located at a start element event,
+	 * or the element name is not as expected, or the namespace URI is not the default namespace.
+	 */
 	public static void assertElement(XMLStreamReader pReader, String pTagName) throws XMLStreamException {
-            assertStartElementState(pReader);
+		assertStartElementState(pReader);
 	    if (!isDefaultNamespace(pReader)) {
-		final String uri = pReader.getNamespaceURI();
-		throw error(pReader, "Expected default namespace, got " + uri);
+	    	final String uri = pReader.getNamespaceURI();
+	    	throw error(pReader, "Expected default namespace, got " + uri);
 	    }
 	}
 
-        public static void assertStartElementState(XMLStreamReader pReader) throws XMLStreamException {
-            final int state = pReader.getEventType();
-            if (XMLStreamReader.START_ELEMENT != state) {
-                throw error(pReader, "Expected state START_ELEMENT, got " + state);
-            }
-        }
+	/** Asserts, that the Stax parser is currently located at a start element event.
+	 * @param pReader The Stax parser being checked.
+	 * @throws XMLStreamException The Stax parser is not located at a start element event.
+	 */
+	public static void assertStartElementState(XMLStreamReader pReader) throws XMLStreamException {
+		final int state = pReader.getEventType();
+		if (XMLStreamReader.START_ELEMENT != state) {
+			throw error(pReader, "Expected state START_ELEMENT, got " + state);
+		}
+	}
 
-        public static boolean isDefaultNamespace(XMLStreamReader pReader) throws XMLStreamException {
-            final String uri = pReader.getNamespaceURI();
-            if (uri == null) {
-                return true;
-            } else {
-                return uri.length() == 0;
-            }
-        }
+	/** Returns, whether the Stax parser is currently located at a start element, or an end
+	 * element event with the default namespace.
+	 * @param pReader The Stax parser being checked.
+	 * @return True, if the current element has the default namespace URI.
+	 * @throws XMLStreamException The Stax parser is not located at a start element, or an end
+	 *   element event, or the elements namespace URI is not the default namespace.
+	 */
+	public static boolean isDefaultNamespace(XMLStreamReader pReader) throws XMLStreamException {
+		final String uri = pReader.getNamespaceURI();
+		if (uri == null) {
+			return true;
+		} else {
+			return uri.length() == 0;
+		}
+	}
 
-        public static void assertDefaultNamespace(XMLStreamReader pReader) throws XMLStreamException {
-            if (!isDefaultNamespace(pReader)) {
-                final String uri = pReader.getNamespaceURI();
-                throw error(pReader, "Expected default namespace, got " + uri);
-            }
-        }
+	/** Asserts, that the Stax parser is currently located at a start element, or an end
+	 * element event with the default namespace.
+	 * @param pReader The Stax parser being checked.
+	 * @throws XMLStreamException The Stax parser is not located at a start element, or an end
+	 *   element event, or the elements namespace URI is not the default namespace.
+	 */
+	public static void assertDefaultNamespace(XMLStreamReader pReader) throws XMLStreamException {
+		if (!isDefaultNamespace(pReader)) {
+			final String uri = pReader.getNamespaceURI();
+			throw error(pReader, "Expected default namespace, got " + uri);
+		}
+	}
+
+	/** Skips the current element, including it's contents, up to, and including, the
+	 * corresponding end element event.
+	 * @param pReader The Stax parser, which is to skip an element.
+	 * @throws XMLStreamException Skipping the element failed.
+	 */
+	public static void skipElementRecursively(XMLStreamReader pReader) throws XMLStreamException {
+		int level = 0;
+		final String uri = pReader.getNamespaceURI();
+		final String localName = pReader.getLocalName();
+		while (pReader.hasNext()) {
+			final int state = pReader.next();
+			switch (state) {
+			case XMLStreamReader.COMMENT:
+			case XMLStreamReader.CHARACTERS:
+			case XMLStreamReader.CDATA:
+			case XMLStreamReader.SPACE:
+				// Ignore this.
+				break;
+			case XMLStreamReader.START_ELEMENT:
+				++level;
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				if (level-- == 0) {
+					if (uri == null  ||  uri.length() == 0) {
+						assertDefaultNamespace(pReader);
+					} else if (!uri.equals(pReader.getNamespaceURI())) {
+						throw error(pReader, "Expected namespace=" + uri + ", got " + pReader.getNamespaceURI());
+					}
+					if (!localName.equals(pReader.getLocalName())) {
+						throw error(pReader, "Expected localName=" + localName + ", got " + pReader.getLocalName());
+					}
+					return;
+				}
+				break;
+			default:
+				throw error(pReader, "Unexpected state: " + state);
+			}
+		}
+	}
 }

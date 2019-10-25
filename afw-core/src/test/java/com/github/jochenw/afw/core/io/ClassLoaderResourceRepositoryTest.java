@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.util.Strings;
 
 /**
  * Test case for the {@link ClassLoaderResourceRepository}.
@@ -29,7 +28,7 @@ public class ClassLoaderResourceRepositoryTest {
 	}
 
 	private void assertResourceFound(final Set<String> pUris, final ClassLoaderResourceRepository pRepository, String pUri, String pMatchString) {
-		assertTrue(pUris.contains(pUri));
+		assertTrue("Resource not found: " + pUri, pUris.contains(pUri));
 /*
 		if (pUris.contains(pUri)) {
 		} else {
