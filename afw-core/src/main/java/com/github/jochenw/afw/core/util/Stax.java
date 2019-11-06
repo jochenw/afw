@@ -25,6 +25,21 @@ public class Stax {
 	}
 
 	/**
+	 * Returns a string, which describes the given location.
+	 * @param pLoc The object providing the location information. If this parameter is null,
+	 *   then the words "Unknown location" will be returned.
+	 * @return A string in the format "<LOCATION_INFORMATION>", if location
+	 *   information is provided. Otherwise, the words "Unknown location".
+	 */
+	public static String asLocation(Location pLoc) {
+		if (pLoc == null) {
+			return "Unknown location";
+		} else {
+			return asLocation(pLoc.getSystemId(), pLoc.getLineNumber(), pLoc.getColumnNumber());
+		}
+	}
+
+	/**
 	 * Returns a string, which includes the given message, and the given location information.
 	 * @param pMsg The message string, which is being augmented with location information.
 	 * @param pSystemId System id of the location information (if available), or null.
@@ -57,6 +72,40 @@ public class Stax {
 			}
 			sb.append(": ");
 			sb.append(pMsg);
+			return sb.toString();
+		}
+	}
+
+	/**
+	 * Returns a string, describing the given location information.
+	 * @param pSystemId System id of the location information (if available), or null.
+	 * @param pLineNumber Line number of the location information (if available), or -1.
+	 * @param pColumnNumber Column number of the location information (if available), or -1
+	 * @return A string in the format "<LOCATION_INFORMATION>", if location
+	 *   information is provided. Otherwise, returns the words "Unknown location".
+	 */
+	public static String asLocation(String pSystemId, int pLineNumber, int pColumnNumber) {
+		if (pSystemId == null  &&  pLineNumber == -1  &&  pColumnNumber == -1) {
+			return "Unknown location";
+		} else {
+			final StringBuilder sb = new StringBuilder();
+			String sep = "";
+			if (pSystemId != null) {
+				sb.append(sep);
+				sb.append(pSystemId);
+				sep = ", ";
+			}
+			if (pLineNumber != -1) {
+				sb.append(sep);
+				sb.append("line ");
+				sb.append(pLineNumber);
+				sep = ", ";
+			}
+			if (pColumnNumber != -1) {
+				sb.append(sep);
+				sb.append("column ");
+				sb.append(pColumnNumber);
+			}
 			return sb.toString();
 		}
 	}
@@ -191,5 +240,43 @@ public class Stax {
 				throw error(pReader, "Unexpected state: " + state);
 			}
 		}
+	}
+
+	/**
+	 * Reads, and returns the current elements text content.
+	 * @param pReader
+	 * @return The current elements text content.
+	 * @throws XMLStreamException
+	 */
+	public static String getElementText(XMLStreamReader pReader) throws XMLStreamException {
+		final String uri = Objects.notNull(pReader.getNamespaceURI(), "");
+		final String localName = pReader.getLocalName();
+		final StringBuilder sb = new StringBuilder();
+		while (pReader.hasNext()) {
+			final int state = pReader.next();
+			switch(state) {
+			case XMLStreamReader.CHARACTERS:
+			case XMLStreamReader.CDATA:
+			case XMLStreamReader.SPACE:
+				sb.append(pReader.getText());
+				break;
+			case XMLStreamReader.COMMENT:
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				final String endUri = Objects.notNull(pReader.getNamespaceURI(), "");
+				if (!uri.equals(endUri)  ||
+					!localName.equals(pReader.getLocalName())) {
+					throw error(pReader, "Expected /" + Sax.asQName(uri, localName)
+					            + ", got " + Sax.asQName(endUri,
+					            		                 pReader.getLocalName()));
+				}
+				return sb.toString();
+			default:
+				throw error(pReader, "Unexpected state: " + state);
+			case XMLStreamReader.START_ELEMENT:
+				throw error(pReader, "Unexpected start element: " + Sax.asQName(pReader.getNamespaceURI(), pReader.getLocalName()));
+			}
+		}
+		throw error(pReader, "Unexpected end of document");
 	}
 }

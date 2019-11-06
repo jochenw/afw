@@ -204,4 +204,19 @@ public class Sax {
 			throw Exceptions.show(t);
 		}
 	}
+
+	/** Converts the given namespace URI, and local name, into a fully qualified
+	 * element name.
+	 * @param pUri The elements namespace URI.
+	 * @param pLocalName The elements local name.
+	 * @return An equivalent, and fully qualified name.
+	 */
+	public static String asQName(String pUri, String pLocalName) {
+		final String localName = Objects.requireNonNull(pLocalName, "LocalName");
+		if (pUri == null  ||  pUri.length() == 0) {
+			return localName;
+		} else {
+			return "{" + pUri + "}" + pLocalName;
+		}
+	}
 }
