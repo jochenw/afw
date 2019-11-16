@@ -85,7 +85,7 @@ public class ExecutorTest {
 	 */
 	@Test
 	public void testEchoCmdToStdoutWithListenerOnNonWindows() {
-		Assume.assumeTrue(Systems.isWindows());
+		Assume.assumeFalse(Systems.isWindows());
 		runTestWithListener("Okay\n", "", "sh", "-c", "echo \"Okay\"");
 		runTestWithListener("Okay", "", "sh", "-c", "echo -n \"Okay\"");
 		runTestWithListener("", "Okay", "sh", "-c", "echo 1>&2 -n \"Okay\"");
