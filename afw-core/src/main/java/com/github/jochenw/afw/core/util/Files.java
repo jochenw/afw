@@ -17,10 +17,24 @@ package com.github.jochenw.afw.core.util;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 
+
+/** Utility class for working with files, and directories.
+ */
 public class Files {
+	/** Copies the directory {@code pSource}, to the directory {@code pTrget}.
+	 * including contents. Files in the target directory may be overwritten, but
+	 * will not be deleted. (This is a copy operation, not a synchronization.)
+	 * @param pSource The source directory.
+	 * @param pTarget The target directory.
+	 * @throws UncheckedIOException Copying failed.
+	 */
 	public static void copyDirectory(final Path pSource, final Path pTarget) {
 		try {
 			java.nio.file.Files.walk(pSource).forEach(a -> {
@@ -36,6 +50,32 @@ public class Files {
 					throw new UncheckedIOException(e);
 				}
 			});
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Removes the given directory completely, including contents.
+	 * @param pDir The directory being removed.
+	 * @throws UncheckedIOException Removal failed.
+	 */
+	public static void removeDirectory(Path pDir) {
+		final FileVisitor<Path> sfv = new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path pFile, BasicFileAttributes pAttrs) throws IOException {
+				java.nio.file.Files.delete(pFile);
+				return super.visitFile(pFile, pAttrs);
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path pDir, IOException pExc) throws IOException {
+				java.nio.file.Files.delete(pDir);
+				return super.postVisitDirectory(pDir, pExc);
+			}
+		};
+		try {
+			java.nio.file.Files.walkFileTree(pDir, sfv);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

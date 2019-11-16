@@ -9,6 +9,39 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class Stax {
 	/**
+	 * Enumeration of possible return codes for {@link ElementListener#element(XMLStreamReader, int, String, String)}.
+	 */
+	public enum ElementAction {
+		/** Request to skip the current element, forbidding child elements.
+		 */
+		SKIP_FLAT,
+		/** Request to skip the current element, including children.
+		 */
+		SKIP_RECURSIVE,
+		/** Information, that the current element has already been skipped. This can be used, for example, if the
+		 * listener has invoked {@link XMLStreamReader#getElementText()} on the reader.
+		 */
+		SKIPPED,
+	}
+
+	/** Interface of a listener, which is being used by {@link Stax#skipElement(XMLStreamReader, ElementListener)}.
+	 */
+	@FunctionalInterface
+	public interface ElementListener {
+		/**
+		 * Called, if a start element event is detected.
+		 * @param pReader The reader, which has detected the event.
+		 * @param pLevel The number of nested parent elements, counting from the invocation of
+		 *    {@link Stax#skipElement(XMLStreamReader, ElementListener)}.
+		 * @param pNamespaceUri The elements namespace URI.
+		 * @param pLocalName
+		 * @return The 
+		 * @throws XMLStreamException
+		 */
+		ElementAction element(XMLStreamReader pReader, int pLevel, String pNamespaceUri, String pLocalName) throws XMLStreamException;
+	}
+
+	/**
 	 * Returns a string, which includes the given message, and the given location information.
 	 * @param pLoc The object providing the location information. If there is no such object
 	 *   (the value is null), then the message string will be returned, as it is.
@@ -242,6 +275,96 @@ public class Stax {
 		}
 	}
 
+	/** Skips the current element, including it's contents, up to, and including, the
+	 * corresponding end element event.
+	 * @param pReader The Stax parser, which is to skip an element.
+	 * @throws XMLStreamException Skipping the element failed.
+	 */
+	public static void skipElementFlat(XMLStreamReader pReader) throws XMLStreamException {
+		final String uri = pReader.getNamespaceURI();
+		final String localName = pReader.getLocalName();
+		while (pReader.hasNext()) {
+			final int state = pReader.next();
+			switch (state) {
+			case XMLStreamReader.COMMENT:
+			case XMLStreamReader.CHARACTERS:
+			case XMLStreamReader.CDATA:
+			case XMLStreamReader.SPACE:
+				// Ignore this.
+				break;
+			case XMLStreamReader.START_ELEMENT:
+				throw error(pReader, "Unexpected child element: " + Sax.asQName(uri, localName));
+			case XMLStreamReader.END_ELEMENT:
+				if (uri == null  ||  uri.length() == 0) {
+					assertDefaultNamespace(pReader);
+				} else if (!uri.equals(pReader.getNamespaceURI())) {
+					throw error(pReader, "Expected namespace=" + uri + ", got " + pReader.getNamespaceURI());
+				}
+				if (!localName.equals(pReader.getLocalName())) {
+					throw error(pReader, "Expected localName=" + localName + ", got " + pReader.getLocalName());
+				}
+				return;
+			default:
+				throw error(pReader, "Unexpected state: " + state);
+			}
+		}
+	}
+
+	/** Skips the current element, including it's contents, up to, and including, the
+	 * corresponding end element event, notifying the given listener.
+	 * @param pReader The Stax parser, which is to skip an element.
+	 * @param pListener The listener, which is being notified in case of {@link XMLStreamReader#START_ELEMENT} events.
+	 * @throws XMLStreamException Skipping the element failed.
+	 */
+	public static void skipElement(XMLStreamReader pReader, ElementListener pListener) throws XMLStreamException {
+		final ElementListener listener = Objects.requireNonNull(pListener, "ElementListener");
+		final XMLStreamReader rdr = pReader;
+		int level = 0;
+		final String uri = rdr.getNamespaceURI();
+		final String localName = rdr.getLocalName();
+		while (rdr.hasNext()) {
+			final int state = rdr.next();
+			switch (state) {
+			case XMLStreamReader.COMMENT:
+			case XMLStreamReader.CHARACTERS:
+			case XMLStreamReader.CDATA:
+			case XMLStreamReader.SPACE:
+				// Ignore this.
+				break;
+			case XMLStreamReader.START_ELEMENT:
+				++level;
+				final ElementAction action = listener.element(rdr, level, uri, localName);
+				switch (action) {
+				  case SKIP_FLAT:
+					skipElementFlat(rdr);
+					break;
+				  case SKIP_RECURSIVE:
+					skipElementRecursively(rdr);
+					break;
+				  case SKIPPED:
+					break;
+				}
+				break;
+			case XMLStreamReader.END_ELEMENT:
+				if (level-- == 0) {
+					if (uri == null  ||  uri.length() == 0) {
+						assertDefaultNamespace(rdr);
+					} else if (!uri.equals(rdr.getNamespaceURI())) {
+						throw error(rdr, "Expected namespace=" + uri + ", got " + rdr.getNamespaceURI());
+					}
+					if (!localName.equals(rdr.getLocalName())) {
+						throw error(rdr, "Expected localName=" + localName + ", got " + rdr.getLocalName());
+					}
+					return;
+				}
+				break;
+			default:
+				throw error(rdr, "Unexpected state: " + state);
+			}
+		}
+	}
+	
+	
 	/**
 	 * Reads, and returns the current elements text content.
 	 * @param pReader
