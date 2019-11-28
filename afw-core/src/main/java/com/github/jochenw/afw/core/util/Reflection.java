@@ -26,6 +26,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+
+import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
+
+import java.util.function.Predicate;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class Reflection {
@@ -235,5 +244,45 @@ public class Reflection {
 			}
 		}
 		return findMethodMatching(pClassIds, pMatcher, pClass.getSuperclass());
+	}
+
+
+	/**
+	 * Searches for declared fields (including private fields), in the given
+	 * type (including parent type(s)).
+	 * Any such field is reported by invoking the given {@code pConsumer}.
+	 * @param pType The type to inspect for fields.
+	 * @param pConsumer The consumer to notify about fields, which are detected.
+	 */
+	public static void findFields(@Nonnull Class<?> pType, @Nonnull FailableConsumer<Field,?> pConsumer) {
+		findFields(pType, pConsumer, null);
+	}
+
+	/**
+	 * Searches for declared fields (including private fields), in the given
+	 * type (including parent type(s)).
+	 * Any such field is reported by invoking the given {@code pConsumer}.
+	 * @param pType The type to inspect for fields.
+	 * @param pConsumer The consumer to notify about fields, which are detected.
+	 * @param pMatcher A filter, which can be used to ignore fields. May be null,
+	 *   in which case a "matches all" filter will be assumed.
+	 */
+	public static void findFields(@Nonnull Class<?> pType, @Nonnull FailableConsumer<Field,?> pConsumer,
+			                      @Nullable FailablePredicate<Field,?> pMatcher) {
+		try {
+			if (pType != null  &&  pType != Object.class) {
+				Field[] fields = pType.getDeclaredFields();
+				if (fields != null) {
+					for (Field f : fields) {
+						if (pMatcher == null  ||  pMatcher.test(f)) {
+							pConsumer.accept(f);
+						}
+					}
+				}
+				findFields(pType.getSuperclass(), pConsumer, pMatcher);
+			}
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
 	}
 }

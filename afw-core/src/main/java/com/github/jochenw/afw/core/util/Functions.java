@@ -297,6 +297,32 @@ public class Functions {
 		public O get() throws T;
 	}
 
+	/** Failable version of {@link Supplier Supplier<Integer>}.
+	 * @param <T> The exception type being thrown by the supplier.
+	 */
+	@FunctionalInterface
+	public interface FailableIntSupplier<T extends Throwable> {
+		/**
+		 * @return The result value, as created by the supplier.
+		 * @throws T The exception type being thrown by the supplier.
+		 * @see Supplier#get()
+		 */
+		public int get() throws T;
+	}
+
+	/** Failable version of {@link Supplier Supplier<Long>}.
+	 * @param <T> The exception type being thrown by the supplier.
+	 */
+	@FunctionalInterface
+	public interface FailableLongSupplier<T extends Throwable> {
+		/**
+		 * @return The result value, as created by the supplier.
+		 * @throws T The exception type being thrown by the supplier.
+		 * @see Supplier#get()
+		 */
+		public long get() throws T;
+	}
+
 	/**
 	 * Converts the given {@link FailableRunnable} into a standard {@link Runnable}.
 	 * @param pRunnable The failable runnable being executed.

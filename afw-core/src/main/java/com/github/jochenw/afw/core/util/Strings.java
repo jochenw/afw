@@ -246,4 +246,43 @@ public class Strings {
 		}
 		return result;
 	}
+	/**
+	 * Concatenates the given values, using the given separator.
+	 * @param pSep The separator to use.
+	 * @param pValues The values being concatenated.
+	 * @return The concatenations result.
+	 */
+	public static String join(String pSep, String... pValues) {
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0;  i < pValues.length;  i++) {
+			if (i > 0) {
+				if (pSep != null) {
+					sb.append(pSep);
+				}
+			}
+			sb.append(pValues[i]);
+		}
+		return sb.toString();
+	}
+	/**
+	 * Concatenates the given values, using the given separator.
+	 * @param pSep The separator to use.
+	 * @param pValues The values being concatenated.
+	 * @return The concatenations result.
+	 */
+	public static String join(String pSep, Iterable<String> pValues) {
+		final StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (String v : pValues) {
+			if (first) {
+				first = false;
+			} else {
+				if (pSep != null) {
+					sb.append(pSep);
+				}
+			}
+			sb.append(v);
+		}
+		return sb.toString();
+	}
 }

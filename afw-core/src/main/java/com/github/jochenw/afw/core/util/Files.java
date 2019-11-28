@@ -80,4 +80,39 @@ public class Files {
 			throw new UncheckedIOException(e);
 		}
 	}
+
+	/** <p>Constructs a path, which is guaranteed to be within the base directory {@code pBaseDir}.</p>
+	 * <p>The use case is a web application, which is supposed to read a file within that directory.
+	 * However, for security reasons, we must guarantee, that the result must not be outside.</p>
+	 * @param pBaseDir The base directory, within the result is expected to live.
+	 * @param pRelativePath The path of the result, relative to the base directory.
+	 * @return Path of a file within the base directory.
+	 * @throws IllegalArgumentException The parameter {@code pRelativePath} is an absolute file
+	 *   name, and outside the base directory.
+	 */
+	public static Path resolve(Path pBaseDir, String pRelativePath) {
+		final Path path = java.nio.file.Paths.get(pRelativePath);
+		if (path.isAbsolute()) {
+			if (isWithin(pBaseDir, path)) {
+				return path;
+			} else {
+				throw new IllegalArgumentException("Invalid path: " + path
+						+ " (Not within " + pBaseDir + ")");
+			}
+		} else {
+			return pBaseDir.resolve(path);
+		}
+	}
+
+	public static boolean isWithin(Path pDir, Path pPath) {
+		Path p = pPath;
+		while (p != null) {
+			if (p.equals(pDir)) {
+				return true;
+			} else {
+				p = p.getParent();
+			}
+		}
+		return false;
+	}
 }
