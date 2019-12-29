@@ -1,5 +1,6 @@
-package com.github.jochenw.afw.cli;
+package com.github.jochenw.afw.core.cli;
 
+import com.github.jochenw.afw.core.cli.Options;
 import static org.junit.Assert.*;
 
 import org.junit.Test;

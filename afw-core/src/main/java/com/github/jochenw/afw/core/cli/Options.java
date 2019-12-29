@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.cli;
+package com.github.jochenw.afw.core.cli;
 
 import java.io.File;
 import java.nio.file.Path;

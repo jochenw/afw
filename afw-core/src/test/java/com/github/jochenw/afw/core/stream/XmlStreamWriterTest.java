@@ -37,12 +37,150 @@ public class XmlStreamWriterTest {
 			@Streamable	private byte primitiveByte;
 			@Streamable private Byte nonPrimitiveByte;
 			@Streamable private boolean primitiveBoolean;
+
+                public String getString() {
+                    return string;
+                }
+
+                public void setString(String string) {
+                    this.string = string;
+                }
+
+                public int getPrimitiveInt() {
+                    return primitiveInt;
+                }
+
+                public void setPrimitiveInt(int primitiveInt) {
+                    this.primitiveInt = primitiveInt;
+                }
+
+                public Integer getNonPrimitiveInt() {
+                    return nonPrimitiveInt;
+                }
+
+                public void setNonPrimitiveInt(Integer nonPrimitiveInt) {
+                    this.nonPrimitiveInt = nonPrimitiveInt;
+                }
+
+                public Integer getAnInteger() {
+                    return anInteger;
+                }
+
+                public void setAnInteger(Integer anInteger) {
+                    this.anInteger = anInteger;
+                }
+
+                public Integer getYaInteger() {
+                    return yaInteger;
+                }
+
+                public void setYaInteger(Integer yaInteger) {
+                    this.yaInteger = yaInteger;
+                }
+
+                public int getNonStreamableInt() {
+                    return nonStreamableInt;
+                }
+
+                public void setNonStreamableInt(int nonStreamableInt) {
+                    this.nonStreamableInt = nonStreamableInt;
+                }
+
+                public long getPrimitiveLong() {
+                    return primitiveLong;
+                }
+
+                public void setPrimitiveLong(long primitiveLong) {
+                    this.primitiveLong = primitiveLong;
+                }
+
+                public Long getNonPrimitiveLong() {
+                    return nonPrimitiveLong;
+                }
+
+                public void setNonPrimitiveLong(Long nonPrimitiveLong) {
+                    this.nonPrimitiveLong = nonPrimitiveLong;
+                }
+
+                public short getPrimitiveShort() {
+                    return primitiveShort;
+                }
+
+                public void setPrimitiveShort(short primitiveShort) {
+                    this.primitiveShort = primitiveShort;
+                }
+
+                public Short getNonPrimitiveShort() {
+                    return nonPrimitiveShort;
+                }
+
+                public void setNonPrimitiveShort(Short nonPrimitiveShort) {
+                    this.nonPrimitiveShort = nonPrimitiveShort;
+                }
+
+                public byte getPrimitiveByte() {
+                    return primitiveByte;
+                }
+
+                public void setPrimitiveByte(byte primitiveByte) {
+                    this.primitiveByte = primitiveByte;
+                }
+
+                public Byte getNonPrimitiveByte() {
+                    return nonPrimitiveByte;
+                }
+
+                public void setNonPrimitiveByte(Byte nonPrimitiveByte) {
+                    this.nonPrimitiveByte = nonPrimitiveByte;
+                }
+
+                public boolean isPrimitiveBoolean() {
+                    return primitiveBoolean;
+                }
+
+                public void setPrimitiveBoolean(boolean primitiveBoolean) {
+                    this.primitiveBoolean = primitiveBoolean;
+                }
+
+                public Boolean getNonPrimitiveBoolean() {
+                    return nonPrimitiveBoolean;
+                }
+
+                public void setNonPrimitiveBoolean(Boolean nonPrimitiveBoolean) {
+                    this.nonPrimitiveBoolean = nonPrimitiveBoolean;
+                }
+
+                public char getPrimitiveChar() {
+                    return primitiveChar;
+                }
+
+                public void setPrimitiveChar(char primitiveChar) {
+                    this.primitiveChar = primitiveChar;
+                }
+
+                public Character getNonPrimitiveChar() {
+                    return nonPrimitiveChar;
+                }
+
+                public void setNonPrimitiveChar(Character nonPrimitiveChar) {
+                    this.nonPrimitiveChar = nonPrimitiveChar;
+                }
 			@Streamable private Boolean nonPrimitiveBoolean;
 			@Streamable private char primitiveChar;
 			@Streamable private Character nonPrimitiveChar;
-		}
+
+                        
+                }
 
 		@Streamable private SerializableSubBean subBean;
+
+        public SerializableSubBean getSubBean() {
+            return subBean;
+        }
+
+        public void setSubBean(SerializableSubBean subBean) {
+            this.subBean = subBean;
+        }
 	}
 
 	/**

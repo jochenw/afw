@@ -117,6 +117,10 @@ public class StreamController {
 			}
 		}
 
+		public @Nullable Field getField(@Nonnull String pId) {
+			return map.get(pId);
+		}
+
 	}
 
 	private final Map<Class<?>,MetaData> metaDataMap = new HashMap<>();

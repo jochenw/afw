@@ -219,4 +219,58 @@ public class Sax {
 			return "{" + pUri + "}" + pLocalName;
 		}
 	}
+
+	/**
+	 * Returns a string, which includes the given message, and the given location information.
+	 * @param pLoc The object providing the location information. If there is no such object
+	 *   (the value is null), then the message string will be returned, as it is.
+	 * @param pMsg The message string, which is being augmented with location information.
+	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 *   information is provided. Otherwise, returns the message string, as it is.
+	 */
+	public static String asLocalizedMessage(Locator pLoc, String pMsg) {
+		if (pLoc == null) {
+			return pMsg;
+		} else {
+			return asLocalizedMessage(pMsg, pLoc.getSystemId(), pLoc.getLineNumber(), pLoc.getColumnNumber());
+		}
+	}
+
+	/**
+	 * Returns a string, which includes the given message, and the given location information.
+	 * @param pMsg The message string, which is being augmented with location information.
+	 * @param pSystemId System id of the location information (if available), or null.
+	 * @param pLineNumber Line number of the location information (if available), or -1.
+	 * @param pColumnNumber Column number of the location information (if available), or -1
+	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 *   information is provided. Otherwise, returns the message string, as it is.
+	 */
+	public static String asLocalizedMessage(String pMsg, String pSystemId, int pLineNumber, int pColumnNumber) {
+		if (pSystemId == null  &&  pLineNumber == -1  &&  pColumnNumber == -1) {
+			return pMsg;
+		} else {
+			final StringBuilder sb = new StringBuilder();
+			String sep = "At ";
+			if (pSystemId != null) {
+				sb.append(sep);
+				sb.append(pSystemId);
+				sep = ", ";
+			}
+			if (pLineNumber != -1) {
+				sb.append(sep);
+				sb.append("line ");
+				sb.append(pLineNumber);
+				sep = ", ";
+			}
+			if (pColumnNumber != -1) {
+				sb.append(sep);
+				sb.append("column ");
+				sb.append(pColumnNumber);
+			}
+			sb.append(": ");
+			sb.append(pMsg);
+			return sb.toString();
+		}
+	}
+
 }

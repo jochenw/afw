@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.cli;
+package com.github.jochenw.afw.core.cli;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,6 +1,8 @@
 package com.github.jochenw.afw.core.stream;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 
@@ -66,7 +68,13 @@ public abstract class AbstractStreamWriter implements StreamWriter {
 			|| type == Byte.class
 			|| type == Byte.TYPE
 			|| type == Character.class
-			|| type == Character.TYPE;
+			|| type == Character.TYPE
+			|| type == Double.class
+			|| type == Double.TYPE
+			|| type == Float.class
+			|| type == Float.TYPE
+			|| type == BigDecimal.class
+			|| type == BigInteger.class;
 	}
 
 	protected String asString(@Nonnull Field pField, @Nonnull Object pObject) {

@@ -82,6 +82,18 @@ public class Exceptions {
         }
     }
 
+    /**
+     * Rethrows the given {@link Throwable}, either directly, or by wrapping it in a
+     * suitable subclass, which can be thrown safely, without affecting the calling
+     * methods signature.
+     * @param pPrefix A prefix for the thrown exceptions message.
+     * @param pTh The throwable being rethrown.
+     * @return Nothing, this method will <em>always</em> throw an exception.
+     */
+	public static RuntimeException show(String pPrefix, Throwable pTh) {
+		throw new UndeclaredThrowableException(pTh, pPrefix + pTh.getMessage());
+	}
+
     /** Converts the given {@link IOException} into a {@link RuntimeException}.
      * @param pExc The {@link IOException} being rethrown.
      * @return Nothing, this method will <em>always</em> throw an exception.
