@@ -45,6 +45,7 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 				final URL url = en.nextElement();
 				log("list: url=" + url);
 				if ("jar".equals(url.getProtocol())) {
+					log("list: Jar URL detected, looking for jar file");
 					final String fileUri = url.getFile();
 					final int offset = fileUri.indexOf('!');
 					if (offset == -1) {
@@ -61,8 +62,10 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 						}
 					}
 				} else if ("file".equals(url.getProtocol())) {
+					log("list: File URL detected, looking for manifest file");
 					final File manifestFile = new File(url.getFile());
 					if (manifestFile.isFile()) {
+						log("list: Manifest file detected, looking for manifest directory");
 						File manifestDir = manifestFile.getParentFile();
 						log("list: Found manifestDir=" + manifestDir);
 						if (manifestDir == null) {
@@ -79,9 +82,12 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 							throw new IllegalStateException("Resource directory not found: " + manifestDir);
 						}
 						new DirResourceRepository(resourceDir).list(pConsumer);
+					} else {
+						log("list: Manifest file not found: " + manifestFile);
 					}
 				} else {
 					// Ignore this URL, can't handle it.
+					log("list: Ignoring URL, protocol=" + url.getProtocol());
 				}
 			}
 		} catch (IOException e) {
