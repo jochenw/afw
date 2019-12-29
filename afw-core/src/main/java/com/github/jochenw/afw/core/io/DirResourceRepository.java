@@ -128,7 +128,7 @@ public class DirResourceRepository implements IResourceRepository {
 				uri.setLength(len);
 				resource.path = pFile;
 				resource.namespace = namespace.toString();
-				log("visitFile: resource=" + resource);
+				log("visitFile: resource.uri=" + resource.uri + ", resource.namespace=" + resource.namespace);
 				pConsumer.accept(resource);
 				final FileVisitResult result = super.visitFile(pFile, pAttrs);
 				log("visitFile: <- " + result);
