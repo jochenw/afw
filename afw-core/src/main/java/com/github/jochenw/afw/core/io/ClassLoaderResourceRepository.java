@@ -79,13 +79,16 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 							throw new IllegalStateException("Manifest directory not found: " + manifestDir);
 						}
 						File resourceDir = manifestDir.getParentFile();
+						log("list: Found resourceDir=" + resourceDir);
 						if (resourceDir == null) {
 							resourceDir = manifestDir.getAbsoluteFile().getParentFile();
 						}
 						if (!resourceDir.isDirectory()) {
 							throw new IllegalStateException("Resource directory not found: " + manifestDir);
 						}
-						new DirResourceRepository(resourceDir).list(pConsumer);
+						final DirResourceRepository drr = new DirResourceRepository(resourceDir);
+						drr.setLogger(logger);
+						drr.list(pConsumer);
 					} else {
 						log("list: Manifest file not found: " + manifestFile);
 					}

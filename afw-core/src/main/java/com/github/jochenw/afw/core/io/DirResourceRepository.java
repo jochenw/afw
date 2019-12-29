@@ -61,6 +61,7 @@ public class DirResourceRepository implements IResourceRepository {
 		}
 	}
 	private final Path baseDir;
+	private Consumer<String> logger;
 
 	/**
 	 * Creates a new instance with the given base directory.
@@ -92,6 +93,8 @@ public class DirResourceRepository implements IResourceRepository {
 
 	@Override
 	public void list(Consumer<IResource> pConsumer) {
+		final String mName = "DirResourceRepository.list";
+		log(mName + " ->");
 		final MutablePathResource resource = new MutablePathResource();
 		final StringBuilder namespace = new StringBuilder();
 		final StringBuilder uri = new StringBuilder();
@@ -115,6 +118,7 @@ public class DirResourceRepository implements IResourceRepository {
 
 			@Override
 			public FileVisitResult visitFile(Path pFile, BasicFileAttributes pAttrs) throws IOException {
+				log("visitFile: -> " + pFile);
 				final int len = uri.length();
 				if (len > 0) {
 					uri.append('/');
@@ -124,8 +128,11 @@ public class DirResourceRepository implements IResourceRepository {
 				uri.setLength(len);
 				resource.path = pFile;
 				resource.namespace = namespace.toString();
+				log("visitFile: resource=" + resource);
 				pConsumer.accept(resource);
-				return super.visitFile(pFile, pAttrs);
+				final FileVisitResult result = super.visitFile(pFile, pAttrs);
+				log("visitFile: <- " + result);
+				return result;
 			}
 
 			@Override
@@ -152,6 +159,7 @@ public class DirResourceRepository implements IResourceRepository {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+		log(mName + " ->");
 	}
 
 	@Override
@@ -191,5 +199,18 @@ public class DirResourceRepository implements IResourceRepository {
 	 */
 	public static boolean isValidResource(IResource pResource) {
 		return pResource instanceof ImmutablePathResource  ||  pResource instanceof MutablePathResource;
+	}
+
+	protected void log(String pMsg) {
+		if (logger != null) {
+			logger.accept(pMsg);
+		}
+	}
+	/**
+	 * Sets the logger. (Null disables logging).
+	 * @param pLogger The logger, or null to disable logging.
+	 */
+	public void setLogger(Consumer<String> pLogger) {
+		logger = pLogger;
 	}
 }
