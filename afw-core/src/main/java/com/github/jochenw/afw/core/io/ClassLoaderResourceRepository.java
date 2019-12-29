@@ -17,6 +17,7 @@ import java.util.function.Consumer;
  * created, to which this repository delegates.
  */
 public class ClassLoaderResourceRepository implements IResourceRepository {
+	private Consumer<String> logger;
 	private final ClassLoader classLoader;
 
 	/**
@@ -36,11 +37,13 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 	
 	@Override
 	public void list(Consumer<IResource> pConsumer) {
+		log("list: ->");
 		try {
 			final String uri = "META-INF/MANIFEST.MF";
 			final Enumeration<URL> en = classLoader.getResources(uri);
 			while (en.hasMoreElements()) {
 				final URL url = en.nextElement();
+				log("list: url=" + url);
 				if ("jar".equals(url.getProtocol())) {
 					final String fileUri = url.getFile();
 					final int offset = fileUri.indexOf('!');
@@ -51,6 +54,7 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 						if (filePart.startsWith("file:")) {
 							final File file = new File(filePart.substring("file:".length()));
 							if (file.isFile()) {
+								log("list: Found zip file=" + file);
 								final ZipFileResourceRepository zfrr = new ZipFileResourceRepository(file);
 								zfrr.list(pConsumer);
 							}
@@ -60,6 +64,7 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 					final File manifestFile = new File(url.getFile());
 					if (manifestFile.isFile()) {
 						File manifestDir = manifestFile.getParentFile();
+						log("list: Found manifestDir=" + manifestDir);
 						if (manifestDir == null) {
 							manifestDir = manifestFile.getAbsoluteFile().getParentFile();
 						}
@@ -82,6 +87,13 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+		log("list: <-");
+	}
+
+	protected void log(String pMsg) {
+		if (logger != null) {
+			logger.accept(pMsg);
+		}
 	}
 
 	@Override
@@ -94,5 +106,9 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 		} else {
 			throw new IllegalArgumentException("Invalid resource type: " + res.getClass().getName());
 		}
+	}
+
+	public void setLogger(Consumer<String> pLogger) {
+		logger = pLogger;
 	}
 }

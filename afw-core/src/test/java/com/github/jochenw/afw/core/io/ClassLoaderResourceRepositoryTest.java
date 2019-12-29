@@ -19,6 +19,7 @@ public class ClassLoaderResourceRepositoryTest {
 	public void testList() {
 		final Set<String> uris = new HashSet<>();
 		final ClassLoaderResourceRepository clrr = new ClassLoaderResourceRepository(getClass().getClassLoader());
+		clrr.setLogger((s) -> System.out.println(s));
 		clrr.list((r) -> uris.add(r.getUri()));
 		assertTrue(uris.contains("javax/servlet/Filter.class"));  // An entry from Maven's "compile" scope.
 		assertTrue(uris.contains("org/junit/Test.class"));       // An entry from Maven's "test" scope.
