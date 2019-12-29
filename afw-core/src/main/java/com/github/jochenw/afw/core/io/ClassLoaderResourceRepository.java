@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -63,7 +66,8 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 					}
 				} else if ("file".equals(url.getProtocol())) {
 					log("list: File URL detected, looking for manifest file");
-					final File manifestFile = new File(url.getFile());
+					final String manifestPath = URLDecoder.decode(url.getFile(), Charset.defaultCharset().name());
+					final File manifestFile = new File(manifestPath);
 					if (manifestFile.isFile()) {
 						log("list: Manifest file detected, looking for manifest directory");
 						File manifestDir = manifestFile.getParentFile();
