@@ -29,7 +29,7 @@ import java.io.Writer;
 
 
 /**
- * Utility class for working with Exceptions.
+ * Utility class for working with byte, and character streams.
  */
 public class Streams {
     /**

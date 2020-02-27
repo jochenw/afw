@@ -89,4 +89,67 @@ public class StringsTest {
     		Assert.assertEquals("Invalid version string, ends with '.': 2.3.0.", e.getMessage());
     	}
     }
+   
+    /** Test for {@link Strings#formatCb(Appendable, String, Object...)}.
+     * @throws Exception The test failed.
+     */
+    @Test
+    public void testFormatCb() throws Exception {
+    	final String formatStr = "Hello, {} {}!";
+    	assertEquals("Hello, beautiful world!", Strings.formatCb(formatStr, "beautiful", "world"));
+    	assertEquals("Hello, funny 42!", Strings.formatCb(formatStr, "funny", Integer.valueOf(42)));
+    	try {
+    		Strings.formatCb(formatStr);
+    		fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		assertEquals("Format string requires at least 0 arguments, but only 0 are given.", e.getMessage());
+    	}
+    	try {
+    		Strings.formatCb(formatStr, (Object[]) null);
+    		fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		assertEquals("Format string requires at least one argument, but none are given.", e.getMessage());
+    	}
+    	try {
+    		Strings.formatCb(formatStr, "a", "b", "c");
+    		fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		assertEquals("Format string requires only 2 arguments, but 3 are given.", e.getMessage());
+    	}
+    }
+
+    /**
+     * Test for {@link Strings#formatLz(int, int)}.
+     */
+    @Test
+    public void testFormatLz() throws Exception {
+    	assertEquals("0", Strings.formatLz(0, 9));
+    	assertEquals("9", Strings.formatLz(9, 9));
+    	assertEquals("00", Strings.formatLz(0, 10));
+    	assertEquals("09", Strings.formatLz(9, 10));
+    	assertEquals("00", Strings.formatLz(0, 99));
+    	assertEquals("09", Strings.formatLz(9, 99));
+       	assertEquals("000", Strings.formatLz(0, 100));
+    	assertEquals("009", Strings.formatLz(9, 100));
+    	assertEquals("000", Strings.formatLz(0, 999));
+    	assertEquals("009", Strings.formatLz(9, 999));
+    	assertEquals("0000", Strings.formatLz(0, 1000));
+    	assertEquals("0009", Strings.formatLz(9, 1000));
+    	assertEquals("0000", Strings.formatLz(0, 9999));
+    	assertEquals("0009", Strings.formatLz(9, 9999));
+    	assertEquals("00000", Strings.formatLz(0, 10000));
+    	assertEquals("00009", Strings.formatLz(9, 10000));
+    	assertEquals("00000", Strings.formatLz(0, 99999));
+    	assertEquals("00009", Strings.formatLz(9, 99999));
+    	assertEquals("000000", Strings.formatLz(0, 100000));
+    	assertEquals("000009", Strings.formatLz(9, 100000));
+    	assertEquals("000000", Strings.formatLz(0, 999999));
+    	assertEquals("000009", Strings.formatLz(9, 999999));
+    	try {
+    		Strings.formatLz(0, 9999999);
+    		fail("Expected exception");
+    	} catch (IllegalArgumentException e) {
+    		assertEquals("The total number of items must be lower than 1000000", e.getMessage());
+    	}
+    }
 }

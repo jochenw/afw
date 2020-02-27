@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -33,9 +32,13 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.LocatorImpl;
 
+
+
+/** This class is basically a DOM parser with the ability to provide
+ * location information for the nodes in the parsed document.
+ */
 public class LocalizableDocument {
 	private static final String KEY = Locator.class.getName();
 
@@ -131,7 +134,14 @@ public class LocalizableDocument {
 	private LocalizableDocument(Document pDocument) {
 		document = pDocument;
 	}
-	
+
+	/**
+	 * Parses the given {@link InputSource}, and returns a document
+	 * with localization info.
+	 * @param pSource The source, from which the parsed XML document
+	 * is being read.
+	 * @return A document with localization info.
+	 */
 	public static LocalizableDocument parse(InputSource pSource) {
 		try {
 			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -146,6 +156,13 @@ public class LocalizableDocument {
 		}
 	}
 
+	/**
+	 * Parses the given {@link File}, and returns a document
+	 * with localization info.
+	 * @param pFile The file, from which the parsed XML document
+	 * is being read.
+	 * @return A document with localization info.
+	 */
 	public static LocalizableDocument parse(File pFile) {
 		try (InputStream istream = new FileInputStream(pFile)) {
 			final InputSource isource = new InputSource(istream);
@@ -156,6 +173,13 @@ public class LocalizableDocument {
 		}
 	}
 
+	/**
+	 * Parses the given {@link URL}, and returns a document
+	 * with localization info.
+	 * @param pUrl The {@link URL}, from which the parsed XML document
+	 * is being read.
+	 * @return A document with localization info.
+	 */
 	public static LocalizableDocument parse(URL pUrl) {
 		try (InputStream istream = pUrl.openStream()) {
 			final InputSource isource = new InputSource(istream);
@@ -166,15 +190,40 @@ public class LocalizableDocument {
 		}
 	}
 
+	/**
+	 * Parses the given {@link InputStream}, and returns a document
+	 * with localization info.
+	 * @param pStream The byte stream, from which the parsed XML document
+	 * is being read.
+	 * @return A document with localization info.
+	 */
 	public static LocalizableDocument parse(InputStream pStream) {
 		final InputSource isource = new InputSource(pStream);
 		return parse(isource);
 	}
 
+	/** Returns location information for the given node.
+	 * The node must have been created (as part of a {@link Document})
+	 * by invoking either of the various parse methods.
+	 * @param pNode The node, for which location information is
+	 *   being queried.
+	 * @return The requested location information, or null, if the
+	 *   node is from a foreign document, and no location information
+	 *   is available.
+	 * @see #parse(InputSource)
+	 * @see #parse(File)
+	 * @see #parse(URL)
+	 * @see #parse(InputStream)
+	 */
 	public Locator getLocator(Node pNode) {
 		return (Locator) pNode.getUserData(KEY);
 	}
 
+	/** Returns the document, that has been parsed. For any node in
+	 * this document, {@link #getLocator(Node)} will provide
+	 * location information.
+	 * @return The document, that has been parsed.
+	 */
 	public Document getDocument() {
 		return document;
 	}

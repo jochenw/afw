@@ -32,7 +32,7 @@ public class DirectoryScannerTest {
 			Assert.assertTrue(files.add(c.getUri()));
 		});
 		Assert.assertTrue(files.contains("main/java/com/github/jochenw/afw/core/util/Sax.java"));
-		Assert.assertTrue(files.contains("main/resources/com/github/jochenw/afw/core/plugins/plugin-list.xsd"));
+		Assert.assertTrue(files.contains("main/resources/com/github/jochenw/afw/core/plugins/plugin-list-100.xsd"));
 		Assert.assertTrue(files.contains("test/java/com/github/jochenw/afw/core/util/StringsTest.java"));
 		Assert.assertTrue(files.contains("test/resources/com/github/jochenw/afw/test/mod/test.properties"));
 	}
@@ -47,7 +47,7 @@ public class DirectoryScannerTest {
 			Assert.assertTrue(files.add(c.getUri()));
 		});
 		Assert.assertTrue(files.contains("main/java/com/github/jochenw/afw/core/util/Sax.java"));
-		Assert.assertTrue(files.contains("main/resources/com/github/jochenw/afw/core/plugins/plugin-list.xsd"));
+		Assert.assertTrue(files.contains("main/resources/com/github/jochenw/afw/core/plugins/plugin-list-100.xsd"));
 		Assert.assertFalse(files.contains("test/java/com/github/jochenw/afw/core/util/StringsTest.java"));
 		Assert.assertFalse(files.contains("test/resources/com/github/jochenw/afw/test/mod/test.properties"));
 	}

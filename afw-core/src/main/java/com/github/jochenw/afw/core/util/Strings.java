@@ -18,6 +18,7 @@ package com.github.jochenw.afw.core.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -26,13 +27,38 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+
+/** Utility class for working with strings. As you are always working with strings,
+ * this class ought to be useful always.
+ */
 public class Strings {
-	public static String notNull(String pValue) {
+	/** Returns the given value, if it is non-null, or the empty string ("").
+	 * @param pValue The value to check for null.
+	 * @return A non-null string: Either the given value, if that is non-null,
+	 *   or the empty string ("").
+	 */
+	public static @Nonnull String notNull(@Nullable String pValue) {
 		return notNull(pValue, "");
 	}
-	public static String notNull(String pValue, String pDefault) {
+	/** Returns the given value, if it is non-null, or the default value.
+	 * @param pValue The value to check for null.
+	 * @param pDefault The non-null default value.
+	 * @return A non-null string: Either the given value, if that is non-null,
+	 *   or the default value.
+	 */
+	public static @Nonnull String notNull(@Nullable String pValue, @Nonnull String pDefault) {
 		return Objects.notNull(pValue, pDefault);
 	}
+	/** Returns the given value, if it is non-null, and non-empty, or
+	 * the default value.
+	 * @param pValue The value to check for null, or empty.
+	 * @param pDefault The non-null, and non-empty default value.
+	 * @return A non-null, and non-empty string: Either the given value,
+	 * if that is non-null, and non-empty, or the default value.
+	 */
 	public static String notEmpty(String pValue, String pDefault) {
 		if (pValue == null  ||  pValue.length() == 0) {
 			return pDefault;
@@ -40,14 +66,38 @@ public class Strings {
 			return pValue;
 		}
 	}
-	public static String requireNonNull(String pValue, String pMessage) {
+
+	/** Asserts, that the given value is non-null. An {@link NullPointerException}
+	 * is thrown otherwise.
+	 * @param pValue The value being checked for non-null.
+	 * @param pMessage If the message is non-null, and the check fails, then this
+	 *   will be used as the thrown exceptions message. Otherwise, a default
+	 *   message will be used.
+	 * @return The input value, if it is non-null, indeed.
+	 * @throws NullPointerException The check failed, because the input value
+	 *   is null.
+	 */
+	public static @Nonnull String requireNonNull(@Nullable String pValue, @Nonnull String pMessage) {
 		return Objects.requireNonNull(pValue, pMessage);
 	}
 
+	/** Converts the given string into a byte array, using the UTF-8
+	 * character set.
+	 * @param pContents The string veing converted.
+	 * @return The converted string.
+	 * @throws UncheckedIOException The conversion failed.
+	 */
 	public static byte[] getBytes(String pContents) {
         return getBytes(pContents, "UTF-8");
     }
 
+	/** Converts the given string into a byte array, using the given
+	 * character set.
+	 * @param pContents The string veing converted.
+	 * @param pCharset The character set being used.
+	 * @return The converted string.
+	 * @throws UncheckedIOException The conversion failed.
+	 */
     public static byte[] getBytes(String pContents, String pCharset) {
         try {
             return pContents.getBytes(pCharset);
@@ -56,6 +106,12 @@ public class Strings {
         }
     }
 
+    /** Converts the given object to a string, using the
+     * {@link Object#toString()} method.
+     * @param pArg
+     * @return The converted object.
+     * @see #append(Appendable, Object)
+     */
     public static String toString(Object pArg) {
         if (pArg == null) {
             return "null";
@@ -69,6 +125,12 @@ public class Strings {
             return String.valueOf(pArg);
         }
     }
+
+    /** Writes the given objects as a string to the given {@link StringBuilder}.
+     * @param pSb The target stream.
+     * @param pArgs The objects being written.
+	 * @throws UncheckedIOException The writing failed.
+     */
     public static void append(StringBuilder pSb, Object... pArgs) {
         try {
             append((Appendable) pSb, pArgs);
@@ -76,6 +138,12 @@ public class Strings {
             throw Exceptions.newUncheckedIOException(e);
         }
     }
+
+    /** Writes the given objects as a string to the given {@link Appendable}.
+     * @param pAppendable The target stream.
+     * @param pArgs The objects being written.
+	 * @throws IOException The writing failed.
+     */
     public static void append(Appendable pAppendable, Object... pArgs) throws IOException {
         if (pArgs == null) {
             pAppendable.append("null");
@@ -89,6 +157,11 @@ public class Strings {
         }
     }
 
+    /** Writes the given object as a string to the given {@link StringBuilder}.
+     * @param pSb The target stream.
+     * @param pArg The object being written.
+	 * @throws UncheckedIOException The writing failed.
+     */
     public static void append(StringBuilder pSb, Object pArg) {
         try {
             append((Appendable) pSb, pArg);
@@ -97,6 +170,11 @@ public class Strings {
         }
     }
 
+    /** Writes the given object as a string to the given {@link Appendable}.
+     * @param pAppendable The target stream.
+     * @param pArg The objects being written.
+	 * @throws IOException The writing failed.
+     */
     public static void append(Appendable pAppendable, Object pArg) throws IOException {
         if (pArg == null) {
             pAppendable.append("null");
@@ -176,12 +254,23 @@ public class Strings {
 		}
 	}
 
-	public static boolean isEmpty(String pCode) {
-		return pCode == null  ||  pCode.length() == 0;
+	/**
+	 * Returns, whether the given value is null, or empty.
+	 * @param pValue The value being checked.
+	 * @return True, if the value is null, or empty, otherwise false.
+	 */
+	public static boolean isEmpty(String pValue) {
+		return pValue == null  ||  pValue.length() == 0;
 	}
 
-	public static boolean isTrimmedEmpty(String pCode) {
-		return pCode == null  ||  pCode.trim().length() == 0;
+	/**
+	 * Returns, whether the given value is null, or empty, after trimming.
+	 * @param pValue The value being checked.
+	 * @return True, if the value is null, or empty, after trimming,
+	 *   otherwise false.
+	 */
+	public static boolean isTrimmedEmpty(String pValue) {
+		return pValue == null  ||  pValue.trim().length() == 0;
 	}
 
 	public static String requireNonEmpty(String pValue, String pName) {
@@ -284,5 +373,85 @@ public class Strings {
 			sb.append(v);
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Writes the given format string to the given appendable. The format string may
+	 * contain curly brace tokens "{}", which are being replaced by the respective
+	 * argument object.
+	 */
+	public static void formatCb(@Nonnull Appendable pAppendable, @Nonnull String pMsg, @Nullable Object... pArgs) throws IOException {
+		int argOffset = 0;
+		int offset = 0;
+		while (offset < pMsg.length()) {
+			final char c = pMsg.charAt(offset++);
+			if (c == '{'  &&  offset < pMsg.length()) {
+				final char c2 = pMsg.charAt(offset++);
+				if (c2 == '}') {
+					if (pArgs == null) {
+						throw new IllegalArgumentException("Format string requires at least one argument, but none are given.");
+					} else if (argOffset >= pArgs.length) {
+						throw new IllegalArgumentException("Format string requires at least " + argOffset
+								                           + " arguments, but only " + pArgs.length
+								                           + " are given.");
+					}
+					final Object arg = pArgs[argOffset++];
+					append(pAppendable, arg);
+				}
+			} else {
+				pAppendable.append(c);
+			}
+		}
+		if (argOffset > 0) {
+			if (pArgs == null) {
+				throw new IllegalArgumentException("Format string requires at least one argument, but none are given.");
+			} else if (argOffset < pArgs.length) {
+				throw new IllegalArgumentException("Format string requires only " + argOffset
+						                           + " arguments, but " + pArgs.length
+						                           + " are given.");
+			}
+		}
+	}
+
+	/**
+	 * Returns the given format string, with the given arguments being applied: The
+	 * format string may contain curly brace tokens "{}", which are being replaced
+	 * by the respective argument object.
+	 * @param pMsg The format string, which may contain curly brace tokens ("{}").
+	 * @param pArgs The arguments, which ought to replace the curly brace tokens.
+	 * @return The formatted string, with the curly brace tokens replaced.
+	 */
+	public static @Nonnull String formatCb(@Nonnull String pMsg, @Nullable Object... pArgs) {
+		final StringBuilder sb = new StringBuilder();
+		try {
+			formatCb(sb, pMsg, pArgs);
+		} catch (IOException e) {
+			throw Exceptions.show(e);
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Formats the given number with leading zeroes.
+	 * @param pItem The number being formatted.
+	 * @param pTotal The number of items.
+	 */
+	public static @Nonnull String formatLz(int pItem, int pTotal) {
+		Integer item = Integer.valueOf(pItem);
+		if (pTotal > 999999) {
+			throw new IllegalArgumentException("The total number of items must be lower than " + (999999 +1));
+		} else if (pTotal > 99999) {
+			return String.format("%06d", item);
+		} else if (pTotal > 9999) {
+			return String.format("%05d", item);
+		} else if (pTotal > 999) {
+			return String.format("%04d", item);
+		} else if (pTotal > 99) {
+			return String.format("%03d", item);
+		} else if (pTotal > 9) {
+			return String.format("%02d", item);
+		} else {
+			return String.format("%d", item);
+		}
 	}
 }

@@ -26,18 +26,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
+
 
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
-
-import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
+/**
+ * Utility class for working with Java reflection.
+ */
 public class Reflection {
+    /** Searches for a field with the given name in the given
+     * instance. If such a field is found, sets it to the given value.
+     * Otherwise, throws an exception.
+     * @param pInstance The instance being modified by setting the given value
+     *   in the given field.
+     * @param pField The field name being searched for.
+     * @param pValue The fields new value.
+     */
     public static void setValue(Object pInstance, String pField, Object pValue) {
     	if (pField == null  ||  pField.length() == 0) {
     		throw new NullPointerException("The field name must not be null, or empty.");
@@ -84,6 +93,10 @@ public class Reflection {
         return null;
     }
 
+    /**  Returns, whether the given method is a public getter.
+     * @param pMethod The method being checked.
+     * @return True, if the given method is a public getter. Otherwise false.
+     */
     public static boolean isPublicGetter(Method pMethod) {
     	if (!isGetter(pMethod)) {
     		return false;
@@ -94,6 +107,10 @@ public class Reflection {
 		return true;
 	}
 
+    /**  Returns, whether the given method is a getter.
+     * @param pMethod The method being checked.
+     * @return True, if the given method is a getter. Otherwise false.
+     */
     public static boolean isGetter(Method pMethod) {
     	final int modifiers = pMethod.getModifiers();
 		if (Modifier.isAbstract(modifiers)) {
@@ -108,7 +125,14 @@ public class Reflection {
 		final Class<?> type = pMethod.getReturnType();
 		return type != Void.TYPE;
 	}
-    
+
+    /** Returns a map of public getters in the given class
+     * (including super classes).
+     * @param pClass The class, which is being searched for public getters.
+     * @return A map. The map keys are bean property names. The map
+     *   values are public getters for the respective bean property
+     *   names. The map contains no null values.
+     */
     public static Map<String, Method> getGetters(Class<?> pClass) {
         final Map<String,Method> map = new HashMap<String,Method>();
         findGetters(map, pClass);
@@ -159,6 +183,18 @@ public class Reflection {
         return suffix;
     }
 
+	/** Searches for a public void method in the given class, which is
+	 * annotated with the given annotation, has the given signature.
+	 * 
+	 * @param pMethodClass The class being searched for a matching method.
+	 *   Super classes are being ignored.
+	 * @param pAnnotationClass Class of the annotation, with
+	 *   which the requested method must be annotated.
+	 * @param pSignature The requested methods signature.
+	 * @return A public void method in the given class, which is
+	 * annotated with the given annotation, and has the given signature.
+	 * If no such method exists, returns null.
+	 */
 	public static Method findPublicVoidMethodAnnotatedWith(Class<? extends Object> pMethodClass, Class<? extends Annotation> pAnnotationClass,
 			                                     Class<?>... pSignature) {
 		final Method[] methods = pMethodClass.getDeclaredMethods();
@@ -193,6 +229,13 @@ public class Reflection {
 	private static interface Matcher<T> {
 		boolean isMatching(T pObject);
 	}
+
+	/** Checks, whether the given class has a public getter for the given
+	 * property. If so, returns that getter. Otherwise, returns null.
+	 * @param pClass The class being checked.
+	 * @param pProperty The property, for which a public getter is being searched.
+	 * @return A public getter for the given property, if such a getter exists, or null.
+	 */
 	public static Method getPublicGetter(Class<? extends Object> pClass, String pProperty) {
 		Objects.requireNonNull(pClass, "Class");
 		Objects.requireNonNull(pProperty, "Property");
@@ -284,5 +327,52 @@ public class Reflection {
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
+	}
+
+	/** Returns a setter for the given property name in the given class, if
+	 * such a setter exists. Otherwise, returns null. 
+	 * @param pClass The class, in which to search for setters.
+	 * @param pProperty
+	 * @return A public setter with the given property name.
+	 */
+	public static Method getPublicSetter(Class<? extends Object> pClass, String pProperty) {
+		Objects.requireNonNull(pClass, "Class");
+		Objects.requireNonNull(pProperty, "Property");
+		if (pProperty.length() == 0) {
+			throw new IllegalArgumentException("The property name must not be empty.");
+		}
+		String suffix = Character.toUpperCase(pProperty.charAt(0)) + pProperty.substring(1);
+		final String setterName = "set" + suffix;
+		final Set<String> classIds = new HashSet<>();
+		final Matcher<Method> matcher = new Matcher<Method>(){
+			@Override
+			public boolean isMatching(Method pMethod) {
+				final String methodName = pMethod.getName();
+				final Class<?> type = pMethod.getReturnType();
+				if (setterName.equals(methodName)  &&  (type == null  ||  Void.TYPE == type)) {
+					final Class<?>[] parameterTypes = pMethod.getParameterTypes();
+					if (parameterTypes != null  &&  parameterTypes.length == 1) {
+						final int modifiers = pMethod.getModifiers();
+						if (Modifier.isPublic(modifiers)
+								&&  !Modifier.isAbstract(modifiers)
+								&&  !Modifier.isStatic(modifiers)) {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+		};
+		return findMethodMatching(classIds, matcher, pClass);
+	}
+
+	/** Returns a non-static field with the given name in the given class, if
+	 * such a field exists. Otherwise, returns null. 
+	 * @param pClass The class, in which to search for fields.
+	 * @param pName The field name.
+	 * @return A private, or public, field with the given name.
+	 */
+	public static Field getField(Class<? extends Object> pClass, String pName) {
+		return findField(pClass, pName);
 	}
 }

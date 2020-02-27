@@ -30,11 +30,11 @@ import javax.annotation.PreDestroy;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.logging.log4j.util.Strings;
-
 import com.github.jochenw.afw.core.ILifecycleController;
 import com.github.jochenw.afw.core.ILifecycleController.TerminableListener;
+import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILogFactory;
+import com.github.jochenw.afw.core.log.IMLog;
 import com.github.jochenw.afw.core.props.BooleanProperty;
 import com.github.jochenw.afw.core.props.IBooleanProperty;
 import com.github.jochenw.afw.core.props.IIntProperty;
@@ -46,6 +46,7 @@ import com.github.jochenw.afw.core.props.LongProperty;
 import com.github.jochenw.afw.core.props.StringProperty;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Functions;
+import com.github.jochenw.afw.core.util.Strings;
 
 
 public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
@@ -218,21 +219,40 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 
 	protected <O> Provider<O> getLogInjectProvider(IComponentFactory pCf, AnnotatedElement pAnnotatable, LogInject pAnnotation) {
 		final String id;
-		if (Strings.isEmpty(pAnnotation.id())) {
-			if (pAnnotatable instanceof Field) {
-				final Field field = ((Field) pAnnotatable);
-				id = field.getDeclaringClass().getName();
-			} else {
-				throw new IllegalStateException("Unable to generate default Id for @LogInject on " + pAnnotatable);
+		final Class<?> type;
+		if (pAnnotatable instanceof Field) {
+			final Field field = (Field) pAnnotatable;
+			type = field.getType();
+			id = Strings.notEmpty(pAnnotation.id(), field.getDeclaringClass().getName());
+		} else if (pAnnotatable instanceof Method) {
+			final Method method = (Method) pAnnotatable;
+			type = method.getParameterTypes()[0];
+			id = Strings.notEmpty(pAnnotation.id(), method.getDeclaringClass().getName());
+		} else {
+			throw new IllegalStateException("Invalid type for annotatable: " + pAnnotatable.getClass().getName());
+		}
+		if (type == ILog.class) {
+			// Nothing to do here.
+		} else if (type == IMLog.class) {
+			if (Strings.isEmpty(pAnnotation.mName())) {
+				throw new IllegalStateException("Missing, or empty mName attribute on @LogInject of " + pAnnotatable);
 			}
 		} else {
-			id = pAnnotation.id();
+			throw new IllegalStateException("Invalid type " + type.getName() + " for @LogInject (Must be either ILog, or IMLog.)");
 		}
 		return () -> {
 			final ILogFactory logFactory = pCf.requireInstance(ILogFactory.class);
-			@SuppressWarnings("unchecked")
-			final O o = (O) logFactory.getLog(id);
-			return o;
+			if (type == ILog.class) {
+				@SuppressWarnings("unchecked")
+				final O o = (O) logFactory.getLog(id);
+				return o;
+			} else if (type == IMLog.class) {
+				@SuppressWarnings("unchecked")
+				final O o = (O) logFactory.getLog(id, pAnnotation.mName());
+				return o;
+			} else {
+				throw new IllegalStateException("Invalid type " + type.getName() + " for @LogInject (Must be either ILog, or IMLog.)");
+			}
 		};
 	}
 

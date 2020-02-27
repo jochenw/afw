@@ -15,14 +15,33 @@
  ! limitations under the License.
  -->
 <xs:schema        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://namespaces.github.com/jochenw/afw/core/plugins/list/1.0.0"
-              xmlns:tns="http://namespaces.github.com/jochenw/afw/core/plugins/list/1.0.0"
+        targetNamespace="http://namespaces.github.com/jochenw/afw/core/plugins/list/1.0.1"
+              xmlns:tns="http://namespaces.github.com/jochenw/afw/core/plugins/list/1.0.1"
      elementFormDefault="qualified">
   <xs:element name="pluginList">
     <xs:complexType>
       <xs:sequence minOccurs="1" maxOccurs="unbounded">
         <xs:element name="plugin">
           <xs:complexType>
+            <xs:sequence>
+              <xs:element name="property" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+                    A property is a name/value pair, where the name is specified by the corresponding attribute.
+                    The value, however, may be given as an embedded text, or by the 'value' attribute. It is an
+                    error, if the 'value' attribute is present, *and* the embedded text is non-empty.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="name" type="xs:string" use="required"/>
+                      <xs:attribute name="value" type="xs:string" use="optional"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
             <xs:attribute name="class" type="xs:string" use="required"/>
       		<xs:attribute name="id" use="optional" type="xs:ID"/>
             <xs:attribute name="dependsOn" use="optional" type="xs:IDREFS"/>

@@ -26,4 +26,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 public @interface LogInject {
 	String id() default "";
+	String mName() default "";
 }

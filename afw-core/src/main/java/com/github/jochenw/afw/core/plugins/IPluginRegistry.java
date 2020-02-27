@@ -23,14 +23,61 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
+
+/** Interface of a plugin registry, which is defined as a system for management of so-called
+ * {@link IExtensionPoint extension points}, and associated plugin lists.
+ * A plugin registry is created by so-called {@link Initializer initializer}. Typically, one
+ * creates an empty plugin registry, and a list of initializers, which will then be invoked to
+ * fill the plugin registry. Once the initializers are done, the plugin registry is ready for
+ * use, and the application can start running, using the plugins from the registry.
+ * The creation of the initializer list can be delegated to the so-called {@link PluginListParser}.
+ * In summary, a typical plugin application could look like this:
+ * <pre>
+ *   //  Create a new, empty plugin registry:
+ *   final IPluginRegistry pluginRegistry = new DefaultPluginRegistry();
+ *   //  Jar files, which contribute to the plugin system are supposed to contain this file:
+ *   final String pluginUri = "META-INF/plugins/my-plugin-list.xml";
+ *   final ClassLoader cl = Thread.currentThread.getContextClassLoader();
+ *   final List<Initializer> initializers = PluginListParser.parseAndSort(pluginUri, cl);
+ *   for (Initializer init : initializers) {
+ *       init.accept(pluginRegistry);
+ *   }
+ *   // Application start: Plugin registry is ready for use.
+ *   ...
+ * </pre>
+ */
 public interface IPluginRegistry {
+	/** Interface of an extension point. An extension point is the declaration of a plugin
+	 * list, which the declarator intends to use. In other words: You can only add a plugin
+	 * to the plugin registry, if a suitable extension point has been declared in advance.
+	 * @param <O> The plugin type (Type of the plugins in the list).
+	 */
 	public interface IExtensionPoint<O extends Object> {
+		/**  Returns the list of plugins in the extension point. Initially, this list is empty.
+		 * @return List of plugins in the extension point. Initially, this list is empty.
+		 *  Never null.
+		 */
 		@Nonnull List<O> getPlugins();
+		/** Iterates over the plugin list, invoking the given consumer for each plugin.
+		 * Shortcut for
+		 * <pre>
+		 *   getPlugins().forEach(pConsumer);
+		 * </pre>
+		 * @param pConsumer The consumer to invoke for every plugin.
+		 */
 		public default void forEach(@Nonnull Consumer<O> pConsumer) {
 			getPlugins().forEach(pConsumer);
 		}
+		/** Adds a new plugin to the list.
+		 * @param pPlugin The the plugin being added.
+		 */
 		void addPlugin(O pPlugin);
 	}
+	/** Interface of a plugin registry initializer. The initializers will prepare the registry by
+	 * declaring extension points, and adding plugins to extension points, which already have been
+	 * declared.
+	 * 
+	 */
 	public interface Initializer extends Consumer<IPluginRegistry> {
 		String getId();
 		List<String> getDependsOn();

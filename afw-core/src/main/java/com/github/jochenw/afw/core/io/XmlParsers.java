@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core.io;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
@@ -24,10 +25,12 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Sax;
@@ -41,7 +44,7 @@ public class XmlParsers {
 			dbf.setNamespaceAware(true);
 			final Document doc = dbf.newDocumentBuilder().parse(pSource);
 			pDocumentConsumer.accept(doc);
-		} catch (Throwable t) {
+		} catch (SAXException|IOException|ParserConfigurationException t) {
 			throw Exceptions.show(t);
 		}
 	}

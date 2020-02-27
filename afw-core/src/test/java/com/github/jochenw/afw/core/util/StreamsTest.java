@@ -25,7 +25,14 @@ import java.io.UnsupportedEncodingException;
 import org.junit.Assert;
 import org.junit.Test;
 
+
+/** Test case for the {@link Streams} class.
+ */
 public class StreamsTest {
+	/**
+	 * A version of {@link ByteArrayInputStream}, which allows to query,
+	 * whether it is {@link #isClosed() closed}.
+	 */
     public static class CloseableInputStream extends ByteArrayInputStream {
         private final byte[] contents;
         private boolean closed;
@@ -58,6 +65,11 @@ public class StreamsTest {
             }
         }
     }
+
+    /**
+	 * A version of {@link StringReader}, which allows to query,
+	 * whether it is {@link #isClosed() closed}.
+	 */
     public static class CloseableReader extends StringReader {
         private final String contents;
         private boolean closed;

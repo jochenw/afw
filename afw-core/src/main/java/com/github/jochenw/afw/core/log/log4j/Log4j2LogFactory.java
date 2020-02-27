@@ -35,9 +35,13 @@ public class Log4j2LogFactory extends AbstractLogFactory {
         return new Log4j2Log(this, pId);
     }
 
+	protected URL getUrl() {
+		return getResourceLocator().getResource("log4j2.xml");
+	}
+
 	@Override
 	protected void init() {
-		final URL url = getResourceLocator().getResource("log4j2.xml");
+		final URL url = getUrl();
 		try (InputStream in = url.openStream()) {
 			final ConfigurationSource csource = new ConfigurationSource(in, url);
 			Configurator.initialize(Thread.currentThread().getContextClassLoader(), csource);

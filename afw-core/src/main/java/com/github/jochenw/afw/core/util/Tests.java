@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 public class Tests {
@@ -160,5 +163,27 @@ public class Tests {
 			assertEquals(i + ": " + key, expect, got);
 		}
 		assertEquals(pExpect.length/2, pGot.size());
+	}
+
+	/**
+	 * Asserts, that the given files have the same content.
+	 */
+	public static void assertSameContent(Path pSrcFile, Path pTargetFile) {
+		long offset = 0;
+		try (InputStream is1 = Files.newInputStream(pSrcFile);
+			 BufferedInputStream bis1 = new BufferedInputStream(is1);
+		     InputStream is2 = Files.newInputStream(pTargetFile);
+			 BufferedInputStream bis2 = new BufferedInputStream(is2)) {
+			for (;;) {
+				int b1 = bis1.read();
+				int b2 = bis2.read();
+				assertEquals(String.valueOf(offset), b1, b2);
+				if (b1 == -1) {
+					break;
+				}
+			}
+		} catch (IOException e) {
+			throw Exceptions.show(e);
+		}
 	}
 }
