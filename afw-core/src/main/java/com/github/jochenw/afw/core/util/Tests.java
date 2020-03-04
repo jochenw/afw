@@ -169,19 +169,39 @@ public class Tests {
 	 * Asserts, that the given files have the same content.
 	 */
 	public static void assertSameContent(Path pSrcFile, Path pTargetFile) {
-		long offset = 0;
 		try (InputStream is1 = Files.newInputStream(pSrcFile);
 			 BufferedInputStream bis1 = new BufferedInputStream(is1);
 		     InputStream is2 = Files.newInputStream(pTargetFile);
 			 BufferedInputStream bis2 = new BufferedInputStream(is2)) {
-			for (;;) {
-				int b1 = bis1.read();
-				int b2 = bis2.read();
-				assertEquals(String.valueOf(offset), b1, b2);
-				if (b1 == -1) {
-					break;
-				}
+			assertSameContent(bis1, bis2);
+		} catch (IOException e) {
+			throw Exceptions.show(e);
+		}
+	}
+
+	/**
+	 * Asserts, that the given streams have the same content.
+	 */
+	public static void assertSameContent(InputStream pIn1, InputStream pIn2)
+			throws IOException {
+		long offset = 0;
+		for (;;) {
+			int b1 = pIn1.read();
+			int b2 = pIn2.read();
+			assertEquals(String.valueOf(offset), b1, b2);
+			if (b1 == -1) {
+				break;
 			}
+		}
+	}
+
+	/**
+	 * Asserts, that the given files, and the given stream, have the same content.
+	 */
+	public static void assertSameContent(Path pSrcFile, InputStream pIn) {
+		try (InputStream is = Files.newInputStream(pSrcFile);
+			 BufferedInputStream bis = new BufferedInputStream(is)) {
+			assertSameContent(bis, pIn);
 		} catch (IOException e) {
 			throw Exceptions.show(e);
 		}

@@ -27,16 +27,25 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path>{
     final StringBuilder sb = new StringBuilder();
-            
+    int level = 0;
+    private final boolean baseDirIncludedInPath;
+
+    protected AbstractFileVisitor(boolean pBaseDirIncludedInPath) {
+    	baseDirIncludedInPath = pBaseDirIncludedInPath;
+    }
+
     @Override
     public FileVisitResult preVisitDirectory(Path pDir, BasicFileAttributes pAttrs) throws IOException {
         /** Add the current directories name to the path.
          */
-        final String dirName = pDir.getFileName().toString();
-        if (sb.length() > 0) {
-           sb.append('/');
-        }
-        sb.append(dirName);
+    	if (level > 0  ||  baseDirIncludedInPath) {
+    		final String dirName = pDir.getFileName().toString();
+    		if (sb.length() > 0) {
+    			sb.append('/');
+    		}
+    		sb.append(dirName);
+    	}
+    	++level;
         try {
         	visitDirectory(sb.toString(), pDir, pAttrs);
         } catch (TerminationRequest tr) {
@@ -59,8 +68,12 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path>{
 
     @Override
     public FileVisitResult postVisitDirectory(Path pDir, IOException pExc) throws IOException, TerminationRequest {
-       /** Remove the current directories name to the path.
+        /** Remove the current directories name to the path.
          */
+        --level;
+        if (level > 0  ||  baseDirIncludedInPath) {
+        	
+        }
        final int offset = sb.lastIndexOf("/");
        if (offset == -1) {
            sb.setLength(0);

@@ -5,6 +5,7 @@ package com.github.jochenw.afw.core.components;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +15,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -27,7 +29,7 @@ import com.github.jochenw.afw.core.util.Streams;
  */
 public class DefaultZipHandler implements IZipFileHandler {
 	@Override
-	public void createZipFile(Path pSourceDir, Path pZipFile) {
+	public void createZipFile(Path pSourceDir, Path pZipFile, boolean pBaseDirIncludedInPath) {
 		final Path zipFileDir = pZipFile.getParent();
 		try {
 			if (!Files.isDirectory(zipFileDir)) {
@@ -40,7 +42,7 @@ public class DefaultZipHandler implements IZipFileHandler {
 		try (OutputStream os = Files.newOutputStream(pZipFile, StandardOpenOption.CREATE_NEW);
 				BufferedOutputStream bos = new BufferedOutputStream(os);
 				ZipOutputStream zos = new ZipOutputStream(bos)) {
-			Files.walkFileTree(pSourceDir, new AbstractFileVisitor() {
+			Files.walkFileTree(pSourceDir, new AbstractFileVisitor(pBaseDirIncludedInPath) {
 				@Override
 				protected void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
 					final ZipEntry ze = new ZipEntry(pPath);
@@ -87,6 +89,53 @@ public class DefaultZipHandler implements IZipFileHandler {
 		} catch (IOException e) {
 			throw Exceptions.show(e);
 		}
+	}
+
+	@Override
+	public InputStream openEntry(Path pZipFile, String pUri) throws IOException {
+		final ZipFile zipFile = new ZipFile(pZipFile.toFile());
+		final ZipEntry entry = zipFile.getEntry(pUri);
+		if (entry == null) {
+			throw new IOException("Zip entry " + pUri + " not found in file: " + pZipFile);
+		}
+		final InputStream in = zipFile.getInputStream(entry);
+		return new FilterInputStream(in) {
+			@Override
+			public int read() throws IOException {
+				return in.read();
+			}
+
+			@Override
+			public int read(byte[] b) throws IOException {
+				return in.read(b);
+			}
+
+			@Override
+			public int read(byte[] b, int off, int len) throws IOException {
+				// TODO Auto-generated method stub
+				return in.read(b, off, len);
+			}
+
+			@Override
+			public void close() throws IOException {
+				Throwable th = null;
+				try {
+					super.close();
+				} catch (IOException e) {
+					th = e;
+				}
+				try {
+					zipFile.close();
+				} catch (IOException e) {
+					if (th == null) {
+						th = e;
+					}
+				}
+				if (th != null) {
+					throw Exceptions.show(th);
+				}
+			}
+		};
 	}
 
 }

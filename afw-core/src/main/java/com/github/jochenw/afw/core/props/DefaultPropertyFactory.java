@@ -62,6 +62,9 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
     }
 
     protected DatedProperties loadProperties(URL pUrl) {
+    	if (pUrl == null) {
+    		return null;
+    	}
         final Properties props = new Properties();
         long lastModifiedTime = 0;
         URLConnection conn = null;
