@@ -39,9 +39,15 @@ public class DefaultZipHandler implements IZipFileHandler {
 		} catch (IOException e) {
 			throw Exceptions.show(e);
 		}
-		try (OutputStream os = Files.newOutputStream(pZipFile, StandardOpenOption.CREATE_NEW);
-				BufferedOutputStream bos = new BufferedOutputStream(os);
-				ZipOutputStream zos = new ZipOutputStream(bos)) {
+		OutputStream os = null;
+		BufferedOutputStream bos = null;
+		ZipOutputStream zos = null;
+		Throwable th = null;
+		try {
+			os = Files.newOutputStream(pZipFile, StandardOpenOption.CREATE_NEW);
+			bos = new BufferedOutputStream(os);
+			zos = new ZipOutputStream(bos);
+			final ZipOutputStream zout = zos;
 			Files.walkFileTree(pSourceDir, new AbstractFileVisitor(pBaseDirIncludedInPath) {
 				@Override
 				protected void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
@@ -49,20 +55,28 @@ public class DefaultZipHandler implements IZipFileHandler {
 					ze.setCreationTime(pAttrs.creationTime());
 					ze.setLastModifiedTime(pAttrs.lastModifiedTime());
 					ze.setLastAccessTime(pAttrs.lastAccessTime());
-					zos.putNextEntry(ze);
+					zout.putNextEntry(ze);
 					try (InputStream in = Files.newInputStream(pFile)) {
-						Streams.copy(in, zos);
+						Streams.copy(in, zout);
 					}
-					zos.closeEntry();
-				}
-
-				@Override
-				protected void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {
-					// Do nothing.
+					zout.closeEntry();
 				}
 			});
-		} catch (IOException e) {
-			throw Exceptions.show(e);
+			zos.close();
+			zos = null;
+			bos.close();
+			bos = null;
+			os.close();
+			os = null;
+		} catch (Throwable t) {
+			th = t;
+		} finally {
+			if (zos != null) { try { zos.close(); } catch (Throwable t) { if (th == null) { th = t; } } }
+			if (bos != null) { try { bos.close(); } catch (Throwable t) { if (th == null) { th = t; } } }
+			if (os != null) { try { os.close(); } catch (Throwable t) { if (th == null) { th = t; } } }
+		}
+		if (th != null) {
+			throw Exceptions.show(th);
 		}
 	}
 

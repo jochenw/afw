@@ -87,6 +87,6 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path>{
        }
    }  
 
-    protected abstract void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException;
+    protected void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {}
     protected abstract void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException;
 }
