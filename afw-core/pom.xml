@@ -18,7 +18,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.jochenw.afw</groupId>
   <artifactId>afw-core</artifactId>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
   <name>AFW (Core)</name>
   <description>Application Framework (Core)</description>
   <properties>
@@ -74,7 +74,7 @@
         						</goals>
         					</pluginExecutionFilter>
         					<action>
-        						<ignore></ignore>
+        						<ignore />
         					</action>
         				</pluginExecution>
         			</pluginExecutions>
@@ -252,7 +252,7 @@
         			  </goals>
         			</pluginExecutionFilter>
         			<action>
-        			  <execute/>
+        			  <execute />
         			</action>
         		  </pluginExecution>
         		  <pluginExecution>
@@ -264,7 +264,7 @@
         				<goal>jar</goal>
         			  </goals>
         			</pluginExecutionFilter>
-        			<action><execute/></action>
+        			<action><execute /></action>
         		  </pluginExecution>
         		  <pluginExecution>
         			<pluginExecutionFilter>
@@ -276,7 +276,7 @@
         			  </goals>
         			</pluginExecutionFilter>
         			<action>
-        				<execute/>
+        				<execute />
         			</action>
         		  </pluginExecution>
         		</pluginExecutions>
@@ -393,5 +393,6 @@
   	<connection>scm:git:https://github.com/jochenw/afw</connection>
   	<url>https://github.com/jochenw/afw</url>
   	<developerConnection>scm:git:https://github.com/jochenw/afw</developerConnection>
+    <tag>afw-core-0.3</tag>
   </scm>
 </project>
