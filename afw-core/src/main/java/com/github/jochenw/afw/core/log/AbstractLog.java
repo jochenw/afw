@@ -19,6 +19,10 @@ import java.util.Formatter;
 
 import com.github.jochenw.afw.core.util.Strings;
 
+
+/**
+ * Abstract base class for implementations of {@link ILog}.
+ */
 public abstract class AbstractLog implements ILog {
     protected static final String SEP_STD = ": ";
     protected static final String SEP_ENT = ": -> ";
@@ -127,9 +131,23 @@ public abstract class AbstractLog implements ILog {
     }
 
     @Override
+    public void info(String pMethod, Throwable pTh) {
+        if (isInfoEnabled()) {
+            log(Level.INFO, asMessage(pMethod, SEP_STD, null), pTh);
+        }
+    }
+
+    @Override
     public void info(String pMethod, String pMessage, Throwable pTh) {
         if (isInfoEnabled()) {
             log(Level.INFO, asMessage(pMethod, SEP_STD, pMessage), pTh);
+        }
+    }
+
+    @Override
+    public void warn(String pMethod, Throwable pTh) {
+        if (isWarnEnabled()) {
+            log(Level.WARN, asMessage(pMethod, SEP_STD, null), pTh);
         }
     }
 
@@ -141,9 +159,23 @@ public abstract class AbstractLog implements ILog {
     }
 
     @Override
+    public void error(String pMethod, Throwable pTh) {
+        if (isErrorEnabled()) {
+            log(Level.ERROR, asMessage(pMethod, SEP_STD, null), pTh);
+        }
+    }
+
+    @Override
     public void error(String pMethod, String pMessage, Throwable pTh) {
         if (isErrorEnabled()) {
             log(Level.ERROR, asMessage(pMethod, SEP_STD, pMessage), pTh);
+        }
+    }
+
+    @Override
+    public void fatal(String pMethod, Throwable pTh) {
+        if (isFatalEnabled()) {
+            log(Level.FATAL, asMessage(pMethod, SEP_STD, null), pTh);
         }
     }
 
@@ -253,6 +285,13 @@ public abstract class AbstractLog implements ILog {
     }
 
     @Override
+    public void entering(String pMethod) {
+        if (isDebugEnabled()) {
+            log(Level.DEBUG, asMessage(pMethod, SEP_ENT, null));
+        }
+    }
+
+    @Override
     public void entering(String pMethod, String pMessage) {
         if (isDebugEnabled()) {
             log(Level.DEBUG, asMessage(pMethod, SEP_ENT, pMessage));
@@ -270,6 +309,13 @@ public abstract class AbstractLog implements ILog {
     public void enteringf(String pMethod, String pFormat, Object... pArgs) {
         if (isDebugEnabled()) {
             log(Level.DEBUG, asMessageF(pMethod, SEP_ENT, pFormat, pArgs));
+        }
+    }
+
+    @Override
+    public void exiting(String pMethod) {
+        if (isDebugEnabled()) {
+            log(Level.DEBUG, asMessage(pMethod, SEP_EXT, null));
         }
     }
 
