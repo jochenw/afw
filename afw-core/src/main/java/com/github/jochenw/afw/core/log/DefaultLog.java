@@ -76,5 +76,4 @@ public class DefaultLog extends AbstractLog implements LogManager.Listener {
     protected synchronized void log(Level pLevel, String pMessage, Throwable pTh) {
         log.log(pLevel, pMessage, pTh);
     }
-
 }

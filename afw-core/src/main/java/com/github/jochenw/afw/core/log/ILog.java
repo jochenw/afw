@@ -41,10 +41,15 @@ public interface ILog {
     void fatal(String pMethod, String pMessage);
     void log(Level pLevel, String pMethod, String pMessage);
 
+    void info(String pMethod, Throwable pTh);
     void info(String pMethod, String pMessage, Throwable pTh);
+    void warn(String pMethod, Throwable pTh);
     void warn(String pMethod, String pMessage, Throwable pTh);
+    void error(String pMethod, Throwable pTh);
     void error(String pMethod, String pMessage, Throwable pTh);
+    void fatal(String pMethod, Throwable pTh);
     void fatal(String pMethod, String pMessage, Throwable pTh);
+
 
     void trace(String pMethod, String pMessage, Object... pArgs);
     void debug(String pMethod, String pMessage, Object... pArgs);
@@ -62,9 +67,11 @@ public interface ILog {
     void fatalf(String pMethod, String pFormat, Object... pArgs);
     void logf(Level pLevel, String pMethod, String pFormat, Object... pArgs);
 
+    void entering(String pMethod);
     void entering(String pMethod, String pMessage);
     void entering(String pMethod, String pMessage, Object... pArgs);
     void enteringf(String pMethod, String pFormat, Object... pArgs);
+    void exiting(String pMethod);
     void exiting(String pMethod, String pMessage);
     void exiting(String pMethod, String pMessage, int pResult);
     void exiting(String pMethod, String pMessage, long pResult);

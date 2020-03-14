@@ -16,7 +16,7 @@ public interface IZipFileHandler {
 	 * @param pSourceDir The source directory where to look for files (recursively) being added
 	 *    to the zip file. 
 	 * @param pZipFile The zip file being created.
-	 * @param Whether the base directories name should be included in the zip file entries. If
+	 * @param pBaseDirIncludedInPath Whether the base directories name should be included in the zip file entries. If
 	 *    so, the base directories name will be present in <em>all</em> entries.
 	 */
 	public void createZipFile(Path pSourceDir, Path pZipFile, boolean pBaseDirIncludedInPath);
@@ -32,8 +32,9 @@ public interface IZipFileHandler {
 	/** Extracts a single entry from the given zip file.
 	 * @param pZipFile The zip file being read. It is assumed, that this file exists, and
 	 *   is a valid zip file.
-	 * @param pUri
-	 * @return
+	 * @param pUri The entry, which is being opened.
+	 * @return An InputStream, which allows to read the entry.
+	 * @throws IOException The operation failed.
 	 */
 	public InputStream openEntry(Path pZipFile, String pUri) throws IOException;
 }
