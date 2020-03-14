@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Function;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 import java.net.URLConnection;
@@ -46,6 +47,26 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
         propertyFactoryUrl = pPropertyFactoryUrl;
         propertyUrl = pPropertyUrl;
         initProperties();
+    }
+
+    public DefaultPropertyFactory(Properties pProperties) {
+    	this(pProperties, null);
+    }
+
+    public DefaultPropertyFactory(Properties pFactoryProperties, Properties pInstanceProperties) {
+    	final Function<Properties,Map<String,String>> mapCreator = (p) -> {
+    		final Map<String,String> map = new HashMap<>();
+    		p.forEach((k,v) -> {
+    			if (k != null  &&  v != null) {
+    				map.put(k.toString(), v.toString());
+    			}
+    		});
+    		return map;
+    	};
+    	propertyFactoryUrl = null;
+    	propertyUrl = null;
+    	factoryProperties = new DatedProperties(mapCreator.apply(pFactoryProperties), 0l);
+    	instanceProperties = new DatedProperties(mapCreator.apply(pInstanceProperties), 0l);
     }
 
     private void initProperties() {
