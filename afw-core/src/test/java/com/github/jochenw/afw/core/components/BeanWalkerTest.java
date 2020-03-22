@@ -58,7 +58,7 @@ public class BeanWalkerTest {
 		final BeanWalker.BeanVisitor<TestContext> visitor = new BeanWalker.BeanVisitor<BeanWalkerTest.TestContext>() {
 			@Override
 			public TestContext startWalking(Object pObject) {
-				final TestContext testContext = new TestContext((s) -> list.add(s));
+				final TestContext testContext = new TestContext((s) -> { list.add(s); System.out.println(s); });
 				testContext.append("endWalking: " + pObject.getClass().getName());
 				return testContext;
 			}
