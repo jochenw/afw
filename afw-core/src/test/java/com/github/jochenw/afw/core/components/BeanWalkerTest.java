@@ -6,6 +6,8 @@ package com.github.jochenw.afw.core.components;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -31,12 +33,12 @@ public class BeanWalkerTest {
 		private String foo, bar;
 	}
 	private static class TestContext extends BeanWalker.Context {
-		private final StringBuilder sb;
-		public TestContext(StringBuilder pSb) {
-			sb = pSb;
+		private final Consumer<String> consumer;
+		public TestContext(Consumer<String> pConsumer) {
+			consumer = pConsumer;
 		}
 		public void append(String pValue) {
-			sb.append(pValue).append("\n");
+			consumer.accept(pValue);
 		}
 	}
 
@@ -52,11 +54,11 @@ public class BeanWalkerTest {
 		testBean.foo = "foo";
 		testBean.bar = "bar";
 
-		final StringBuilder sb = new StringBuilder();
+		final List<String> list = new ArrayList<>();
 		final BeanWalker.BeanVisitor<TestContext> visitor = new BeanWalker.BeanVisitor<BeanWalkerTest.TestContext>() {
 			@Override
 			public TestContext startWalking(Object pObject) {
-				final TestContext testContext = new TestContext(sb);
+				final TestContext testContext = new TestContext((s) -> list.add(s));
 				testContext.append("endWalking: " + pObject.getClass().getName());
 				return testContext;
 			}
@@ -116,26 +118,29 @@ public class BeanWalkerTest {
 		final BeanWalker beanWalker = new BeanWalker();
 		beanWalker.setFieldComparator((f1, f2) -> f1.getName().compareTo(f2.getName()));
 		beanWalker.walk(visitor, testBean);
-		final String EXPECT =
-				"endWalking: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean\n" + 
-				"isAtomic: int -> true\n" + 
-				"visitAtomicProperty: anInteger, 47\n" + 
-				"isAtomic: java.lang.String -> true\n" + 
-				"visitAtomicProperty: bar, bar\n" + 
-				"isAtomic: java.lang.String -> true\n" + 
-				"visitAtomicProperty: foo, foo\n" + 
-				"isAtomic: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> false\n" + 
-				"isComplex: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> true\n" + 
-				"startVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean\n" + 
-				"isAtomic: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> false\n" + 
-				"isComplex: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> true\n" + 
-				"startVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean\n" + 
-				"isAtomic: java.lang.Long -> true\n" + 
-				"visitAtomicProperty: number, 6\n" + 
-				"endVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean\n" + 
-				"endVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean\n" + 
-				"endWalking: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean\n";
-		assertEquals(EXPECT, sb.toString());
+		final String[] EXPECT = {
+				"endWalking: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean", 
+				"isAtomic: int -> true", 
+				"visitAtomicProperty: anInteger, 47",
+				"isAtomic: java.lang.String -> true",
+				"visitAtomicProperty: bar, bar",
+				"isAtomic: java.lang.String -> true",
+				"visitAtomicProperty: foo, foo",
+				"isAtomic: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> false",
+				"isComplex: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> true",
+				"startVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean",
+				"isAtomic: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> false",
+				"isComplex: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> true",
+				"startVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean",
+				"isAtomic: java.lang.Long -> true",
+				"visitAtomicProperty: number, 6",
+				"endVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean",
+				"endVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean",
+				"endWalking: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean"};
+		assertEquals(EXPECT.length, list.size());
+		for (int i = 0;  i < EXPECT.length;  i++) {
+			assertEquals(EXPECT[i], list.get(i));
+		}
 	}
 
 }
