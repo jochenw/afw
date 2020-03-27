@@ -60,17 +60,17 @@ public class BeanWalkerTest {
 			@Override
 			public TestContext startWalking(Object pObject) {
 				final TestContext testContext = new TestContext((s) -> { list.add(s); System.out.println(s); });
-				testContext.append("startWalking: " + pObject.getClass().getName());
+				testContext.append("startWalking: " + getName(pObject.getClass()));
 				return testContext;
 			}
 
 			@Override
 			public void endWalking(TestContext pContext, Object pObject) {
-				pContext.append("endWalking: " + pObject.getClass().getName());
+				pContext.append("endWalking: " + getName(pObject.getClass()));
 			}
 
 			@Override
-			public boolean isAtomic(TestContext pContext, Class<?> pType) {
+			public boolean isAtomic(TestContext pContext, String pFieldName, Class<?> pType) {
 				final boolean result =
 						   pType == String.class
 						|| pType == Boolean.class
@@ -87,16 +87,16 @@ public class BeanWalkerTest {
 						|| pType == Double.TYPE
 						|| pType == Float.class
 						|| pType == Float.TYPE;
-				pContext.append("isAtomic: " + getName(pType) + " -> " + String.valueOf(result));
+				pContext.append("isAtomic: " + pFieldName + ", " + getName(pType) + " -> " + String.valueOf(result));
 				return result;
 			}
 
 			@Override
-			public boolean isComplex(TestContext pContext, Class<?> pType) {
+			public boolean isComplex(TestContext pContext, String pFieldName, Class<?> pType) {
 				final boolean result =
 						    pType == TestBean.InnerBean.class
 						 || pType == TestBean.InnerBean.InnerMostBean.class;
-				pContext.append("isComplex: " + getName(pType) + " -> " + String.valueOf(result));
+				pContext.append("isComplex: " + pFieldName + ", " + getName(pType) + " -> " + String.valueOf(result));
 				return result;
 			}
 
@@ -128,20 +128,20 @@ public class BeanWalkerTest {
 		beanWalker.setFieldComparator((f1, f2) -> f1.getName().compareTo(f2.getName()));
 		beanWalker.walk(visitor, testBean);
 		final String[] EXPECT = {
-				"endWalking: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean", 
-				"isAtomic: int -> true", 
+				"startWalking: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean", 
+				"isAtomic: anInteger, int -> true", 
 				"visitAtomicProperty: anInteger, 47",
-				"isAtomic: java.lang.String -> true",
+				"isAtomic: bar, java.lang.String -> true",
 				"visitAtomicProperty: bar, bar",
-				"isAtomic: java.lang.String -> true",
+				"isAtomic: foo, java.lang.String -> true",
 				"visitAtomicProperty: foo, foo",
-				"isAtomic: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> false",
-				"isComplex: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> true",
+				"isAtomic: innerBean, com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> false",
+				"isComplex: innerBean, com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean -> true",
 				"startVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean",
-				"isAtomic: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> false",
-				"isComplex: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> true",
+				"isAtomic: innerMostBean, com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> false",
+				"isComplex: innerMostBean, com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean -> true",
 				"startVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean",
-				"isAtomic: java.lang.Long -> true",
+				"isAtomic: number, java.lang.Long -> true",
 				"visitAtomicProperty: number, 6",
 				"endVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean$InnerMostBean",
 				"endVisiting: com.github.jochenw.afw.core.components.BeanWalkerTest$TestBean$InnerBean",

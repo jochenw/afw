@@ -55,18 +55,20 @@ public class BeanWalker {
 		 * Called, when a field has been detected. Takes as input the
 		 * fields type.
 		 * @param pContext The context object.
+		 * @param pFieldName The fields name.
 		 * @param pType The fields type.
 		 * @return True, if this field is considered atomic, in which
 		 *   case {@link #visitAtomicProperty(Context, Field, Supplier, Consumer)}
 		 *   will be invoked for this field. False, if this field isn't considered
-		 *   atomic, in which case {@link #isComplex(Context, Class)} will be
+		 *   atomic, in which case {@link #isComplex(Context, String, Class)} will be
 		 *   invoked.
 		 */
-		boolean isAtomic(C pContext, Class<?> pType);
+		boolean isAtomic(C pContext, String pFieldName, Class<?> pType);
 		/**
 		 * Called, when a non-atomic field has been detected. Takes as input the
 		 * fields type.
 		 * @param pContext The context object.
+		 * @param pFieldName The fields name.
 		 * @param pType The fields type.
 		 * @return True, if this field is considered complex, in which
 		 *   case {@link #startVisiting(Context, Object)}, and (later on)
@@ -74,7 +76,7 @@ public class BeanWalker {
 		 *   if this field isn't complex, in which case the field will be
 		 *   ignored.
 		 */
-		boolean isComplex(C pContext, Class<?> pType);
+		boolean isComplex(C pContext, String pFieldName, Class<?> pType);
 		/** Called, when an atomic field has been detected.
 		 * @param pContext The context object.
 		 * @param pField The field, which has been detected.
@@ -124,7 +126,7 @@ public class BeanWalker {
 		final Set<String> propertyNames = new HashSet<>();
 		final FailableConsumer<Field, ?> consumer = (f) -> {
 			final Class<?> type = f.getType();
-			if (pVisitor.isAtomic(pContext, type)) {
+			if (pVisitor.isAtomic(pContext, f.getName(), type)) {
 				final Supplier<Object> supplier = () -> {
 					return getFieldValue(pObject, f);
 				};
@@ -133,7 +135,7 @@ public class BeanWalker {
 				};
 				pVisitor.visitAtomicProperty(pContext, f, supplier, consmr);
 				propertyNames.add(f.getName());
-			} else if (pVisitor.isComplex(pContext, type)) {
+			} else if (pVisitor.isComplex(pContext, f.getName(), type)) {
 				final Object object = getFieldValue(pObject, f);
 				pVisitor.startVisiting(pContext, object);
 				walkComplexObject(pVisitor, object, pContext);
