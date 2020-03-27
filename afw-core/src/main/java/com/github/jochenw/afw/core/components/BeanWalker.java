@@ -126,7 +126,7 @@ public class BeanWalker {
 		final Set<String> propertyNames = new HashSet<>();
 		final FailableConsumer<Field, ?> consumer = (f) -> {
 			final Class<?> type = f.getType();
-			if ("$jacocoData".equals(f.getName())) {
+			if (!"$jacocoData".equals(f.getName())) {
 				if (pVisitor.isAtomic(pContext, f.getName(), type)) {
 					final Supplier<Object> supplier = () -> {
 						return getFieldValue(pObject, f);
