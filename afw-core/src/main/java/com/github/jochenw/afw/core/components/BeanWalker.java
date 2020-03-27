@@ -4,7 +4,6 @@
 package com.github.jochenw.afw.core.components;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +34,7 @@ public class BeanWalker {
 	}
 	/** The visitor is invoked by the {@link BeanWalker bean walker},
 	 * whenever the walker detects a new field.
+	 * @param <C> The type of the context object.
 	 */
 	public interface BeanVisitor<C extends Context> {
 		/** Called, when the walker starts iteration over a top level object.

@@ -32,6 +32,7 @@ public class BeanWalkerTest {
 		@SuppressWarnings("unused")
 		private String foo, bar;
 	}
+
 	private static class TestContext extends BeanWalker.Context {
 		private final Consumer<String> consumer;
 		public TestContext(Consumer<String> pConsumer) {
@@ -59,7 +60,7 @@ public class BeanWalkerTest {
 			@Override
 			public TestContext startWalking(Object pObject) {
 				final TestContext testContext = new TestContext((s) -> { list.add(s); System.out.println(s); });
-				testContext.append("endWalking: " + pObject.getClass().getName());
+				testContext.append("startWalking: " + pObject.getClass().getName());
 				return testContext;
 			}
 
@@ -86,7 +87,7 @@ public class BeanWalkerTest {
 						|| pType == Double.TYPE
 						|| pType == Float.class
 						|| pType == Float.TYPE;
-				pContext.append("isAtomic: " + pType.getName() + " -> " + String.valueOf(result));
+				pContext.append("isAtomic: " + getName(pType) + " -> " + String.valueOf(result));
 				return result;
 			}
 
@@ -95,7 +96,7 @@ public class BeanWalkerTest {
 				final boolean result =
 						    pType == TestBean.InnerBean.class
 						 || pType == TestBean.InnerBean.InnerMostBean.class;
-				pContext.append("isComplex: " + pType.getName() + " -> " + String.valueOf(result));
+				pContext.append("isComplex: " + getName(pType) + " -> " + String.valueOf(result));
 				return result;
 			}
 
@@ -113,6 +114,14 @@ public class BeanWalkerTest {
 			@Override
 			public void endVisiting(TestContext pContext, Object pBean) {
 				pContext.append("endVisiting: " + pBean.getClass().getName());
+			}
+
+			protected String getName(Class<?> pType) {
+				if (Integer.TYPE == pType) {
+					return "int";
+				} else {
+					return pType.getName();
+				}
 			}
 		};
 		final BeanWalker beanWalker = new BeanWalker();
