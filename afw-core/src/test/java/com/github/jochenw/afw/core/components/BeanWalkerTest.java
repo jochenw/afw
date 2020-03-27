@@ -117,11 +117,7 @@ public class BeanWalkerTest {
 			}
 
 			protected String getName(Class<?> pType) {
-				if (Integer.TYPE == pType) {
-					return "int";
-				} else {
-					return pType.getName();
-				}
+				return pType.getName();
 			}
 		};
 		final BeanWalker beanWalker = new BeanWalker();

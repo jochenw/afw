@@ -127,8 +127,6 @@ public class BeanWalker {
 		final FailableConsumer<Field, ?> consumer = (f) -> {
 			final Class<?> type = f.getType();
 			if ("$jacocoData".equals(f.getName())) {
-				// Jacoco adds some fields to the class, which we aren't interested in.
-			} else {
 				if (pVisitor.isAtomic(pContext, f.getName(), type)) {
 					final Supplier<Object> supplier = () -> {
 						return getFieldValue(pObject, f);
