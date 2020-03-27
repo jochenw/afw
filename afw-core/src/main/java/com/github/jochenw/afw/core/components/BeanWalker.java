@@ -126,20 +126,24 @@ public class BeanWalker {
 		final Set<String> propertyNames = new HashSet<>();
 		final FailableConsumer<Field, ?> consumer = (f) -> {
 			final Class<?> type = f.getType();
-			if (pVisitor.isAtomic(pContext, f.getName(), type)) {
-				final Supplier<Object> supplier = () -> {
-					return getFieldValue(pObject, f);
-				};
-				final Consumer<Object> consmr = (o) -> {
-					setFieldValue(pObject, f, o);
-				};
-				pVisitor.visitAtomicProperty(pContext, f, supplier, consmr);
-				propertyNames.add(f.getName());
-			} else if (pVisitor.isComplex(pContext, f.getName(), type)) {
-				final Object object = getFieldValue(pObject, f);
-				pVisitor.startVisiting(pContext, object);
-				walkComplexObject(pVisitor, object, pContext);
-				pVisitor.endVisiting(pContext, object);
+			if ("$jacocoData".equals(f.getName())) {
+				// Jacoco adds some fields to the class, which we aren't interested in.
+			} else {
+				if (pVisitor.isAtomic(pContext, f.getName(), type)) {
+					final Supplier<Object> supplier = () -> {
+						return getFieldValue(pObject, f);
+					};
+					final Consumer<Object> consmr = (o) -> {
+						setFieldValue(pObject, f, o);
+					};
+					pVisitor.visitAtomicProperty(pContext, f, supplier, consmr);
+					propertyNames.add(f.getName());
+				} else if (pVisitor.isComplex(pContext, f.getName(), type)) {
+					final Object object = getFieldValue(pObject, f);
+					pVisitor.startVisiting(pContext, object);
+					walkComplexObject(pVisitor, object, pContext);
+					pVisitor.endVisiting(pContext, object);
+				}
 			}
 		};
 		final Comparator<Field> fieldComp = getFieldComparator();
