@@ -290,6 +290,19 @@ public class DomHelper {
 		}
 	}
 
+	/** Returns the first child element of the given node, which has the
+	 * {@link #getDefaultNamespaceUri() default namespace URI}, and the
+	 * given local name. If no such child element is found, returns null.
+	 * @param pNode The requested child's parent node.
+	 * @param pLocalName The requested child's local name.
+	 * @return The first child element of the given node, which has the
+	 * {@link #getDefaultNamespaceUri() default namespace URI}, and the
+	 * given local name. Null, if no such child is present.
+	 */
+	public @Nullable Element getFirstChild(@Nonnull Node pNode, String pLocalName) {
+		return getFirstChildNS(pNode, getDefaultNamespaceUri(), pLocalName);
+	}
+
 	/** Returns the first child element of the given node, which has the given
 	 * namespace URI, and the given local name. If no such child element is
 	 * found, returns null.
@@ -307,6 +320,22 @@ public class DomHelper {
 		}
 		return null;
 	}
+
+	/** Returns the first child element of the given node, which has the
+	 * {@link #getDefaultNamespaceUri() default namespace URI}, and the
+	 * given local name. If no such child element is found, returns null.
+	 * @param pNode The requested child's parent node.
+	 * @param pLocalName The requested child's local name.
+	 * @return The first child element of the given node, which has the
+	 * {@link #getDefaultNamespaceUri() default namespace URI}, and the
+	 * given local name. If no such child element is
+	 * found, throws a {@link LocalizableException}.
+	 * @throws LocalizableException No matching child is present.
+	 */
+	public @Nullable Element requireFirstChild(@Nonnull Node pNode, String pLocalName) throws LocalizableException {
+		return requireFirstChildNS(pNode, getDefaultNamespaceUri(), pLocalName);
+	}
+
 
 	/** Returns the first child element of the given node, which has the given
 	 * namespace URI, and the given local name. If no such child element is
