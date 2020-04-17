@@ -43,6 +43,10 @@ public class ObjectStreams {
 		private Stream<O> stream;
 		private boolean terminated;
 
+		/** Creates a new instance with the same sequence of elements as the given
+		 * stream.
+		 * @param pStream The stream providing the element stream.
+		 */
 		public FailableStream(Stream<O> pStream) {
 			stream = pStream;
 		}
@@ -94,7 +98,14 @@ public class ObjectStreams {
 			});
 		}
 
-	    /**
+		protected void makeTerminated() {
+			if (terminated) {
+				throw new IllegalStateException("This stream is already terminated.");
+			}
+			terminated = true;
+		}
+
+		/**
 	     * Performs a mutable reduction operation on the elements of this stream using a
 	     * {@code Collector}.  A {@code Collector}
 	     * encapsulates the functions used as arguments to
@@ -143,7 +154,7 @@ public class ObjectStreams {
 	     * @see Collectors
 	     */
 		public <A,R> R collect(Collector<? super O,A,R> pCollector) {
-			terminated = true;
+			makeTerminated();
 			return stream().collect(pCollector);
 		}
 
@@ -192,7 +203,7 @@ public class ObjectStreams {
 	     * @return The result of the reduction
 	     */
 		public <A,R> R collect(Supplier<R> pSupplier, BiConsumer<R,? super O> pAccumulator, BiConsumer<R,R> pCombiner) {
-			terminated = true;
+			makeTerminated();
 			return stream().collect(pSupplier, pAccumulator, pCombiner);
 		}
 
@@ -240,7 +251,7 @@ public class ObjectStreams {
 	     * @return the result of the reduction
 	     */
 		public O reduce(O pIdentity, BinaryOperator<O> pAccumulator) {
-			terminated = true;
+			makeTerminated();
 			return stream().reduce(pIdentity, pAccumulator);
 		}
 

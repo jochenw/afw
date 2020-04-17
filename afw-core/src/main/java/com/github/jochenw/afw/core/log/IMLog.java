@@ -34,9 +34,13 @@ public interface IMLog {
     void fatal(String pMessage);
     void log(Level pLevel, String pMessage);
     
+    void info(Throwable pTh);
     void info(String pMessage, Throwable pTh);
+    void warn(Throwable pTh);
     void warn(String pMessage, Throwable pTh);
+    void error(Throwable pTh);
     void error(String pMessage, Throwable pTh);
+    void fatal(Throwable pTh);
     void fatal(String pMessage, Throwable pTh);
     
     void trace(String pMessage, Object... pArgs);
@@ -72,6 +76,4 @@ public interface IMLog {
     void exiting(String pMessage, Object pResult);
     void exiting(String pMessage, Object... pArgs);
     void exitingf(String pFormat, Object... pArgs);
-    
-
 }

@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.annotation.Nullable;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.ContentHandler;
@@ -270,6 +271,14 @@ public class Sax {
 			sb.append(": ");
 			sb.append(pMsg);
 			return sb.toString();
+		}
+	}
+
+	public static @Nullable Locator clone(@Nullable Locator pLocator) {
+		if (pLocator == null) {
+			return null;
+		} else {
+			return new LocatorImpl(pLocator);
 		}
 	}
 

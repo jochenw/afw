@@ -111,9 +111,23 @@ public class DefaultMLog implements IMLog {
     }
 
     @Override
+    public void info(Throwable pTh) {
+        if (log.isInfoEnabled()) {
+            log.log(Level.INFO, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
+        }
+    }
+
+    @Override
     public void info(String pMessage, Throwable pTh) {
         if (log.isInfoEnabled()) {
             log.log(Level.INFO, log.asMessage(method, AbstractLog.SEP_STD, pMessage), pTh);
+        }
+    }
+
+    @Override
+    public void warn(Throwable pTh) {
+        if (log.isWarnEnabled()) {
+            log.log(Level.WARN, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
         }
     }
 
@@ -125,9 +139,23 @@ public class DefaultMLog implements IMLog {
     }
 
     @Override
+    public void error(Throwable pTh) {
+        if (log.isErrorEnabled()) {
+            log.log(Level.ERROR, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
+        }
+    }
+
+    @Override
     public void error(String pMessage, Throwable pTh) {
         if (log.isErrorEnabled()) {
             log.log(Level.ERROR, log.asMessage(method, AbstractLog.SEP_STD, pMessage), pTh);
+        }
+    }
+
+    @Override
+    public void fatal(Throwable pTh) {
+        if (log.isErrorEnabled()) {
+            log.log(Level.FATAL, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
         }
     }
 
