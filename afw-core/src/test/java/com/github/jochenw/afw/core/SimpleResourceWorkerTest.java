@@ -22,6 +22,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.SimpleResourceWorker;
+import com.github.jochenw.afw.core.SimpleResourceWorker.ResCallable;
 import com.github.jochenw.afw.core.SimpleResourceWorker.ResRunnable;
 import com.github.jochenw.afw.core.SimpleResourceWorker.SimpleResourceTracker;
 
@@ -43,8 +44,12 @@ public class SimpleResourceWorkerTest {
 		}
 	}
 
+	/**
+	 * Test, that all tracked resources are being closed in the reversed
+	 * order of registration.
+	 */
 	@Test
-	public void test() {
+	public void testAllClosedInOrder() {
 		final List<SimpleResource> resources = new ArrayList<>();
 		for (int i = 0;  i < 10;  i++) {
 			resources.add(new SimpleResource());
@@ -76,4 +81,94 @@ public class SimpleResourceWorkerTest {
 		}
 	}
 
+	private static class FailingResource implements AutoCloseable {
+		private final Exception error;
+
+		public FailingResource(Exception pError) {
+			error = pError;
+		}
+
+		@Override
+		public void close() throws Exception {
+			if (error != null) {
+				throw error;
+			}
+		}
+	}
+
+	/**
+	 * Tests, whether the {@link SimpleResourceWorker} reports the first
+	 * exception, which is thrown upon closing.
+	 */
+	public void testFirstExceptionVisible() {
+		final SimpleResourceWorker srw = new SimpleResourceWorker();
+		final RuntimeException rte = new RuntimeException("An error occcurred.");
+		/** If a single exception occurs, we expect that exception.
+		 */
+		try {
+			srw.call((tracker) -> {
+				tracker.track(new FailingResource(rte));
+				return Boolean.TRUE;
+			});
+			Assert.fail("Expected Exception");
+		} catch (RuntimeException e) {
+			Assert.assertSame(rte, e);
+		}
+		/** If multiple exceptions occur, we expect the first exception.
+		 */
+		final RuntimeException other = new RuntimeException("Another error occurred.");
+		try {
+			srw.call((tracker) -> {
+				tracker.track(new FailingResource(rte));
+				tracker.track(new FailingResource(other));
+				return Boolean.TRUE;
+			});
+			Assert.fail("Expected Exception");
+		} catch (RuntimeException e) {
+			Assert.assertSame(other, e);
+		}
+	}
+
+	/** Test for {@link SimpleResourceWorker#assertTrackable(Object)}.
+	 */
+	public void testAssertTrackable() {
+		final SimpleResourceWorker srw = new SimpleResourceWorker();
+		try {
+			srw.run((tracker) -> {
+				tracker.track("Untrackable object");
+			});
+			Assert.fail("Expected Exception");
+		} catch (IllegalStateException ise) {
+			Assert.assertEquals("", ise.getMessage());
+		}
+	}
+
+	/** Test for a custom {@link SimpleResourceWorker#assertTrackable(Object)}.
+	 */
+	public void testCustomAssertTrackable() {
+		final SimpleResourceWorker srw = new SimpleResourceWorker() {
+
+			@Override
+			protected void assertTrackable(Object pResource) {
+				if (pResource instanceof String) {
+					// Do nothing, okay.
+				} else {
+					super.assertTrackable(pResource);
+				}
+			}
+
+			@Override
+			protected void closeResource(Object pResource, boolean pCommit) throws Throwable {
+				if (pResource instanceof String) {
+					// Do nothing, okay.
+				} else {
+					super.closeResource(pResource, pCommit);
+				}
+			}
+			
+		};
+		srw.run((tracker) -> {
+			tracker.track("Untrackable object");
+		});
+	}
 }

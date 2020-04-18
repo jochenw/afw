@@ -23,10 +23,12 @@ import java.util.Objects;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 public class SimpleResourceWorker {
-	public abstract static class ResRunnable {
+	@FunctionalInterface
+	public interface ResRunnable {
 		public abstract void run(SimpleResourceTracker pTracker);
 	}
-	public abstract static class ResCallable<T> {
+	@FunctionalInterface
+	public interface ResCallable<T> {
 		public abstract T call(SimpleResourceTracker pTracker);
 	}
 	public class SimpleResourceTracker {
