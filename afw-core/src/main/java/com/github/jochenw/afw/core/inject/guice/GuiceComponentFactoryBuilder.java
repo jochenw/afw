@@ -41,6 +41,55 @@ import com.google.inject.spi.TypeListener;
 
 
 public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder<GuiceComponentFactoryBuilder> {
+	private static class GcfbTypeListener implements TypeListener {
+		private final IComponentFactory pComponentFactory;
+		private final OnTheFlyBinder otfb;
+
+		/**
+		 * @param pComponentFactory
+		 * @param otfb
+		 */
+		private GcfbTypeListener(IComponentFactory pComponentFactory, OnTheFlyBinder otfb) {
+			this.pComponentFactory = pComponentFactory;
+			this.otfb = otfb;
+		}
+
+		@Override
+		public <I> void hear(TypeLiteral<I> pTypeLiteral, TypeEncounter<I> pEncounter) {
+			Class<?> clazz = pTypeLiteral.getRawType();
+			otfb.findConsumers(pComponentFactory, clazz, (i) -> {
+				final InjectionListener<I> il = new InjectionListener<I>() {
+					@Override
+					public void afterInjection(I pInjectee) {
+						i.accept(pInjectee);
+					}
+				};
+				pEncounter.register(il);
+			});
+			while (clazz != null  &&  !Object.class.equals(clazz)) {
+				for (Field field : clazz.getDeclaredFields()) {
+					final Provider<Object> provider = otfb.getProvider(pComponentFactory, field);
+					if (provider != null) {
+						pEncounter.register(new MembersInjector<I>() {
+							@Override
+							public void injectMembers(I instance) {
+								try {
+									if (!field.isAccessible()) {
+										field.setAccessible(true);
+									}
+									field.set(instance, provider.get());
+								} catch (Throwable t) {
+									throw Exceptions.show(t);
+								}
+							}
+						});
+					}
+				}
+				clazz = clazz.getSuperclass();
+			}
+		}
+	}
+
 	public GuiceComponentFactoryBuilder() {
 		componentFactoryClass(GuiceComponentFactory.class);
 		onTheFlyBinder(new DefaultOnTheFlyBinder());
@@ -55,42 +104,7 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder<GuiceC
 			public void configure(com.google.inject.Binder pBinder) {
 				final OnTheFlyBinder otfb = getOnTheFlyBinder();
 				if (otfb != null) {
-					pBinder.bindListener(Matchers.any(), new TypeListener() {
-						@Override
-						public <I> void hear(TypeLiteral<I> pTypeLiteral, TypeEncounter<I> pEncounter) {
-							Class<?> clazz = pTypeLiteral.getRawType();
-							otfb.findConsumers(pComponentFactory, clazz, (i) -> {
-								final InjectionListener<I> il = new InjectionListener<I>() {
-									@Override
-									public void afterInjection(I pInjectee) {
-										i.accept(pInjectee);
-									}
-								};
-								pEncounter.register(il);
-							});
-							while (clazz != null  &&  !Object.class.equals(clazz)) {
-								for (Field field : clazz.getDeclaredFields()) {
-									final Provider<Object> provider = otfb.getProvider(pComponentFactory, field);
-									if (provider != null) {
-										pEncounter.register(new MembersInjector<I>() {
-											@Override
-											public void injectMembers(I instance) {
-												try {
-													if (!field.isAccessible()) {
-														field.setAccessible(true);
-													}
-													field.set(instance, provider.get());
-												} catch (Throwable t) {
-													throw Exceptions.show(t);
-												}
-											}
-										});
-									}
-								}
-								clazz = clazz.getSuperclass();
-							}
-						}
-					});
+					pBinder.bindListener(Matchers.any(), new GcfbTypeListener(pComponentFactory, otfb));
 				}
 				for (BindingBuilder<?> bb : pBindings) {
 					@SuppressWarnings("unchecked")
