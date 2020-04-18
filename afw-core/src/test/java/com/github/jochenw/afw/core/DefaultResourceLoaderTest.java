@@ -71,6 +71,8 @@ public class DefaultResourceLoaderTest {
 		assertResource(drl, cl, URL0.getFile(), "12345");
 		drl.setInstanceName(null);
 		assertNoResource(drl, cl, "x/y/Bar.properties");
+		drl.setInstanceName("");
+		assertNoResource(drl, cl, "x/y/Bar.properties");
 		drl.setInstanceName("prod");
 		assertResource(drl, cl, "x/y/Bar.properties", "012345");
 		drl.setInstanceName(null);
@@ -88,9 +90,11 @@ public class DefaultResourceLoaderTest {
 		try {
 			tcl = Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
-			final DefaultResourceLoader drl = new DefaultResourceLoader("foo", "prod");
+			final DefaultResourceLoader drl = new DefaultResourceLoader();
 			assertResource(drl, null, URL0.getFile(), "12345");
 			drl.setInstanceName(null);
+			assertNoResource(drl, null, "x/y/Bar.properties");
+			drl.setInstanceName("");
 			assertNoResource(drl, null, "x/y/Bar.properties");
 			drl.setInstanceName("prod");
 			assertResource(drl, null, "x/y/Bar.properties", "012345");
