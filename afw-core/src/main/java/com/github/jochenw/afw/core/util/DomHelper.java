@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.XMLConstants;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.Locator;
@@ -259,6 +260,18 @@ public class DomHelper {
 	}
 
 	/**
+	 * Asserts, that the given node is an element. If the assertion fails, throws a
+	 * {@link LocalizableException}.
+	 * @param pNode The node, which is being tested.
+	 * @throws LocalizableException The assertion failed.
+	 */
+	public void assertElement(@Nonnull Node pNode) throws LocalizableException {
+		if (pNode.getNodeType() != Node.ELEMENT_NODE) {
+			throw error(pNode, "Expected element, got " + pNode.getClass().getName());
+		}
+	}
+
+	/**
 	 * Asserts, that the given node is an element with the {@link #getDefaultNamespaceUri() default
 	 * namespace URI}, and the given local name. If the assertion fails, throws a {@link LocalizableException}.
 	 * @param pNode The node, which is being tested.
@@ -356,5 +369,69 @@ public class DomHelper {
 			            + ", no such child is present.");
 		}
 		return e;
+	}
+
+	/** Returns the value of the attribute {@code pName} in the element {@code pName},
+	 * or null, if no such attribute is present.
+	 * @param pNode The element being queried for an attribute value.
+	 * @param pName The attribute name.
+	 * @return The value of the attribute {@code pName} in the element {@code pName},
+	 * or null, if no such attribute is present.
+	 * @throws LocalizableException The given node is not an element.
+	 */
+	public @Nullable String getAttribute(@Nonnull Node pNode, @Nonnull String pName) throws LocalizableException {
+		assertElement(pNode);
+		final Attr attr = ((Element) pNode).getAttributeNode(pName);
+		if (attr == null) {
+			return null;
+		} else {
+			return attr.getValue();
+		}
+	}
+
+	/** Returns the value of the attribute {@code pName} in the element {@code pName}.
+	 * @param pNode The element being queried for an attribute value.
+	 * @param pName The attribute name.
+	 * @return The value of the attribute {@code pName} in the element {@code pName}.
+	 * @throws LocalizableException The given node is not an element, or the element
+	 * doesn't have an attribute with the name {@code pName}, or the attribute is
+	 * empty.
+	 */
+	public @Nonnull String requireAttribute(@Nonnull Node pNode, @Nonnull String pName) throws LocalizableException {
+		final String value = getAttribute(pNode, pName);
+		if (value == null  ||  value.length() == 0) {
+			throw error(pNode, "Missing, or empty attribute: " + pNode.getNodeName() + "/@" + pName);
+		}
+		return value;
+	}
+
+	/** Returns the value of the attribute {@code pName} in the element {@code pName}.
+	 * @param pNode The element being queried for an attribute value.
+	 * @param pName The attribute name.
+	 * @param pDefaultValue The attributes default value.
+	 * @return The value of the attribute {@code pName} in the element {@code pName}.
+	 * @throws LocalizableException The given node is not an element.
+	 */
+	public @Nonnull String requireAttribute(@Nonnull Node pNode, @Nonnull String pName, @Nonnull String pDefaultValue) throws LocalizableException {
+		final String value = getAttribute(pNode, pName);
+		if (value == null  ||  value.length() == 0) {
+			return pDefaultValue;
+		}
+		return value;
+	}
+
+	/** Returns the boolean value of the attribute {@code pName} in the element {@code pName}.
+	 * @param pNode The element being queried for an attribute value.
+	 * @param pName The attribute name.
+	 * @param pDefaultValue The attributes default value.
+	 * @return The boolean value of the attribute {@code pName} in the element {@code pName}.
+	 * @throws LocalizableException The given node is not an element.
+	 */
+	public @Nonnull boolean requireAttribute(@Nonnull Node pNode, @Nonnull String pName, @Nonnull boolean pDefaultValue) throws LocalizableException {
+		final String value = getAttribute(pNode, pName);
+		if (value == null  ||  value.length() == 0) {
+			return pDefaultValue;
+		}
+		return Boolean.parseBoolean(value);
 	}
 }
