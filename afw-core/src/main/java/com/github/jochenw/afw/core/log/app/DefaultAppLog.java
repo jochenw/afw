@@ -61,8 +61,8 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 
 	@Override
 	public void log(Level pLevel, String pMsg) {
-		runReadLocked(() -> {
-			if (isEnabled(pLevel)) {
+		runWriteLocked(() -> {
+			if (isEnabledLocked(pLevel)) {
 				writeLine(pMsg);
 			}
 		});
@@ -70,8 +70,8 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 
 	@Override
 	public void log(Level pLevel, String pMsg, FailableConsumer<OutputStream, IOException> pStreamConsumer) {
-		runReadLocked(() -> {
-			if (isEnabled(pLevel)) {
+		runWriteLocked(() -> {
+			if (isEnabledLocked(pLevel)) {
 				writeLine(pMsg);
 				pStreamConsumer.accept(out);
 				writer.newLine();
@@ -81,21 +81,23 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 
 	@Override
 	public void close() throws IOException {
-		Throwable th = null;
-		try {
-			writer.close();
-		} catch (Throwable t) {
-			th = t;
-		}
-		try {
-			out.close();
-		} catch (Throwable t) {
-			if (th == null) {
+		runWriteLocked(() -> {
+			Throwable th = null;
+			try {
+				writer.close();
+			} catch (Throwable t) {
 				th = t;
 			}
-		}
-		if (th != null) {
-			throw Exceptions.show(th, IOException.class);
-		}
+			try {
+				out.close();
+			} catch (Throwable t) {
+				if (th == null) {
+					th = t;
+				}
+			}
+			if (th != null) {
+				throw Exceptions.show(th, IOException.class);
+			}
+		});
 	}
 }

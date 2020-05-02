@@ -9,7 +9,7 @@ import org.junit.Test;
 public class FilesTest {
 	@Test
 	public void testRelativizeOnLinux() {
-		Assume.assumeTrue("Not running on Linux/Unix", Systems.isUnix());
+		Assume.assumeTrue("Not running on Linux/Unix", Systems.isLinuxOrUnix());
 		final String instanceDir = "/f/SoftwareAG/webMethods99/IntegrationServer/instances/default/";
 		final Path logFileDir = java.nio.file.Paths.get(instanceDir).resolve("logs");
 		String lclBaseLogUri = "lidl/lcl/base.log";

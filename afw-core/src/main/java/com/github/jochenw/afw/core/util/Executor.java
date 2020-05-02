@@ -36,6 +36,20 @@ public class Executor {
 		 */
 		void accept(int pStatus);
 	}
+
+	/** A consumer, which copies it's input to {@link System#out}, suitable as a
+	 * default value for {@link #run(Path, String[], String[], Consumer, Consumer, IntConsumer)}.
+	 */
+	public static final Consumer<InputStream> CONSUMER_COPY_TO_SYSTEM_OUT = (in) -> {
+		Streams.copy(in, System.out);
+	};
+	/** A consumer, which copies it's input to {@link System#out}, suitable as a
+	 * default value for {@link #run(Path, String[], String[], Consumer, Consumer, IntConsumer)}.
+	 */
+	public static final Consumer<InputStream> CONSUMER_COPY_TO_SYSTEM_ERR = (in) -> {
+		Streams.copy(in, System.err);
+	};
+
 	/** Called to execute the command {@code pCmd}, using the environment {@code pEnv},
 	 * in the directory {@code pDir}.
 	 * @param pDir The directory, where to execute the command. May be null, in which

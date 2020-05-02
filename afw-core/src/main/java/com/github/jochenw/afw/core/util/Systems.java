@@ -7,8 +7,8 @@ public class Systems {
 	private static String OS = System.getProperty("os.name").toLowerCase();
 	private static boolean isWindows = OS.contains("win");
 	private static boolean isMac = OS.contains("mac");
-	private static boolean isUnix = (OS.contains("nix") || OS.contains("nux") || OS.contains("aix") || OS.contains("sunos"));
-	private static boolean isOther = !isWindows  &&  !isMac  &&  !isUnix;
+	private static boolean isLinuxOrUnix = (OS.contains("nix") || OS.contains("nux") || OS.contains("aix") || OS.contains("sunos"));
+	private static boolean isOther = !isWindows  &&  !isMac  &&  !isLinuxOrUnix;
 
 	/**
 	 * Returns, whether we are currently running under Windows.
@@ -30,8 +30,8 @@ public class Systems {
 	 * Returns, whether we are currently running under Linux, or Unix.
 	 * @return True, if are currently running under Linux, or Unix, otherwise false.
 	 */
-    public static boolean isUnix() {
-        return isUnix;
+    public static boolean isLinuxOrUnix() {
+        return isLinuxOrUnix;
     }
 
 	/**
@@ -52,7 +52,7 @@ public class Systems {
             return "windows";
         } else if (isMac()) {
             return "mac";
-        } else if (isUnix()) {
+        } else if (isLinuxOrUnix()) {
             return "unix";
         } else {
             return "other";

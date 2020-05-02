@@ -26,6 +26,8 @@ import java.nio.file.Paths;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
+
 
 /** Utility class for working with objects. (Working with objects is
  * something, that you will always do. So, this class will always be
@@ -43,6 +45,30 @@ public class Objects {
 	public static @Nonnull <T> T notNull(@Nullable T pValue, @Nonnull T pDefault) {
 		if (pValue == null) {
 			return pDefault;
+		} else {
+			return pValue;
+		}
+	}
+
+	/**
+	 * Checks, if the given value is null. If so, invokes the supplier, and returns
+	 * the suppliers value. Otherwise, returns the non-null input value.
+	 * @param <T> Type of the input (and output) value.
+	 * @param pValue The input value.
+	 * @param pSupplier A supplier, which returns the default value. The supplier is
+	 *   only invoked, if necessary. (If {@code pValue} is null.
+	 * @return The input value, if non-null. Otherwise the default value.
+	 * @throws NullPointerException The default value supplier
+	 */
+	public static @Nonnull <T> T notNull(@Nullable T pValue, @Nonnull FailableSupplier<T,?> pSupplier) {
+		if (pValue == null) {
+			final T value;
+			try {
+				value = pSupplier.get();
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+			return requireNonNull(value, "The supplier returned null.");
 		} else {
 			return pValue;
 		}

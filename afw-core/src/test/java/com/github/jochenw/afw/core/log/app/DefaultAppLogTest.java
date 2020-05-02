@@ -8,9 +8,11 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.log.app.IAppLog.Level;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 /**
@@ -24,15 +26,53 @@ public class DefaultAppLogTest {
 	 */
 	@Test
 	public void testLogLevelString() throws Exception {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try (DefaultAppLog dal = new DefaultAppLog(baos)) {
-			dal.info("This is a log message.");
-			dal.debug("This is another log message.");
-			dal.error("This is the third log message.");
+		{
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try (DefaultAppLog dal = new DefaultAppLog(baos)) {
+				dal.info("This is a log message.");
+				dal.debug("This is another log message.");
+				dal.error("This is the third log message.");
+			}
+			assertEquals("This is a log message." + System.lineSeparator() +
+					"This is the third log message." + System.lineSeparator(),
+					baos.toString("UTF-8"));
 		}
-		assertEquals("This is a log message." + System.lineSeparator() +
-				     "This is the third log message." + System.lineSeparator(),
-				     baos.toString("UTF-8"));
+		{
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try (DefaultAppLog dal = new DefaultAppLog(baos)) {
+				dal.setLevel(Level.DEBUG);
+				dal.info("This is a log message.");
+				dal.debug("This is another log message.");
+				dal.error("This is the third log message.");
+			}
+			assertEquals("This is a log message." + System.lineSeparator() +
+					"This is another log message." + System.lineSeparator() +
+					"This is the third log message." + System.lineSeparator(),
+					baos.toString("UTF-8"));
+		}
+		{
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try (DefaultAppLog dal = new DefaultAppLog(Level.DEBUG, StandardCharsets.UTF_8, "\n", baos)) {
+				dal.info("This is a log message.");
+				dal.debug("This is another log message.");
+				dal.error("This is the third log message.");
+			}
+			assertEquals("This is a log message.\n"
+					+ "This is another log message.\n"
+					+ "This is the third log message.\n",
+					baos.toString("UTF-8"));
+		}
+		{
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try (DefaultAppLog dal = new DefaultAppLog(Level.INFO, StandardCharsets.UTF_8, "\r\n", baos)) {
+				dal.info("This is a log message.");
+				dal.debug("This is another log message.");
+				dal.error("This is the third log message.");
+			}
+			assertEquals("This is a log message.\r\n"
+					+ "This is the third log message.\r\n",
+					baos.toString("UTF-8"));
+		}
 	}
 
 	/**

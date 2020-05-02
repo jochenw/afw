@@ -67,4 +67,12 @@ public abstract class AbstractAppLog implements IAppLog {
 			return callReadLocked(callable);
 		}
 	}
+
+	protected boolean isEnabledLocked(@Nonnull Level pLevel) {
+		if (pLevel == null) {
+			return false;
+		} else {
+			return pLevel.ordinal() >= level.ordinal();
+		}
+	}
 }
