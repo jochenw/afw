@@ -17,8 +17,9 @@ public abstract class AbstractStreamWriter implements StreamWriter {
 
 	/**
 	 * Returns the given objects streamable id. The streamable id is
-	 * given by the objects class. This class {@em must} be annotated
+	 * given by the objects class. This class <em>must</em> be annotated
 	 * with {@link Streamable @Streamable}.
+	 * @param pStreamable The object, for which an id is being queried.
 	 * @return The value of the id attribute in the types
 	 * {@link Streamable @Streamable} annotation, if that attribute
 	 * is present, and non-empty. Otherwise, the types
@@ -30,6 +31,17 @@ public abstract class AbstractStreamWriter implements StreamWriter {
 		return requireStreamableId(pStreamable.getClass());
 	}
 
+	/**
+	 * Returns the given types streamable id. The type <em>must</em>
+	 * be annotated with {@link Streamable @Streamable}.
+	 * @param pType The type, for which an id is being queried.
+	 * @return The value of the id attribute in the types
+	 * {@link Streamable @Streamable} annotation, if that attribute
+	 * is present, and non-empty. Otherwise, the types
+	 * {@link Class#getSimpleName() simple name}, as a default value.
+	 * @throws IllegalArgumentException The objects type is not
+	 * annotated with {@link Streamable @Streamable}.
+	 */
 	protected String requireStreamableId(@Nonnull Class<?> pType) {
 		final Streamable streamableAnnotation = pType.getAnnotation(Streamable.class);
 		if (streamableAnnotation == null) {

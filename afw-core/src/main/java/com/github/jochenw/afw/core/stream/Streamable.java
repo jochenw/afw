@@ -24,6 +24,7 @@ public @interface Streamable {
 	 * {@link XmlStreamWriter} will use the value to decide, whether a value is
 	 * being written as an XML attribute, or a child element. The {@link JsonStreamWriter},
 	 * on the other hand, will ignore this value.
+	 * @return Returns, whether to display the value in a terse manner.
 	 */
 	public boolean terse() default false;
 }

@@ -167,11 +167,13 @@ public class Tests {
 
 	/**
 	 * Asserts, that the given files have the same content.
+	 * @param pExpect A {@link Path file}, which provides the expected content.
+	 * @param pGot A {@link Path file}, which provides the actual content.
 	 */
-	public static void assertSameContent(Path pSrcFile, Path pTargetFile) {
-		try (InputStream is1 = Files.newInputStream(pSrcFile);
+	public static void assertSameContent(Path pExpect, Path pGot) {
+		try (InputStream is1 = Files.newInputStream(pExpect);
 			 BufferedInputStream bis1 = new BufferedInputStream(is1);
-		     InputStream is2 = Files.newInputStream(pTargetFile);
+		     InputStream is2 = Files.newInputStream(pGot);
 			 BufferedInputStream bis2 = new BufferedInputStream(is2)) {
 			assertSameContent(bis1, bis2);
 		} catch (IOException e) {
@@ -181,13 +183,16 @@ public class Tests {
 
 	/**
 	 * Asserts, that the given streams have the same content.
+	 * @param pExpect An {@link InputStream}, which provides the expected content.
+	 * @param pGot An {@link InputStream}, which provides the actual content.
+	 * @throws IOException Reading either of the content streams failed.
 	 */
-	public static void assertSameContent(InputStream pIn1, InputStream pIn2)
+	public static void assertSameContent(InputStream pExpect, InputStream pGot)
 			throws IOException {
 		long offset = 0;
 		for (;;) {
-			int b1 = pIn1.read();
-			int b2 = pIn2.read();
+			int b1 = pExpect.read();
+			int b2 = pGot.read();
 			assertEquals(String.valueOf(offset), b1, b2);
 			if (b1 == -1) {
 				break;
@@ -197,11 +202,13 @@ public class Tests {
 
 	/**
 	 * Asserts, that the given files, and the given stream, have the same content.
+	 * @param pExpect A {@link Path file}, which provides the expected content.
+	 * @param pGot An {@link InputStream}, which provides the actual content.
 	 */
-	public static void assertSameContent(Path pSrcFile, InputStream pIn) {
-		try (InputStream is = Files.newInputStream(pSrcFile);
+	public static void assertSameContent(Path pExpect, InputStream pGot) {
+		try (InputStream is = Files.newInputStream(pExpect);
 			 BufferedInputStream bis = new BufferedInputStream(is)) {
-			assertSameContent(bis, pIn);
+			assertSameContent(bis, pGot);
 		} catch (IOException e) {
 			throw Exceptions.show(e);
 		}

@@ -226,7 +226,7 @@ public class Sax {
 	 * @param pLoc The object providing the location information. If there is no such object
 	 *   (the value is null), then the message string will be returned, as it is.
 	 * @param pMsg The message string, which is being augmented with location information.
-	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 * @return A string in the format "At &lt;LOCATION_INFORMATION&gt;: &lt;MESSAGE&gt;", if location
 	 *   information is provided. Otherwise, returns the message string, as it is.
 	 */
 	public static String asLocalizedMessage(Locator pLoc, String pMsg) {
@@ -243,7 +243,7 @@ public class Sax {
 	 * @param pSystemId System id of the location information (if available), or null.
 	 * @param pLineNumber Line number of the location information (if available), or -1.
 	 * @param pColumnNumber Column number of the location information (if available), or -1
-	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 * @return A string in the format "At &lt;LOCATION_INFORMATION&gt;: &lt;MESSAGE&gt;", if location
 	 *   information is provided. Otherwise, returns the message string, as it is.
 	 */
 	public static String asLocalizedMessage(String pMsg, String pSystemId, int pLineNumber, int pColumnNumber) {

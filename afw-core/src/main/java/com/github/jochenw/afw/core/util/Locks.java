@@ -34,9 +34,10 @@ public class Locks {
 		 * The call is performed, while still holding the lock. Guarantees, that
 		 * the write lock is released afterwards.
 		 * @return The result object, which has been returned by the callable.
+		 * @param <O> The result type (of the callable, and this method)
 		 * @param pCallable The {@link FailableCallable} to call.
 		 */
-		public <O,T> O callReadLocked(FailableCallable<O,?> pCallable) {
+		public <O> O callReadLocked(FailableCallable<O,?> pCallable) {
 			return callLocked(() -> stampedLock.readLock(), pCallable);
 		}
 		/**
@@ -45,9 +46,10 @@ public class Locks {
 		 * The call is performed, while still holding the lock. Guarantees, that
 		 * the write lock is released afterwards.
 		 * @return The result object, which has been returned by the callable.
+		 * @param <O> The result type (of the callable, and this method)
 		 * @param pCallable The {@link FailableCallable} to call.
 		 */
-		public <O,T> O callWriteLocked(FailableCallable<O,?> pCallable) {
+		public <O> O callWriteLocked(FailableCallable<O,?> pCallable) {
 			return callLocked(() -> stampedLock.writeLock(), pCallable);
 		}
 		/**
@@ -80,6 +82,8 @@ public class Locks {
 		 * result.
 		 * @return The result object, which has been returned
 		 *   by calling the callable.
+		 * @param <O> The return type (of the callable, and
+		 *   of this method).
 		 * @param pCallable The callable being called.
 		 * @param pSupplier The supplier, which creates the lock.
 		 */
@@ -127,8 +131,11 @@ public class Locks {
 		 * still holding the lock. Guarantees, that the lock
 		 * is released afterwards.
 		 * Returns the callables result.
+		 * @param <O> The return type (both of the callable, and the method).
 		 * @param pCallable The callable being called.
 		 * @param pSupplier The supplier, which creates the lock.
+		 * @return The result object, which has been obtained by
+		 *   invoking the callable.
 		 */
 		protected <O> O callLocked(FailableLongSupplier<?> pSupplier, FailableCallable<O,?> pCallable) {
 			Long lock = null;
@@ -207,6 +214,7 @@ public class Locks {
 	 * result.
 	 * @return The result object, which has been
 	 *   returned by the callable.
+	 * @param <O> The result type (both, of the callable, and this method)
 	 * @param pCallable The callable being called.
 	 * @param pSupplier The supplier, which creates the lock.
 	 */

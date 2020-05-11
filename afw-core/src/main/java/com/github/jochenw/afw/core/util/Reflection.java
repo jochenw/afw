@@ -332,7 +332,7 @@ public class Reflection {
 	/** Returns a setter for the given property name in the given class, if
 	 * such a setter exists. Otherwise, returns null. 
 	 * @param pClass The class, in which to search for setters.
-	 * @param pProperty
+	 * @param pProperty The property name, for which a public setter is being searched.
 	 * @return A public setter with the given property name.
 	 */
 	public static Method getPublicSetter(Class<? extends Object> pClass, String pProperty) {

@@ -87,12 +87,12 @@ public class BeanWalker {
 				                 Consumer<Object> pConsumer);
 		/** Called, when a complex field has been detected.
 		 * @param pContext The context object.
-		 * @param pBean
+		 * @param pBean The bean, which is about to be visited.
 		 */
 		void startVisiting(C pContext, Object pBean);
 		/** Called, when a complex field has been detected, and iterated over.
 		 * @param pContext The context object.
-		 * @param pBean
+		 * @param pBean The bean, which has been visited.
 		 */
 		void endVisiting(C pContext, Object pBean);
 	}

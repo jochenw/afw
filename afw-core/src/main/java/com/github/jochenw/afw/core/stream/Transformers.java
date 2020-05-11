@@ -30,7 +30,8 @@ public class Transformers {
 	/**
 	 * Creates a new {@link TransformerHandler} with default settings, and the given
 	 * {@link Result}.
-	 * <p>Example: Consider the following snippet:
+	 * 
+	 * Example: Consider the following snippet:
 	 * <pre>
 	 *   OutputStream out;
 	 *   final TransformerHandler th = Transformers.newTransformerHandler(
@@ -45,7 +46,8 @@ public class Transformers {
 	 *   Transformer t = th.getTransformer();
 	 *   th.setResult(new StreamResult(out));
 	 * </pre>
-	 * </p>
+	 *
+	 * @param pResult The created transformer handlers {@link Result}.
 	 * @return The newly created {@link TransformerHandler}, which has default settings,
 	 * and the given {@link Result}.
 	 */
@@ -62,7 +64,8 @@ public class Transformers {
 	/**
 	 * <p>Creates a new {@link TransformerHandler} with the given output properties,
 	 * and the given {@link Result}.</p>
-	 * <p>Example: Consider the following snippet:
+	 * 
+	 * Example: Consider the following snippet:
 	 * <pre>
 	 *   OutputStream out;
 	 *   final TransformerHandler th = Transformers.newTransformerHandler(
@@ -80,7 +83,7 @@ public class Transformers {
 	 *   t.setOutputProperty(OutputKeys.INDENT, "yes");
 	 *   t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 	 * </pre>
-	 * </p>
+	 *
 	 * @param pResult The result, to which the transformer handlers output is being
 	 * written.
 	 * @param pOutputProperties An array of name/value pairs, which are being

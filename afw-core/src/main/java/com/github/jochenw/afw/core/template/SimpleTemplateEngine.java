@@ -33,7 +33,7 @@ public class SimpleTemplateEngine implements ITemplateEngine<Map<String,Object>>
 	 * Creates a new instance with the given {@link PropertyResolver}, and the given
 	 * {@link ElEvaluator}.
 	 * @param pPropertyResolver The property resolver to use for 
-	 * @param pEvaluator
+	 * @param pEvaluator The evaluator, which is being used to resolve property values.
 	 */
 	public SimpleTemplateEngine(PropertyResolver pPropertyResolver, ElEvaluator pEvaluator) {
 		propertyResolver = pPropertyResolver;

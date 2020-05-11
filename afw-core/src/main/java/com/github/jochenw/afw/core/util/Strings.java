@@ -108,7 +108,7 @@ public class Strings {
 
     /** Converts the given object to a string, using the
      * {@link Object#toString()} method.
-     * @param pArg
+     * @param pArg The object to convert into a string.
      * @return The converted object.
      * @see #append(Appendable, Object)
      */
@@ -379,6 +379,19 @@ public class Strings {
 	 * Writes the given format string to the given appendable. The format string may
 	 * contain curly brace tokens "{}", which are being replaced by the respective
 	 * argument object.
+	 * 
+	 * Example:
+	 * <pre>
+	 *   final StringBuilder sb = new StringBuilder();
+	 *   Strings.formatCb(sb, "Writing to {} failed with the following error: {}.",
+	 *                    "myfile", "Out of disk space.");
+	 *   // -&gt; Writing to myfile failed with the following error: Out of disk space.
+	 * </pre>
+	 *     
+	 * @param pAppendable The appendable, to which text is being written.
+	 * @param pMsg The format string.
+	 * @param pArgs The arguments, which are being written.
+	 * @throws IOException Appending to the {@link Appendable appendable} failed.
 	 */
 	public static void formatCb(@Nonnull Appendable pAppendable, @Nonnull String pMsg, @Nullable Object... pArgs) throws IOException {
 		int argOffset = 0;
@@ -435,6 +448,7 @@ public class Strings {
 	 * Formats the given number with leading zeroes.
 	 * @param pItem The number being formatted.
 	 * @param pTotal The number of items.
+	 * @return The number {@code pItem}, possibly prepended with leading zeroes.
 	 */
 	public static @Nonnull String formatLz(int pItem, int pTotal) {
 		Integer item = Integer.valueOf(pItem);

@@ -72,7 +72,7 @@ public class XmlStreamWriter extends AbstractStreamWriter {
 
 	/** <p>XML specific method for writing. This is internally used by
 	 * {@link #write(OutputStream, Object)}, and {@link #write(Writer, Object)}.</p>
-	 * <em>Note:</em< This method doesn't emit any of the events
+	 * <em>Note:</em> This method doesn't emit any of the events
 	 * {@link ContentHandler#startDocument()}, {@link ContentHandler#endDocument()},
 	 * {@link ContentHandler#startPrefixMapping(String, String)}, or
 	 * {@link ContentHandler#endPrefixMapping(String)}. Doing that is the callers

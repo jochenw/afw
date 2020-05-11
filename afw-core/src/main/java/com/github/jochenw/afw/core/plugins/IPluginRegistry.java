@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
  *   //  Jar files, which contribute to the plugin system are supposed to contain this file:
  *   final String pluginUri = "META-INF/plugins/my-plugin-list.xml";
  *   final ClassLoader cl = Thread.currentThread.getContextClassLoader();
- *   final List<Initializer> initializers = PluginListParser.parseAndSort(pluginUri, cl);
+ *   final List&lt;Initializer&gt; initializers = PluginListParser.parseAndSort(pluginUri, cl);
  *   for (Initializer init : initializers) {
  *       init.accept(pluginRegistry);
  *   }

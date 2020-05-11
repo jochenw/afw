@@ -18,7 +18,7 @@ import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
  * not to throw Exceptions, at least not checked Exceptions, aka instances
  * of {@link Exception}. This enforces the use of constructs like
  * <pre>
- *     Consumer<java.lang.reflect.Method> consumer = (m) -> {
+ *     Consumer&lt;java.lang.reflect.Method&gt; consumer = (m) -&gt; {
  *         try {
  *             m.invoke(o, args);
  *         } catch (Throwable t) {
@@ -29,7 +29,7 @@ import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
  * </pre>
  * Using a {@link FailableStream}, this can be rewritten as follows:
  * <pre>
- *     Streams.failable(stream).forEach((m) -> m.invoke(o, args));
+ *     Streams.failable(stream).forEach((m) -&gt; m.invoke(o, args));
  * </pre>
  * Obviously, the second version is much more concise and the spirit of
  * Lambda expressions is met better than in the first version.
@@ -37,7 +37,7 @@ import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
 public class ObjectStreams {
 	/** A reduced, and simplified version of a {@link Stream} with
 	 * failable method signatures.
-	 * @param <O>
+	 * @param <O> The streams element type.
 	 */
 	public static class FailableStream<O extends Object> {
 		private Stream<O> stream;
@@ -55,7 +55,7 @@ public class ObjectStreams {
 	     * Returns a FailableStream consisting of the elements of this stream that match
 	     * the given FailablePredicate.
 	     *
-	     * <p>This is an intermediate operation</a>.
+	     * This is an intermediate operation.
 	     *
 	     * @param pPredicate a non-interfering, stateless predicate to apply to each
 	     * element to determine if it should be included.
@@ -75,7 +75,7 @@ public class ObjectStreams {
 	    /**
 	     * Performs an action for each element of this stream.
 	     *
-	     * <p>This is a terminal operation</a>.
+	     * This is a terminal operation.
 	     *
 	     * <p>The behavior of this operation is explicitly nondeterministic.
 	     * For parallel stream pipelines, this operation does <em>not</em>
@@ -113,20 +113,20 @@ public class ObjectStreams {
 	     * collection strategies and composition of collect operations such as
 	     * multiple-level grouping or partitioning.
 	     *
-	     * <p>If the underlying stream is parallel, and the {@code Collector}
+	     * If the underlying stream is parallel, and the {@code Collector}
 	     * is concurrent, and either the stream is unordered or the collector is
 	     * unordered, then a concurrent reduction will be performed
 	     * (see {@link Collector} for details on concurrent reduction.)
 	     *
-	     * <p>This is a terminal operation.
+	     * This is a terminal operation.
 	     *
-	     * <p>When executed in parallel, multiple intermediate results may be
+	     * When executed in parallel, multiple intermediate results may be
 	     * instantiated, populated, and merged so as to maintain isolation of
 	     * mutable data structures.  Therefore, even when executed in parallel
 	     * with non-thread-safe data structures (such as {@code ArrayList}), no
 	     * additional synchronization is needed for a parallel reduction.
 	     *
-	     * @apiNote
+	     * <em>Note:</em>
 	     * The following will accumulate strings into an ArrayList:
 	     * <pre>{@code
 	     *     List<String> asList = stringStream.collect(Collectors.toList());
@@ -175,7 +175,8 @@ public class ObjectStreams {
 	     *
 	     * <p>This is a terminal operation.
 	     *
-	     * @apiNote There are many existing classes in the JDK whose signatures are
+	     * <em>Note:</em>
+	     * There are many existing classes in the JDK whose signatures are
 	     * well-suited for use with method references as arguments to {@code collect()}.
 	     * For example, the following will accumulate strings into an {@code ArrayList}:
 	     * <pre>{@code
@@ -202,7 +203,7 @@ public class ObjectStreams {
 	     *   accumulator function
 	     * @return The result of the reduction
 	     */
-		public <A,R> R collect(Supplier<R> pSupplier, BiConsumer<R,? super O> pAccumulator, BiConsumer<R,R> pCombiner) {
+		public <R> R collect(Supplier<R> pSupplier, BiConsumer<R,? super O> pAccumulator, BiConsumer<R,R> pCombiner) {
 			makeTerminated();
 			return stream().collect(pSupplier, pAccumulator, pCombiner);
 		}
@@ -225,9 +226,10 @@ public class ObjectStreams {
 	     * {@code accumulator.apply(identity, t)} is equal to {@code t}.
 	     * The {@code accumulator} function must be an associative function.
 	     *
-	     * <p>This is a terminal operation.
+	     * This is a terminal operation.
 	     *
-	     * @apiNote Sum, min, max, average, and string concatenation are all special
+	     * <em>Note:</em>
+	     * Sum, min, max, average, and string concatenation are all special
 	     * cases of reduction. Summing a stream of numbers can be expressed as:
 	     *
 	     * <pre>{@code
@@ -240,7 +242,7 @@ public class ObjectStreams {
 	     *     Integer sum = integers.reduce(0, Integer::sum);
 	     * }</pre>
 	     *
-	     * <p>While this may seem a more roundabout way to perform an aggregation
+	     * While this may seem a more roundabout way to perform an aggregation
 	     * compared to simply mutating a running total in a loop, reduction
 	     * operations parallelize more gracefully, without needing additional
 	     * synchronization and with greatly reduced risk of data races.
@@ -291,7 +293,7 @@ public class ObjectStreams {
 	     *
 	     * <p>This is a short-circuiting terminal operation.
 	     *
-	     * @apiNote
+	     * <em>Note:</em>
 	     * This method evaluates the <em>universal quantification</em> of the
 	     * predicate over the elements of the stream (for all x P(x)).  If the
 	     * stream is empty, the quantification is said to be <em>vacuously
@@ -318,9 +320,9 @@ public class ObjectStreams {
 	     * necessary for determining the result.  If the stream is empty then
 	     * {@code false} is returned and the predicate is not evaluated.
 	     *
-	     * <p>This is a short-circuiting terminal operation</a>.
+	     * This is a short-circuiting terminal operation.
 	     *
-	     * @apiNote
+	     * <em>Note:</em>
 	     * This method evaluates the <em>existential quantification</em> of the
 	     * predicate over the elements of the stream (for some x P(x)).
 	     *

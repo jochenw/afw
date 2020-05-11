@@ -297,7 +297,7 @@ public class Functions {
 		public O get() throws T;
 	}
 
-	/** Failable version of {@link Supplier Supplier<Integer>}.
+	/** Failable version of {@link Supplier Supplier&lt;Integer&gt;}.
 	 * @param <T> The exception type being thrown by the supplier.
 	 */
 	@FunctionalInterface
@@ -310,7 +310,7 @@ public class Functions {
 		public int get() throws T;
 	}
 
-	/** Failable version of {@link Supplier Supplier<Long>}.
+	/** Failable version of {@link Supplier Supplier&lt;Long&gt;}.
 	 * @param <T> The exception type being thrown by the supplier.
 	 */
 	@FunctionalInterface
@@ -353,6 +353,9 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableCallable} into a standard {@link Callable}.
+	 * @param <O> The callables return type (both callables, and the parameter).
+	 * @param pCallable The callable to convert.
+	 * @return A proxy callable, which is implemented by invoking {@code pCallable}.
 	 */
 	public static <O extends Object> Callable<O> asCallable(FailableCallable<O,?> pCallable) {
 		return () -> {
@@ -369,7 +372,7 @@ public class Functions {
 	 * Rethrows checked exceptions, if necessary.
 	 * @param pCallable The {@link FailableCallable} to execute.
 	 * @return The result object, which has been returned by invoking the callable.
-	 * @param <O> The callables return type.
+	 * @param <O> The return type (both the callables, and this methods).
 	 * @param <T> The exception type, which may be thrown by the callable.
 	 */
 	public static <O, T extends Throwable> O call(FailableCallable<O,T> pCallable) {
@@ -382,6 +385,12 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableFunction} into a standard {@link Function}.
+	 * @param <I> The functions input type (both functions, the parameter, and
+	 *   the result).
+	 * @param <O> The functions output type (both functions, the parameter, and
+	 *   the result).
+	 * @param pFunction The failable function to convert.
+	 * @return A proxy function, which is implemented by invking {@code pFunction}.
 	 */
 	public static <I,O> Function<I,O> asFunction(FailableFunction<I,O,?> pFunction) {
 		return (pInput) -> {
@@ -534,6 +543,12 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableBiConsumer} into a standard {@link BiConsumer}.
+	 * @param <I1> The biconsumer's first input type (both the parameter consumer,
+	 *   and the result consumer).
+	 * @param <I2> The biconsumer's second input type (both the parameter consumer,
+	 *   and the result consumer).
+	 * @param pConsumer The failable consumer to convert.
+	 * @return A proxy biconsumer, which is implemented by invoking {@code pConsumer}.
 	 */
 	public static <I1,I2> BiConsumer<I1,I2> asConsumer(FailableBiConsumer<I1,I2,?> pConsumer) {
 		return asBiConsumer(pConsumer);
@@ -541,6 +556,12 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableBiConsumer} into a standard {@link BiConsumer}.
+	 * @param <I1> The biconsumer's first input type (both the parameter consumer,
+	 *   and the result consumer).
+	 * @param <I2> The biconsumer's second input type (both the parameter consumer,
+	 *   and the result consumer).
+	 * @param pConsumer The failable consumer to convert.
+	 * @return A proxy biconsumer, which is implemented by invoking {@code pConsumer}.
 	 */
 	public static <I1,I2> BiConsumer<I1,I2> asBiConsumer(FailableBiConsumer<I1,I2,?> pConsumer) {
 		return (pInput1, pInput2) -> {
@@ -570,7 +591,7 @@ public class Functions {
 		}
 	}
 
-        /** Makes the given {@link FailableBiIntConsumer} accept the given parameters.
+    /** Makes the given {@link FailableBiIntConsumer} accept the given parameters.
 	 * Rethrows checked exceptions, if necessary.
 	 * @param pBiIntConsumer The {@link FailableBiIntConsumer}, which is to accept the objects.
 	 * @param pInt The first parameter being consumed, a primitive integer.
@@ -587,7 +608,7 @@ public class Functions {
 	    }
 	}
 
-        /** Makes the given {@link FailableBiIntConsumer} accept the given parameters.
+    /** Makes the given {@link FailableBiIntConsumer} accept the given parameters.
 	 * Rethrows checked exceptions, if necessary.
 	 * @param pBiLongConsumer The {@link FailableBiLongConsumer}, which is to accept the objects.
 	 * @param pLong The first parameter being consumed, a primitive long.
@@ -606,6 +627,10 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailablePredicate} into a standard {@link Predicate}.
+	 * @param <I> The predicates input type (both, the parameter predicate, and the
+	 *   result)
+	 * @param pPredicate The failable predicate to convert.
+	 * @return A proxy predicate, which is implemented by invoking {@code pPredicate}.
 	 */
 	public static <I> Predicate<I> asPredicate(FailablePredicate<I,?> pPredicate) {
 		return (pInput) -> {
@@ -668,6 +693,12 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableBiPredicate} into a standard {@link BiPredicate}.
+	 * @param <I1> The bipredicate's first input type (both the parameter,
+	 *   and the result predicate).
+	 * @param <I2> The bipredicate's second input type (both the parameter,
+	 *   and the result predicate).
+	 * @param pPredicate The failable predicate to convert.
+	 * @return A bipredicate, which is implemented by invoking {@code pPredicate}.
 	 */
 	public static <I1,I2> BiPredicate<I1,I2> asBiPredicate(FailableBiPredicate<I1,I2,?> pPredicate) {
 		return (pInput1, pInput2) -> {
@@ -736,6 +767,10 @@ public class Functions {
 
 	/**
 	 * Converts the given {@link FailableSupplier} into a standard {@link Supplier}.
+	 * @param pSupplier The failable supplier to convert.
+	 * @param <O> The suppliers return type (both the parameter, and the result
+	 *   supplier)
+	 * @return A supplier, which is implemented by invoking {@code pSupplier}.
 	 */
 	public static <O> Supplier<O> asSupplier(FailableSupplier<O,?> pSupplier) {
 		return () -> {

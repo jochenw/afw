@@ -34,9 +34,9 @@ public class Stax {
 		 * @param pLevel The number of nested parent elements, counting from the invocation of
 		 *    {@link Stax#skipElement(XMLStreamReader, ElementListener)}.
 		 * @param pNamespaceUri The elements namespace URI.
-		 * @param pLocalName
-		 * @return The 
-		 * @throws XMLStreamException
+		 * @param pLocalName The elements local name.
+		 * @return An action object, which instructs the parser on how to proceed with the current element.
+		 * @throws XMLStreamException Processing the event failed.
 		 */
 		ElementAction element(XMLStreamReader pReader, int pLevel, String pNamespaceUri, String pLocalName) throws XMLStreamException;
 	}
@@ -46,7 +46,7 @@ public class Stax {
 	 * @param pLoc The object providing the location information. If there is no such object
 	 *   (the value is null), then the message string will be returned, as it is.
 	 * @param pMsg The message string, which is being augmented with location information.
-	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 * @return A string in the format "At &lt;LOCATION_INFORMATION&gt;: &lt;MESSAGE&gt;", if location
 	 *   information is provided. Otherwise, returns the message string, as it is.
 	 */
 	public static String asLocalizedMessage(Location pLoc, String pMsg) {
@@ -61,7 +61,7 @@ public class Stax {
 	 * Returns a string, which describes the given location.
 	 * @param pLoc The object providing the location information. If this parameter is null,
 	 *   then the words "Unknown location" will be returned.
-	 * @return A string in the format "<LOCATION_INFORMATION>", if location
+	 * @return A string in the format "&lt;LOCATION_INFORMATION&gt;", if location
 	 *   information is provided. Otherwise, the words "Unknown location".
 	 */
 	public static String asLocation(Location pLoc) {
@@ -78,7 +78,7 @@ public class Stax {
 	 * @param pSystemId System id of the location information (if available), or null.
 	 * @param pLineNumber Line number of the location information (if available), or -1.
 	 * @param pColumnNumber Column number of the location information (if available), or -1
-	 * @return A string in the format "At <LOCATION_INFORMATION>: <MESSAGE>", if location
+	 * @return A string in the format "At &lt;LOCATION_INFORMATION&gt;: &lt;MESSAGE&gt;", if location
 	 *   information is provided. Otherwise, returns the message string, as it is.
 	 */
 	public static String asLocalizedMessage(String pMsg, String pSystemId, int pLineNumber, int pColumnNumber) {
@@ -114,7 +114,7 @@ public class Stax {
 	 * @param pSystemId System id of the location information (if available), or null.
 	 * @param pLineNumber Line number of the location information (if available), or -1.
 	 * @param pColumnNumber Column number of the location information (if available), or -1
-	 * @return A string in the format "<LOCATION_INFORMATION>", if location
+	 * @return A string in the format "&lt;LOCATION_INFORMATION&gt;", if location
 	 *   information is provided. Otherwise, returns the words "Unknown location".
 	 */
 	public static String asLocation(String pSystemId, int pLineNumber, int pColumnNumber) {
@@ -367,9 +367,9 @@ public class Stax {
 	
 	/**
 	 * Reads, and returns the current elements text content.
-	 * @param pReader
+	 * @param pReader The pull parser, which is being used.
 	 * @return The current elements text content.
-	 * @throws XMLStreamException
+	 * @throws XMLStreamException Reading the element text failed.
 	 */
 	public static String getElementText(XMLStreamReader pReader) throws XMLStreamException {
 		final String uri = Objects.notNull(pReader.getNamespaceURI(), "");

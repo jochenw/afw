@@ -182,6 +182,9 @@ public class DefaultObjectComparator implements IObjectComparator {
 	/**
 	 * Tests, whether the given objects are equal. The caller must ensure, that both objects
 	 * are non-null, and atomic.
+	 * @param pExpectedObject The expected object.
+	 * @param pActualObject The actual object
+	 * @return True, if the objects are considered equal, otherwise false.
 	 */
 	protected boolean isEqual(Object pExpectedObject, Object pActualObject) {
 		return pExpectedObject.equals(pActualObject);
