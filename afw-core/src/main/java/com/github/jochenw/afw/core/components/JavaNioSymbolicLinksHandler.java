@@ -16,7 +16,7 @@ public class JavaNioSymbolicLinksHandler implements ISymbolicLinksHandler {
 	@Override
 	public void createDirectoryLink(Path pTarget, Path pLink) {
 		try {
-			Files.createSymbolicLink(pLink, pTarget);
+			Files.createSymbolicLink(pLink, pTarget.toAbsolutePath());
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
@@ -25,7 +25,7 @@ public class JavaNioSymbolicLinksHandler implements ISymbolicLinksHandler {
 	@Override
 	public void createFileLink(Path pTarget, Path pLink) throws UnsupportedOperationException {
 		try {
-			Files.createSymbolicLink(pLink, pTarget);
+			Files.createSymbolicLink(pLink, pTarget.toAbsolutePath());
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
