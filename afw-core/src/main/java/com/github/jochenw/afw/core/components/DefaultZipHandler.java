@@ -50,7 +50,7 @@ public class DefaultZipHandler implements IZipFileHandler {
 			final ZipOutputStream zout = zos;
 			Files.walkFileTree(pSourceDir, new AbstractFileVisitor(pBaseDirIncludedInPath) {
 				@Override
-				protected void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
+				public void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
 					final ZipEntry ze = new ZipEntry(pPath);
 					ze.setCreationTime(pAttrs.creationTime());
 					ze.setLastModifiedTime(pAttrs.lastModifiedTime());
