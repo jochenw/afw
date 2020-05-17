@@ -89,6 +89,7 @@
                 <failOnWarnings>false</failOnWarnings>
                 <failOnError>true</failOnError>
                 <excludePackageNames>com.github.jochenw.afw.core.el.jcc</excludePackageNames>
+                <source>8</source>
             </configuration>
         </plugin>
       </plugins>
