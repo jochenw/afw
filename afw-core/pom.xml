@@ -86,8 +86,9 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>3.2.0</version>
             <configuration>
-                <failOnWarnings>true</failOnWarnings>
+                <failOnWarnings>false</failOnWarnings>
                 <failOnError>true</failOnError>
+                <excludePackageNames>com.github.jochenw.afw.core.el.jcc</excludePackageNames>
             </configuration>
         </plugin>
       </plugins>
