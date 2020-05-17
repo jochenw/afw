@@ -97,7 +97,7 @@ public class DefaultZipHandlerTest {
 		zfh.extractZipFile(workDir, zipFile);
 		final AbstractFileVisitor fv = new AbstractFileVisitor(true) {
 			@Override
-			protected void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
+			public void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
 				final Path srcFile = Paths.get(pPath);
 				final Path targetFile = workDir.resolve(pPath);
 				assertTrue(Files.isRegularFile(srcFile));
@@ -106,7 +106,7 @@ public class DefaultZipHandlerTest {
 			}
 			
 			@Override
-			protected void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {
+			public void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {
 				final Path srcDir = Paths.get(pPath);
 				final Path targetDir = workDir.resolve(pPath);
 				assertTrue(srcDir.toString(), Files.isDirectory(srcDir));

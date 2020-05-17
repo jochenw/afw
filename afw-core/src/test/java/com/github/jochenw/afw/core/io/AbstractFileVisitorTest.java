@@ -44,7 +44,7 @@ public class AbstractFileVisitorTest {
 		final List<String> rejectedNames = expectedFiles();
 		final FileVisitor<Path> fv = new AbstractFileVisitor(true) {
 			@Override
-			protected void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
+			public void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
 				if (rejectedNames.contains(pPath)) {
 					throw new IllegalStateException("Unexpected name: " + pPath);
 				}
@@ -52,7 +52,7 @@ public class AbstractFileVisitorTest {
 			}
 			
 			@Override
-			protected void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {
+			public void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {
 				// Do nothing
 			}
 		};
@@ -66,7 +66,7 @@ public class AbstractFileVisitorTest {
 		final List<String> expectedNames = expectedFiles();
 		final FileVisitor<Path> fv = new AbstractFileVisitor(false) {
 			@Override
-			protected void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
+			public void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException {
 				if (rejectedNames.contains(pPath)) {
 					throw new IllegalStateException("Unexpected name: " + pPath);
 				}
@@ -74,7 +74,7 @@ public class AbstractFileVisitorTest {
 			}
 			
 			@Override
-			protected void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {
+			public void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {
 				// Do nothing
 			}
 		};
