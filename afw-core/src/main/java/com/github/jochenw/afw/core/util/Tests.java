@@ -81,6 +81,13 @@ public class Tests {
 		}
 	}
 
+	public static void assertEquals(byte[] pExpect, byte[] pGot) {
+		assertEquals(pExpect.length, pGot.length);
+		for (int i = 0;  i < pExpect.length;  i++) {
+			assertEquals(pExpect[i], pGot[i]);
+		}
+	}
+
 	public static void assertEquals(Object pExpect, Object pGot) {
 		if (!pExpect.equals(pGot)) {
 			fail("Assertion failed, expected " + pExpect + ", got " + pGot);

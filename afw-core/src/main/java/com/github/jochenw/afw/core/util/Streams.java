@@ -15,7 +15,10 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
 import java.io.FilterReader;
@@ -25,7 +28,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
+
+import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 
 /**
@@ -274,4 +286,59 @@ public class Streams {
 			}
         };
     }
+
+    /** Opens an {@link InputStream} for reading the given {@link URL},
+     * and passes that {@link InputStream} to the given {@link Consumer}.
+     * @param pUrl The {@link URL} to read.
+     * @param pConsumer A {@link FailableConsumer}, which is being invoked with
+     *   the opened {@link InputStream} as the parameter. The {@link
+     *   InputStream} will be closed automatically afterwards.
+     * @throws UncheckedIOException An error occurred, while opening
+     *   the {@link URL}, or reading the {@link InputStream}.
+     */
+    public static void accept(@Nonnull URL pUrl, @Nonnull FailableConsumer<InputStream,IOException> pConsumer) {
+    	try (InputStream in = pUrl.openStream();
+    		 BufferedInputStream bin = new BufferedInputStream(in)) {
+    		pConsumer.accept(in);
+    	} catch (IOException e) {
+    		throw new UncheckedIOException(e);
+    	}
+    }
+   
+    /** Opens an {@link InputStream} for reading the given {@link Path file},
+     * and passes that {@link InputStream} to the given {@link Consumer}.
+     * @param pFile The {@link Path file} to read.
+     * @param pConsumer A {@link FailableConsumer}, which is being invoked with
+     *   the opened {@link InputStream} as the parameter. The {@link
+     *   InputStream} will be closed automatically afterwards.
+     * @throws UncheckedIOException An error occurred, while opening
+     *   the {@link URL}, or reading the {@link InputStream}.
+     */
+    public static void accept(@Nonnull Path pFile, @Nonnull FailableConsumer<InputStream,IOException> pConsumer) {
+    	try (InputStream in = Files.newInputStream(pFile);
+    		 BufferedInputStream bin = new BufferedInputStream(in)) {
+    		pConsumer.accept(bin);
+    	} catch (IOException e) {
+    		throw new UncheckedIOException(e);
+    	}
+    }
+
+    /** Opens an {@link InputStream} for reading the given {@link File file},
+     * and passes that {@link InputStream} to the given {@link Consumer}.
+     * @param pFile The {@link File file} to read.
+     * @param pConsumer A {@link FailableConsumer}, which is being invoked with
+     *   the opened {@link InputStream} as the parameter. The {@link
+     *   InputStream} will be closed automatically afterwards.
+     * @throws UncheckedIOException An error occurred, while opening
+     *   the {@link URL}, or reading the {@link InputStream}.
+     */
+    public static void accept(@Nonnull File pFile, @Nonnull FailableConsumer<InputStream,IOException> pConsumer) {
+    	try (InputStream in = new FileInputStream(pFile);
+    		 BufferedInputStream bin = new BufferedInputStream(in)) {
+    		pConsumer.accept(bin);
+    	} catch (IOException e) {
+    		throw new UncheckedIOException(e);
+    	}
+    }
+
 }
