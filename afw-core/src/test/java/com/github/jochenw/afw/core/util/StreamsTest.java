@@ -287,6 +287,6 @@ public class StreamsTest {
     public void testAcceptFileConsumer() {
     	final File file = new File("pom.xml");
     	assertTrue(file.isFile());
-    	Streams.accept(file, (in)-> Tests.assertSameContent(file.toPath(), in));
+    	Streams.accept(file, (in) -> Tests.assertSameContent(file.toPath(), in));
     }
 }
