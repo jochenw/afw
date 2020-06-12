@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
 
 /**
@@ -304,7 +305,7 @@ public class Streams {
     		throw new UncheckedIOException(e);
     	}
     }
-   
+
     /** Opens an {@link InputStream} for reading the given {@link Path file},
      * and passes that {@link InputStream} to the given {@link Consumer}.
      * @param pFile The {@link Path file} to read.
@@ -341,4 +342,58 @@ public class Streams {
     	}
     }
 
+    /** Opens an {@link InputStream} for reading the given {@link URL},
+     * and passes that {@link InputStream} to the given {@link FailableFunction}.
+     * @param pUrl The {@link URL} to read.
+     * @param pFunction A {@link FailableFunction}, which is being invoked with
+     *   the opened {@link InputStream} as the parameter. The {@link
+     *   InputStream} will be closed automatically afterwards. The functions
+     *   result is returned as the method result.
+     * @throws UncheckedIOException An error occurred, while opening
+     *   the {@link URL}, or reading the {@link InputStream}.
+     * @return The result of invoking {@code pFunction}.
+     */
+    public static <O> O apply(@Nonnull URL pUrl, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
+    	try (InputStream in = pUrl.openStream();
+    		 BufferedInputStream bin = new BufferedInputStream(in)) {
+    		return pFunction.apply(in);
+    	} catch (IOException e) {
+    		throw new UncheckedIOException(e);
+    	}
+    }
+
+    /** Opens an {@link InputStream} for reading the given {@link Path},
+     * and passes that {@link InputStream} to the given {@link FailableFunction}.
+     * @param pPath The {@link Path file} to read.
+     * @param pFunction A {@link FailableFunction}, which is being invoked with
+     *   the opened {@link InputStream} as the parameter. The {@link
+     *   InputStream} will be closed automatically afterwards. The functions
+     *   result is returned as the method result.
+     * @throws UncheckedIOException An error occurred, while opening
+     *   the {@link URL}, or reading the {@link InputStream}.
+     * @return The result of invoking {@code pFunction}.
+     */
+    public static <O> O apply(@Nonnull Path pPath, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
+    	try (InputStream in = Files.newInputStream(pPath);
+    		 BufferedInputStream bin = new BufferedInputStream(in)) {
+    		return pFunction.apply(in);
+    	} catch (IOException e) {
+    		throw new UncheckedIOException(e);
+    	}
+    }
+
+    /** Opens an {@link InputStream} for reading the given {@link File file},
+     * and passes that {@link InputStream} to the given {@link FailableFunction}.
+     * @param pFile The {@link File file} to read.
+     * @param pFunction A {@link FailableFunction}, which is being invoked with
+     *   the opened {@link InputStream} as the parameter. The {@link
+     *   InputStream} will be closed automatically afterwards. The functions
+     *   result is returned as the method result.
+     * @throws UncheckedIOException An error occurred, while opening
+     *   the {@link URL}, or reading the {@link InputStream}.
+     * @return The result of invoking {@code pFunction}.
+     */
+    public static <O> O apply(@Nonnull File pFile, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
+    	return apply(pFile.toPath(), pFunction);
+    }
 }

@@ -56,11 +56,13 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
     public DefaultPropertyFactory(Properties pFactoryProperties, Properties pInstanceProperties) {
     	final Function<Properties,Map<String,String>> mapCreator = (p) -> {
     		final Map<String,String> map = new HashMap<>();
-    		p.forEach((k,v) -> {
-    			if (k != null  &&  v != null) {
-    				map.put(k.toString(), v.toString());
-    			}
-    		});
+    		if (p != null) {
+    			p.forEach((k,v) -> {
+    				if (k != null  &&  v != null) {
+    					map.put(k.toString(), v.toString());
+    				}
+    			});
+    		}
     		return map;
     	};
     	propertyFactoryUrl = null;
