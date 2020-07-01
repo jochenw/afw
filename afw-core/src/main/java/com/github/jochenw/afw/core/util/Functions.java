@@ -59,7 +59,7 @@ public class Functions {
 		public void accept(T1 pObject1, T2 pObject2) throws T3;
 	}
 
-        /** Failable version of {@link BiConsumer}, where the first parameter is a primitive integer.
+    /** Failable version of {@link BiConsumer}, where the first parameter is a primitive integer.
 	 * @param <I> The first type being consumed.
 	 * @param <T> The exception type being thrown by the consumer.
 	 * @see BiConsumer
@@ -87,6 +87,21 @@ public class Functions {
 		 * @throws T The exception type being thrown by the consumer.
 		 */
 		public void accept(long pObject1, I pObject2) throws T;
+	}
+
+	/** Extended version of a {@link BiConsumer}, accepting three arguments.
+	 * @param <I1> First input parameters type.
+	 * @param <I2> Second input parameters type.
+	 * @param <I3> Third input parameters type.
+	 */
+	@FunctionalInterface
+	public interface TriConsumer<I1 extends Object, I2 extends Object, I3 extends Object> {
+		/** Called to process the input parameters.
+		 * @param pI1 The first input parameter.
+		 * @param pI2 The second input parameter.
+		 * @param pI3 The  input parameter.
+		 */
+		public void accept(I1 pI1, I2 pI2, I3 pI3);
 	}
 
 	/** Failable version of {@link Function}.

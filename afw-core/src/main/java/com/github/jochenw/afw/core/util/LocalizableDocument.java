@@ -44,12 +44,12 @@ import com.github.jochenw.afw.core.util.DomHelper.LocalizableException;
 public class LocalizableDocument {
 	private static final String KEY = Locator.class.getName();
 
-	private static class Handler implements ContentHandler {
+	public static class Handler implements ContentHandler {
 		private final Document nodeFactory;
 		private Node currentNode;
 		private Locator locator;
 
-		Handler(Document pDocument) {
+		public Handler(Document pDocument) {
 			nodeFactory = pDocument;
 		}
 
@@ -134,7 +134,7 @@ public class LocalizableDocument {
 	private final Document document;
 	private final DomHelper domHelper = new DomHelper();
 
-	private LocalizableDocument(Document pDocument) {
+	public LocalizableDocument(Document pDocument) {
 		document = pDocument;
 		domHelper.setLocationProvider((node) -> getLocator(node));
 		domHelper.setErrorHandler((loc,msg) -> new LocalizableException(loc,msg));
