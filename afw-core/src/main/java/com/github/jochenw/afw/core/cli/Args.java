@@ -3,9 +3,15 @@
  */
 package com.github.jochenw.afw.core.cli;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,6 +47,154 @@ public class Args {
 		 *   {@link #isValueAvailable()} to prevent this.
 		 */
 		public String getValue() throws ArgsException;
+		/** Returns the current options value. Invoking
+		 * this method is valid only within the
+		 * {@link Args.Listener#option(Context, String)}
+		 * method. Additionally, invoking this method
+		 * indicates, that it is an error, if this option
+		 * is being repeated.
+		 * @return The current options value.
+		 * @throws ArgsException No value is available. Use
+		 *   {@link #isValueAvailable()} to prevent this.
+		 */
+		public String getSingleValue() throws ArgsException;
+		/** Returns the current listener.
+		 * @return The current listener.
+		 */
+		public Args.Listener getListener();
+		/** Returns the current options value as a
+		 * {@link Path} object. Invoking
+		 * this method is valid only within the
+		 * {@link Args.Listener#option(Context, String)}
+		 * method.
+		 * @return The current options value.
+		 * @throws ArgsException No value is available. Use
+		 *   {@link #isValueAvailable()} to prevent this.
+		 */
+		public default Path getPathValue() throws ArgsException {
+			return Paths.get(getValue());
+		}
+		/** Returns the current options value as a
+		 * {@link Path} object. Invoking
+		 * this method is valid only within the
+		 * {@link Args.Listener#option(Context, String)}
+		 * method. Additionally, invoking this method
+		 * indicates, that it is an error, if this option
+		 * is being repeated.
+		 * @return The current options value.
+		 * @throws ArgsException No value is available. Use
+		 *   {@link #isValueAvailable()} to prevent this.
+		 */
+		public default Path getSinglePathValue() throws ArgsException {
+			return Paths.get(getSingleValue());
+		}
+		/** Returns the current options value as a
+		 * {@link Path} object. Invoking
+		 * this method is valid only within the
+		 * {@link Args.Listener#option(Context, String)}
+		 * method. Additionally, invoking this method
+		 * indicates, that it is an error, if this option
+		 * is being repeated.
+		 * @param pPredicate A predicate, which tests, whether
+		 * the option value is valid. If the predicate returns
+		 * false, then an {@link ArgsException} is thrown with
+		 * the given error message.
+		 * @param pMsg The error message, which is used if the
+		 * predicate returns false.
+		 * @return The current options value.
+		 * @throws ArgsException No value is available. Use
+		 *   {@link #isValueAvailable()} to prevent this.
+		 */
+		public default Path getSinglePathValue(Predicate<Path> pPredicate, String pMsg) throws ArgsException {
+			final Path p = getSinglePathValue();
+			if (!pPredicate.test(p)) {
+				final RuntimeException rte = getListener().error(pMsg);
+				if (rte == null) {
+					throw new ArgsException(pMsg);
+				} else {
+					throw rte;
+				}
+			}
+			return p;
+		}
+		/** Returns the current options value as an
+		 * integer number. Invoking
+		 * this method is valid only within the
+		 * {@link Args.Listener#option(Context, String)}
+		 * method.
+		 * @return The current options value.
+		 * @throws ArgsException No value is available. Use
+		 *   {@link #isValueAvailable()} to prevent this.
+		 */
+		public default int getIntValue() throws ArgsException {
+			final String v = getValue();
+			try {
+				return Integer.parseInt(v);
+			} catch (NumberFormatException e) {
+				final String msg = "Invalid argument for option " + getName() + ": Expected integer value, got " + v;
+				final RuntimeException rte = getListener().error(msg);
+				if (rte == null) {
+					throw new ArgsException(msg);
+				} else {
+					throw rte;
+				}
+			}
+		}
+		/** Returns the current options value as an
+		 * integer number. Invoking
+		 * this method is valid only within the
+		 * {@link Args.Listener#option(Context, String)}
+		 * method. Additionally, invoking this method
+		 * indicates, that it is an error, if this option
+		 * is being repeated.
+		 * @return The current options value.
+		 * @throws ArgsException No value is available. Use
+		 *   {@link #isValueAvailable()} to prevent this.
+		 */
+		public default int getSingleIntValue() throws ArgsException {
+			final String v = getSingleValue();
+			try {
+				return Integer.parseInt(v);
+			} catch (NumberFormatException e) {
+				final String msg = "Invalid argument for option " + getName() + ": Expected integer value, got " + v;
+				final RuntimeException rte = getListener().error(msg);
+				if (rte == null) {
+					throw new ArgsException(msg);
+				} else {
+					throw rte;
+				}
+			}
+		}
+		/** Returns the current options value as an
+		 * integer number. Invoking
+		 * this method is valid only within the
+		 * {@link Args.Listener#option(Context, String)}
+		 * method. Additionally, invoking this method
+		 * indicates, that it is an error, if this option
+		 * is being repeated.
+		 * @param pPredicate A predicate, which tests, whether
+		 * the option value is valid. If the predicate returns
+		 * false, then an {@link ArgsException} is thrown with
+		 * the given error message.
+		 * @param pMsg The error message, which is used if the
+		 * predicate returns false.
+		 * @return The current options value.
+		 * @throws ArgsException No value is available. Use
+		 *   {@link #isValueAvailable()} to prevent this.
+		 */
+		public default int getSingleIntValue(IntPredicate pPredicate, String pMsg) throws ArgsException {
+			final int i = getSingleIntValue();
+			if (!pPredicate.test(i)) {
+				final RuntimeException rte = getListener().error(pMsg);
+				if (rte == null) {
+					throw new ArgsException(pMsg);
+				} else {
+					throw rte;
+				}
+			}
+			return i;
+		}
+		
 		/** Returns the current options name. Invoking
 		 * this method is valid only within the
 		 * {@link Args.Listener#option(Context, String)}
@@ -77,10 +231,11 @@ public class Args {
 		private final @Nonnull List<String> args;
 		private String arg;
 		private String name;
+		private Set<String> singleOptionNames = new HashSet<>();
 
 		public ContextImpl(@Nonnull Listener pListener, @Nonnull List<String> pArgs) {
-			args = pArgs;
-			listener = pListener;
+			args = Objects.requireNonNull(pArgs, "Args");
+			listener = Objects.requireNonNull(pListener, "Listener");
 		}
 
 		@Override
@@ -131,6 +286,17 @@ public class Args {
 			} else {
 				return args.remove(0);
 			}
+		}
+
+		@Override
+		public String getSingleValue() throws ArgsException {
+			singleOptionNames.add(getName());
+			return getValue();
+		}
+
+		@Override
+		public Listener getListener() {
+			return listener;
 		}
 	}
 	
