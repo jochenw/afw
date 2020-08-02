@@ -264,7 +264,11 @@ public class Args {
 					return true;
 				}
 			}
-			return !args.isEmpty();
+			if (args.isEmpty()) {
+				return false;
+			}
+			final String v = args.get(0);
+			return v != null  &&  !v.startsWith("-");
 		}
 
 		@Override

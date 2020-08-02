@@ -69,6 +69,9 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
     	propertyUrl = null;
     	factoryProperties = new DatedProperties(mapCreator.apply(pFactoryProperties), 0l);
     	instanceProperties = new DatedProperties(mapCreator.apply(pInstanceProperties), 0l);
+    	myProperties = new HashMap<String,String>();
+    	myProperties.putAll(factoryProperties.properties);
+    	myProperties.putAll(instanceProperties.properties);
     }
 
     private void initProperties() {
