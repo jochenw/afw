@@ -167,6 +167,7 @@ public class StringsTest {
 
     /** Test case for {@link Strings#matcher(String)}.
      */
+    @Test
     public void testMatcher() {
     	final Predicate<String> fooMatcher = Strings.matcher("Foo");
     	assertTrue(fooMatcher.test("Foo"));
@@ -198,5 +199,31 @@ public class StringsTest {
     	assertTrue(reMatcherCaseInsensitive.test("abbbbbbC"));
     	assertTrue(reMatcherCaseInsensitive.test("aBC"));
     	assertFalse(reMatcherCaseInsensitive.test("abCd"));
+    }
+
+    /** Test case for {@link Strings#matchers(String,String)}.
+     */
+    @Test
+    public void testMatchers() {
+    	final Predicate<String> pred = Strings.matchers("Foo,Wm*,re:ab+C", ",");
+    	assertTrue(pred.test("Foo"));
+    	assertFalse(pred.test("foo"));
+    	assertTrue(pred.test("Wm"));
+    	assertTrue(pred.test("Wm10"));
+    	assertTrue(pred.test("WmRoot"));
+    	assertFalse(pred.test("wm"));
+    	assertTrue(pred.test("aC"));
+    	assertFalse(pred.test("ac"));
+    	assertFalse(pred.test("Bar"));
+    	final Predicate<String> predCi = Strings.matchers("Foo/i,Wm*/i,re:ab+C/i", ",");
+    	assertTrue(predCi.test("Foo"));
+    	assertTrue(predCi.test("foo"));
+    	assertTrue(predCi.test("Wm"));
+    	assertTrue(predCi.test("Wm10"));
+    	assertTrue(predCi.test("WmRoot"));
+    	assertTrue(predCi.test("wm"));
+    	assertTrue(predCi.test("aC"));
+    	assertTrue(predCi.test("ac"));
+    	assertFalse(predCi.test("Bar"));
     }
 }
