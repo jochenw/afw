@@ -190,12 +190,14 @@ public class StringsTest {
     	assertTrue(wmMatcherCaseInsensitive.test("wmFoo"));
     	assertTrue(wmMatcherCaseInsensitive.test("wM9"));
     	final Predicate<String> reMatcher = Strings.matcher("re:ab+C");
-    	assertTrue(reMatcher.test("aC"));
+    	assertFalse(reMatcher.test("aC"));
+    	assertTrue(reMatcher.test("abC"));
     	assertTrue(reMatcher.test("abbbbbbC"));
     	assertFalse(reMatcher.test("aBC"));
     	assertFalse(reMatcher.test("abCd"));
     	final Predicate<String> reMatcherCaseInsensitive = Strings.matcher("re:ab+C/i");
-    	assertTrue(reMatcherCaseInsensitive.test("aC"));
+    	assertFalse(reMatcherCaseInsensitive.test("aC"));
+    	assertTrue(reMatcherCaseInsensitive.test("aBC"));
     	assertTrue(reMatcherCaseInsensitive.test("abbbbbbC"));
     	assertTrue(reMatcherCaseInsensitive.test("aBC"));
     	assertFalse(reMatcherCaseInsensitive.test("abCd"));
@@ -212,7 +214,7 @@ public class StringsTest {
     	assertTrue(pred.test("Wm10"));
     	assertTrue(pred.test("WmRoot"));
     	assertFalse(pred.test("wm"));
-    	assertTrue(pred.test("aC"));
+    	assertTrue(pred.test("abC"));
     	assertFalse(pred.test("ac"));
     	assertFalse(pred.test("Bar"));
     	final Predicate<String> predCi = Strings.matchers("Foo/i,Wm*/i,re:ab+C/i", ",");
@@ -222,8 +224,10 @@ public class StringsTest {
     	assertTrue(predCi.test("Wm10"));
     	assertTrue(predCi.test("WmRoot"));
     	assertTrue(predCi.test("wm"));
-    	assertTrue(predCi.test("aC"));
-    	assertTrue(predCi.test("ac"));
+    	assertFalse(predCi.test("aC"));
+    	assertFalse(predCi.test("ac"));
+    	assertTrue(predCi.test("aBC"));
+    	assertTrue(predCi.test("abc"));
     	assertFalse(predCi.test("Bar"));
     }
 }

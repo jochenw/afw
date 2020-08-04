@@ -500,15 +500,17 @@ public class Strings {
 		}
 		final String patternStr;
 		if (matcher.startsWith("re:")) {
-			patternStr = matcher;
+			patternStr = matcher.substring("re:".length());
 		} else if (matcher.indexOf('*') != -1  ||  matcher.indexOf('?') != -1) {
 			final StringBuilder sb = new StringBuilder();
 			for (int i = 0;  i < matcher.length();  i++) {
 				final char c = matcher.charAt(i);
 				if ('*' == c) {
-					sb.append(".*");
+					sb.append(".*");					
 				} else if ('?' == c) {
 					sb.append(".");
+				} else if (Character.isLetterOrDigit(c)) {
+					sb.append(c);
 				} else {
 					sb.append("\\");
 					sb.append(c);
@@ -525,7 +527,7 @@ public class Strings {
 			}
 		}
 		final Pattern pattern;
-		if (patternStr.endsWith("/i")) {
+		if (caseInsensitive) {
 			pattern = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
 		} else {
 			pattern = Pattern.compile(patternStr);

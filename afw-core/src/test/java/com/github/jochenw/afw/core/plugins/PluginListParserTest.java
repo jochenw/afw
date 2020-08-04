@@ -97,10 +97,6 @@ public class PluginListParserTest {
 		final URL url = getClass().getResource("plugin-list-" + pVersion + ".xsd");
 		Assert.assertNotNull(url);
 		final Schema schema;
-		System.out.println("Reading schema: ");
-		try (InputStream in = url.openStream()) {
-			Streams.copy(in, System.out);
-		}
 		try (InputStream in = url.openStream()) {
 			final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			schema = schemaFactory.newSchema(newSource(in));
