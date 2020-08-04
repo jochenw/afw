@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -469,5 +471,104 @@ public class Strings {
 		} else {
 			return String.format("%d", item);
 		}
+	}
+
+	/** Creates a predicate, which decides, whether an input string matches
+	 * the given matcher description. The matcher description will be
+	 * interpreted as follows:
+	 * <ol>
+	 *   <li>A regular expression, introduced by the prefix "re:".</li>
+	 *   <li>A glob pattern, containing either of the characters
+	 *     '?' (a single, but arbitrary character), or '*' (an arbitrary
+	 *     number of arbitrary characters).</li>
+	 *   <li>If the matcher string doesn't have the prefix "re:",
+	 *     and doesn't contain the characters '?', or '*', then
+	 *     
+	 * </ol>
+	 * @param pMatcher The matcher description.
+	 * @return A predicate, which tests, whether the given description
+	 *   matches it's input string.
+	 */
+	public static @Nonnull Predicate<String> matcher(@Nonnull String pMatcher) {
+		@Nonnull String matcher = Objects.requireNonNull(pMatcher, "Matcher");
+		final boolean caseInsensitive;
+		if (matcher.endsWith("/i")) {
+			caseInsensitive = true;
+			matcher = matcher.substring(0, matcher.length()-2);
+		} else {
+			caseInsensitive = false;
+		}
+		final String patternStr;
+		if (matcher.startsWith("re:")) {
+			patternStr = matcher;
+		} else if (matcher.indexOf('*') != -1  ||  matcher.indexOf('?') != -1) {
+			final StringBuilder sb = new StringBuilder();
+			for (int i = 0;  i < matcher.length();  i++) {
+				final char c = matcher.charAt(i);
+				if ('*' == c) {
+					sb.append(".*");
+				} else if ('?' == c) {
+					sb.append(".");
+				} else {
+					sb.append("\\");
+					sb.append(c);
+				}
+			}
+			patternStr = sb.toString();
+		} else {
+			if (caseInsensitive) {
+				final String lcMatcher = matcher.toLowerCase();
+				return (s) -> s.toLowerCase().equals(lcMatcher);
+			} else {
+				final String m = matcher;
+				return (s) -> s.equals(m);
+			}
+		}
+		final Pattern pattern;
+		if (patternStr.endsWith("/i")) {
+			pattern = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
+		} else {
+			pattern = Pattern.compile(patternStr);
+		}
+		return (s) -> pattern.matcher(s).matches();
+	}
+	
+	/** Parses the given string into a list of matchers, by tokenizing the string,
+	 * using the given separator. For each of the tokens, a subpredicate is created by
+	 * invoking {@link #matcher(String)}. The returned predicate will be true, if
+	 * either of the subpredicates is true.
+	 * 
+	 * Example: The matcher string {@code Wm*,Wx*,Foo} with the separator ","
+	 * will create three subpredicates. The first subpredicate will be true,
+	 * if the tested string has the prefix "Wm". Likewise, the second
+	 * subpredicate matches the prefix "Wx". Finally the third
+	 * subpredicate is an exact match for the string "Foo".
+	 * In summary, the returned predicate will be true, if the input string is
+	 * "Foo", or if it starts with "Wx", or "Wm".
+	 * @param pMatchers The list of subpredicate descriptions, separated by
+	 *   {@code pSeparator}.
+	 * @param pSeparator The string, which separates the submatcher strings.
+	 * @return A predicate, which is true, if either of the subpredicates,
+	 *   created from {@code pMatchers} is true.
+	 */
+	public static @Nonnull Predicate<String> matchers(@Nonnull String pMatchers, @Nonnull String pSeparator) {
+		final @Nonnull String matchers = Objects.requireNonNull(pMatchers, "Matchers");
+		final @Nonnull String separator = Objects.requireNonNull(pSeparator, "Separator");
+		final List<Predicate<String>> predicates = new ArrayList<>();
+		for (StringTokenizer st = new StringTokenizer(matchers, separator);  st.hasMoreTokens();  ) {
+			final String matcher = st.nextToken();
+			predicates.add(matcher(matcher));
+		}
+		if (predicates.isEmpty()) {
+			throw new IllegalArgumentException("No matcher definitions found.");
+		}
+		return (s) -> {
+			for (Predicate<String> pred : predicates) {
+				if (pred.test(s)) {
+					return true;
+				}
+			}
+			return false;
+		};
 	}
 }

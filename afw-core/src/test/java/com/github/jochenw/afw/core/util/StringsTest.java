@@ -21,11 +21,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+
+/**
+ * Test suite for the {@link Strings} class.
+ */
 public class StringsTest {
+	/** Test case for {@link Strings#toString()}.
+	 */
     @Test
     public void testToString() {
         final Object[] array = new Object[]{"a", Long.valueOf(-1), Boolean.FALSE};
@@ -42,6 +49,8 @@ public class StringsTest {
         assertEquals("{a => 2, b => [a, -1, false], c => true}", Strings.toString(map));
     }
 
+	/** Test case for {@link Strings#isEmpty(String)}, and {@link Strings#isTrimmedEmpty(String)}.
+	 */
     @Test
     public void testIsEmpty() {
         assertTrue(Strings.isEmpty(null));
@@ -54,6 +63,8 @@ public class StringsTest {
         assertFalse(Strings.isTrimmedEmpty(" 0\t"));
     }
 
+    /** Test case for {@link Strings#parseVersionNumber(String)}.
+     */
     @Test
     public void testParseVersionNumber() {
     	Assert.assertArrayEquals(new int[] {2,3,0}, Strings.parseVersionNumber("2.3.0"));
@@ -120,6 +131,7 @@ public class StringsTest {
 
     /**
      * Test for {@link Strings#formatLz(int, int)}.
+     * @throws Exception The test failed.
      */
     @Test
     public void testFormatLz() throws Exception {
@@ -151,5 +163,40 @@ public class StringsTest {
     	} catch (IllegalArgumentException e) {
     		assertEquals("The total number of items must be lower than 1000000", e.getMessage());
     	}
+    }
+
+    /** Test case for {@link Strings#matcher(String)}.
+     */
+    public void testMatcher() {
+    	final Predicate<String> fooMatcher = Strings.matcher("Foo");
+    	assertTrue(fooMatcher.test("Foo"));
+    	assertFalse(fooMatcher.test("foo"));
+    	assertFalse(fooMatcher.test("0"));
+    	final Predicate<String> fooMatcherCaseInsensitive = Strings.matcher("Foo/i");
+    	assertTrue(fooMatcherCaseInsensitive.test("Foo"));
+    	assertTrue(fooMatcherCaseInsensitive.test("foo"));
+    	assertFalse(fooMatcherCaseInsensitive.test("0"));
+    	final Predicate<String> wmMatcher = Strings.matcher("Wm*");
+    	assertTrue(wmMatcher.test("Wm"));
+    	assertTrue(wmMatcher.test("Wm9"));
+    	assertTrue(wmMatcher.test("WmFoo"));
+    	assertFalse(wmMatcher.test("wmFoo"));
+    	assertFalse(wmMatcher.test("wM9"));
+    	final Predicate<String> wmMatcherCaseInsensitive = Strings.matcher("Wm*/i");
+    	assertTrue(wmMatcherCaseInsensitive.test("Wm"));
+    	assertTrue(wmMatcherCaseInsensitive.test("Wm9"));
+    	assertTrue(wmMatcherCaseInsensitive.test("WmFoo"));
+    	assertTrue(wmMatcherCaseInsensitive.test("wmFoo"));
+    	assertTrue(wmMatcherCaseInsensitive.test("wM9"));
+    	final Predicate<String> reMatcher = Strings.matcher("re:ab+C");
+    	assertTrue(reMatcher.test("aC"));
+    	assertTrue(reMatcher.test("abbbbbbC"));
+    	assertFalse(reMatcher.test("aBC"));
+    	assertFalse(reMatcher.test("abCd"));
+    	final Predicate<String> reMatcherCaseInsensitive = Strings.matcher("re:ab+C/i");
+    	assertTrue(reMatcherCaseInsensitive.test("aC"));
+    	assertTrue(reMatcherCaseInsensitive.test("abbbbbbC"));
+    	assertTrue(reMatcherCaseInsensitive.test("aBC"));
+    	assertFalse(reMatcherCaseInsensitive.test("abCd"));
     }
 }
