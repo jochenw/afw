@@ -3,85 +3,116 @@ package com.github.jochenw.afw.bootstrap.log;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
+import java.lang.reflect.UndeclaredThrowableException;
 
-
-public interface Logger {
-	public static enum Level {
-		trace, debug, info, warn, error, fatal;
+public abstract class Logger implements AutoCloseable {
+	public enum Level {
+		TRACE, DEBUG, INFO, WARN, ERROR, FATAL;
 	}
-	public interface OsConsumer {
-		public void accept(OutputStream pOs) throws IOException;
+	public interface LogWriter {
+		public void write(OutputStream pOut) throws IOException;
 	}
+	private Level logLevel;
+	private final long startTime;
 
-	public Charset getCharset();
-
-	public boolean isEnabled(Level pLevel);
-	public void log(Level pLevel, OsConsumer pConsumer);
-
-	public default void log(Level pLevel, String pMsg) {
+	public boolean isEnabled(Level pLevel) {
+		return logLevel.ordinal() <= pLevel.ordinal();
+	}
+	protected Logger(Level pLogLevel) {
+		logLevel = pLogLevel;
+		startTime = System.currentTimeMillis();
+	}
+	protected abstract OutputStream getOutputStream();
+	public abstract void close();
+	public void log(Level pLevel, LogWriter pLogWriter) {
 		if (isEnabled(pLevel)) {
-			final OsConsumer consumer = (out) -> {
-				final byte[] bytes = (pMsg + System.lineSeparator()).getBytes(getCharset());
-				out.write(bytes, 0, bytes.length);
-			};
-			log(pLevel, consumer);
+			final OutputStream out = getOutputStream();
+			synchronized(out) {
+				try {
+					pLogWriter.write(out);
+				} catch (IOException e) {
+					throw new UndeclaredThrowableException(e);
+				}
+			}
 		}
 	}
-	public default void log(Level pLevel, Throwable pTh) {
+	public void log(final Level pLevel, final String pMsg) {
 		if (isEnabled(pLevel)) {
-			final OsConsumer consumer = (out) -> {
-				final PrintStream ps = new PrintStream(out);
-				pTh.printStackTrace(ps);
-				ps.flush();
+			final LogWriter logWriter = new LogWriter() {
+				@Override
+				public void write(OutputStream pOut) throws IOException {
+					final StringBuilder sb = new StringBuilder();
+					sb.append(System.currentTimeMillis()-startTime);
+					sb.append(" ");
+					sb.append(pLevel.name());
+					sb.append(": ");
+					sb.append(pMsg);
+					sb.append("\n");
+					final byte[] bytes = sb.toString().getBytes("UTF-8");
+					pOut.write(bytes);
+					pOut.flush();
+				}
 			};
-			log(pLevel, consumer);
+			log(pLevel, logWriter);
 		}
 	}
-
-	public default void trace(String pMsg) {
-		if (isEnabled(Level.trace)) {
-			log(Level.trace, pMsg);
+	public void log(final Level pLevel, final Throwable pTh) {
+		if (isEnabled(pLevel)) {
+			final LogWriter logWriter = new LogWriter() {
+				@Override
+				public void write(OutputStream pOut) throws IOException {
+					final StringBuilder sb = new StringBuilder();
+					sb.append(System.currentTimeMillis()-startTime);
+					sb.append(" ");
+					sb.append(pLevel.name());
+					sb.append(": ");
+					sb.append(pTh.getClass().getName());
+					if (pTh.getMessage() != null) {
+						sb.append(" ");
+						sb.append(pTh.getMessage());
+					}
+					sb.append("\n");
+					final byte[] bytes = sb.toString().getBytes("UTF-8");
+					pOut.write(bytes);
+					final PrintStream ps = new PrintStream(pOut);
+					pTh.printStackTrace(ps);
+					ps.flush();
+				}
+			};
+			log(pLevel, logWriter);
 		}
 	}
-	public default void debug(String pMsg) {
-		if (isEnabled(Level.debug)) {
-			log(Level.debug, pMsg);
-		}
+	public void trace(String pMsg) {
+		log(Level.TRACE, pMsg);
 	}
-	public default void info(String pMsg) {
-		if (isEnabled(Level.info)) {
-			log(Level.info, pMsg);
-		}
+	public void debug(String pMsg) {
+		log(Level.DEBUG, pMsg);
 	}
-	public default void warn(String pMsg) {
-		if (isEnabled(Level.warn)) {
-			log(Level.warn, pMsg);
-		}
+	public void info(String pMsg) {
+		log(Level.INFO, pMsg);
 	}
-	public default void warn(Throwable pTh) {
-		if (isEnabled(Level.warn)) {
-			log(Level.warn, pTh);
-		}
+	public void warn(String pMsg) {
+		log(Level.WARN, pMsg);
 	}
-	public default void error(String pMsg) {
-		if (isEnabled(Level.error)) {
-			log(Level.error, pMsg);
-		}
+	public void error(String pMsg) {
+		log(Level.ERROR, pMsg);
 	}
-	public default void error(Throwable pTh) {
-		if (isEnabled(Level.error)) {
-			log(Level.error, pTh);
-		}
+	public void fatal(String pMsg) {
+		log(Level.FATAL, pMsg);
 	}
-	public default void fatal(String pMsg) {
-		if (isEnabled(Level.fatal)) {
-			log(Level.fatal, pMsg);
-		}
+	public void warn(Throwable pTh) {
+		log(Level.WARN, pTh);
 	}
-	public default void fatal(Throwable pTh) {
-		if (isEnabled(Level.fatal)) {
-			log(Level.fatal, pTh);
-		}
+	public void error(Throwable pTh) {
+		log(Level.ERROR, pTh);
+	}
+	public void fatal(Throwable pTh) {
+		log(Level.FATAL, pTh);
+	}
+	public Object getLevel() {
+		return logLevel;
+	}
+	public void setLevel(Level pLevel) {
+		logLevel = pLevel;
 	}
 }
