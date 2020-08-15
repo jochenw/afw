@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
@@ -104,6 +105,12 @@ public class Files {
 		}
 	}
 
+	/** Checks, whether a given file, or directory, is located within another directory.
+	 * @param pDir The directory, which might contain a file, or another directory.
+	 * @param pPath The file, or directory, which is being questioned.
+	 * @return True, if the file, or directory {@code pPath} is located within the
+	 *     directory {@code pDir}, otherwise false.
+	 */
 	public static boolean isWithin(Path pDir, Path pPath) {
 		Path p = pPath;
 		while (p != null) {
@@ -114,5 +121,31 @@ public class Files {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Replacement for {@link java.nio.file.Files#isDirectory(Path, java.nio.file.LinkOption...)}.
+	 * This is here, so that the current class ({@link Files}) can be imported without the need
+	 * to qualify {@link java.nio.file.Files}, when using it.
+	 * @param pPath The path object, which is being checked.
+	 * @param pLinkOptions The link options, which are being considered.
+	 * @return True, if {@code pPath} is a directory, considering the given link options,
+	 *   otherwise false.
+	 */
+	public static boolean isDirectory(Path pPath, LinkOption... pLinkOptions) {
+		return java.nio.file.Files.isDirectory(pPath, pLinkOptions);
+	}
+
+	/**
+	 * Replacement for {@link java.nio.file.Files#isRegularFile(Path, java.nio.file.LinkOption...)}.
+	 * This is here, so that the current class ({@link Files}) can be imported without the need
+	 * to qualify {@link java.nio.file.Files}, when using it.
+	 * @param pPath The path object, which is being checked.
+	 * @param pLinkOptions The link options, which are being considered.
+	 * @return True, if {@code pPath} is a regular file, considering the given link options,
+	 *   otherwise false.
+	 */
+	public static boolean isRegularFile(Path pPath, LinkOption... pLinkOptions) {
+		return java.nio.file.Files.isRegularFile(pPath, pLinkOptions);
 	}
 }

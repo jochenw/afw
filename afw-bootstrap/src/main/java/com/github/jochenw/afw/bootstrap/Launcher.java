@@ -8,14 +8,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 
+import com.github.jochenw.afw.bootstrap.archive.IArchiveHandler;
+import com.github.jochenw.afw.bootstrap.archive.IArchiveHandler.ArchiveEntryConsumer;
 import com.github.jochenw.afw.bootstrap.cli.Args.Options;
+import com.github.jochenw.afw.bootstrap.io.IoStreamSupplier;
 import com.github.jochenw.afw.bootstrap.log.FileLogger;
 import com.github.jochenw.afw.bootstrap.log.Logger;
 import com.github.jochenw.afw.bootstrap.log.Logger.Level;
+import com.github.jochenw.afw.bootstrap.util.Paths;
 import com.github.jochenw.afw.bootstrap.util.Versions;
 import com.github.jochenw.afw.bootstrap.util.Versions.Version;
 import com.github.jochenw.afw.bootstrap.log.SystemOutLogger;
@@ -24,10 +27,19 @@ import com.github.jochenw.afw.bootstrap.log.SystemOutLogger;
 public class Launcher {
 	private Options options;
 	private Logger logger;
+	private Path localPropertyPath, remotePropertyPath, bootstrapJarPath;
 	private Properties localProperties, remoteProperties;
 
 	public void run(Options pOptions) {
 		options = pOptions;
+		final URL url = Launcher.class.getResource("Launcher.class");
+		if (url == null) {
+			throw new IllegalStateException("Unable to locate resource: Launcher.class");
+		}
+		bootstrapJarPath = Paths.pathOf(Launcher.class);
+		if (!"jar".equals(url.getProtocol())) {
+			throw new IllegalStateException("Expected jar URL, got " + url);
+		}
 		try (final Logger log = newLogger(pOptions)) {
 			logger = log;
 			localProperties = readProperties();
@@ -72,13 +84,74 @@ public class Launcher {
 			throw new IllegalStateException("Invalid base directory " + baseDir
 					+ " (Doesn't exist, or is not a directory.)");
 		}
+		extractArchive(pRemoteUrl, baseDir);
 	}
 
-	protected Path downLoad(String pRemoteUrl, Path pBaseDir) {
+	protected void extractArchive(String pRemoteUrl, final Path baseDir) {
+		final Path archiveFile = downLoadUri(baseDir, pRemoteUrl);
+		for (IArchiveHandler ah : IArchiveHandler.getArchiveHandlers()) {
+			if (ah.isHandling(archiveFile)) {
+				ah.read(archiveFile, new ArchiveEntryConsumer() {
+					@Override
+					public void accept(String pPath, IoStreamSupplier pStreamSupplier) throws IOException {
+						Path path = Paths.get(pPath);
+						if (path.isAbsolute()) {
+							throw new IOException("Update archive contains file with absolute path: " + path);
+						} else {
+							if (path.equals(localPropertyPath)) {
+								/* Do not simply override the old properties with the new properties.
+								 * They need to be merged later on.
+								 */
+								path = addClassifierToPath(path, "new");
+								remotePropertyPath = path;
+							} else if (path.equals(bootstrapJarPath)) {
+								/* Do not attempt to overwrite the bootstrap jar file.
+								 * On Windows, this would fail, because the bootstrap jar is currently in use.
+								 * Instead, create a new file, and let the launcher script overwrite it, when
+								 * it runs the next time, or after the program exits.
+								 */
+								path = addClassifierToPath(path,  "new");
+							}
+							final Path dir = path.getParent();
+							if (dir != null  &&  !Files.isDirectory(dir)) {
+								Files.createDirectories(dir);
+							}
+							try (InputStream in = pStreamSupplier.get();
+								 OutputStream out = Files.newOutputStream(path)) {
+								final byte[] buffer = new byte[8192];
+								for (;;) {
+									final int res = in.read(buffer);
+									if (res == -1) {
+										break;
+									} else if (res > 0) {
+										out.write(buffer, 0, res);
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+		}
+	}
+
+	protected Path addClassifierToPath(Path pPath, String pClassifier) {
+		final String pathStr = pPath.toString();
+		final int offset = pathStr.lastIndexOf('.');
+		if (offset == -1) {
+			return Paths.get(pathStr + "-" + pClassifier);
+		} else {
+			final String baseName = pathStr.substring(0, offset);
+			final String extension = pathStr.substring(offset+1);
+			return Paths.get(baseName + "-" + pClassifier + "." + extension);
+		}
+	}
+
+	protected Path downLoadUri(Path pBaseDir, String pRemoteUrl) {
 		final URL url;
 		try {
 			url = new URL(pRemoteUrl);
-			return download(url, pBaseDir);
+			return downloadUrl(url, pBaseDir);
 		} catch (MalformedURLException e) {
 			final Path file = Paths.get(pRemoteUrl);
 			if (Files.isRegularFile(file)) {
@@ -90,7 +163,7 @@ public class Launcher {
 		}
 	}
 
-	protected Path download(URL pUrl, Path pBaseDir) {
+	protected Path downloadUrl(URL pUrl, Path pBaseDir) {
 		String fileName = pUrl.getFile();
 		Path file;
 		final int offset = Math.max(fileName.indexOf('/'), fileName.indexOf('\\'));
@@ -115,6 +188,7 @@ public class Launcher {
 		}
 		return file;
 	}
+
 	protected String getProperty(Properties pProperties, String pKey) {
 		return pProperties.getProperty(pKey);
 	}
@@ -147,6 +221,7 @@ public class Launcher {
 	protected Properties readProperties() {
 		final Path path = Objects.requireNonNull(options.getPropertyFile(), "propertyFile");
 		final Properties props = readProperties(() -> Files.newInputStream(path), path.toString());
+		localPropertyPath = path;
 		return props;
 	}
 
