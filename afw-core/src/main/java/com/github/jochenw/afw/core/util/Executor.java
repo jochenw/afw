@@ -1,10 +1,13 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
@@ -96,9 +99,33 @@ public class Executor {
 		try {
 			final File dir = pDir == null ? null : pDir.toFile();
 			final Process pr = Runtime.getRuntime().exec(pCmd, pEnv, dir);
-			startConsumer(pr.getInputStream(), pStdOutputConsumer);
-			startConsumer(pr.getErrorStream(), pErrOutputConsumer);
+			// Number of active threads
+			final MutableInteger mi = new MutableInteger();
+			mi.setValue(2);
+			startConsumer(pr.getInputStream(), pStdOutputConsumer, () -> {
+				synchronized(mi) {
+					mi.dec();
+				}
+			});
+			startConsumer(pr.getErrorStream(), pErrOutputConsumer, () -> {
+				synchronized(mi) {
+					mi.dec();
+				}
+			});
 			final int status = pr.waitFor();
+			for (;;) {
+				final int numberOfThreads;
+				synchronized(mi) {
+					numberOfThreads = mi.getValue();
+					if (numberOfThreads == 0) {
+						break;
+					}
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
 			if (pExitCodeHandler != null) {
 				pExitCodeHandler.accept(status);
 			}
@@ -108,11 +135,26 @@ public class Executor {
 		}
 	}
 
-	protected void startConsumer(@Nonnull InputStream pIn, Consumer<InputStream> pConsumer) {
+	protected void startConsumer(@Nonnull InputStream pIn, Consumer<InputStream> pConsumer, Runnable pTerminator) {
 		final Runnable runnable = () -> {
 			if (pConsumer != null) {
 				pConsumer.accept(pIn);
+			} else {
+				// No consumer: Discard the output.
+				final byte[] buffer = new byte[1024];
+				for (;;) {
+					final int res;
+					try {
+						res = pIn.read(buffer);
+					} catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+					if (res == -1) {
+						break;
+					}
+				}
 			}
+			pTerminator.run();
 		};
 		final Thread t = new Thread(runnable, getThreadName());
 		t.setDaemon(isUsingDaemonThreads());
