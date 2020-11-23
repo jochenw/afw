@@ -93,6 +93,15 @@ public class Reflection {
         return null;
     }
 
+    private static Field findStaticField(Class<?> pClass, String pFieldName) {
+        try {
+            return pClass.getDeclaredField(pFieldName);
+        } catch (NoSuchFieldException e) {
+            // Ignore the exception.
+        }
+        return null;
+    }
+
     /**  Returns, whether the given method is a public getter.
      * @param pMethod The method being checked.
      * @return True, if the given method is a public getter. Otherwise false.
@@ -374,5 +383,15 @@ public class Reflection {
 	 */
 	public static Field getField(Class<? extends Object> pClass, String pName) {
 		return findField(pClass, pName);
+	}
+
+	/** Returns a static field with the given name in the given class, if
+	 * such a field exists. Otherwise, returns null. 
+	 * @param pClass The class, in which to search for fields.
+	 * @param pName The field name.
+	 * @return A private, or public, field with the given name.
+	 */
+	public static Field getStaticField(Class<? extends Object> pClass, String pName) {
+		return findStaticField(pClass, pName);
 	}
 }

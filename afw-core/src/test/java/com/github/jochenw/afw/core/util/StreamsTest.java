@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -34,6 +35,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -288,5 +291,82 @@ public class StreamsTest {
     	final File file = new File("pom.xml");
     	assertTrue(file.isFile());
     	Streams.accept(file, (in) -> Tests.assertSameContent(file.toPath(), in));
+    }
+
+    /** Test for {@link Streams#load(URL)}.
+     */
+    public void testLoadUrl() throws Exception {
+    	final Properties props = newTestProperties();
+    	final Path path = createTestProperties(props, false);
+    	final Properties got = Streams.load(path.toUri().toURL());
+    	assertSameProperties(props, got);
+    	final Path xmlPath = createTestProperties(props, true);
+    	final Properties xmlGot = Streams.load(xmlPath.toUri().toURL());
+    	assertSameProperties(props, xmlGot);
+    }
+
+    /** Test for {@link Streams#load(Path)}.
+     */
+    public void testLoadPath() {
+    	final Properties props = newTestProperties();
+    	final Path path = createTestProperties(props, false);
+    	final Properties got = Streams.load(path);
+    	assertSameProperties(props, got);
+    	final Path xmlPath = createTestProperties(props, true);
+    	final Properties xmlGot = Streams.load(xmlPath);
+    	assertSameProperties(props, xmlGot);
+    }
+
+    /** Test for {@link Streams#load(File)}.
+     */
+    public void testLoadFile() {
+    	final Properties props = newTestProperties();
+    	final Path path = createTestProperties(props, false);
+    	final Properties got = Streams.load(path.toFile());
+    	assertSameProperties(props, got);
+    	final Path xmlPath = createTestProperties(props, true);
+    	final Properties xmlGot = Streams.load(xmlPath.toFile());
+    	assertSameProperties(props, xmlGot);
+    }
+
+    protected Properties newTestProperties() {
+    	final Properties props = new Properties();
+    	props.put("answer", "42");
+    	props.put("whatever", "works");
+    	props.put("time", String.valueOf(System.currentTimeMillis()));
+    	return props;
+    }
+
+    protected Path createTestProperties(Properties pProps, boolean pXml) {
+    	final Path testDir = Paths.get("target");
+    	final Path testFile;
+    	if (pXml) {
+    		testFile = testDir.resolve("test-created.properties.xml");
+    	} else {
+    		testFile = testDir.resolve("test-created.properties");
+    	}
+    	try {
+    		Files.deleteIfExists(testFile);
+    		Files.createDirectories(testDir);
+    		try (OutputStream out = Files.newOutputStream(testFile)) {
+    			if (pXml) {
+    				pProps.storeToXML(out, null);
+    			} else {
+    				pProps.store(out, null);
+    			}
+    		}
+    	} catch (IOException e) {
+    		throw Exceptions.show(e);
+    	}
+    	return testFile;
+    }
+
+    protected void assertSameProperties(Properties pExpect, Properties pGot) {
+    	assertEquals(pExpect.size(), pGot.size());
+    	for (Map.Entry<Object,Object> en : pExpect.entrySet()) {
+    		final String key = (String) en.getKey();
+    		final String value = (String) en.getValue();
+    		assertEquals(key, value, pGot.get(key));
+    	}
     }
 }

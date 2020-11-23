@@ -33,6 +33,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
@@ -396,4 +397,39 @@ public class Streams {
     public static <O> O apply(@Nonnull File pFile, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
     	return apply(pFile.toPath(), pFunction);
     }
+
+    /** Loads the given property file, and returns it as an instance of
+     * {@link Properties}.
+     */
+    public static Properties load(InputStream pIn, String pUri) throws IOException {
+    	final Properties props = new Properties();
+    	if (pUri.endsWith(".xml")) {
+    		props.loadFromXML(pIn);
+    	} else {
+    		props.load(pIn);
+    	}
+    	return props;
+    }
+
+    /** Loads the given property file, and returns it as an instance of
+     * {@link Properties}.
+     */
+    public static Properties load(Path pPath) {
+    	return Streams.apply(pPath, (in) -> { return load(in, pPath.getFileName().toString()); });
+    }
+
+    /** Loads the given property file, and returns it as an instance of
+     * {@link Properties}.
+     */
+    public static Properties load(File pFile) {
+    	return Streams.apply(pFile, (in) -> { return load(in, pFile.getName()); });
+    }
+
+    /** Loads the given property file, and returns it as an instance of
+     * {@link Properties}.
+     */
+    public static Properties load(URL pUrl) {
+    	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
+    }
+
 }

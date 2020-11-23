@@ -3,6 +3,8 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
@@ -17,6 +19,8 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.Locator;
+
+import com.google.common.base.Supplier;
 
 /**
  * @author jwi
@@ -433,5 +437,56 @@ public class DomHelper {
 			return pDefaultValue;
 		}
 		return Boolean.parseBoolean(value);
+	}
+
+	public @Nonnull Path requirePathAttribute(@Nonnull Node pNode, @Nonnull String pName) {
+		final String value = requireAttribute(pNode, pName);
+		return Objects.requireNonNull(Paths.get(value));
+	}
+
+	public @Nonnull Path requirePathAttribute(@Nonnull Node pNode, @Nonnull String pName, @Nonnull Predicate<Path> pPredicate,
+			                         @Nonnull Supplier<String> pErrorMsgSupplier) {
+		final Path path = requirePathAttribute(pNode, pName);
+		if (pPredicate.test(path)) {
+			return path;
+		} else {
+			throw error(pNode, pErrorMsgSupplier.get());
+		}
+	}
+
+	public Path requirePathElement(@Nonnull Node pNode, @Nonnull String pName, @Nonnull Predicate<Path> pPredicate,
+			Function<String,String> pErrorMsgSupplier) {
+		final Element element = getFirstChild(pNode, pName);
+		if (element == null) {
+			throw error(pNode, "Expected child element not found: " + pName);
+		}
+		final String text = element.getTextContent();
+		if (text.length() == 0) {
+			throw error(element, "Expected non-empty content for element " + element.getLocalName());
+		}
+		final Path path = Paths.get(text);
+		if (pPredicate.test(path)) {
+			return path;
+		} else {
+			throw error(element, pErrorMsgSupplier.apply(path.toString()));
+		}
+	}
+
+	public Path getPathElement(@Nonnull Node pNode, @Nonnull String pName, @Nonnull Predicate<Path> pPredicate,
+			Function<String,String> pErrorMsgSupplier) {
+		final Element element = getFirstChild(pNode, pName);
+		if (element == null) {
+			return null;
+		}
+		final String text = element.getTextContent();
+		if (text.length() == 0) {
+			throw error(element, "Expected non-empty content for element " + element.getLocalName());
+		}
+		final Path path = Paths.get(text);
+		if (pPredicate.test(path)) {
+			return path;
+		} else {
+			throw error(element, pErrorMsgSupplier.apply(path.toString()));
+		}
 	}
 }
