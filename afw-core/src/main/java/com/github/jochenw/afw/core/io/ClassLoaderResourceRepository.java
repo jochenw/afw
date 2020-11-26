@@ -57,6 +57,9 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 						final ZipFileResourceRepository zfrr = new ZipFileResourceRepository(jarFile);
 						zfrr.list(pConsumer);
 						log("list: Done with listing jar file " + jarFile);
+					} else {
+						throw new IllegalStateException("Jar file " + jarFile
+								+ " not found for MANIFEST URL " + url);
 					}
 				} else if ("file".equals(url.getProtocol())) {
 					log("list: File URL detected, looking for manifest file");
