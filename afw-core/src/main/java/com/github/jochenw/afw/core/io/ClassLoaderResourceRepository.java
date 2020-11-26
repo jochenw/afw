@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.function.Consumer;
+
 
 /**
  * Implementation of {@link IResourceRepository}, which uses a {@link ClassLoader},
@@ -49,20 +50,13 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 				log("list: url=" + url);
 				if ("jar".equals(url.getProtocol())) {
 					log("list: Jar URL detected: host=" + url.getHost() + ", port=" + url.getPort() + ", file=" + url.getFile());
-					final String fileUri = url.getFile();
-					final int offset = fileUri.indexOf('!');
-					if (offset == -1) {
-						throw new IllegalStateException("Unable to handle jar URL: " + url);
-					} else {
-						final String filePart = fileUri.substring(0, offset);
-						if (filePart.startsWith("file:")) {
-							final File file = new File(filePart.substring("file:".length()));
-							if (file.isFile()) {
-								log("list: Found zip file=" + file);
-								final ZipFileResourceRepository zfrr = new ZipFileResourceRepository(file);
-								zfrr.list(pConsumer);
-							}
-						}
+					final JarURLConnection juc = (JarURLConnection) url.openConnection();
+					final File jarFile = new File(juc.getJarFile().getName());
+					if (jarFile.isFile()) {
+						log("list: Found jar file " + jarFile);
+						final ZipFileResourceRepository zfrr = new ZipFileResourceRepository(jarFile);
+						zfrr.list(pConsumer);
+						log("list: Done with listing jar file " + jarFile);
 					}
 				} else if ("file".equals(url.getProtocol())) {
 					log("list: File URL detected, looking for manifest file");
