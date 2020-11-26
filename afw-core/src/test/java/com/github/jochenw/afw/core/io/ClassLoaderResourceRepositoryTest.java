@@ -27,6 +27,7 @@ public class ClassLoaderResourceRepositoryTest {
 	public void testList() {
 		final Set<String> uris = new HashSet<>();
 		final ClassLoaderResourceRepository clrr = new ClassLoaderResourceRepository(getClass().getClassLoader());
+		clrr.setLogger(System.out::println);
 		Consumer<IResource> consumer = (r) -> {
 			uris.add(r.getUri());
 		};
