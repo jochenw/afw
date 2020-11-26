@@ -48,7 +48,7 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 				final URL url = en.nextElement();
 				log("list: url=" + url);
 				if ("jar".equals(url.getProtocol())) {
-					log("list: Jar URL detected, looking for jar file: " + url.getFile());
+					log("list: Jar URL detected: host=" + url.getHost() + ", port=" + url.getPort() + ", file=" + url.getFile());
 					final String fileUri = url.getFile();
 					final int offset = fileUri.indexOf('!');
 					if (offset == -1) {
