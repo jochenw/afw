@@ -16,12 +16,14 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -573,4 +575,32 @@ public class Strings {
 			return false;
 		};
 	}
+
+	/**
+	 * Basically same as {@link Arrays#asList(Object...)}, except that this method
+	 * returns an {@link ArrayList} (a modifiable list).
+	 * @param pValues The list values.
+	 * @return An {@link ArrayList} (a modifiable list) with the given values.
+	 * @throws NullPointerException The {@code pValues} parameter is null.
+	 */
+	public static @Nonnull ArrayList<String> list(@Nonnull String... pValues) {
+		final @Nonnull String[] values = Objects.requireNonNull(pValues, "Values");
+		final ArrayList<String> list = new ArrayList<>(values.length);
+		for (String s : values) {
+			list.add(s);
+		}
+		return list;
+	}
+
+	/**
+	 * Returns a string array with the given values.
+	 * @param pValues The array values.
+	 * @return A string array with the given values.
+	 * @throws NullPointerException The {@code pValues} parameter is null.
+	 */
+	public static @Nonnull String[] array(@Nonnull String... pValues) {
+		final @Nonnull String[] values = Objects.requireNonNull(pValues, "Values");
+		return values;
+	}
 }
+

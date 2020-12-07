@@ -16,6 +16,7 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,16 +28,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableFunction;
@@ -432,4 +437,42 @@ public class Streams {
     	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
     }
 
+    /**
+     * Creates a {@link ByteArrayInputStream}, returning the given byte array.
+     * @param pBytes The byte array, which ought to constitute the contents
+     *   of the returned stream.
+     * @return A {@link ByteArrayInputStream}, returning the given byte array.
+     * @throws NullPointerException The parameter {@code pBytes} is null.
+     */
+    public static @Nonnull ByteArrayInputStream of(@Nonnull byte[] pBytes) {
+    	return new ByteArrayInputStream(Objects.requireNonNull(pBytes, "Bytes"));
+    }
+
+
+    /**
+     * Creates a {@link StringReader}, returning the given string.
+     * @param pBytes The string, which ought to constitute the contents
+     *   of the returned stream.
+     * @return A {@link StringReader}, returning the given string.
+     * @throws NullPointerException The parameter {@code pString} is null.
+     */
+    public static @Nonnull StringReader of(@Nonnull String pString) {
+    	return new StringReader(Objects.requireNonNull(pString, "String"));
+    }
+
+    /**
+     * Creates a {@link ByteArrayInputStream}, returning the given string.
+     * @param pBytes The string, which ought to constitute the contents
+     *   of the returned stream.
+     * @param pCharset The character set, which should be used to convert
+     *   the string into a byte array. (May be null, in which case
+     *   {@link StandardCharsets#UTF_8} will be used as the default.
+     * @return A {@link ByteArrayInputStream}, returning the given byte array.
+     * @throws NullPointerException The parameter {@code pBytes} is null.
+     */
+    public static @Nonnull ByteArrayInputStream of(@Nonnull String pString, @Nullable Charset pCharset) {
+    	final @Nonnull byte[] bytes = Objects.requireNonNull(pString, "String")
+    			.getBytes(Objects.notNull(pCharset, StandardCharsets.UTF_8));
+    	return of(bytes);
+    }
 }
