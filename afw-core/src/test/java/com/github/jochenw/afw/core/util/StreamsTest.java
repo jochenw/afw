@@ -374,12 +374,12 @@ public class StreamsTest {
 
     /** Test case for {@link Streams#of(byte[])}.
      */
-    public void testOfByteArray() {
+    public void testOfByteArray() throws Exception {
     	String string = "763209kfegLIZRD$";
 		final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
     	final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     	Streams.copy(Streams.of(bytes), baos);
-    	assertEquals(string, baos.toString(StandardCharsets.UTF_8));
+    	assertEquals(string, baos.toString(StandardCharsets.UTF_8.name()));
     	try {
     		Streams.of((byte[]) null);
     		fail("Expected Exception");
@@ -405,14 +405,14 @@ public class StreamsTest {
 
     /** Test case for {@link Streams#of(String, Charset)}.
      */
-    public void testOfStringCharset() {
+    public void testOfStringCharset() throws Exception {
     	String string = "763209kfegLIZRD$";
     	final ByteArrayOutputStream baos0 = new ByteArrayOutputStream();
     	Streams.copy(Streams.of(string, null), baos0);
-    	assertEquals(string, baos0.toString(StandardCharsets.UTF_8));
+    	assertEquals(string, baos0.toString(StandardCharsets.UTF_8.name()));
     	final ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
     	Streams.copy(Streams.of(string, StandardCharsets.ISO_8859_1), baos1);
-    	assertEquals(string, baos1.toString(StandardCharsets.ISO_8859_1));
+    	assertEquals(string, baos1.toString(StandardCharsets.ISO_8859_1.name()));
     	try {
     		Streams.of((String) null, (Charset) null);
     		fail("Expected Exception");
