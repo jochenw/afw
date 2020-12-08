@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Predicate;
@@ -229,5 +230,23 @@ public class StringsTest {
     	assertTrue(predCi.test("aBC"));
     	assertTrue(predCi.test("abc"));
     	assertFalse(predCi.test("Bar"));
+    }
+
+    @Test
+    public void testSplit() {
+    	final String value0 = "a b c d";
+    	final List<String> splittedValue0 = Strings.split(value0, " ");
+    	assertEquals(4, splittedValue0.size());
+    	assertEquals("a", splittedValue0.get(0));
+    	assertEquals("b", splittedValue0.get(1));
+    	assertEquals("c", splittedValue0.get(2));
+    	assertEquals("d", splittedValue0.get(3));
+    	final String value1 = "a, b, c,  d";
+    	final List<String> splittedValue1 = Strings.split(value1, ", ");
+    	assertEquals(4, splittedValue1.size());
+    	assertEquals("a", splittedValue1.get(0));
+    	assertEquals("b", splittedValue1.get(1));
+    	assertEquals("c", splittedValue1.get(2));
+    	assertEquals(" d", splittedValue1.get(3));
     }
 }

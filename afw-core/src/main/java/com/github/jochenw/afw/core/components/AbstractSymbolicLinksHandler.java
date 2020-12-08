@@ -10,7 +10,6 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.jochenw.afw.core.util.Exceptions;
 
 /** Abstract base implementation of {@link ISymbolicLinksHandler}.
  */
@@ -49,13 +48,13 @@ public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHand
 	@Override
 	public Path checkLink(Path pPath) {
 		final Path path = Objects.requireNonNull(pPath, "The path must not be null.");
-		return checkSymbolicLink(pPath);
+		return checkSymbolicLink(path);
 	}
 
 	@Override
 	public void removeLink(Path pPath) {
 		final Path path = Objects.requireNonNull(pPath, "The path must not be null.");
-		removeSymbolicLink(pPath);
+		removeSymbolicLink(path);
 	}
 
 }

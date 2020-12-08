@@ -573,4 +573,21 @@ public class Strings {
 			return false;
 		};
 	}
+
+	public static List<String> split(String pValue, String pSeparator) {
+		String value = Objects.requireNonNull(pValue, "Value");
+		final String sep = Objects.requireNonNull(pSeparator, "Separator");
+		final List<String> result = new ArrayList<>();
+		while (value.length() > 0) {
+			final int offset = value.indexOf(sep);
+			if (offset == -1) {
+				result.add(value);
+				return result;
+			} else {
+				result.add(value.substring(0, offset));
+				value = value.substring(offset + sep.length());
+			}
+		}
+		return result;
+	}
 }

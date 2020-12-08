@@ -204,9 +204,27 @@
     </dependency>
     <dependency>
         <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore-osgi</artifactId>
+        <artifactId>httpcore</artifactId>
         <version>4.4.13</version>
         <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.bouncycastle</groupId>
+    	<artifactId>bcprov-jdk15to18</artifactId>
+    	<version>1.67</version>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>bouncycastle</groupId>
+    	<artifactId>bouncycastle-jce-jdk13</artifactId>
+    	<version>112</version>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.groovy</groupId>
+    	<artifactId>groovy</artifactId>
+    	<version>4.0.0-alpha-1</version>
+    	<scope>provided</scope>
     </dependency>
   </dependencies>
   <reporting>

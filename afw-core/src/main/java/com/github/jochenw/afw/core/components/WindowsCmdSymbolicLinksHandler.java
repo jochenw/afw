@@ -5,7 +5,6 @@ package com.github.jochenw.afw.core.components;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
@@ -18,7 +17,6 @@ import java.util.regex.Pattern;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Executor;
 import com.github.jochenw.afw.core.util.Objects;
-import com.github.jochenw.afw.core.util.Processes;
 import com.github.jochenw.afw.core.util.Streams;
 
 /** Alternative implementation of {@link ISymbolicLinksHandler}, which is using

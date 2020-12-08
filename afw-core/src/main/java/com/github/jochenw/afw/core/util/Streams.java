@@ -25,19 +25,24 @@ import java.io.FilterReader;
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.io.ReaderInputStream;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
@@ -55,7 +60,7 @@ public class Streams {
 
     /**
      * Returns the contents of the given {@link InputStream}, as a byte
-     * array. The {@link InputStream} is closed.
+     * array. The {@link InputStream} isn't closed.
      * @param pIn The {@link InputStream} to read from. Will be closed.
      * @return The contents, which have been read from {@code pIn}.
      */
@@ -68,6 +73,21 @@ public class Streams {
         }
         return baos.toByteArray();
     }
+
+    /**
+     * Returns the contents of the given {@link InputStream}, as a
+     * string. The {@link InputStream} isn't closed.
+     * @param pIn The {@link InputStream} to read from. Will be closed.
+     * @param pCharset The character set to use for byte[]->string
+     *   conversion. May be null, in which case
+     *   {@link StandardCharsets#UTF_8 UTF-8} will be used.
+     * @return The contents, which have been read from {@code pIn}.
+     */
+    public static @Nonnull String read(@Nonnull InputStream pIn, @Nullable Charset pCharset) {
+    	final Charset charSet = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	return read(new InputStreamReader(pIn, charSet));
+    }
+
 
     /** Copies the contents of the given {@link InputStream} to the given
      * {@link OutputStream}, using a buffer of 8192 bytes. Neither stream
@@ -432,4 +452,20 @@ public class Streams {
     	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
     }
 
+    /** Converts the given {@link Reader} into an {@link InputStream}, using the
+     * given {@link Charset character set} to encode characters as bytes.
+     *
+     * @param pReader The {@link Reader}, which is being converted.
+     * @param pCharset The {@link Charset character set}, which is being
+     *     used to convert characters into bytes. May be null, in which
+     *     case {@link StandardCharsets#UTF_8} will be used.
+     * @return An {@link InputStream}, which is internally reading characters
+     *     from {@code pReader}.
+     * @throws NullPointerException The parameter {@code pReader} is null.
+     */
+    public static @Nonnull ReaderInputStream asInputStream(@Nonnull Reader pReader, @Nullable Charset pCharset) {
+    	final @Nonnull Reader reader = Objects.requireNonNull(pReader, "Reader");
+    	final @Nonnull Charset charset = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	return new ReaderInputStream(reader, charset);
+    }
 }

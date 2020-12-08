@@ -3,6 +3,7 @@ package com.github.jochenw.afw.core.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,6 +14,8 @@ import java.util.function.IntConsumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 /** A component for executing commands as external processes.
  */
@@ -112,6 +115,12 @@ public class Executor {
 					mi.dec();
 				}
 			});
+			if (input != null) {
+				final Runnable runnable = () -> Functions.accept(input, pr.getOutputStream());
+				final Thread t = new Thread(runnable, getThreadName());
+				t.setDaemon(isUsingDaemonThreads());
+				t.start();
+			}
 			final int status = pr.waitFor();
 			for (;;) {
 				final int numberOfThreads;
@@ -162,6 +171,7 @@ public class Executor {
 	}
 
 	private boolean isUsingDaemonThreads = true;
+	private FailableConsumer<OutputStream,?> input = null;
 
 	/** Returns, whether the threads, which are created by this object, are daemon
 	 * threads (true, default), or not.
@@ -198,5 +208,13 @@ public class Executor {
 	 */
 	protected String getThreadName() {
 		return "ExecOutputPuller" + getConsumerId();
+	}
+
+	public void setInput(FailableConsumer<OutputStream,?> pInput) {
+		input = pInput;
+	}
+
+	public FailableConsumer<OutputStream,?> getInput() {
+		return input;
 	}
 }
