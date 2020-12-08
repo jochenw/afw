@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -367,6 +369,55 @@ public class StreamsTest {
     		final String key = (String) en.getKey();
     		final String value = (String) en.getValue();
     		assertEquals(key, value, pGot.get(key));
+    	}
+    }
+
+    /** Test case for {@link Streams#of(byte[])}.
+     */
+    public void testOfByteArray() throws Exception {
+    	String string = "763209kfegLIZRD$";
+		final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+    	final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    	Streams.copy(Streams.of(bytes), baos);
+    	assertEquals(string, baos.toString(StandardCharsets.UTF_8.name()));
+    	try {
+    		Streams.of((byte[]) null);
+    		fail("Expected Exception");
+    	} catch (NullPointerException e) {
+    		assertEquals("Bytes", e.getMessage());
+    	}
+    }
+
+    /** Test case for {@link Streams#of(String)}.
+     */
+    public void testOfString() {
+    	String string = "763209kfegLIZRD$";
+    	final StringWriter sw = new StringWriter();
+    	Streams.copy(Streams.of(string), sw);
+    	assertEquals(string, sw.toString());
+    	try {
+    		Streams.of((String) null);
+    		fail("Expected Exception");
+    	} catch (NullPointerException e) {
+    		assertEquals("String", e.getMessage());
+    	}
+    }
+
+    /** Test case for {@link Streams#of(String, Charset)}.
+     */
+    public void testOfStringCharset() throws Exception {
+    	String string = "763209kfegLIZRD$";
+    	final ByteArrayOutputStream baos0 = new ByteArrayOutputStream();
+    	Streams.copy(Streams.of(string, null), baos0);
+    	assertEquals(string, baos0.toString(StandardCharsets.UTF_8.name()));
+    	final ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+    	Streams.copy(Streams.of(string, StandardCharsets.ISO_8859_1), baos1);
+    	assertEquals(string, baos1.toString(StandardCharsets.ISO_8859_1.name()));
+    	try {
+    		Streams.of((String) null, (Charset) null);
+    		fail("Expected Exception");
+    	} catch (NullPointerException e) {
+    		assertEquals("String", e.getMessage());
     	}
     }
 }

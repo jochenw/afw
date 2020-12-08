@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -248,5 +249,25 @@ public class StringsTest {
     	assertEquals("b", splittedValue1.get(1));
     	assertEquals("c", splittedValue1.get(2));
     	assertEquals(" d", splittedValue1.get(3));
+    }
+
+    /** Test case for {@link Strings#list(String...)}.
+     */
+    public void testList() {
+    	final ArrayList<String> values = Strings.list("a", "c", "b");
+    	assertEquals(3, values.size());
+    	assertEquals("a", values.get(0));
+    	assertEquals("c", values.get(1));
+    	assertEquals("b", values.get(2));
+    }
+
+    /** Test case for {@link Strings#list(String...)}.
+     */
+    public void testArray() {
+    	final String[] values = Strings.array("a", "c", "b");
+    	assertEquals(3, values.length);
+    	assertEquals("a", values[0]);
+    	assertEquals("c", values[1]);
+    	assertEquals("b", values[2]);
     }
 }
