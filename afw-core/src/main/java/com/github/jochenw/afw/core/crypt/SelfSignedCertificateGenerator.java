@@ -17,12 +17,26 @@ import com.github.jochenw.afw.core.util.Strings;
 import com.github.jochenw.afw.core.util.Systems;
 
 public class SelfSignedCertificateGenerator {
+	private Consumer<String> logger;
 	private String keyToolExe;
 	private String keyAlgorithm, fileName, storePassword, alias;
 	private int validInDays, keySize;
 	private String name, orgUnit, organization, location, stateOrProvince, country;
 
-	
+	public void setLogger(Consumer<String> pLogger) {
+		logger = pLogger;
+	}
+
+	public Consumer<String> getLogger() {
+		return logger;
+	}
+
+	public void log(String pMessage) {
+		if (logger != null) {
+			logger.accept(pMessage);
+		}
+	}
+
 	public String getAlias() {
 		return alias;
 	}
@@ -35,96 +49,96 @@ public class SelfSignedCertificateGenerator {
 		return keyToolExe;
 	}
 
-	public void setKeyToolExe(String keyToolExe) {
-		this.keyToolExe = keyToolExe;
+	public void setKeyToolExe(String pKeyToolExe) {
+		keyToolExe = pKeyToolExe;
 	}
 
 	public String getKeyAlgorithm() {
 		return keyAlgorithm;
 	}
 
-	public void setKeyAlgorithm(String keyAlgorithm) {
-		this.keyAlgorithm = keyAlgorithm;
+	public void setKeyAlgorithm(String pKeyAlgorithm) {
+		keyAlgorithm = pKeyAlgorithm;
 	}
 
 	public String getFileName() {
 		return fileName;
 	}
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void setFileName(String pFileName) {
+		fileName = pFileName;
 	}
 
 	public String getStorePassword() {
 		return storePassword;
 	}
 
-	public void setStorePassword(String storePassword) {
-		this.storePassword = storePassword;
+	public void setStorePassword(String pStorePassword) {
+		storePassword = pStorePassword;
 	}
 
 	public int getValidInDays() {
 		return validInDays;
 	}
 
-	public void setValidInDays(int validInDays) {
-		this.validInDays = validInDays;
+	public void setValidInDays(int pValidInDays) {
+		validInDays = pValidInDays;
 	}
 
 	public int getKeySize() {
 		return keySize;
 	}
 
-	public void setKeySize(int keySize) {
-		this.keySize = keySize;
+	public void setKeySize(int pKeySize) {
+		keySize = pKeySize;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String pName) {
+		name = pName;
 	}
 
 	public String getOrgUnit() {
 		return orgUnit;
 	}
 
-	public void setOrgUnit(String orgUnit) {
-		this.orgUnit = orgUnit;
+	public void setOrgUnit(String pOrgUnit) {
+		orgUnit = pOrgUnit;
 	}
 
 	public String getOrganization() {
 		return organization;
 	}
 
-	public void setOrganization(String organization) {
-		this.organization = organization;
+	public void setOrganization(String pOrganization) {
+		organization = pOrganization;
 	}
 
 	public String getLocation() {
 		return location;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
+	public void setLocation(String pLocation) {
+		location = pLocation;
 	}
 
 	public String getStateOrProvince() {
 		return stateOrProvince;
 	}
 
-	public void setStateOrProvince(String stateOrProvince) {
-		this.stateOrProvince = stateOrProvince;
+	public void setStateOrProvince(String pStateOrProvince) {
+		stateOrProvince = pStateOrProvince;
 	}
 
 	public String getCountry() {
 		return country;
 	}
 
-	public void setCountry(String country) {
-		this.country = country;
+	public void setCountry(String pCountry) {
+		country = pCountry;
 	}
 
 	/**
@@ -192,6 +206,7 @@ public class SelfSignedCertificateGenerator {
 		}
 		
 		final String[] cmdArray = cmd.toArray(new String[cmd.size()]);
+		log("Executing command: " + String.join(" ", cmdArray));
 		final Executor executor = new Executor();
 		executor.setInput((in) -> in.write(inputSb.toString().getBytes()));
 		final Consumer<InputStream> outConsumer = (out) -> Streams.copy(out, System.out);

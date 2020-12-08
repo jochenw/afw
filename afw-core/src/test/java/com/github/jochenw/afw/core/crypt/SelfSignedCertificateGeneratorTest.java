@@ -48,6 +48,7 @@ public class SelfSignedCertificateGeneratorTest {
 		scgen.setStorePassword("okayokay");
 		scgen.setValidInDays(9999);
 		scgen.createSelfSignedCertificate();
+		scgen.setLogger(System.out::println);
 		assertTrue(Files.isRegularFile(keyStorePath));
 		try (InputStream in = Files.newInputStream(keyStorePath)) {
 			final KeyStore keyStore = KeyStore.getInstance("jks");
