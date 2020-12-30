@@ -4,9 +4,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.codehaus.groovy.ast.ASTNode;
 
 import com.github.jochenw.afw.core.util.Objects;
 
@@ -15,6 +18,7 @@ import com.github.jochenw.afw.core.util.Holder;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyCodeSource;
+import groovy.lang.GroovyRuntimeException;
 import groovy.lang.GroovyShell;
 
 public class GroovyScriptEngine implements IScriptEngine {
@@ -37,14 +41,31 @@ public class GroovyScriptEngine implements IScriptEngine {
 			final @Nonnull Map<String,Object> parameters = asParameters(pParameters);
 			gScript.setBinding(new Binding(parameters));
 			@SuppressWarnings("unchecked")
-			final O o = (O) gScript.run();
+			final O o = (O) run();
 			return o;
+		}
+
+		protected Object run() {
+			try {
+				return gScript.run();
+			} catch (GroovyRuntimeException gre) {
+				final ASTNode node = gre.getNode();
+				if (node == null) {
+					throw gre;
+				} else {
+					final String text = node.getText();
+					final int lineNumber = node.getLineNumber();
+					final int columnNumber = node.getColumnNumber();
+					throw gre;
+				}
+			}
 		}
 
 		@Override
 		public void run(@Nonnull Map<String, Object> pParameters) {
 			final @Nonnull Map<String,Object> parameters = asParameters(pParameters);
 			gScript.setBinding(new Binding(parameters));
+			run();
 		}
 		
 	}

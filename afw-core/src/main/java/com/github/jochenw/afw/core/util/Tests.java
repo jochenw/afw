@@ -121,6 +121,25 @@ public class Tests {
 		throw new IllegalStateException(pMessage);
 	}
 	
+
+	public static Path requireTestDirectory(Class<?> pTestClass) {
+		return requireTestDirectory(pTestClass.getSimpleName());
+	}
+
+	public static Path requireTestDirectory(String pTestName) {
+		final Path junitWorkDir = requireTestDirectory().toPath();
+		final Path testDir = junitWorkDir.resolve(pTestName);
+		Functions.run(() -> Files.createDirectories(testDir));
+		return testDir;
+	}
+
+	public static Path setupTestDirectory(Class<?> pTestClass, Path pSourceDir) {
+		final Path testDir = requireTestDirectory(pTestClass);
+		com.github.jochenw.afw.core.util.Files.removeDirectory(testDir);
+		com.github.jochenw.afw.core.util.Files.copyDirectory(pSourceDir, testDir);
+		return testDir;
+	}
+
 	public static File requireTestDirectory() {
 		final File targetDir = new File("target");
 		assertTrue(targetDir.isDirectory());

@@ -24,19 +24,20 @@ import com.github.jochenw.afw.core.util.Streams;
  * operating systems, but Windows.
  */
 public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler {
+	public static final String CMD_EXE = "cmd.exe";
 	private final Executor executor = new Executor();
 
 	@Override
 	protected void createSymbolicDirLink(Path pTarget, Path pLink) {
 		final Path dir = Objects.notNull(pLink.getParent(), () -> Paths.get("."));
-		final String[] command = { "cmd", "/c", "mklink", "/j", "/d", pLink.getFileName().toString(),
+		final String[] command = { CMD_EXE, "/c", "mklink", "/j", "/d", pLink.getFileName().toString(),
 				                   pTarget.toAbsolutePath().toString() };
 		executor.run(dir, command, null, null, null, null);
 	}
 
 	@Override
 	protected void createSymbolicFileLink(Path pTarget, Path pLink) {
-		final String[] command = { "cmd", "/c", "mkdir", pLink.toString(),
+		final String[] command = { CMD_EXE, "/c", "mkdir", pLink.toString(),
                 pTarget.toString() };
 		executor.run(null, command, null, null);
 	}
@@ -46,7 +47,7 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 		final Path dir = Objects.notNull(pPath.getParent(), () -> Paths.get("."));
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final Consumer<InputStream> outConsumer = (in) -> { Streams.copy(in, baos); };
-		executor.run(dir, new String[] {"cmd", "/c", "dir", "." }, null,
+		executor.run(dir, new String[] {CMD_EXE, "/c", "dir", "." }, null,
 				     outConsumer, null, null);
 		final String output = baos.toString();
 		final Pattern pat = Pattern.compile("\\s+\\Q" + pPath.getFileName()

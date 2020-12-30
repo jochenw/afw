@@ -2,6 +2,7 @@ package com.github.jochenw.afw.core.util;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
@@ -112,6 +113,16 @@ public class FunctionsTest {
         public boolean isClosed() {
             return closed;
         }
+    }
+
+    @Test
+    public void testCreate() throws Exception {
+    	final Constructor<Functions> constructor = Functions.class.getDeclaredConstructor();
+    	if (!constructor.isAccessible()) {
+    		constructor.setAccessible(true);
+    	}
+    	final Functions functions = constructor.newInstance();
+    	assertNotNull(functions);
     }
 
     @Test

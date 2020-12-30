@@ -15,9 +15,15 @@
  */
 package com.github.jochenw.afw.core.inject.simple;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.inject.IComponentFactory;
+import com.github.jochenw.afw.core.inject.IComponentFactoryAware;
 import com.github.jochenw.afw.core.inject.InjectTests;
+import com.github.jochenw.afw.core.util.Holder;
 
 
 
@@ -25,5 +31,24 @@ public class SimpleComponentFactoryTest {
 	@Test
 	public void testSimpleComponentFactory() {
 		InjectTests.testComponentFactory(new SimpleComponentFactoryBuilder());
+	}
+
+	@Test
+	public void testComponentFactoryAware() {
+		final Holder<IComponentFactory> cfHolder = new Holder<>();
+		final Object object = new IComponentFactoryAware() {
+			@Override
+			public void init(IComponentFactory pFactory) {
+				assertNotNull(pFactory);
+				cfHolder.set(pFactory);
+			}
+		};
+		final IComponentFactory cf = new SimpleComponentFactoryBuilder().module((b) -> {
+			b.bind(Object.class, "singleton").toInstance(object);
+		}).build();
+		final Object o = cf.requireInstance(Object.class, "singleton");
+		assertNotNull(o);
+		assertSame(object, o);
+		assertSame(cf, cfHolder.get());
 	}
 }

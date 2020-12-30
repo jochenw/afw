@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -64,6 +65,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 	    <T> AnnotatedBindingBuilder<T> bind(Class<T> pType);
 	    <T> LinkedBindingBuilder<T> bind(Class<T> pType, String pName);
 	    void requestStaticInjection(Class<?>... types);
+	    void addFinalizer(Consumer<IComponentFactory> pComponentFactory);
 	}
 	public interface Module {
 		void configure(Binder pBinder);
@@ -363,16 +365,18 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 	public @Nonnull IComponentFactory build() {
 		if (instance == null) {
 			immutable = true;
-			final IComponentFactory cf = newInstance();
+			final IComponentFactory componentFctory = newInstance();
 			final Set<Class<?>> staticInjectionClasses = new HashSet<>();
-			final List<BindingBuilder<?>> builders = createBindingBuilders(cf, staticInjectionClasses);
-			createBindings(cf, builders, staticInjectionClasses);
-			instance = cf;
+			final List<Consumer<IComponentFactory>> finalizers = new ArrayList<>();
+			final List<BindingBuilder<?>> builders = createBindingBuilders(componentFctory, finalizers, staticInjectionClasses);
+			createBindings(componentFctory, builders, staticInjectionClasses);
+			instance = componentFctory;
+			finalizers.forEach((fin) -> fin.accept(componentFctory));
 		}
 		return instance;
 	}
 
-	protected List<BindingBuilder<?>> createBindingBuilders(IComponentFactory pCf, Set<Class<?>> pStaticInjectionClasses) {
+	protected List<BindingBuilder<?>> createBindingBuilders(IComponentFactory pCf, List<Consumer<IComponentFactory>> pFinalizers, Set<Class<?>> pStaticInjectionClasses) {
 		final Map<Key<?>,BindingBuilder<?>> builders = new HashMap<>();
 		final Binder binder = new Binder() {
 			@Override
@@ -434,6 +438,11 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 				for (Class<?> type : Objects.requireAllNonNull(pTypes, "Type")) {
 					pStaticInjectionClasses.add(type);
 				}
+			}
+
+			@Override
+			public void addFinalizer(Consumer<IComponentFactory> pFinalizer) {
+				pFinalizers.add(pFinalizer);
 			}
 		};
 		binder.bind(IComponentFactory.class).toInstance(pCf);

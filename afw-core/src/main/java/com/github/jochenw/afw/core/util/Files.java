@@ -16,7 +16,11 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UncheckedIOException;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.LinkOption;
@@ -24,6 +28,9 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.function.Function;
+
+import com.github.jochenw.afw.core.props.Interpolator;
 
 
 /** Utility class for working with files, and directories.
@@ -46,6 +53,43 @@ public class Files {
 						java.nio.file.Files.createDirectories(b);
 					} else {
 						java.nio.file.Files.copy(a, b, StandardCopyOption.REPLACE_EXISTING);
+					}
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/** Copies the directory {@code pSource}, to the directory {@code pTrget}.
+	 * including contents. Files in the target directory may be overwritten, but
+	 * will not be deleted. (This is a copy operation, not a synchronization.)
+	 * @param pSource The source directory.
+	 * @param pTarget The target directory.
+	 * @param pInterpolator A mapping of property names to property values.
+	 *   which may be contained, and replaced in the copied files.
+	 * @throws UncheckedIOException Copying failed.
+	 */
+	public static void copyDirectory(final Path pSource, final Path pTarget, Function<String,String> pMapper) {
+		try {
+			java.nio.file.Files.walk(pSource).forEach(a -> {
+				final Path relativePath = pSource.relativize(a);
+				final Path b = pTarget.resolve(relativePath);
+				try {
+					if (java.nio.file.Files.isDirectory(a)) {
+						java.nio.file.Files.createDirectories(b);
+					} else {
+						final Interpolator interpolator = new DefaultInterpolator(pMapper);
+						final StringWriter sw = new StringWriter();
+						try (Reader reader = java.nio.file.Files.newBufferedReader(a, StandardCharsets.UTF_8)) {
+							Streams.copy(reader, sw);
+						}
+						final String contents = interpolator.interpolate(sw.toString());
+						try (Writer w = java.nio.file.Files.newBufferedWriter(b)) {
+							w.write(contents);
+						}
 					}
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);

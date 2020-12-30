@@ -37,6 +37,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.github.jochenw.afw.core.inject.IComponentFactory;
+import com.github.jochenw.afw.core.inject.IComponentFactoryAware;
 import com.github.jochenw.afw.core.inject.Key;
 import com.github.jochenw.afw.core.inject.OnTheFlyBinder;
 import com.github.jochenw.afw.core.inject.Scope;
@@ -94,6 +95,9 @@ public class SimpleComponentFactory implements IComponentFactory {
 	@Override
 	public void init(Object pObject) {
 		getMetaData(pObject.getClass()).init(pObject);
+		if (pObject instanceof IComponentFactoryAware) {
+			((IComponentFactoryAware) pObject).init(this);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
