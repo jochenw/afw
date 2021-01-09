@@ -7,9 +7,15 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.DosFileAttributeView;
+import java.nio.file.attribute.DosFileAttributes;
+import java.nio.file.attribute.FileAttributeView;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +23,7 @@ import java.util.regex.Pattern;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Executor;
 import com.github.jochenw.afw.core.util.Objects;
+import com.github.jochenw.afw.core.util.Reflection;
 import com.github.jochenw.afw.core.util.Streams;
 
 /** Alternative implementation of {@link ISymbolicLinksHandler}, which is using
@@ -44,26 +51,16 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 
 	@Override
 	protected Path checkSymbolicLink(Path pPath) {
-		final Path dir = Objects.notNull(pPath.getParent(), () -> Paths.get("."));
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final Consumer<InputStream> outConsumer = (in) -> { Streams.copy(in, baos); };
-		executor.run(dir, new String[] {CMD_EXE, "/c", "dir", "." }, null,
-				     outConsumer, null, null);
-		final String output = baos.toString();
-		final Pattern pat = Pattern.compile("\\s+\\Q" + pPath.getFileName()
-		                                    + "\\E\\s+\\[(.*)\\]\\s*$");
-		try (StringReader sr = new StringReader(output);
-			 BufferedReader br = new BufferedReader(sr)) {
-			for (;;) {
-				final String line = br.readLine();
-				if (line == null) {
-					return null;
+		try {
+			if (Files.exists(pPath, LinkOption.NOFOLLOW_LINKS)) {
+				final BasicFileAttributes bfa = Files.readAttributes(pPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+				if (!bfa.isSymbolicLink()  &&  bfa.isOther()) {
+					return pPath.toRealPath();
 				} else {
-					final Matcher m = pat.matcher(line);
-					if (m.find()) {
-						return Paths.get(m.group(1));
-					}
+					return null;
 				}
+			} else {
+				return null;
 			}
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
@@ -78,5 +75,4 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 			throw Exceptions.show(t);
 		}
 	}
-
 }
