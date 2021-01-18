@@ -16,7 +16,6 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
@@ -29,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -327,7 +325,7 @@ public class Strings {
 				sb.append(c);
 				break;
 			  default:
-				  throw new IllegalStateException("Invalid character in version string: " + pVersionStr);
+				  throw new IllegalArgumentException("Invalid character " + (int) c + " in version string: " + pVersionStr);
 			}			
 		}
 		if (sb.length() == 0) {
