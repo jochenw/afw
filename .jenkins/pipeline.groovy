@@ -16,9 +16,9 @@ pipeline {
                 ) {
 				    script {
 				        if (isUnix()) {
-    			            sh 'mvn -fafw/afw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            sh 'mvn -fafw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    } else {
-    			            bat 'mvn.cmd -fafw/afw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            bat 'mvn.cmd -fafw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    }
 					}
                 }
@@ -35,9 +35,9 @@ pipeline {
                 ) {
 				    script {
 				        if (isUnix()) {
-    			            sh 'mvn -fafw/afw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            sh 'mvn -fafw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    } else {
-    			            bat 'mvn.cmd -fafw/afw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            bat 'mvn.cmd -fafw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    }
 				    }
                 }
