@@ -44,7 +44,9 @@ pipeline {
             }
         }
 		stage ('profiler') {
-            step( [ $class: 'JacocoPublisher' ] )
+		    steps {
+                step( [ $class: 'JacocoPublisher' ] )
+			}
 		}
     }
 }
