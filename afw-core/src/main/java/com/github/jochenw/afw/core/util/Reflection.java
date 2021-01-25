@@ -16,10 +16,12 @@
 package com.github.jochenw.afw.core.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -393,5 +395,61 @@ public class Reflection {
 	 */
 	public static Field getStaticField(Class<? extends Object> pClass, String pName) {
 		return findStaticField(pClass, pName);
+	}
+
+	/** Creates a new instance of the given type by searching for a constructor, which
+	 * accepts the given arguments. If the arguments are not exactly matching the
+	 * signature, then you may pass additional arguments, that are class objects, in
+	 * front of the actual arguments. If so, then the class arguments are taken to
+	 * indicate the actual signature.
+	 * For example, suggest the following classes:
+	 * <pre>
+	 *   public class IntClass { public IntClass(Integer pNumber) { ... } }
+	 *   public class NumberClass { public NumberClass(Number pNumber) { ... } } 
+	 * </pre>
+	 * In the example, the following would work:
+	 * <pre>
+	 *   newObject("IntClass", Integer.valueOf(42));
+	 * </pre>
+	 * This however, wouldn't work, because there is no constructor NumberClass(Integer).
+	 * <pre>
+	 *   newObject("NumberClass", Integer.valueOf(42));
+	 * </pre>
+	 * To get this working, use
+	 * <pre>
+	 *   newObject("NumberClass", Number.class, Integer.valueOf(42));
+	 * </pre>
+	 * @param <O> The result type.
+	 * @param pType Name of the class, which is being instantiated
+	 * @param pArgs The constructor arguments. If the first arguments is a class, then
+	 *   this argument, and all following arguments, that are classes, are used as the
+	 *   constructors signature.
+	 * @return The created object.
+	 */
+	public static <O> O newObject(String pType, Object... pArgs) {
+		try {
+			final List<Class<?>> classes = new ArrayList<>();
+			final List<Object> objects = new ArrayList<>(Arrays.asList(pArgs));
+			while (!objects.isEmpty()  &&  objects.get(0) instanceof Class) {
+				final Class<?> cl = (Class<?>) objects.remove(0);
+				classes.add(cl);
+			}
+			if (classes.isEmpty()) {
+				for (Object o : objects) {
+					final Class<?> cl = o.getClass();
+					classes.add(cl);
+				}
+			}
+			@SuppressWarnings("unchecked")
+			final Class<Object> cl1 = (Class<Object>) Class.forName(pType);
+			final Class<Object> cl = cl1;
+			final Constructor<Object> cons = cl.getDeclaredConstructor(classes.toArray(new Class<?>[classes.size()]));
+			cons.setAccessible(true);
+			@SuppressWarnings("unchecked")
+			final O o = (O) cons.newInstance(objects.toArray(new Object[objects.size()]));
+			return o;
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
 	}
 }

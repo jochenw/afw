@@ -14,10 +14,12 @@ pipeline {
                     // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
                     mavenLocalRepo: '.repository',
                 ) {
-				    if (isUnix()) {
-    			        sh 'mvn -fafw/afw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
-					} else {
-    			        bat 'mvn.cmd -fafw/afw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+				    script {
+				        if (isUnix()) {
+    			            sh 'mvn -fafw/afw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+					    } else {
+    			            bat 'mvn.cmd -fafw/afw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+					    }
 					}
                 }
             }
@@ -31,11 +33,13 @@ pipeline {
                     // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
                     mavenLocalRepo: '.repository',
                 ) {
-				    if (isUnix()) {
-    			        sh 'mvn -fafw/afw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
-					} else {
-    			        bat 'mvn.cmd -fafw/afw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
-					}
+				    script {
+				        if (isUnix()) {
+    			            sh 'mvn -fafw/afw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+					    } else {
+    			            bat 'mvn.cmd -fafw/afw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+					    }
+				    }
                 }
             }
         }
