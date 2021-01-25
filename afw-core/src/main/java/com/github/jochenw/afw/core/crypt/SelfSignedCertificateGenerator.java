@@ -2,15 +2,23 @@ package com.github.jochenw.afw.core.crypt;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import javax.inject.Inject;
+
+import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Executor;
+import com.github.jochenw.afw.core.util.Keys;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Streams;
 import com.github.jochenw.afw.core.util.Strings;
@@ -18,11 +26,13 @@ import com.github.jochenw.afw.core.util.Systems;
 
 public class SelfSignedCertificateGenerator {
 	private Consumer<String> logger;
+	private @Inject IKeyHandler keyHandler;
 	private String keyToolExe;
-	private String keyAlgorithm, fileName, storePassword, alias;
+	private String keyAlgorithm, fileName, keyPassword, storePassword, alias, storeType;
 	private int validInDays, keySize;
 	private String name, orgUnit, organization, location, stateOrProvince, country;
 
+	
 	public void setLogger(Consumer<String> pLogger) {
 		logger = pLogger;
 	}
@@ -35,6 +45,30 @@ public class SelfSignedCertificateGenerator {
 		if (logger != null) {
 			logger.accept(pMessage);
 		}
+	}
+
+	public String getKeyPassword() {
+		return keyPassword;
+	}
+
+	public void setKeyPassword(String pKeyPassword) {
+		keyPassword = pKeyPassword;
+	}
+
+	public void setKeyHandler(IKeyHandler pKeyHandler) {
+		keyHandler = pKeyHandler;
+	}
+
+	public IKeyHandler getKeyHandler() {
+		return Objects.notNull(keyHandler, Keys.getKeyHandler());
+	}
+
+	public void setStoreType(String pStoreType) {
+		storeType = pStoreType;
+	}
+
+	public String getStoreType() {
+		return Objects.notNull(storeType, "JKS");
 	}
 
 	public String getAlias() {
@@ -162,25 +196,6 @@ public class SelfSignedCertificateGenerator {
 	 *    [no]:  yes
 	 */
 	public void createSelfSignedCertificate() {
-		final String keytool = findKeyTool();
-		final List<String> cmd = new ArrayList<>();
-		cmd.add(keytool);
-		cmd.add("-genkey");
-		cmd.add("-keyalg");
-		cmd.add(Objects.notNull(getKeyAlgorithm(), "RSA"));
-		if (getAlias() == null) {
-			throw new IllegalStateException("No alias given");
-		} else {
-			cmd.add("-alias");
-			cmd.add(getAlias());
-		}
-		if (getFileName() == null) {
-			throw new IllegalStateException("No fileName given");
-		} else {
-			cmd.add("-keystore");
-			cmd.add(getFileName());
-		}
-
 		final StringBuilder inputSb = new StringBuilder();
 		final BiConsumer<String,String> appender = (sh,st) -> {
 			if (st != null) {
@@ -198,20 +213,24 @@ public class SelfSignedCertificateGenerator {
 		appender.accept("L", getLocation());
 		appender.accept("S", getStateOrProvince());
 		appender.accept("C", getCountry());
-		cmd.add("-dname");
-		cmd.add(inputSb.toString());
-		if (getStorePassword() != null) {
-			cmd.add("-storepass");
-			cmd.add(getStorePassword());
+		final IKeyHandler kh = getKeyHandler();
+		final KeyPair keyPair = kh.createKeyPair();
+		final Certificate certificate = kh.generateCertificate(inputSb.toString(), keyPair, validInDays);
+		final Path path = Paths.get(fileName);
+		final Path dir = path.getParent();
+		try {
+			if (dir != null) {
+				Files.createDirectories(dir);
+			}
+			try (OutputStream os = Files.newOutputStream(path)) {
+				kh.createKeyStore(os, keyPair.getPrivate(), certificate, getAlias(), getStoreType(),
+						          getStorePassword(), getKeyPassword());
+			}
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
 		}
+			
 		
-		final String[] cmdArray = cmd.toArray(new String[cmd.size()]);
-		log("Executing command: " + String.join(" ", cmdArray));
-		final Executor executor = new Executor();
-		executor.setInput((in) -> in.write(inputSb.toString().getBytes()));
-		final Consumer<InputStream> outConsumer = (out) -> Streams.copy(out, System.out);
-		final Consumer<InputStream> errConsumer = (err) -> Streams.copy(err, System.err);
-		executor.run(null, cmdArray, null, outConsumer, errConsumer, null);
 	}
 
 	public String findKeyTool() {
