@@ -79,8 +79,9 @@ public class DefaultKeyHandler implements IKeyHandler {
 			String pStorePass, String pKeyPass) {
 		try {
 			KeyStore keyStore = KeyStore.getInstance(Objects.notNull(pStoreType, "JKS"));
-			keyStore.load(null, null);
-			keyStore.setKeyEntry(pAlias, pPrivateKey, "654321".toCharArray(), new Certificate[] {pCertificate});
+			keyStore.load(null, pStorePass.toCharArray());
+			final String pwd = Objects.notNull(pKeyPass, pStorePass);
+			keyStore.setKeyEntry(pAlias, pPrivateKey, pwd.toCharArray(), new Certificate[] {pCertificate});
 			return keyStore;
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
