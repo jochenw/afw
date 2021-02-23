@@ -18,26 +18,70 @@ package com.github.jochenw.afw.core;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+
+/**
+ * The {@link ResourceLocator} maintains the application name, and the instance name.
+ * An application may exist in multiple instances. (For example, a web application,
+ * which is deployed several times.) If so, the application name is assumed to be
+ * identical for all instances, whereas the instance name is assumed to be unique. 
+ */
 public abstract class ResourceLocator {
-	private String instanceName, applicationName;
+	private @Nullable String instanceName, applicationName;
 
-	public String getInstanceName() {
+
+	/**
+	 * Returns the instance name.
+	 * @return The instance name.
+	 */
+	public @Nullable String getInstanceName() {
 		return instanceName;
 	}
-	public void setInstanceName(String instanceName) {
-		this.instanceName = instanceName;
+	/**
+	 * Sets the instance name.
+	 * @param pInstanceName The instance name.
+	 */
+	public void setInstanceName(@Nullable String pInstanceName) {
+		instanceName = pInstanceName;
 	}
-	public String getApplicationName() {
+	/**
+	 * Returns the application name.
+	 * @return The application name.
+	 */
+	public @Nullable String getApplicationName() {
 		return applicationName;
 	}
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
+	/**
+	 * Sets the application name.
+	 * @param pApplicationName The application name.
+	 */
+	public void setApplicationName(@Nullable String pApplicationName) {
+		applicationName = pApplicationName;
 	}
 
-	public URL getResource(String pUri) {
+	/**
+	 * Returns the resource with the given URI, searching in the
+	 * current threads context class loader.
+	 * @param pUri The URI, which is being searched.
+	 * @return An URL, which may be opened to read the resource,
+	 *   or null, if the resource wasn't found.
+	 * @see #requireResource(String)
+	 */
+	public @Nullable URL getResource(@Nonnull String pUri) {
 		return getResource(Thread.currentThread().getContextClassLoader(), pUri);
 	}
+	/**
+	 * Returns the resource with the given URI, searching in the
+	 * current threads context class loader.
+	 * @param pUri The URI, which is being searched.
+	 * @return An URL, which may be opened to read the resource.
+	 *   Never null, an Exception is thrown, if the resource
+	 *   wasn't found.
+	 * @throws NoSuchElementException The resource wasn't found.
+	 * @see #requireResource(String)
+	 */
 	public URL requireResource(String pUri) throws NoSuchElementException {
 		final URL url = getResource(pUri);
 		if (url == null) {
@@ -45,7 +89,30 @@ public abstract class ResourceLocator {
 		}
 		return url;
 	}
+	/**
+	 * Returns the resource with the given URI, searching in the
+	 * given class loader.
+	 * @param pClassLoader The class loader, which is being used to perform
+	 *   the search.
+	 * @param pUri The URI, which is being searched.
+	 * @return An URL, which may be opened to read the resource,
+	 *   or null, if the resource wasn't found.
+	 * @see #requireResource(ClassLoader, String)
+	 * @see #getResource(String)
+	 */
 	public abstract URL getResource(ClassLoader pClassLoader, String pUri);
+	/**
+	 * Returns the resource with the given URI, searching in the
+	 * given class loader.
+	 * @param pClassLoader The class loader, which is being used to perform
+	 *   the search.
+	 * @param pUri The URI, which is being searched.
+	 * @return An URL, which may be opened to read the resource.
+	 *   Never null. (An Exception is thrown, if the resource wasn't found.)
+	 * @throws NoSuchElementException The resource wasn't found.
+	 * @see #getResource(ClassLoader, String)
+	 * @see #getResource(String)
+	 */
 	public URL requireResource(ClassLoader pClassLoader, String pUri) {
 		final URL url = getResource(pUri);
 		if (url == null) {

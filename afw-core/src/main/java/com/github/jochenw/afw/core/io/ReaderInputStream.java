@@ -2,7 +2,9 @@ package com.github.jochenw.afw.core.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -13,7 +15,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 
-/** The opposite of a {@link InputStreamReader}: An
+/** The opposite of an {@link InputStreamReader}: An
  * {@link InputStream}, which converts the characters,
  * that are read from an underlying {@link Reader}
  * to a byte stream.

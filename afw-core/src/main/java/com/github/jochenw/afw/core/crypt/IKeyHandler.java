@@ -78,15 +78,19 @@ public interface IKeyHandler {
 	public Tupel<PrivateKey,Certificate> readPrivateKey(@Nonnull InputStream pIn, @Nonnull String pAlias,
 			                                            @Nonnull String pStorePass, @Nullable String pKeyPass);
 
-	/** Encrypts a string, using the given private key to a byte array.
+	/** Encrypts a byte array, using the given private key to a byte array.
 	 * @param pKey The (private) key to use for encryption.
 	 * @param pBytes The byte array, which is being encrypted.
+	 * @return The encrypted byte array.
 	 */
 	public byte[] encrypt(Key pKey, byte[] pBytes);
 
-	/** Encrypts a string, using the given private key to a string.
+	/** Encrypts a string, using the given private key to a string, and
+	 * the {@link StandardCharsets#UTF_8 UTF-8} character set for
+	 * conversion of bytes into characters, and vice versa. 
 	 * @param pKey The (private) key to use for encryption.
 	 * @param pString The string, which is being encrypted.
+	 * @return The encrypted string, as a base64 encoded byte array.
 	 */
 	public default String encryptToString(Key pKey, String pString) {
 		final byte[] bytes = encrypt(pKey, pString.getBytes(StandardCharsets.UTF_8));
@@ -95,6 +99,9 @@ public interface IKeyHandler {
 	}
 
 	/** Decrypts a byte array, using the given public key, to a byte array.
+	 * @param pKey The (public) key, which is being used for decryption.
+	 * @param pBytes The byte array, which is being decrypted.
+	 * @return The decrypted byte array.
 	 */
 	public byte[] decrypt(Key pKey, byte[] pBytes);
 	

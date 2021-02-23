@@ -17,30 +17,62 @@ package com.github.jochenw.afw.core;
 
 import java.net.URL;
 
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.util.Strings;
 
+
+/**
+ * Default implementation of the {@link ResourceLocator}.
+ */
 public class DefaultResourceLoader extends ResourceLocator {
 	String resourcePrefix;
 
+	/**
+	 * Creates a new instance with application name = null, and instance name = null,
+	 * and resource prefix = null.
+	 */
 	public DefaultResourceLoader() {
 		this(null, null);
 	}
 
-	public DefaultResourceLoader(String pApplicationName, String pInstanceName) {
+	/**
+	 * Creates a new instance with the given application name, and the given
+	 * instance name, and the resource prefix null.
+	 * @param pApplicationName The application name
+	 * @param pInstanceName The instance name
+	 */
+	public DefaultResourceLoader(@Nullable String pApplicationName, @Nullable String pInstanceName) {
 		this(pApplicationName, pInstanceName, null);
 	}
 
-	public DefaultResourceLoader(String pApplicationName, String pInstanceName, String pResourcePrefix) {
+	/**
+	 * Creates a new instance with the given application name, and the given
+	 * instance name, and the given resource prefix.
+	 * @param pApplicationName The application name
+	 * @param pInstanceName The instance name
+	 * @param pResourcePrefix The resource prefix
+	 */
+	public DefaultResourceLoader(@Nullable String pApplicationName, @Nullable String pInstanceName,
+			                     @Nullable String pResourcePrefix) {
 		setApplicationName(pApplicationName);
 		setInstanceName(pInstanceName);
 		resourcePrefix = pResourcePrefix;
 	}
 
-	public String getResourcePrefix() {
+	/**
+	 * Returns the resource prefix.
+	 * @return The resource prefix.
+	 */
+	public @Nullable String getResourcePrefix() {
 		return resourcePrefix;
 	}
 
-	public void setResourcePrefix(String pResourcePrefix) {
+	/**
+	 * Sets the resource prefix.
+	 * @param pResourcePrefix The resource prefix.
+	 */
+	public void setResourcePrefix(@Nullable String pResourcePrefix) {
 		resourcePrefix = pResourcePrefix;
 	}
 	

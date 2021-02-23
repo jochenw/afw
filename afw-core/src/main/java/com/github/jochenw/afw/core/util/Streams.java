@@ -420,8 +420,13 @@ public class Streams {
     	return apply(pFile.toPath(), pFunction);
     }
 
-    /** Loads the given property file, and returns it as an instance of
-     * {@link Properties}.
+    /** Reads the given input stream, and returns it as an instance of
+     * {@link java.util.Properties}.
+     * @param pIn The input stream, which is being read.
+     * @param pUri The input streams URI.
+     * @return The contents of the given file, as a {@link java.util.Properties}
+     *   object.
+     * @throws IOException Reading the input stream has failed.
      */
     public static Properties load(InputStream pIn, String pUri) throws IOException {
     	final Properties props = new Properties();
@@ -434,23 +439,32 @@ public class Streams {
     }
 
     /** Loads the given property file, and returns it as an instance of
-     * {@link Properties}.
+     * {@link java.util.Properties}.
+     * @param pPath The property file, which is being loaded.
+     * @return The contents of the given file, as a {@link java.util.Properties}
+     *   object.
      */
     public static Properties load(Path pPath) {
     	return Streams.apply(pPath, (in) -> { return load(in, pPath.getFileName().toString()); });
     }
 
     /** Loads the given property file, and returns it as an instance of
-     * {@link Properties}.
+     * {@link java.util.Properties}.
+     * @param pFile The property file, which is being loaded.
+     * @return The contents of the given file, as a {@link java.util.Properties}
+     *   object.
      */
-    public static Properties load(File pFile) {
+    public static java.util.Properties load(File pFile) {
     	return Streams.apply(pFile, (in) -> { return load(in, pFile.getName()); });
     }
 
-    /** Loads the given property file, and returns it as an instance of
-     * {@link Properties}.
+    /** Reads the given property URL, and returns it as an instance of
+     * {@link java.util.Properties}.
+     * @param pUrl The URL, which is being read.
+     * @return The contents of the given URL, as a {@link java.util.Properties}
+     *   object.
      */
-    public static Properties load(URL pUrl) {
+    public static java.util.Properties load(URL pUrl) {
     	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
     }
 
@@ -485,7 +499,7 @@ public class Streams {
 
     /**
      * Creates a {@link StringReader}, returning the given string.
-     * @param pBytes The string, which ought to constitute the contents
+     * @param pString The string, which ought to constitute the contents
      *   of the returned stream.
      * @return A {@link StringReader}, returning the given string.
      * @throws NullPointerException The parameter {@code pString} is null.
@@ -496,7 +510,7 @@ public class Streams {
 
     /**
      * Creates a {@link ByteArrayInputStream}, returning the given string.
-     * @param pBytes The string, which ought to constitute the contents
+     * @param pString The string, which ought to constitute the contents
      *   of the returned stream.
      * @param pCharset The character set, which should be used to convert
      *   the string into a byte array. (May be null, in which case
