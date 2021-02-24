@@ -23,7 +23,12 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+/**
+ * A component, which provides HTTP, or HTTPS connections.
+ */
 public class HttpConnector {
+	/** A {@link X509TrustManager}, which accepts all certificates.
+	 */
 	public static final X509TrustManager TRUST_ALL_MANAGER = new X509TrustManager() {
 		public X509Certificate[] getAcceptedIssuers() {
 			return null;
@@ -35,7 +40,14 @@ public class HttpConnector {
 		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		}
 	};
+	/**
+	 * A wrapper for an {@link HttpURLConnection}, which implements
+	 * {@link AutoCloseable}.
+	 */
 	public interface HttpConnection extends AutoCloseable {
+		/** Returns the underlying {@link HttpURLConnection}.
+		 * @return The wrapped {@link HttpURLConnection}
+		 */
 		public HttpURLConnection getUrlConnection();
 		@Override
 		public void close();
@@ -57,7 +69,7 @@ public class HttpConnector {
 	/**
 	 * Sets, whether all SSL certificates are trusted. If that is the case,
 	 * SSL certificate checking is effectively disabled.
-	 * @return True, if all SSL certificates are trusted. The default is false.
+	 * @param pTrustingAllCertificates True, if all SSL certificates are trusted. The default is false.
 	 */
 	public void setTrustingAllCertificates(boolean pTrustingAllCertificates) {
 		trustingAllCertificates = pTrustingAllCertificates;
@@ -66,7 +78,8 @@ public class HttpConnector {
 	 * Returns the trust store to use for verification of SSL certificates.
 	 * @return The trust store to use for verification of SSL certificates.
 	 *   The default is null (Use the system's default trust store).
-	 * @see #setTruststore(Path pPath)
+	 * @see #setTruststore(Path, String)
+	 * @see #getTruststorePassword()
 	 */
 	public Path getTruststore() {
 		return trustStore;
@@ -76,7 +89,8 @@ public class HttpConnector {
 	 * @return The password to use for reading the truststore.
 	 *   Ignored, if the system's default truststore is used
 	 *   (If the configured truststore is null.)
-	 * @see #setTruststore(Path pPath)
+	 * @see #setTruststore(Path, String)
+	 * @see #getTruststore()
 	 */
 	public String getTruststorePassword() {
 		return trustStorePassword;
@@ -94,9 +108,17 @@ public class HttpConnector {
 		trustStore = pTruststore;
 	}
 
+	/**
+	 * Returns the proxy host.
+	 * @return The proxy host.
+	 */
 	public @Nullable String getProxyHost() {
 		return proxy == null ? null : proxy.getHostString();
 	}
+	/**
+	 * Returns the proxy port.
+	 * @return The proxy port.
+	 */
 	public @Nullable Integer getProxyPort() {
 		return proxy == null ? null : Integer.valueOf(proxy.getPort());
 	}
@@ -136,7 +158,13 @@ public class HttpConnector {
 		}
 	}
 	
-	
+
+	/**
+	 * Creates an {@link HttpConnection} for the given URL.
+	 * @param pUrl The URL, to which a connection is being created.
+	 * @return The established connection.
+	 * @throws IOException Creating the connection failed.
+	 */
 	public HttpConnection connect(URL pUrl) throws IOException {
 		if ("http".equals(pUrl.getProtocol())) {
 			return asHttpConnection(pUrl);

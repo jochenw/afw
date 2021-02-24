@@ -14,13 +14,24 @@ import javax.annotation.Nullable;
 import com.github.jochenw.afw.core.crypt.DefaultKeyHandler;
 import com.github.jochenw.afw.core.crypt.IKeyHandler;
 
+
+/** Utility class, which provides static encryption/decryption methods.
+ */
 public class Keys {
 	private static volatile @Nonnull IKeyHandler keyHandler = new DefaultKeyHandler();
 
+	/**
+	 * Returns the default {@link IKeyHandler}, which is internally used.
+	 * @return The default {@link IKeyHandler}, which is internally used.
+	 */
 	public static @Nonnull IKeyHandler getKeyHandler() {
 		return keyHandler;
 	}
 
+	/**
+	 * Sets the default {@link IKeyHandler}, which is internally used.
+	 * @param pKeyHandler The default {@link IKeyHandler}, which is internally used.
+	 */
 	public static void setKeyHandler(@Nonnull IKeyHandler pKeyHandler) {
 		keyHandler = Objects.requireNonNull(pKeyHandler, "IKeyHandler");
 	}
@@ -100,6 +111,7 @@ public class Keys {
 	/** Encrypts a string, using the given private key to a byte array.
 	 * @param pKey The (private) key to use for encryption.
 	 * @param pBytes The byte array, which is being encrypted.
+	 * @return The encrypted byte array.
 	 */
 	public static byte[] encrypt(Key pKey, byte[] pBytes) {
 		return getKeyHandler().encrypt(pKey, pBytes);
@@ -108,12 +120,17 @@ public class Keys {
 	/** Encrypts a string, using the given private key to a string.
 	 * @param pKey The (private) key to use for encryption.
 	 * @param pString The string, which is being encrypted.
+	 * @return The encrypted byte array, as a base 64 encoded
+	 *   string.
 	 */
 	public static String encryptToString(Key pKey, String pString) {
 		return getKeyHandler().encryptToString(pKey, pString);
 	}
 
 	/** Decrypts a byte array, using the given public key, to a byte array.
+	 * @param pKey The key, which is being used for decryption.
+	 * @param pBytes The byte array, which is being decrypted.
+	 * @return The decrypted byte array.
 	 */
 	public static byte[] decrypt(Key pKey, byte[] pBytes) {
 		return getKeyHandler().decrypt(pKey, pBytes);

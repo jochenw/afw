@@ -25,6 +25,7 @@ public class TerminationRequest extends RuntimeException {
 	}
 
 	/** Returns the result value (if available), or null.
+	 * @return The result value (if available), or null.
 	 */
 	public Object getValue() {
 		return value;

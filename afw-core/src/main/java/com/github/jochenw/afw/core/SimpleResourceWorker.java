@@ -22,23 +22,82 @@ import java.util.Objects;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 
+
+/** This class is responsible for collecting resources, that must
+ * be released later on. Typically a {@link SimpleResourceWorker}
+ * is instantiated at the beginning of a transaction, and
+ * released (together with the collected resources) at the end
+ * of the transaction.
+ */
 public class SimpleResourceWorker {
+	/**
+	 * A runnable object, which may be invoked, adding
+	 * resources to the {@link SimpleResourceWorker
+	 * resource workers} collection set.
+	 */
 	@FunctionalInterface
 	public interface ResRunnable {
+		/**
+		 * Called to perform an action, that produces no
+		 * result. The {@link SimpleResourceTracker tracker}
+		 * may be used to collect resources.
+		 * @param pTracker The tracker accepts resources,
+		 *   that have been collected. This resources will
+		 *   later on be released, together with the
+		 *   controlling {@link SimpleResourceWorker}.
+		 */
 		public abstract void run(SimpleResourceTracker pTracker);
 	}
+	/**
+	 * A callable object, which may be invoked, adding
+	 * resources to the {@link SimpleResourceWorker
+	 * resource workers} collection set, and producing
+	 * a result object.
+	 * @param <T> The result objects type.
+	 */
 	@FunctionalInterface
 	public interface ResCallable<T> {
+		/**
+		 * Called to perform an action, that produces no
+		 * result. The {@link SimpleResourceTracker tracker}
+		 * may be used to collect resources.
+		 * @param pTracker The tracker accepts resources,
+		 *   that have been collected. This resources will
+		 *   later on be released, together with the
+		 *   controlling {@link SimpleResourceWorker}.
+		 * @return The result object, which has been
+		 *   produced.
+		 */
 		public abstract T call(SimpleResourceTracker pTracker);
 	}
+	/** The {@link SimpleResourceTracker tracker} acts as a
+	 * delegate of the {@link SimpleResourceWorker}, accepting
+	 * collected resources on behalf of the latter.
+	 */
 	public class SimpleResourceTracker {
 		private final List<Object> resources = new ArrayList<>();
 
+
+		/**
+		 * Called to collect a resource, which may be released
+		 * later on.
+		 * @param pResource The resource, which is being collected.
+		 * @see SimpleResourceWorker#assertTrackable(Object)
+		 * @see SimpleResourceWorker#closeResource(Object, boolean)
+		 */
 		public void track(Object pResource) {
 			assertTrackable(pResource);
 			resources.add(pResource);
 		}
 
+		/**
+		 * Called to release the resources, that have been collected.
+		 * Release is done in reverse order of collection.
+		 * @throws RuntimeException An error occurred while
+		 *   releasing a resource. If multiple errors are occurring,
+		 *   then the first is thrown (assuming that later problems
+		 *   may be triggered by the first).
+		 */
 		public void close() {
 			Throwable th = null;
 			for (int i = resources.size()-1;  i >= 0;  i--) {
@@ -79,7 +138,13 @@ public class SimpleResourceWorker {
 	protected SimpleResourceTracker newTracker() {
 		return new SimpleResourceTracker();
 	}
-	
+
+	/**
+	 * Called to execute a piece of code, that allocates resources, that
+	 * are to be released automatically, when the {@link ResRunnable runnable}
+	 * is finished.
+	 * @param pRunnable The piece of code, that is being executed.
+	 */
 	public void run(ResRunnable pRunnable) {
 		Objects.requireNonNull(pRunnable, "Runnable");
 		SimpleResourceTracker tracker = newTracker();
@@ -106,6 +171,15 @@ public class SimpleResourceWorker {
 		}
 	}
 	
+	/**
+	 * Called to execute a piece of code, that allocates resources, producing
+	 * a result object. The allocated resources are to be released automatically,
+	 * when the {@link ResCallable callable} is finished
+	 * @param pCallable The piece of code, that is being executed.
+	 * @param <T> The result objects type.
+	 * @return The result object, that has been produced by the
+	 *   {@link ResCallable callable}.
+	 */
 	public <T> T call(ResCallable<T> pCallable) {
 		Objects.requireNonNull(pCallable, "Callable");
 		SimpleResourceTracker tracker = newTracker();

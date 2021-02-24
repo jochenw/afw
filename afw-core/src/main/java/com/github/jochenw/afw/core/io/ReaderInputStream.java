@@ -40,8 +40,10 @@ public class ReaderInputStream extends InputStream {
 	 * Creates a new instance, which reads characters from
 	 * the given {@code pReader}. The characters are converted
 	 * to bytes using the given {@code pCharset}.
-	 * @param pReader
-	 * @param pCharset
+	 * @param pReader The reader, from which to read data.
+	 * @param pCharset The character set, which is being used to convert
+	 *   characters into bytes.
+	 * @throws NullPointerException Either of the parameters is null.
 	 */
 	public ReaderInputStream(@Nonnull Reader pReader, @Nonnull Charset pCharset) {
 		reader = Objects.requireNonNull(pReader, "Reader");

@@ -63,12 +63,12 @@ public class Files {
 		}
 	}
 
-	/** Copies the directory {@code pSource}, to the directory {@code pTrget}.
+	/** Copies the directory {@code pSource}, to the directory {@code pTarget}.
 	 * including contents. Files in the target directory may be overwritten, but
 	 * will not be deleted. (This is a copy operation, not a synchronization.)
 	 * @param pSource The source directory.
 	 * @param pTarget The target directory.
-	 * @param pInterpolator A mapping of property names to property values.
+	 * @param pMapper A mapping of property names to property values.
 	 *   which may be contained, and replaced in the copied files.
 	 * @throws UncheckedIOException Copying failed.
 	 */

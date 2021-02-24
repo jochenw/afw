@@ -80,7 +80,7 @@ public class Streams {
      * Returns the contents of the given {@link InputStream}, as a
      * string. The {@link InputStream} isn't closed.
      * @param pIn The {@link InputStream} to read from. Will be closed.
-     * @param pCharset The character set to use for byte[]->string
+     * @param pCharset The character set to use for byte[]-to-string
      *   conversion. May be null, in which case
      *   {@link StandardCharsets#UTF_8 UTF-8} will be used.
      * @return The contents, which have been read from {@code pIn}.
@@ -367,6 +367,9 @@ public class Streams {
 
     /** Opens an {@link InputStream} for reading the given {@link URL},
      * and passes that {@link InputStream} to the given {@link FailableFunction}.
+     * @param <O> The type of the {@link FailableFunction failable function's}
+     *   result object. Also the type of this objects result object, because
+     *   the same object is returned.
      * @param pUrl The {@link URL} to read.
      * @param pFunction A {@link FailableFunction}, which is being invoked with
      *   the opened {@link InputStream} as the parameter. The {@link
@@ -387,6 +390,9 @@ public class Streams {
 
     /** Opens an {@link InputStream} for reading the given {@link Path},
      * and passes that {@link InputStream} to the given {@link FailableFunction}.
+     * @param <O> The type of the {@link FailableFunction failable function's}
+     *   result object. Also the type of this objects result object, because
+     *   the same object is returned.
      * @param pPath The {@link Path file} to read.
      * @param pFunction A {@link FailableFunction}, which is being invoked with
      *   the opened {@link InputStream} as the parameter. The {@link
@@ -407,6 +413,9 @@ public class Streams {
 
     /** Opens an {@link InputStream} for reading the given {@link File file},
      * and passes that {@link InputStream} to the given {@link FailableFunction}.
+     * @param <O> The type of the {@link FailableFunction failable function's}
+     *   result object. Also the type of this objects result object, because
+     *   the same object is returned.
      * @param pFile The {@link File file} to read.
      * @param pFunction A {@link FailableFunction}, which is being invoked with
      *   the opened {@link InputStream} as the parameter. The {@link
