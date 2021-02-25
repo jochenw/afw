@@ -18,7 +18,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.jochenw.afw</groupId>
   <artifactId>afw-core</artifactId>
-  <version>0.6-SNAPSHOT</version>
+  <version>0.5-SNAPSHOT</version>
   <name>AFW (Core)</name>
   <description>Application Framework (Core)</description>
   <properties>
