@@ -17,13 +17,27 @@ package com.github.jochenw.afw.core.el;
 
 import java.util.Objects;
 
+/**
+ * Default implementation of {@link PropertyResolver}, which supports
+ * access to complex properties like "foo.bar" in nested objects,
+ * using a so-called atomic property resolver.
+ */
 public class DefaultPropertyResolver extends PropertyResolver {
 	private final PropertyResolver atomicPropertyResolver;
 
+	/**
+	 * Creates a new instance with the default atomic property
+	 * resolver.
+	 */
 	public DefaultPropertyResolver() {
 		this(new DefaultAtomicPropertyResolver());
 	}
 
+	/**
+	 * Creates a new instance with the given atomic property
+	 * resolver.
+	 * @param pAtomicPropertyResolver The atomic property resolver to use.
+	 */
 	public DefaultPropertyResolver(PropertyResolver pAtomicPropertyResolver) {
 		atomicPropertyResolver = pAtomicPropertyResolver;
 	}

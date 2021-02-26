@@ -56,14 +56,25 @@ public class EqualityExpression {
     	this(pLeft, null, null);
     }
 
+    /**
+     * Returns the left hand side of the equality expression.
+     * @return The left hand side of the equality expression.
+     */
 	public RelationalExpression getLeft() {
 		return left;
 	}
 
+    /**
+     * Returns the right hand side of the equality expression.
+     * @return The right hand side of the equality expression.
+     */
 	public RelationalExpression getRight() {
 		return right;
 	}
 
+	/** Returns the operator, which compares the left hand side, and the right hand side.
+	 * @return The operator, which compares the left hand side, and the right hand side.
+	 */
 	public Op getOp() {
 		return op;
 	}

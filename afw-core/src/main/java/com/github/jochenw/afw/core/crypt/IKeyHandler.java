@@ -17,6 +17,9 @@ import javax.annotation.Nullable;
 import com.github.jochenw.afw.core.util.Tupel;
 
 
+/**
+ * Interface of an object, which is able to create keys, and certificates.
+ */
 public interface IKeyHandler {
 	/**
 	 * Generates a new key pair
@@ -49,6 +52,7 @@ public interface IKeyHandler {
                                             @Nonnull Certificate pCertificate, @Nonnull String pAlias,
                                             @Nullable String pStoreType, @Nonnull String pStorePass,
                                             @Nonnull String pKeyPass);
+
 	/**
 	 * Creates a new key store with exactly one entry, representing the given private key,
 	 * and certificate. The created key store is being written to the given {@link OutputStream}.

@@ -41,24 +41,43 @@ public class MultiplyExpression {
     private final UnaryExpression left, right;
     private final Op op;
 
+    /** Creates a new instance with the given left hand side, the given operator, and
+     * the given right hand side. 
+     * @param pLeft The expressions left hand side.
+     * @param pOp The expressions operator.
+     * @param pRight The expressions right hand side.
+     */
     public MultiplyExpression(UnaryExpression pLeft, Op pOp, UnaryExpression pRight) {
     	left = pLeft;
     	op = pOp;
     	right = pRight;
     }
 
+    /** Creates a new instance with the given left hand side, no operator, and
+     * no right hand side. 
+     * @param pLeft The expressions left hand side.
+     */
     public MultiplyExpression(UnaryExpression pLeft) {
     	this(pLeft, null, null);
     }
 
+    /** Returns the expressions left hand side.
+     * @return The expressions left hand side.
+     */
 	public UnaryExpression getLeft() {
 		return left;
 	}
 
+    /** Returns the expressions right hand side.
+     * @return The expressions right hand side.
+     */
 	public UnaryExpression getRight() {
 		return right;
 	}
 
+    /** Returns the expressions operator.
+     * @return The expressions operator.
+     */
 	public Op getOp() {
 		return op;
 	}

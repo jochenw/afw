@@ -22,7 +22,15 @@ import com.github.jochenw.afw.core.el.tree.ElExpression;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
+/** A parser for EL expressions.
+ */
 public class ElReader {
+	/** Parses the given string as an EL expression.
+	 * @param pExpression The EL expression string, which is being parsed.
+	 * @return The parsed EL expression, which may then be evaluated using
+	 * {@link ElEvaluator#evaluate(ElExpression, Object)}, or
+	 * {@link ElEvaluator#evaluate(ElExpression, Object, java.util.List)}.
+	 */
 	public ElExpression parse(String pExpression) {
 		final ELParser parser = new ELParser(new StringReader(pExpression));
 		try {

@@ -17,24 +17,45 @@ package com.github.jochenw.afw.core.el.tree;
 
 import java.io.Serializable;
 
+
+/** An object, which represents a parsed EL expression as an object
+ * tree.
+ */
 public class ElExpression implements Serializable {
 	private static final long serialVersionUID = 8384812496202649423L;
 	private final OrExpression orExpression;
 	private final int numPlaceholders;
 
+	/**
+	 * Creates a new instance, which consists of a single {@link OrExpression},
+	 * and has no placeholders.
+	 * @param pOrExpression The single {@link OrExpression}.
+	 */
 	public ElExpression(OrExpression pOrExpression) {
 		this(pOrExpression, 0);
 	}
 
+	/**
+	 * Creates a new instance, which consists of the given {@link OrExpression},
+	 * and has the given number of placeholders.
+	 * @param pOrExpression The single {@link OrExpression}.
+	 * @param pNumPlaceholders The number of placeholders.
+	 */
 	public ElExpression(OrExpression pOrExpression, int pNumPlaceholders) {
 		orExpression = pOrExpression;
 		numPlaceholders = pNumPlaceholders;
 	}
 
+	/** Returns the single {@link OrExpression}.
+	 * @return The single {@link OrExpression}.
+	 */
 	public OrExpression getOrExpression() {
 		return orExpression;
 	}
 
+	/** Returns the number of placeholders.
+	 * @return The number of placeholders.
+	 */
 	public int getNumberOfPlaceholders() {
 		return numPlaceholders;
 	}

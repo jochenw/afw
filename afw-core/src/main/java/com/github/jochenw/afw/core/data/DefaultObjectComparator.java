@@ -11,16 +11,37 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+
+/**
+ * Default implementation of {@link IObjectComparator}.
+ */
 public class DefaultObjectComparator implements IObjectComparator {
+	/** This object is used to calculate the location of a difference.
+	 *(The first argument of {@link Listener#difference(String, String)}.
+	 */
 	public static class Context {
 		private final Listener listener;
 		private final StringBuilder sb = new StringBuilder();
+		/** Creates a new instance with the given listener.
+		 * @param pListener The listener, which is being invoked
+		 *   in case of differences.
+		 */
 		public Context(Listener pListener) {
 			listener = pListener;
 		}
+		/** Returns the current length of the location (context)
+		 * string.
+		 * @return The current length of the location (context)
+		 * string.
+		 */
 		public int getContext() {
 			return sb.length();
 		}
+		/** Restores a previous location string by truncating the
+		 * current location string to the given length.
+		 * @param pPreviousContext The length of the new,
+		 *   truncated location string.
+		 */
 		public void restoreContext(int pPreviousContext) {
 			if (pPreviousContext > sb.length()) {
 				throw new IllegalStateException("Unable to restore context to length"
@@ -28,16 +49,30 @@ public class DefaultObjectComparator implements IObjectComparator {
 			}
 			sb.setLength(pPreviousContext);
 		}
+		/** Extends the current location string by appending the given
+		 * suffix (typically the name of a property, which is currently
+		 * being compared recursively.
+		 * @param pContextExtension The suffix, which is being appended
+		 *   to the location string.
+		 */
 		public void addContext(String pContextExtension) {
 			if (sb.length() > 0) {
 				sb.append('.');
 			}
 			sb.append(pContextExtension);
 		}
+		/** Called to report a difference with the given description,
+		 * and the current location string.
+		 * @param pDescription The difference description.
+		 */
 		public void difference(String pDescription) {
 			listener.difference(sb.toString(), pDescription);
 		}
 	}
+
+	/** A wrapper for map-like objects, or collections of
+	 * key/value pairs.
+	 */
 	public abstract static class MapWrapper {
 		private final String prefix, suffix;
 		private final Object object;
@@ -46,19 +81,55 @@ public class DefaultObjectComparator implements IObjectComparator {
 			suffix = pSuffix;
 			object = pObject;
 		}
+		/** Returns the prefix, which is being used to
+		 * create a textual representation of the underlying object.
+		 * @return The prefix, which is being used to
+		 * create a textual representation of the underlying object.
+		 */
 	    public String getPrefix() { return prefix; }
+		/** Returns the suffix, which is being used to
+		 * create a textual representation of the underlying object.
+		 * @return The suffix, which is being used to
+		 * create a textual representation of the underlying object.
+		 */
 		public String getSuffix() { return suffix; }
+		/** Returns the wrapped object.
+		 * @return The underlying object.
+		 */
 		public Object getObject() { return object; }
+		/** Called to iterate over the key/value pairs in the wrapped
+		 * object, in no particular order.
+		 * @param pConsumer The consumer, which is being invoked for
+		 *   every key/value pair in the wrapped object.
+		 */
 		public abstract void forEach(BiConsumer<String,Object> pConsumer);
 	}
+	/** A wrapper for map-like objects, or ordered collections of
+	 * objects.
+	 */
 	public abstract static class ListWrapper {
 		private final String prefix, suffix;
 		protected ListWrapper(String pPrefix, String pSuffix) {
 			prefix = pPrefix;
 			suffix = pSuffix;
 		}
+		/** Returns the prefix, which is being used to
+		 * create a textual representation of the underlying object.
+		 * @return The prefix, which is being used to
+		 * create a textual representation of the underlying object.
+		 */
 	    public String getPrefix() { return prefix; }
+		/** Returns the suffix, which is being used to
+		 * create a textual representation of the underlying object.
+		 * @return The suffix, which is being used to
+		 * create a textual representation of the underlying object.
+		 */
 		public String getSuffix() { return suffix; }
+		/** Called to iterate over the elements in the wrapped
+		 * object, in the wrapped objects natural order.
+		 * @param pConsumer The consumer, which is being invoked for
+		 *   every element in the wrapped object.
+		 */
 		public abstract void forEach(Consumer<Object> pConsumer);
 	}
 

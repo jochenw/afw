@@ -15,6 +15,12 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+
+/**
+ * An expression, which constitutes a single value. For example,
+ * a constant value, a variable reference, or a placeholder
+ * reference.
+ */
 public class ValueExpression {
 	private final ElExpression elExpression;
 	private final Boolean booleanValue;
@@ -24,8 +30,12 @@ public class ValueExpression {
 	private final VariableReferenceExpression variableReference;
 	private final Integer placeholderIndex;
 
-	public ValueExpression(Long pLongValue) {
-		longValue = pLongValue;
+	/**
+	 * Creates a new instance with the given constant value.
+	 * @param pValue The constant value.
+	 */
+	public ValueExpression(Long pValue) {
+		longValue = pValue;
 		booleanValue = null;
 		doubleValue = null;
 		stringValue = null;
@@ -34,9 +44,13 @@ public class ValueExpression {
 		elExpression = null;
 	}
 
-	public ValueExpression(Boolean pBooleanValue) {
+	/**
+	 * Creates a new instance with the given constant value.
+	 * @param pValue The constant value.
+	 */
+	public ValueExpression(Boolean pValue) {
 		longValue = null;
-		booleanValue = pBooleanValue;
+		booleanValue = pValue;
 		doubleValue = null;
 		stringValue = null;
 		variableReference = null;
@@ -44,26 +58,38 @@ public class ValueExpression {
 		elExpression = null;
 	}
 
-	public ValueExpression(Double pDoubleValue) {
+	/**
+	 * Creates a new instance with the given constant value.
+	 * @param pValue The constant value.
+	 */
+	public ValueExpression(Double pValue) {
 		longValue = null;
 		booleanValue = null;
-		doubleValue = pDoubleValue;
+		doubleValue = pValue;
 		stringValue = null;
 		variableReference = null;
 		placeholderIndex = null;
 		elExpression = null;
 	}
 
-	public ValueExpression(String pStringValue) {
+	/**
+	 * Creates a new instance with the given constant value.
+	 * @param pValue The constant value.
+	 */
+	public ValueExpression(String pValue) {
 		longValue = null;
 		booleanValue = null;
 		doubleValue = null;
-		stringValue = pStringValue;
+		stringValue = pValue;
 		variableReference = null;
 		placeholderIndex = null;
 		elExpression = null;
 	}
 
+	/**
+	 * Creates a new instance with the given variable reference as the value.
+	 * @param pVariableReference The variable reference.
+	 */
 	public ValueExpression(VariableReferenceExpression pVariableReference) {
 		longValue = null;
 		booleanValue = null;
@@ -74,6 +100,11 @@ public class ValueExpression {
 		elExpression = null;
 	}
 
+	/**
+	 * Creates a new instance with the given placeholder reference as the value.
+	 * @param pPlaceholderIndex Index of the placeholder value, that is being
+	 *   referenced.
+	 */
 	public ValueExpression(Integer pPlaceholderIndex) {
 		longValue = null;
 		booleanValue = null;
@@ -84,6 +115,9 @@ public class ValueExpression {
 		elExpression = null;
 	}
 
+	/**
+	 * Creates a new instance with the value null.
+	 */
 	public ValueExpression() {
 		longValue = null;
 		booleanValue = null;
@@ -94,6 +128,10 @@ public class ValueExpression {
 		elExpression = null;
 	}
 
+	/**
+	 * Creates a new instance with the given expressions result as the value.
+	 * @param pElExpression The expression, which constitutes the value.
+	 */
 	public ValueExpression(ElExpression pElExpression) {
 		longValue = null;
 		booleanValue = null;
@@ -104,34 +142,67 @@ public class ValueExpression {
 		elExpression = pElExpression;
 	}
 
+	/**
+	 * Returns the constant boolean value, if any, or null.
+	 * @return The constant boolean value, if any, or null.
+	 */
 	public Boolean getBooleanValue() {
 		return booleanValue;
 	}
 
+	/**
+	 * Returns the constant long value, if any, or null.
+	 * @return The constant long value, if any, or null.
+	 */
 	public Long getLongValue() {
 		return longValue;
 	}
 
+	/**
+	 * Returns the constant double value, if any, or null.
+	 * @return The constant double value, if any, or null.
+	 */
 	public Double getDoubleValue() {
 		return doubleValue;
 	}
 
+	/**
+	 * Returns the constant String value, if any, or null.
+	 * @return The constant String value, if any, or null.
+	 */
 	public String getStringValue() {
 		return stringValue;
 	}
 
+	/**
+	 * Returns the variable reference, if any, or null.
+	 * @return The variable reference, if any, or null.
+	 */
 	public VariableReferenceExpression getVariableReference() {
 		return variableReference;
 	}
 
+	/**
+	 * Returns the placeholder index, if any, or null.
+	 * @return The placeholder index, if any, or null.
+	 */
 	public Integer getPlaceholderIndex() {
 		return placeholderIndex;
 	}
 
+	/**
+	 * Returns the inner expression, if any, or null.
+	 * @return The inner expression, if any, or null.
+	 */
 	public ElExpression getElExpression() {
 		return elExpression;
 	}
 
+	/**
+	 * Creates a new instance, which constitutes the given value.
+	 * @param pObject The created expressions value.
+	 * @return The created instance.
+	 */
 	public static ValueExpression valueOf(Object pObject) {
 		if (pObject == null) {
 			return new ValueExpression();
@@ -154,6 +225,11 @@ public class ValueExpression {
 		}
 	}
 
+	/**
+	 * Converts the given string literal into a value.
+	 * @param pLiteral The string literal, which is being parsed.
+	 * @return The parsed value.
+	 */
 	public static String ofLiteral(String pLiteral) {
 		if (pLiteral == null) {
 			throw new NullPointerException("A String Literal must not be null.");

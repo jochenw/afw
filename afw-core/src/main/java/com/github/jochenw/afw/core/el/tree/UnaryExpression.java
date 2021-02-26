@@ -21,21 +21,36 @@ package com.github.jochenw.afw.core.el.tree;
  * another expression.
  */
 public class UnaryExpression {
+	/** The unary expressions operator.
+	 */
 	public static enum Op {
-		NOT, MINUS, EMPTY
+		/** The "!" (not) operator.
+		 */
+		NOT,
+		/** The unary "-" (minus) operator.
+		 */
+		MINUS,
+		/** The "empty" operator.
+		 */
+		EMPTY
 	}
 	
     private final ValueExpression value;
     private final Op op;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance with no operator.
      * @param pValue The expression value.
      */
     public UnaryExpression(ValueExpression pValue) {
     	this(pValue, null);
     }
 
+    /**
+     * Creates a new instance with the given operator.
+     * @param pValue The expression value.
+     * @param pOp The expressions operator.
+     */
     public UnaryExpression(ValueExpression pValue, Op pOp) {
     	value = pValue;
     	op = pOp;
@@ -49,6 +64,10 @@ public class UnaryExpression {
         return value;
     }
 
+    /**
+     * Returns the operator.
+     * @return The operator.
+     */
 	public Op getOp() {
 		return op;
 	}

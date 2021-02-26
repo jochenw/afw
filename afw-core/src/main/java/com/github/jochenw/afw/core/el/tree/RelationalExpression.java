@@ -66,14 +66,23 @@ public class RelationalExpression {
     	this(pLeft, null, null);
     }
 
+    /** Returns the expressions left hand side.
+     * @return The expressions left hand side.
+     */
 	public AddExpression getLeft() {
 		return left;
 	}
 
+    /** Returns the expressions right hand side.
+     * @return The expressions right hand side.
+     */
 	public AddExpression getRight() {
 		return right;
 	}
 
+    /** Returns the expressions operator.
+     * @return The expressions operator.
+     */
 	public Op getOp() {
 		return op;
 	}

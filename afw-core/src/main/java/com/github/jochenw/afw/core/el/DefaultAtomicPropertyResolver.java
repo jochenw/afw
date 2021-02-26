@@ -22,6 +22,17 @@ import java.util.Objects;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Reflection;
 
+/**
+ * Default implementation of {@link PropertyResolver}, which supports
+ * the following strategies of reading a property:
+ * <ol>
+ *   <li>Using {@link Map#get(Object)} on Map objects.</li>
+ *   <li>Finding, and using corresponding public getters.
+ * </ol>
+ * Note, that this property resolver is only suitable for
+ * simple properties (like "foo", or "bar", in objects of depth 1) not for complex
+ * properties like "foo.bar" in nested objects.
+ */
 public class DefaultAtomicPropertyResolver extends PropertyResolver {
 	@Override
 	public Object getValue(Object pObject, String pProperty) {

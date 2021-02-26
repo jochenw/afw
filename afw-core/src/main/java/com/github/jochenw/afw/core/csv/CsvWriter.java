@@ -28,6 +28,8 @@ import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Streams;
 
 
+/** A creator for CSV files.
+ */
 public class CsvWriter implements AutoCloseable {
 	private final String[] header;
 	private final String lineSeparator;
@@ -35,6 +37,13 @@ public class CsvWriter implements AutoCloseable {
 	private Writer w;
 	private BufferedWriter bw;
 
+	/**
+	 * Creates a new instance, which writes to the given {@link OutputStream},
+	 * using the given array of header names.
+	 * @param pOut The output stream, to which the CSV file is being written.
+	 * @param pHeader The array of header names, which is being written as the
+	 *   first line.
+	 */
 	public CsvWriter(OutputStream pOut, String[] pHeader) {
 		try {
 			header = pHeader;
@@ -117,6 +126,11 @@ public class CsvWriter implements AutoCloseable {
 		}
 	}
 
+	/**
+	 * Writes a CSV row with the given values, using the map keys to calculate
+	 * the column indices.
+	 * @param pMap The CSV row, as a map of key/value pairs.
+	 */
 	public void write(Map<String,String> pMap) {
 		final String[] row = new String[header.length];
 		for (int i = 0;  i < header.length;  i++) {

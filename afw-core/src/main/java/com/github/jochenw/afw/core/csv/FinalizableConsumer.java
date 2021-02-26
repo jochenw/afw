@@ -19,6 +19,11 @@ import java.util.function.Consumer;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 
+
+/**
+ * A consumer, which is being notified about the end of events.
+ * @param <T> The consumers input type.
+ */
 public class FinalizableConsumer<T> implements Consumer<T> {
 	/** Called for success.
 	 */

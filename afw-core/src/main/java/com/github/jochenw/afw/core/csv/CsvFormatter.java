@@ -20,6 +20,8 @@ import java.io.IOException;
 import com.github.jochenw.afw.core.io.WritableCharacterStream;
 
 
+/** An entity, which can write CSV files, applying minimal formatting.
+ */
 public class CsvFormatter implements AutoCloseable {
 	private final String lineSeparator;
 	private final String quoteString;
@@ -27,6 +29,13 @@ public class CsvFormatter implements AutoCloseable {
 
 	private final WritableCharacterStream wcs;
 
+	/** Creates a new instance, which writes CSV data to the given character stream, using
+	 * the given line separator, the given quote string, and the given column separator.
+	 * @param pWcs The character stream, to which data is being written.
+	 * @param pLineSeparator The line separator.
+	 * @param pQuoteString The quote string
+	 * @param pColumnSeparator The column separator.
+	 */
 	public CsvFormatter(WritableCharacterStream pWcs,
 			            String pLineSeparator, String pQuoteString, String pColumnSeparator) {
 		wcs = pWcs;
@@ -35,6 +44,12 @@ public class CsvFormatter implements AutoCloseable {
 		columnSeparator = pColumnSeparator;
 	}
 
+	/** Writes the given row to the target stream.
+	 * @param pRow The data row to write.
+	 * @param pForceQuoteString Whether to force the prsence of the quote string. By
+	 *   default, the need of quote strings is determined automatically, and per cell.
+	 * @throws IOException Writing the data failed, due to an I/O error.
+	 */
 	public void write(String[] pRow, boolean pForceQuoteString) throws IOException {
 		for (int i = 0;  i < pRow.length;  i++) {
 			if (i > 0) {
@@ -53,12 +68,19 @@ public class CsvFormatter implements AutoCloseable {
 		wcs.write(lineSeparator);
 	}
 
+	/** Returns, whether the use of quote strings is required for the given cell value.
+	 * @param pValue The value, which is being checked.
+	 * @return True, if writing a CSV cell with the given value requires the use of
+	 *   quote strings. Otherwise false.
+	 * @throws IllegalArgumentException Writing this cell value would require escaping,
+	 *   which is not supported.
+	 */
 	private boolean isQuoteStringRequired(String pValue) {
 		if (pValue.indexOf(quoteString) != -1) {
-			throw new IllegalStateException("Quote string inside column value is not supported.");
+			throw new IllegalArgumentException("Quote string inside column value is not supported.");
 		}
 		if (pValue.indexOf(columnSeparator) != -1) {
-			throw new IllegalStateException("Column separator inside column value is not supported.");
+			throw new IllegalArgumentException("Column separator inside column value is not supported.");
 		}
 		return false;
 	}

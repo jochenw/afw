@@ -15,15 +15,27 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+
+/**
+ * An expression, which is being evaluated by referencing a property in the data model.
+ */
 public class VariableReferenceExpression {
 	private final String var;
 
+	/**
+	 * An expression, which is being evaluated by referencing the given
+	 * property in the data model.
+	 * @param pVar The property reference, possibly complex, like "foo.bar.baz".
+	 */
 	public VariableReferenceExpression(String pVar) {
 		var = pVar;
 	}
 	
+	/**
+	 * Returns the property reference, possibly complex, like "foo.bar.baz".
+	 * @return The property reference, possibly complex, like "foo.bar.baz".
+	 */
 	public String getVar() {
 		return var;
 	}
-
 }

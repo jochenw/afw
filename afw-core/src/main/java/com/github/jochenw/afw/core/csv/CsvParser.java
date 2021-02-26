@@ -18,6 +18,9 @@ package com.github.jochenw.afw.core.csv;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A simple parser for CSV files.
+ */
 public class CsvParser {
 	private final String lineSeparator;
 	private final String quoteString;
@@ -26,6 +29,13 @@ public class CsvParser {
 	private final int quoteStringLength;
 	private final int columnSeparatorLength;
 
+	/**
+	 * Creates a new line with the given line separator, quote string, and column separator.
+	 * @param pLineSeparator The line separator, typically "\n", or "\r\n".
+	 * @param pQuoteString The quite string, which is being used as a prefix, and suffix for
+	 *   CSV cell values. Typically "\"", or "'".
+	 * @param pColumnSeparator The column separator, typically ",", or ";".
+	 */
 	public CsvParser(String pLineSeparator, String pQuoteString, String pColumnSeparator) {
 		lineSeparator = pLineSeparator;
 		quoteString = pQuoteString;
@@ -35,6 +45,14 @@ public class CsvParser {
 		columnSeparatorLength = columnSeparator.length();
 	}
 
+
+	/**
+	 * Parses the given line
+	 * @param pLine The line, which is being parsed.
+	 * @param pLineNumber The line number, for use in error messages.
+	 * @return The array of cell values, that have been found in the
+	 *   given line.
+	 */
 	public String[] asArray(final String pLine, int pLineNumber) {
 		final int length = pLine.length();
 		int state = 0;
@@ -81,6 +99,4 @@ public class CsvParser {
 			}
 		}
 	}
-
-
 }

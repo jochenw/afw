@@ -15,10 +15,19 @@
  */
 package com.github.jochenw.afw.core.csv;
 
+
+/** An exception, which is thrown by the {@link CsvParser} in case of
+ * invalid data.
+ */
 public class CsvParseException extends RuntimeException {
 	private static final long serialVersionUID = -5942567849644190594L;
 
-	public CsvParseException(String message) {
-		super(message);
+	/**
+	 * Creates a new instance with the given error message.
+	 * @param pMessage The error message.
+	 * @see RuntimeException#RuntimeException(String)
+	 */
+	public CsvParseException(String pMessage) {
+		super(pMessage);
 	}
 }

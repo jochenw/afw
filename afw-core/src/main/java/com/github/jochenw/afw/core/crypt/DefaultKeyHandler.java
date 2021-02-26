@@ -22,6 +22,10 @@ import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Reflection;
 import com.github.jochenw.afw.core.util.Tupel;
 
+
+/**
+ * Default implementation of {@link IKeyHandler}, using RSA.
+ */
 public class DefaultKeyHandler implements IKeyHandler {
 	@Override
 	public KeyPair createKeyPair() {

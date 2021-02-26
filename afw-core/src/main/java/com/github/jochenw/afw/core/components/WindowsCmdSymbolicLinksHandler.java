@@ -31,6 +31,10 @@ import com.github.jochenw.afw.core.util.Streams;
  * operating systems, but Windows.
  */
 public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler {
+	/** Name of "cmd.exe". We need this, because we are, in fact, launching cmd.exe,
+	 * to execute internal commands like mklink, that don't exist as separate .exe
+	 * files.
+	 */
 	public static final String CMD_EXE = "cmd.exe";
 	private final Executor executor = new Executor();
 

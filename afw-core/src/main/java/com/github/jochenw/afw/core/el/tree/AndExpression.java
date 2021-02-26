@@ -33,6 +33,11 @@ public class AndExpression {
         items = pItems;
     }
 
+    /**
+     * Creates a new instance with a single item.
+     * @param pExpr The single item nn the expressions item list. Th expressions result will be built by evaluating this
+     *   item, and returning that evalutions result.
+     */
     public AndExpression(EqualityExpression pExpr) {
     	this(Collections.singletonList(pExpr));
 	}

@@ -18,8 +18,31 @@ package com.github.jochenw.afw.core.el;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+
+/** Instances of this class are used by the {@link ElEvaluator} for
+ * resolving properties in the model.
+ */
 public abstract class PropertyResolver {
+	/**
+	 * Called to resolve a nullable property in the model.
+	 * @param pObject The model, which is being applied to the EL expression.
+	 * @param pProperty The (possibly complex) property, like
+	 *   "foo", "bar", or "foo.bar".
+	 * @return The evaluated value. May be null, if the property wasn't found
+	 *   to be applicable, or if applying the model resulted in a null value.
+	 */
 	public abstract Object getValue(Object pObject, String pProperty);
+	/**
+	 * Called to resolve a non-null property in the model.
+	 * @param pObject The model, which is being applied to the EL expression.
+	 * @param pProperty The (possibly complex) property, like
+	 *   "foo", "bar", or "foo.bar".
+	 * @return The evaluated value, if the property was found
+	 *   to be applicable, and if applying the model resulted in a non-null
+	 *   value. Otherwise, a {@link NoSuchElementException} is thrown.
+	 * @throws NoSuchElementException Evaluating the property resulted in
+	 *   a null value.
+	 */
 	public Object requireValue(Object pObject, String pProperty) throws NoSuchElementException {
 		Objects.requireNonNull(pObject, "Object");
 		Objects.requireNonNull(pProperty, "Property");

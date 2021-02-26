@@ -22,12 +22,12 @@ import java.util.Set;
 import org.junit.Test;
 
 
+/** A test suite for the {@link SelfSignedCertificateGenerator}.
+ */
 public class SelfSignedCertificateGeneratorTest {
-	@Test
-	public void testFindKeytool() {
-		assertNotNull(new SelfSignedCertificateGenerator().findKeyTool());
-	}
-
+	/** Test case for {@link SelfSignedCertificateGenerator#createSelfSignedCertificate}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testCreateSelfSignedCertificate() throws Exception {
 		final Path keyStorePath = Paths.get("target/unit-tests/SelfSignedCertificateGeneratorTest/keystore.jks");
@@ -38,8 +38,6 @@ public class SelfSignedCertificateGeneratorTest {
 		scgen.setAlias("selfsigned");
 		scgen.setCountry("DE");
 		scgen.setFileName(keyStorePath.toString());
-		scgen.setKeyAlgorithm("RSA");
-		scgen.setKeySize(4096);
 		scgen.setLocation("The Net");
 		scgen.setName("127.0.0.1");
 		scgen.setOrganization("Organized? Me?");

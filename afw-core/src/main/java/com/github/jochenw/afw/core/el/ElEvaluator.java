@@ -33,7 +33,19 @@ import com.github.jochenw.afw.core.el.tree.ValueExpression;
 import com.github.jochenw.afw.core.el.tree.VariableReferenceExpression;
 
 
+/** An instance of this class may be used to resolve the
+ * value of a given EL expression. To use the ElEvaluator,
+ * you first compile the EL expression to an instance of
+ * {@link ElExpression} by invoking {@link ElReader#parse(String)}.
+ * The compiled EL expression may then be evaluted by
+ * invoking {@link #evaluate(ElExpression, Object)},
+ * passing the compiled EL expression, and an object model.
+ */
 public class ElEvaluator {
+	/** An object, which is being used internally to
+	 * calculate the expressions value, applying
+	 * the given model.
+	 */
 	public static class Evaluator {
 		private final PropertyResolver resolver;
 		private final Object model;
@@ -443,17 +455,36 @@ public class ElEvaluator {
 			}
 		}
 	}
-	
+
+	/**
+	 * Creates a new instance with the given property resolver.
+	 * @param pResolver The poperty resolver, which is being used
+	 *   to evaluate properties in the model.
+	 */
 	public ElEvaluator(PropertyResolver pResolver) {
 		propertyResolver = pResolver;
 	}
 	
 	private final PropertyResolver propertyResolver;
 
+	/** Called to evaluate the given EL expression, applying the
+	 * given model.
+	 * @param pExpression The EL expression, which is being evaluated.
+	 * @param pModel The data model, which is being applied.
+	 * @return The evaluated expressions result.
+	 */
 	public Object evaluate(ElExpression pExpression, Object pModel) {
 		return new Evaluator(propertyResolver, pModel).evaluate(pExpression);
 	}
 
+	/** Called to evaluate the given EL expression (which must not use any
+	 * placeholders), applying the given model.
+	 * @param pExpression The EL expression, which is being evaluated.
+	 * @param pModel The data model, which is being applied.
+	 * @param pParameters A 
+	 * @return The evaluated expressions result.
+	 * @see #evaluate(ElExpression, Object, List)
+	 */
 	public Object evaluate(ElExpression pExpression, Object pModel, Object... pParameters) {
 		if (pParameters == null) {
 			return new Evaluator(propertyResolver, pModel).evaluate(pExpression);
@@ -462,6 +493,14 @@ public class ElEvaluator {
 		}
 	}
 
+	/** Called to evaluate the given EL expression (which may use
+	 * placeholders), applying the given model.
+	 * @param pExpression The EL expression, which is being evaluated.
+	 * @param pModel The data model, which is being applied.
+	 * @param pParameters The values, which are being inserted for placeholders.
+	 * @return The evaluated expressions result.
+	 * @see #evaluate(ElExpression, Object)
+	 */
 	public Object evaluate(ElExpression pExpression, Object pModel, List<Object> pParameters) {
 		if (pParameters == null) {
 			return new Evaluator(propertyResolver, pModel).evaluate(pExpression);
