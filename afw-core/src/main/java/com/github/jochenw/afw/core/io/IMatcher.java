@@ -17,6 +17,13 @@ package com.github.jochenw.afw.core.io;
 
 import java.util.function.Predicate;
 
+/** A predicate on Strings, in particular path names: It either
+ * accepts a string, or it doesn't.
+ */
 public interface IMatcher extends Predicate<String> {
+	/**
+	 * Returns, whether this is an "accept all" (a trivial) matcher.
+	 * @return True, if this is an "accept all" (a trivial) matcher.
+	 */
 	public default boolean isMatchingAll() { return false; }
 }

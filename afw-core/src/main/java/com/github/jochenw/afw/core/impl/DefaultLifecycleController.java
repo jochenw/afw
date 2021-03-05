@@ -23,6 +23,10 @@ import com.github.jochenw.afw.core.ILifecycleController;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
+
+/**
+ * Default implementation of the {@link ILifecycleController}.
+ */
 public class DefaultLifecycleController implements ILifecycleController {
 	private List<Listener> startableListeners = new ArrayList<>();
 	private List<Listener> startedListeners = new ArrayList<>();

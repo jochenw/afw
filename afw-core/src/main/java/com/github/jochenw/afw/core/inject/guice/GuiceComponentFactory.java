@@ -29,16 +29,28 @@ import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
 
+/** Implementation of the {@link IComponentFactory}, which is based
+ * on Google Guice.
+ */
 public class GuiceComponentFactory implements IComponentFactory {
 	private Injector injector;
 
+	/**
+	 * Sets the created {@link Injector}, making the component
+	 * factory usable.
+	 */
 	void setInjector(@Nonnull Injector pInjector) {
 		injector = Objects.requireNonNull(pInjector, "Injector");
 	}
 
+	/**
+	 * Returns the created {@link Injector}.
+	 * @return The created {@link Injector}
+	 */
 	public @Nullable Injector getInjector() {
 		return injector;
 	}
+
 	@Override
 	public void init(Object pObject) {
 		injector.injectMembers(pObject);

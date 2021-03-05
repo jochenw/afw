@@ -19,14 +19,34 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+
+
+/** Default implementation of {@link IMatcher}, which supports:
+ * <ol>
+ *   <li>regular expressions</li>
+ *   <li>case sensitive/case insensitive matching</li>
+ * </ol>
+ * To create an instance of this class, use {@link #asMatchers(String[], boolean)}.
+ */
 public class DefaultMatcher implements IMatcher {
 	private final String patternStr, regex;
 	private final Pattern pattern;
 
+
+	/** Creates a new instance, which matches the given regular expression,
+	 * with case sensitive matching.
+	 * @param pPattern The regular expression, that is being matched.
+	 */
 	public DefaultMatcher(String pPattern) {
 		this(pPattern, true);
 	}
 
+	/** Creates a new instance, which matches the given regular expression,
+	 * and the given value for case sensitive matching.
+	 * @param pPattern The regular expression, that is being matched.
+	 * @param pCaseSensitive True, if the regular expression is being
+	 *   case sensitive. False for case insensitive matching.
+	 */
 	public DefaultMatcher(String pPattern, boolean pCaseSensitive) {
 		patternStr = Objects.requireNonNull(pPattern, "Pattern");
 		regex = asRegex(patternStr);
@@ -81,11 +101,27 @@ public class DefaultMatcher implements IMatcher {
 		return pattern.matcher(pUri).matches();
 	}
 
+	/**
+	 * Creates a new instance of {@link IMatcher}, which accepts a file name,
+	 * if it matches either of the include strings, but none of the exclude strings.
+	 * @param pIncludes The include strings, that the created matcher should accept.
+	 * @param pExcludes The exclude strings, that the created matcher should rejept.
+	 * @param pCaseSensitive True, if the created matcher should be case sensitive.
+	 *   False, if it should be case insensitive.
+	 * @return A matcher, which meets the above criteria.
+	 */
 	public static IMatcher newMatcher(String[] pIncludes, String[] pExcludes, boolean pCaseSensitive) {
 		final IMatcher[] includes = asMatchers(pIncludes, pCaseSensitive);
 		final IMatcher[] excludes = asMatchers(pExcludes, pCaseSensitive);
 		return newMatcher(includes, excludes);
 	}
+	/**
+	 * Creates a new instance of {@link IMatcher}, which accepts a file name,
+	 * if it matches either of the include matchers, but none of the exclude matchers.
+	 * @param pIncludes The include matchers, that the created matcher should accept.
+	 * @param pExcludes The exclude matchers, that the created matcher should rejept.
+	 * @return A matcher, which meets the above criteria.
+	 */
 	public static IMatcher newMatcher(IMatcher[] pIncludes, IMatcher[] pExcludes) {
 		if (isTrivial(pIncludes)) {
 			if (isTrivial(pExcludes)) {

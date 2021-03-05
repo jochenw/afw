@@ -45,7 +45,16 @@ import com.github.jochenw.afw.core.inject.Scopes;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Objects;
 
+
+
+/** A simple, standalone implementation of an {@link IComponentFactory}.
+ */
 public class SimpleComponentFactory implements IComponentFactory {
+	/**
+	 * A binding is a supplier of an injectable value, that has been
+	 * registered under a suitable key.
+	 * @param <T> The injectable values type.
+	 */
 	public abstract static class Binding<T> implements Supplier<T> {
 	}
 
@@ -76,6 +85,11 @@ public class SimpleComponentFactory implements IComponentFactory {
 	private static final Predicate<Annotation> SBL_ANNOTATION_FILTER = (a) ->
 		!(a instanceof Inject);
 
+	/**
+	 * A predicate, which decides, whether a class requires static injection.
+	 * @return A predicate, which decides, whether a class requires static
+	 *   injection.
+	 */
 	public Predicate<Class<?>> getStaticInjectionPredicate() {
 		return staticInjectionPredicate;
 	}
@@ -84,6 +98,11 @@ public class SimpleComponentFactory implements IComponentFactory {
 		staticInjectionPredicate = pPredicate;
 	}
 
+	/** Returns the {@link OnTheFlyBinder}, which can create bindings
+	 * dynamically.
+	 * @return The {@link OnTheFlyBinder}, which can create bindings
+	 * dynamically.
+	 */
 	public OnTheFlyBinder getOnTheFlyBinder() {
 		return onTheFlyBinder;
 	}
@@ -126,6 +145,13 @@ public class SimpleComponentFactory implements IComponentFactory {
 		return o;
 	}
 
+	/**
+	 * Registers a binding under the given key.
+	 * @param pKey The bindings key in the map of registered bindings.
+	 * @param pBinding The binding, which is being registered.
+	 * @param pReplace Whether replacement of an existing binding is
+	 *   permitted.
+	 */
 	public void addBinding(Key<?> pKey, Binding<?> pBinding, boolean pReplace) {
 		final SimpleBindingList sbl = findBindingList(pKey.getType(), false);
 		synchronized(sbl) {

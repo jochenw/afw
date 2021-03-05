@@ -37,37 +37,161 @@ import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Objects;
 
 
+
+/**
+ * Abstract base class for builders of {@link IComponentFactory}.
+ * @param <T> Type of the componentfactory, that is being built.
+ */
 public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<T>> {
+	/** Interface of a binding builder without scope.
+	 */
 	public interface ScopedBindingBuilder {
-	    void in(Scope scope);
+		/**
+		 * Sets the bindings scope.
+		 * @param pScope Sets the bindings scope.
+		 */
+	    void in(Scope pScope);
+		/**
+		 * Sets the bindings scope to {@link Scopes#EAGER_SINGLETON}.
+		 */
 	    void asEagerSingleton();
 	}
+	/**
+	 * Interface of a binding builder without scope, and {@link Supplier}.
+	 * @param <T> Type of the binding, that is being built.
+	 */
 	public interface LinkedBindingBuilder<T extends Object> extends ScopedBindingBuilder {
+		/** Sets the bindings supplier to instantiating the given class.
+		 * @param pImplementation The class, which is being instantiated by the binding.
+		 * @return A binding builder without scope, but with supplier.
+		 */
 	    ScopedBindingBuilder to(Class<? extends T> pImplementation);
+		/** Sets the bindings supplier to instantiating the given class.
+		 * @param pImplementation The class, which is being instantiated by the binding.
+		 * @return A binding builder without scope, but with supplier.
+		 */
 	    ScopedBindingBuilder toClass(Class<?> pImplementation);
-	    ScopedBindingBuilder to(Key<? extends T> targetKey);
+		/** Sets the bindings supplier to referencing the given {@link Key}.
+		 * @param pKey The key of the binding, that is being referenced.
+		 * @return A binding builder without scope, but with supplier.
+		 */
+	    ScopedBindingBuilder to(Key<? extends T> pKey);
+		/** Sets the bindings supplier to returning the given instance, and
+		 * the bindings scope to {@link Scopes#SINGLETON}.
+		 * @param pInstance The instance, which is being returned by the binding.
+		 */
 	    void toInstance(T pInstance);
+		/** Sets the bindings supplier to an invocation of the given provider.
+		 * @param pProvider The provider, that is being invoked by the binding.
+		 * @return A binding builder without scope, but with supplier.
+		 */
 	    ScopedBindingBuilder toProvider(Provider<? extends T> pProvider);
+		/** Sets the bindings supplier to the given supplier.
+		 * @param pSupplier The supplier, that is being invoked by the binding.
+		 * @return A binding builder without scope, but with supplier.
+		 */
 	    ScopedBindingBuilder toSupplier(Supplier<? extends T> pSupplier);
-	    ScopedBindingBuilder toProvider(Class<? extends Provider<? extends T>> pProviderType);
-	    <P extends Provider<? extends T>> ScopedBindingBuilder toProvider(Key<P> providerKey);
-	    <S extends T> ScopedBindingBuilder toConstructor(Constructor<S> constructor);
+		/** Sets the bindings supplier to an invocation of the given constructor
+		 * (without parameters).
+		 * @param pConstructor The supplier, that is being invoked by the binding.
+		 * @param <S> Type, that is created by the constructor.
+		 * @return A binding builder without scope, but with supplier.
+		 */
+	    <S extends T> ScopedBindingBuilder toConstructor(Constructor<S> pConstructor);
 	}
+	/**
+	 * Interface of a binding builder without scope, and {@link Supplier},
+	 * and the ability to restriction by annotations.
+	 * @param <T> Type of the binding, that is being built.
+	 */
 	public interface AnnotatedBindingBuilder<T extends Object> extends LinkedBindingBuilder<T> {
+		/**
+		 * Restricts the binding to a context, where an annotation of the given type is
+		 * present.
+		 * @param pAnnotationType Type of the annotation, that must be present in the
+		 *   context upon application of the binding.
+		 * @return A binding builder without scope, and {@link Supplier}.
+		 */
 	    LinkedBindingBuilder<T> annotatedWith(Class<? extends Annotation> pAnnotationType);
+		/**
+		 * Restricts the binding to a context, where the given annotation is present.
+		 * The method {@link Object#equals(Object)} is used on the given parameter
+		 * to compare annotations.
+		 * @param pAnnotation The annotation, that must be present in the
+		 *   context upon application of the binding.
+		 * @return A binding builder without scope, and {@link Supplier}.
+		 */
 	    LinkedBindingBuilder<T> annotatedWith(Annotation pAnnotation);
+		/**
+		 * Restricts the binding to a context, where a {@link Named} annotation
+		 * is present with the given value.
+		 * @param pName The expected value of the {@link Named} annotation.
+		 * @return A binding builder without scope, and {@link Supplier}.
+		 */
 	    LinkedBindingBuilder<T> named(String pName);
 	}
+	/** A {@link Binder} is an object, that can be used to create binding
+	 * builders.
+	 */
 	public interface Binder {
+		/** Creates a binding builder, that will be applicable in a context
+		 * with the given {@link Key}.
+		 * @param <T> The created binding builders type.
+		 * @param pKey The key, in which the created binding will be applicable.
+		 * @return The created binding builder.
+		 */
 	    <T> LinkedBindingBuilder<T> bind(Key<T> pKey);
+		/** Creates a binding builder, that will be applicable in a context
+		 * with the given {@link Type type}.
+		 * @param <T> The created binding builders type.
+		 * @param pType The type, in which the created binding will be applicable.
+		 * @return The created binding builder.
+		 */
 	    <T> AnnotatedBindingBuilder<T> bind(Types.Type<T> pType);
+		/** Creates a binding builder, that will be applicable in a context
+		 * with the given {@link Type type}, and the given name.
+		 * @param <T> The created binding builders type.
+		 * @param pType The type, in which the created binding will be applicable.
+		 * @param pName The expected value of the {@link Named} annotation.
+		 * @return The created binding builder.
+		 */
 	    <T> LinkedBindingBuilder<T> bind(Types.Type<T> pType, String pName);
+		/** Creates a binding builder, that will be applicable in a context
+		 * with the given {@link Class type}.
+		 * @param <T> The created binding builders type.
+		 * @param pType The type, in which the created binding will be applicable.
+		 * @return The created binding builder.
+		 */
 	    <T> AnnotatedBindingBuilder<T> bind(Class<T> pType);
+		/** Creates a binding builder, that will be applicable in a context
+		 * with the given {@link Class type}, and the given name.
+		 * @param <T> The created binding builders type.
+		 * @param pType The type, in which the created binding will be applicable.
+		 * @param pName The expected value of the {@link Named} annotation.
+		 * @return The created binding builder.
+		 */
 	    <T> LinkedBindingBuilder<T> bind(Class<T> pType, String pName);
-	    void requestStaticInjection(Class<?>... types);
+	    /** Requests, that the binder should configure static fields of the given classes.
+	     * @param pTypes The classes, on which static fields are being configured.
+	     */
+	    void requestStaticInjection(Class<?>... pTypes);
+	    /** Configures a consumer, that will be invoked after creation of the
+	     * {@link IComponentFactory component factory}.
+	     * @param pComponentFactory The component factory, that has been created.
+	     */
 	    void addFinalizer(Consumer<IComponentFactory> pComponentFactory);
 	}
+	/**
+	 * Interface of a module, that participates in the creation of bindings by
+	 * consuming, and using, the given {@link Binder binder}.
+	 */
 	public interface Module {
+		/**
+		 * Called to participate in the creation of bindings by
+		 * consuming, and using, the given {@link Binder binder}.
+		 * @param pBinder The binder, which may be called to create
+		 * new binding builders.
+		 */
 		void configure(Binder pBinder);
 	}
 
@@ -77,12 +201,26 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 	private Class<? extends IComponentFactory> componentFactoryClass;
 	private final List<Module> modules = new ArrayList<>();
 
-	public T onTheFlyBinder(OnTheFlyBinder pBinder) {
+	/**
+	 * Sets an {@link OnTheFlyBinder}, which participates in the
+	 * component creation by performing dynamic bindings.
+	 * @param pBinder An {@link OnTheFlyBinder}, which participates in the
+	 * component creation by performing dynamic bindings.
+	 * @return This builder.
+	 */
+	public T onTheFlyBinder(@Nonnull OnTheFlyBinder pBinder) {
 		assertMutable();
 		onTheFlyBinder = pBinder;
 		return self();
 	}
 
+	/**
+	 * Returns the {@link OnTheFlyBinder}, that has been configured,
+	 * if any, or null.
+	 * @return An {@link OnTheFlyBinder}, which participates in the
+	 * component creation by performing dynamic bindings. May be null,
+	 * if no such binder has been configured.
+	 */
 	public OnTheFlyBinder getOnTheFlyBinder() {
 		return onTheFlyBinder;
 	}
@@ -93,6 +231,15 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		}
 	}
 
+	/**
+	 * Configures a module, that will participate in the creation of the
+	 * component factory by creating binding builders. If more than one
+	 * module is registered, then they will be invoked in the order of
+	 * registration.
+	 * @param pModule A module, that will participate in the creation of the
+	 * component factory by creating binding builders.
+	 * @return This builder.
+	 */
 	public T module(@Nonnull Module pModule) {
 		final Module module = Objects.requireNonNull(pModule);
 		assertMutable();
@@ -100,6 +247,15 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return self();
 	}
 
+	/**
+	 * Configures zero, or more modules, that will participate in the
+	 * creation of the component factory by creating binding builders.
+	 * If more than one module is registered, then they will be
+	 * invoked in the order of registration.
+	 * @param pModules Zero, or more, modules, that will participate in
+	 * the creation of the component factory by creating binding builders.
+	 * @return This builder.
+	 */
 	public T modules(Module... pModules) {
 		final Module[] modules = Objects.requireAllNonNull(pModules, "Module");
 		assertMutable();
@@ -109,6 +265,15 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return self();
 	}
 
+	/**
+	 * Configures zero, or more modules, that will participate in the
+	 * creation of the component factory by creating binding builders.
+	 * If more than one module is registered, then they will be
+	 * invoked in the order of registration.
+	 * @param pModules Zero, or more, modules, that will participate in
+	 * the creation of the component factory by creating binding builders.
+	 * @return This builder.
+	 */
 	public T modules(Iterable<Module> pModules) {
 		final Iterable<Module> modules = Objects.requireAllNonNull(pModules, "Module");
 		assertMutable();
@@ -118,10 +283,23 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return self();
 	}
 
+	/**
+	 * Returns the modules, that will participate in the
+	 * creation of the component factory by creating binding builders.
+	 * If more than one module is registered, then they will be
+	 * invoked in the given order.
+	 * @return The modules, that will participate in the
+	 * creation of the component factory by creating binding builders.
+	 */
 	public List<Module> getModules() {
 		return modules;
 	}
 
+	/**
+	 * Sets the type of the component factory, that is being created.
+	 * @param pType The type of the component factory, that is being created.
+	 * @return This builder.
+	 */
 	public @Nonnull T componentFactoryClass(@Nonnull Class<? extends IComponentFactory> pType) {
 		final Class<? extends IComponentFactory> cfClass = Objects.requireNonNull(pType, "Type");
 		assertMutable();
@@ -129,10 +307,17 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return self();
 	}
 
+	/**
+	 * Returns the type of the component factory, that is being created.
+	 * @return The type of the component factory, that is being created.
+	 */
 	public @Nonnull Class<? extends IComponentFactory> getComponentFactoryClass() {
 		return Objects.requireNonNull(componentFactoryClass);
 	}
 
+	/** Default implementation of the various binding builder classes.
+	 * @param <O> Type of the object, that is being created.
+	 */
 	public static class BindingBuilder<O extends Object> implements AnnotatedBindingBuilder<O>, LinkedBindingBuilder<O>, ScopedBindingBuilder {
 		private Key<O> key;
 		private Scope scope;
@@ -143,8 +328,6 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		private Key<? extends O> targetKey;
 		private Provider<? extends O> targetProvider;
 		private Supplier<? extends O> targetSupplier;
-		private Class<? extends Provider<? extends O>> targetProviderClass;
-		private Key<? extends Provider<? extends O>> targetProviderKey;
 		private Constructor<? extends O> targetConstructor;
 		private O targetInstance;
 
@@ -236,22 +419,6 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		}
 
 		@Override
-		public ScopedBindingBuilder toProvider(Class<? extends Provider<? extends O>> pProviderType) {
-			assertNotTargeted();
-			haveTarget = true;
-			targetProviderClass = pProviderType;
-			return this;
-		}
-
-		@Override
-		public <P extends Provider<? extends O>> ScopedBindingBuilder toProvider(Key<P> pProviderKey) {
-			assertNotTargeted();
-			haveTarget = true;
-			targetProviderKey = pProviderKey;
-			return this;
-		}
-
-		@Override
 		public <S extends O> ScopedBindingBuilder toConstructor(Constructor<S> pConstructor) {
 			assertNotTargeted();
 			haveTarget = true;
@@ -283,54 +450,112 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 			return annotatedWith(named);
 		}
 
+		/**
+		 * Returns the key, that has been configured by invoking
+		 * the corresponding constructor.
+		 * @return The key, that has been configured by invoking
+		 * the corresponding constructor.
+		 */
 		public Key<O> getKey() {
 			return key;
 		}
 
+		/** Returns the bindings scope, that has been configured
+		 * by invoking {@link #in(Scope)}, {@link #asEagerSingleton()},
+		 * {@link #toInstance(Object)}.
+		 * @return The bindings scope.
+		 */
 		public Scope getScope() {
 			return scope;
 		}
 
+		/** Returns the annotation, that has been configured
+		 * by invoking {@link #annotatedWith(Annotation)},
+		 * if any, or null.
+		 * @return The annotation, that has been configured
+		 * by invoking {@link #annotatedWith(Annotation)},
+		 * if any, or null.
+		 */
 		public Annotation getAnnotation() {
 			return annotation;
 		}
 
+		/** Returns the annotation type, that has been configured
+		 * by invoking {@link #annotatedWith(Class)},
+		 * if any, or null.
+		 * @return The annotation, that has been configured
+		 * by invoking {@link #annotatedWith(Class)},
+		 * if any, or null.
+		 */
 		public Class<? extends Annotation> getAnnotationClass() {
 			return annotationClass;
 		}
 
+		/** Returns, whether either of the methods {@link #to(Class)},
+		 * {@link #to(Key)}, {@link #toInstance(Object)},
+		 * {@link #toConstructor(Constructor)}
+		 * {@link #toSupplier(Supplier)}, or {@link #toProvider(Provider)}
+		 * has been invoked.
+		 * @return True, if either of the methods {@link #to(Class)},
+		 * {@link #to(Key)}, {@link #toInstance(Object)},
+		 * {@link #toConstructor(Constructor)},
+		 * {@link #toSupplier(Supplier)}, or {@link #toProvider(Provider)}
+		 * has been invoked.
+		 */
 		public boolean hasTarget() {
 			return haveTarget;
 		}
 
+		/** Returns the type, that has been configured by invoking
+		 * {@link #to(Class)}, if any, or null.
+		 * @return The type, that has been configured by invoking
+		 * {@link #to(Class)}, if any, or null.
+		 */
 		public Class<? extends O> getTargetClass() {
 			return targetClass;
 		}
 
+		/** Returns the key, that has been configured by invoking
+		 * {@link #to(Key)}, if any, or null.
+		 * @return The key, that has been configured by invoking
+		 * {@link #to(Key)}, if any, or null.
+		 */
 		public Key<? extends O> getTargetKey() {
 			return targetKey;
 		}
 
+		/** Returns the provider, that has been configured by invoking
+		 * {@link #toProvider(Provider)}, if any, or null.
+		 * @return The provider, that has been configured by invoking
+		 * {@link #toProvider(Provider)}, if any, or null.
+		 */
 		public Provider<? extends O> getTargetProvider() {
 			return targetProvider;
 		}
 
+		/** Returns the supplier, that has been configured by invoking
+		 * {@link #toSupplier(Supplier)}, if any, or null.
+		 * @return The supplier, that has been configured by invoking
+		 * {@link #toSupplier(Supplier)}, if any, or null.
+		 */
 		public Supplier<? extends O> getTargetSupplier() {
 			return targetSupplier;
 		}
 
-		public Class<? extends Provider<? extends O>> getTargetProviderClass() {
-			return targetProviderClass;
-		}
-
-		public Key<? extends Provider<? extends O>> getTargetProviderKey() {
-			return targetProviderKey;
-		}
-
+		/** Returns the constructor, that has been configured by invoking
+		 * {@link #toConstructor(Constructor)}, if any, or null.
+		 * @return The constructor, that has been configured by invoking
+		 * {@link #toConstructor(Constructor)}, if any, or null.
+		 */
 		public Constructor<? extends O> getTargetConstructor() {
 			return targetConstructor;
 		}
 
+		/** Returns the instance, that has been configured by invoking
+		 * {@link #toInstance(Object)}, if any, or null.
+		 * @return The instance, that has been configured by invoking
+		 * {@link #toConstructor(Constructor)}, if any, or null.
+		 */
 		public O getTargetInstance() {
 			return targetInstance;
 		}
@@ -355,6 +580,12 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		}
 	}
 
+	/**
+	 * Returns the component factory, that has been created.
+	 * @return The component factory, that has been created.
+	 * @throws IllegalStateException The method {@link #build()} has
+	 *   not yet been invoked, and no such instance is available (yet).
+	 */
 	public @Nonnull IComponentFactory getInstance() {
 		if (!immutable   ||  instance == null) {
 			throw new IllegalStateException("This object is not yet mutable.");
@@ -362,6 +593,11 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return instance;
 	}
 
+	/**
+	 * Creates, and returns a component factory, by applying the collected
+	 * binding builders.
+	 * @return The component factory, that has been created.
+	 */
 	public @Nonnull IComponentFactory build() {
 		if (instance == null) {
 			immutable = true;
@@ -464,33 +700,11 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 					if (provider == null) {
 						final Supplier<? extends O> supplier = pBb.targetSupplier;
 						if (supplier == null) {
-							final Class<? extends Provider<? extends O>> providerClass = pBb.targetProviderClass;
-							if (providerClass == null) {
-								final Key<? extends O> key = pBb.targetKey;
-								if (key == null) {
-									final Key<? extends Provider<? extends O>> providerKey = pBb.targetProviderKey;
-									if (providerKey == null) {
-										throw new IllegalStateException("Neither of the methods to(Class), to(Key), toInstance(), toProvider(*), and toConstructor(*) have been invoked on the BindingBuilder.");
-									} else {
-										return () -> {
-											final Provider<? extends O> o = getInstance().getInstance(providerKey);
-											return o.get();
-										};
-									}
-								} else {
-									return () -> {
-										final O o = getInstance().getInstance(key);
-										return o;
-									};
-								}
-							} else {
-								return () -> {
-									final Provider<? extends O> prov = getInstance().newInstance(providerClass);
-									return prov.get();
-								};
-							}
+							throw new IllegalStateException("Neither of the methods to(Class), to(Key), toInstance(), toProvider(), or toConstructor() have been invoked on the BindingBuilder.");
 						} else {
-							return () -> supplier.get();
+							return () -> {
+								return supplier.get();
+							};
 						}
 					} else {
 						@SuppressWarnings("unchecked")

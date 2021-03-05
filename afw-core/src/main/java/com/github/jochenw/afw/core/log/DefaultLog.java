@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Jochen Wiedmann
+0 * Copyright 2018 Jochen Wiedmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,19 @@
  */
 package com.github.jochenw.afw.core.log;
 
+/**
+ * Default implementation of {@link ILog}.  Doesn't do any logging until a
+ * real implementation of {@link ILogFactory} becomes available, and
+ * logging can be deferred to the new implementation.
+ */
 public class DefaultLog extends AbstractLog implements LogManager.Listener {
     private AbstractLog log;
 
+    /**
+     * Creates a new instance with the given factory, and the given id.
+     * @param pFactory The factory, that creates this logger.
+     * @param pId The logger id.
+     */
     public DefaultLog(DefaultLogFactory pFactory, String pId) {
         super(pFactory, pId);
         

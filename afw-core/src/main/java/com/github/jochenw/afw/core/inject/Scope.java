@@ -15,6 +15,10 @@
  */
 package com.github.jochenw.afw.core.inject;
 
+
+/** A bindings scope.
+ * @see com.github.jochenw.afw.core.inject.Scopes
+ */
 public class Scope {
 	Scope() {}
 }

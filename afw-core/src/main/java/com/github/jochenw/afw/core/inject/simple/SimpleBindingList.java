@@ -24,6 +24,13 @@ import com.github.jochenw.afw.core.inject.Key;
 import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory.Binding;
 
 
+/**
+ * A binding list is a collection of bindings, that have the
+ * same type, but not the same key. The idea is, that we use
+ * the type to identify a binding list, and then search for
+ * an actually matching key in the list. Roughly like a hash
+ * map.
+ */
 public class SimpleBindingList {
 	private static class KeyAndBinding {
 		final Key<?> key;
@@ -36,9 +43,16 @@ public class SimpleBindingList {
 	}
 	private final List<KeyAndBinding> bindings = new ArrayList<>();
 
+	/**
+	 * Adds a new, or replaces an existing binding with the given.
+	 * @param pKey The bindings key.
+	 * @param pBinding The binding
+	 * @param pReplace Whether to replace an existing binding, or
+	 * add a new one.
+	 */
 	public void add(Key<?> pKey, Binding<?> pBinding, boolean pReplace) {
 		for (KeyAndBinding kab : bindings) {
-			if (pKey.equals(pBinding)) {
+			if (pKey.equals(kab.key)) {
 				if (pReplace) {
 					kab.binding = pBinding;
 					return;
@@ -50,6 +64,15 @@ public class SimpleBindingList {
 		bindings.add(new KeyAndBinding(pKey, pBinding));
 	}
 
+	/** Given the supplied list of annotations, and the given predicate, searches
+	 * for a binding, that matches.
+	 * @param pAnnotations An annotated elements (a field, or a method parameter) list of annotations,
+	 *   possibly empty.
+	 * @param pFilter A predicate, that is supposed to match either of the annotations in the
+	 *   list.
+	 * @return A binding, which is applicable to either of the given annotations, that matches
+	 *   the given predicate.
+	 */
 	public Binding<?> find(Annotation[] pAnnotations, Predicate<Annotation> pFilter) {
 		Binding<?> bindingMatchedByAnnotationType = null;
 		boolean annotationFound = false;
@@ -100,6 +123,11 @@ public class SimpleBindingList {
 		}
 	}
 
+	/** Searches the bindings in the list for an exact match of the given key.
+	 * @param pKey A key with the signature of an injectable element (a field,
+	 *   or a method parameter)
+	 * @return A binding, which is associated with the given key.
+	 */
 	public Binding<?> find(Key<?> pKey) {
 		final Annotation annotation = pKey.getAnnotation();
 		for (KeyAndBinding kab : bindings) {

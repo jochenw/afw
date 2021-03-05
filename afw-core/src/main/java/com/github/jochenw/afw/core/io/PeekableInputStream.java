@@ -19,11 +19,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
+
+/**
+ * A filtering {@link InputStream} with some buffering capabilities,
+ * that allow to peek into the upcoming data.
+ */
 public class PeekableInputStream extends CircularBufferInputStream {
+	/**
+	 * Creates a new instance, which filters the given underlying
+	 * input streams, maintaining a buffer with the given size.
+	 * @param pIn The underlying input stream.
+	 * @param pBufferSize The internal buffers size.
+	 */
 	public PeekableInputStream(InputStream pIn, int pBufferSize) {
 		super(pIn, pBufferSize);
 	}
 
+	/**
+	 * Creates a new instance, which filters the given underlying
+	 * input streams, maintaining a buffer with the default size
+	 * (8192).
+	 * @param pIn The underlying input stream.
+	 */
 	public PeekableInputStream(InputStream pIn) {
 		super(pIn);
 	}

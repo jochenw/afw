@@ -19,12 +19,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
+
+/** An {@link InputStream}, which maintains a buffer of upcoming
+ * data, that allows peeking into the buffer.
+ */
 public class CircularBufferInputStream extends InputStream {
 	protected final InputStream in;
 	protected final CircularByteBuffer buffer;
 	protected final int bufferSize;
 	private boolean eofSeen;
 
+	/**
+	 * Creates a new instance, which reads from the given {@link
+	 * InputStream}, maintaining a buffer of the given size.
+	 * @param pIn The underlying {@link InputStream}, from which
+	 *   to read the data.
+	 * @param pBufferSize The size of the underlying buffer.
+	 */
 	public CircularBufferInputStream(InputStream pIn, int pBufferSize) {
 		Objects.requireNonNull(pIn, "InputStream");
 		if (pBufferSize <= 0) {
@@ -36,6 +47,13 @@ public class CircularBufferInputStream extends InputStream {
 		eofSeen = false;
 	}
 
+	/**
+	 * Creates a new instance, which reads from the given {@link
+	 * InputStream}, maintaining a buffer of the default size
+	 * (8192 bytes).
+	 * @param pIn The underlying {@link InputStream}, from which
+	 *   to read the data.
+	 */
 	public CircularBufferInputStream(InputStream pIn) {
 		this(pIn, 8192);
 	}

@@ -5,11 +5,39 @@ import java.io.InputStream;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 
+
+
+/**
+ * A filtering {@link InputStream}, which allows to observe the data, that is being read.
+ */
 public class ObservableInputStream extends InputStream {
+	/** This listener is being notified about events regarding the observed data stream.
+	 */
 	public interface Listener {
+		/**
+		 * The data stream has been read completely, and is about to return -1 (EOF).
+		 * @throws IOException The listener failed.
+		 */
 		void endOfFile() throws IOException;
-		void reading(int pRes) throws IOException;
-		void reading(byte[] pB, int pI, int pRes) throws IOException;
+		/**
+		 * The data stream is about to return the given data byte.
+		 * @param pByte The byte, that the data stream is about to return.
+		 * @throws IOException The listener failed.
+		 */
+		void reading(int pByte) throws IOException;
+		/**
+		 * The data stream is about to return the given data bytes.
+		 * @param pBuffer A byte array, that contains the bytes that are being returned by
+		 *   the data stream.
+		 * @param pOffset The offset of the first byte in the array, that is being returned.
+		 * @param pLen The number of bytes in the array, that are being returned.
+		 * @throws IOException The listener failed.
+		 */
+		void reading(byte[] pBuffer, int pOffset, int pLen) throws IOException;
+		/**
+		 * The data stream is about to close.
+		 * @throws IOException The listener failed.
+		 */
 		void closing() throws IOException;
 		
 	}
@@ -17,6 +45,12 @@ public class ObservableInputStream extends InputStream {
 	private final InputStream in;
 	private final Listener listener;
 
+	/**
+	 * Creates a new instance, which reads from the given {@link InputStream}, and
+	 * notifies the given listener, while doing so.
+	 * @param pIn The input stream, which is actually being read.
+	 * @param pListener The listener, which is being notified about data events.
+	 */
 	public ObservableInputStream(InputStream pIn, Listener pListener) {
 		in = pIn;
 		listener = pListener;

@@ -17,10 +17,23 @@ package com.github.jochenw.afw.core.log;
 
 import com.github.jochenw.afw.core.log.ILog.Level;
 
+
+/** Default implementation of {@link IMLog}. Internally,
+ * this is based on an instance of {@link ILog}, to
+ * which most calls are delegated.
+ */
 public class DefaultMLog implements IMLog {
     private final AbstractLog log;
     private final String method;
 
+    /**
+     * Creates a new instance with the given logger, and
+     * the given method name.
+     * @param pLog The logger, which is being used
+     *   internally.
+     * @param pMethod The method name, which is being
+     *   emitted with every message.
+     */
     public DefaultMLog(AbstractLog pLog, String pMethod) {
         log = pLog;
         method = pMethod;

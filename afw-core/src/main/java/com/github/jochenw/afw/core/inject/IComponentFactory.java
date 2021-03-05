@@ -192,18 +192,42 @@ public interface IComponentFactory {
 	 * @return The newly created instance.
 	 */
 	public <O> O newInstance(Class<? extends O> pImplClass);
+	/** Returns an instance of the given type.
+	 * @param <O> The expected result type.
+	 * @param pType The implementation class.
+	 * @return The newly created instance. May be null, if no
+	 *   such binding has been registered.
+	 */
 	public default <O> O getInstance(@Nonnull Type pType) {
 		final Key<O> key = new Key<O>(pType);
 		return getInstance(key);
 	}
+	/** Returns an instance of the given type.
+	 * @param <O> The expected result type.
+	 * @param pType The implementation class.
+	 * @return The newly created instance. Never null.
+	 * @throws NoSuchElementException No such binding has been registered.
+	 */
 	public default <O> O requireInstance(@Nonnull Type pType) {
 		final Key<O> key = new Key<O>(pType);
 		return requireInstance(key);
 	}
+	/** Returns an instance of the given type.
+	 * @param <O> The expected result type.
+	 * @param pType The implementation class.
+	 * @return The newly created instance. May be null, if no
+	 *   such binding has been registered.
+	 */
 	public default <O> O getInstance(@Nonnull Types.Type<O> pType) {
 		final Key<O> key = new Key<O>(pType.getRawType());
 		return getInstance(key);
 	}
+	/** Returns an instance of the given type.
+	 * @param <O> The expected result type.
+	 * @param pType The implementation class.
+	 * @return The newly created instance. Never null.
+	 * @throws NoSuchElementException No such binding has been registered.
+	 */
 	public default <O> O requireInstance(@Nonnull Types.Type<O> pType) {
 		final Key<O> key = new Key<O>(pType.getRawType());
 		return requireInstance(key);

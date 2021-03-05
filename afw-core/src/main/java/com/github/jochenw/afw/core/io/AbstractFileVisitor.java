@@ -87,6 +87,20 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path>{
        }
    }  
 
+    /**
+     * A method, which is being invoked, if the visitor encounters a subdirectory.
+     * @param pPath The directories relative path.
+     * @param pDir The directories path.
+     * @param pAttrs The directories file attributes.
+     * @throws IOException Visiting the directory failed.
+     */
     public void visitDirectory(String pPath, Path pDir, BasicFileAttributes pAttrs) throws IOException {}
+    /**
+     * A method, which is being invoked, if the visitor encounters a file.
+     * @param pPath The directories relative path.
+     * @param pFile The files path.
+     * @param pAttrs The files file attributes.
+     * @throws IOException Visiting the file failed.
+     */
     public abstract void visitFile(String pPath, Path pFile, BasicFileAttributes pAttrs) throws IOException;
 }

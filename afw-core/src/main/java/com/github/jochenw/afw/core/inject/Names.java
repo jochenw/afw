@@ -17,10 +17,15 @@ package com.github.jochenw.afw.core.inject;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.util.Objects;
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
 
+import com.github.jochenw.afw.core.util.Objects;
+
+
+/** This class supports working with instances of {@link Named}.
+ */
 public class Names {
 	private static class NamedImpl implements javax.inject.Named, Serializable {
 		private static final long serialVersionUID = -3588508855233450088L;
@@ -58,10 +63,21 @@ public class Names {
 		}
 	}
 
+	/** Creates an instance of {@link Named} with the given value.
+	 * @param pValue The created annotations value.
+	 * @return A newly created instance of {@link Named} with the given value.
+	 */
 	public static javax.inject.Named named(@Nonnull String pValue) {
 		return new NamedImpl(pValue);
 	}
 
+	/** Creates a camel cased method property name. Example: prefix=get,
+	 * suffix=foo yields getFoo.
+	 * @param pPrefix The method names prefix, for example "get", or "is".
+	 * @param pSuffix The property name.
+	 * @return The prefix, appended by the upercased first character of the
+	 *   suffix, and the remainder of the suffix.
+	 */
 	public static String upperCased(String pPrefix, String pSuffix) {
 		Objects.requireNonNull(pPrefix, "Prefix");
 		Objects.requireNonNull(pSuffix, "Suffix");

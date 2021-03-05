@@ -21,12 +21,27 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/** This annotation can be used to request the injection of loggers.
+ * The request is satisfied by using an {@link OnTheFlyBinder}.
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 public @interface PropInject {
+	/**
+	 * A string constant, that indicates, that there is no default value
+	 * for a property.
+	 */
 	public static String NO_DEFAULT = "";
 
+	/** Returns the property key. Defaults to "fully qualified class
+	 * name of the declaring class" + "." + "field name".
+	 * @return The property key.
+	 */
 	String id() default "";
+	/** Returns the properties default value, or {@link #NO_DEFAULT}, if
+	 * there is no such value.
+	 * @return The properties default value.
+	 */
 	String defaultValue() default NO_DEFAULT;
 }

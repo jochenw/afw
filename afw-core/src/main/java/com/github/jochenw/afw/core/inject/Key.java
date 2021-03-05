@@ -24,37 +24,74 @@ import javax.annotation.Nullable;
 
 import javax.inject.Named;
 
+import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory;
+
+/**
+ * A {@link IComponentFactory} is basically a map: In the case of
+ * the {@link SimpleComponentFactory}, the map's keys are instances
+ * of {@link Key}, and the values are the respective bindings.
+ * @param <O> Type of the binding, that is associated with the key.
+ */
 public class Key<O extends Object> {
 	private final @Nonnull Type type;
 	private final @Nullable Annotation annotation;
 	private final @Nullable Class<? extends Annotation> annotationClass;
 
+	/** Creates a new instance with the given type, no annotation,
+	 * and no annotation class.
+	 * @param pType The type, to which the keys binding is applicable.
+	 */
 	public Key(@Nonnull Type pType) {
 		type = pType;
 		annotation = null;
 		annotationClass = null;
 	}
 
+	/** Creates a new instance with the given type, the given annotation,
+	 * and no annotation class.
+	 * @param pType The type, to which the keys binding is applicable.
+	 * @param pAnnotation The annotation, which must be present to make
+	 * the keys binding applicable.
+	 */
 	public Key(@Nonnull Type pType, @Nonnull Annotation pAnnotation) {
 		type = pType;
 		annotation = pAnnotation;
 		annotationClass = null;
 	}
 
+	/** Creates a new instance with the given type, no annotation,
+	 * and the given annotation class.
+	 * @param pType The type, to which the keys binding is applicable.
+	 * @param pAnnotationClass The annotation class, which must be
+	 *   present to make the keys binding applicable.
+	 */
 	public Key(@Nonnull Type pType, @Nonnull Class<? extends Annotation> pAnnotationClass) {
 		type = pType;
 		annotation = null;
 		annotationClass = pAnnotationClass;
 	}
 
+	/** Returns the type, to which the keys binding is applicable.
+	 * @return The type, to which the keys binding is applicable.
+	 */
 	public Type getType() {
 		return type;
 	}
 
+	/** Returns the annotation, which must be present to make
+	 * the keys binding applicable.
+	 * @return The annotation, which must be present to make
+	 * the keys binding applicable.
+	 */
 	public Annotation getAnnotation() {
 		return annotation;
 	}
 
+	/** Returns the annotation class, which must be present to make
+	 * the keys binding applicable.
+	 * @return The annotation class, which must be present to make
+	 * the keys binding applicable.
+	 */
 	public Class<? extends Annotation> getAnnotationClass() {
 		return annotationClass;
 	}
@@ -98,6 +135,11 @@ public class Key<O extends Object> {
 		return getType().equals(other.getType());
 	}
 
+	/** Returns the keys description, as a string.
+	 * Same value as {@link #toString()}.
+	 * @return The keys description, as a string.
+	 * @see #toString()
+	 */
 	public @Nonnull String getDescription() {
 		final StringBuilder sb = new StringBuilder();
 		final Type t = getType();

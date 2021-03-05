@@ -15,12 +15,12 @@
  */
 package com.github.jochenw.afw.core.io;
 
-import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
 import com.github.jochenw.afw.core.util.Exceptions;
+
 
 /**
  * A buffer, which doesn't need reallocation of byte arrays, because it
@@ -252,9 +252,19 @@ public class CircularByteBuffer {
 		currentNumberOfBytes = 0;
 	}
 
+	/** Converts the current contents of the byte buffer into
+	 * a string, applying the systems default character set.
+	 * @return The converted byte buffer.
+	 */
 	public String toString() {
 		return new String(getBytes());
 	}
+	/** Converts the current contents of the byte buffer into
+	 * a string, applying the given character set.
+	 * @param pCharset The character set, which is applied
+	 *   for bytes into characters.
+	 * @return The converted byte buffer.
+	 */
 	public String toString(String pCharset) {
 		try {
 			return new String(getBytes(), pCharset);
@@ -262,9 +272,21 @@ public class CircularByteBuffer {
 			throw Exceptions.show(e);
 		}
 	}
+	/** Converts the current contents of the byte buffer into
+	 * a string, applying the given character set.
+	 * @param pCharset The character set, which is applied
+	 *   for bytes into characters.
+	 * @return The converted byte buffer.
+	 */
 	public String toString(Charset pCharset) {
 		return new String(getBytes(), pCharset);
 	}
+	/**
+	 * Returns the current contents of the byte buffer as a
+	 * byte array.
+	 * @return The current contents of the byte buffer as a
+	 * byte array.
+	 */
 	public byte[] getBytes() {
 		final byte[] bytes = new byte[getCurrentNumberOfBytes()];
 		int offset = 0;

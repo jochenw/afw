@@ -28,7 +28,15 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 
 
+/**
+ * An object, which collects file names in a directory, 
+ * that meet criteria, given by sets of include/exclude strings.
+ */
 public class DirectoryScanner {
+	/**
+	 * A helper object, which is passed to the {@link DirectoryScanner.Listener}
+	 * in order to provide additional information.
+	 */
 	public interface Context {
 		/** Returns the base directory, which is currently being scanned.
 		 * @return The base directory, which is currently being scanned.
@@ -50,6 +58,10 @@ public class DirectoryScanner {
 		 */
 		@Nonnull String getUri();
 	}
+	/**
+	 * A listener object, which is being notified to collect the
+	 * requested information.
+	 */
 	public interface Listener {
 		/** This method is being invoked for every file, which the directory
 		 * scanner has detected.
@@ -92,11 +104,31 @@ public class DirectoryScanner {
 		}
 	}
 
+	/**
+	 * Called to scan the given base directory for files. For every file name, that
+	 * matches the include/exclude matchers, the given listener will be invoked.
+	 * More precisely, the include/exclude matchers will be used to create a
+	 * matcher by invoking {@link DefaultMatcher#newMatcher(IMatcher[], IMatcher[])},
+	 * and that matcher will be used to invoke {@link #scan(Path, Predicate, Listener)}.
+	 * @param pBaseDir The directory, that is being scanned for files.
+	 * @param pIncludes A set of include matchers.
+	 * @param pExcludes A set of exclude matchers.
+	 * @param pListener A listener, which is being notified to collect file names,
+	 *   that meet the given criteria.
+	 */
 	public void scan(@Nonnull Path pBaseDir, IMatcher[] pIncludes, IMatcher[] pExcludes, Listener pListener) {
 		final IMatcher matcher = DefaultMatcher.newMatcher(pIncludes, pExcludes);
 		scan(pBaseDir, matcher, pListener);
 	}
 
+	/**
+	 * Called to scan the given base directory for files. For every file name, that
+	 * matches the given predicate, the given listener will be invoked.
+	 * @param pBaseDir The directory, that is being scanned for files.
+	 * @param pMatcher A predicate, that determines, whether a file is accepted, or not.
+	 * @param pListener A listener, which is being notified to collect file names,
+	 *   that meet the given criteria.
+	 */
 	public void scan(@Nonnull Path pBaseDir, Predicate<String> pMatcher, Listener pListener) {
 		if (!Files.isDirectory(pBaseDir)) {
 			throw new IllegalArgumentException("Directory not found, or otherwise unreadable: " + pBaseDir);

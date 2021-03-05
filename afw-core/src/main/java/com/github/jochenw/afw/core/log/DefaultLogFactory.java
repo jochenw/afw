@@ -20,6 +20,11 @@ import java.util.List;
 
 import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
 
+/** Default implementation of {@link ILogFactory}. Doesn't do any logging until another implementation
+ * becomes available, and logging can be deferred to the new implementation.
+ * The purpose is the ability to assign loggers immediately, even at a point,
+ * when the real logging facility is not yet available.
+ */
 public class DefaultLogFactory extends AbstractLogFactory implements ILogFactory, LogManager.Listener {
     private AbstractLogFactory lf = new SimpleLogFactory();
     private boolean initialized;

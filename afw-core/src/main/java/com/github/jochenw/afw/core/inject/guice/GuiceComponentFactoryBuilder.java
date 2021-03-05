@@ -15,7 +15,6 @@
  */
 package com.github.jochenw.afw.core.inject.guice;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -40,6 +39,9 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 
+/** Builder for the {@link GuiceComponentFactory}, an implementation of
+ * {@link IComponentFactory}, that is based on Google Guice.
+ */
 public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder<GuiceComponentFactoryBuilder> {
 	private static class GcfbTypeListener implements TypeListener {
 		private final IComponentFactory pComponentFactory;
@@ -90,6 +92,8 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder<GuiceC
 		}
 	}
 
+	/** Creates a new instance.
+	 */
 	public GuiceComponentFactoryBuilder() {
 		componentFactoryClass(GuiceComponentFactory.class);
 		onTheFlyBinder(new DefaultOnTheFlyBinder());
@@ -132,27 +136,7 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder<GuiceC
 					if (prov == null) {
 						final Supplier<? extends Object> supp = pBb.getTargetSupplier();
 						if (supp == null) {
-							final Class<? extends Provider<? extends Object>> provClass = pBb.getTargetProviderClass();
-							if (provClass == null) {
-								final Constructor<? extends Object> cons = pBb.getTargetConstructor();
-								if (cons == null) {
-									final Key<? extends Object> targetKey = pBb.getTargetKey();
-									if (targetKey == null) {
-										final Key<? extends Provider<? extends Object>> targetProviderKey = pBb.getTargetProviderKey();
-										if (targetProviderKey == null) {
-											throw new IllegalStateException("No target found for binding: " + pBb.getKey().getDescription());
-										} else {
-											sbb = pBinder.bind(gKey).toProvider(pGcf.asGKey(targetProviderKey));
-										}
-									} else {
-										sbb = pBinder.bind(gKey).to(pGcf.asGKey(targetKey));
-									}
-								} else {
-									sbb = pBinder.bind(gKey).toConstructor(cons);
-								}
-							} else {
-								sbb = pBinder.bind(gKey).toProvider(provClass);
-							}
+							throw new IllegalStateException("No target found for binding: " + pBb.getKey().getDescription());
 						} else {
 							sbb = pBinder.bind(gKey).toProvider(() -> supp.get());
 						}

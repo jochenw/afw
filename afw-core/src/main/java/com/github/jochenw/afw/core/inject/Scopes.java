@@ -15,8 +15,17 @@
  */
 package com.github.jochenw.afw.core.inject;
 
+/** This class specifies the possible instances of {@link Scope}.
+ */
 public class Scopes {
+	/** The binding creates a singleton with lazy instantiation.
+	 */
 	public static final Scope SINGLETON = new Scope();
+	/** The binding creates an eager singleton (Instantiated
+	 * immediately, rather than lazy.
+	 */
 	public static final Scope EAGER_SINGLETON = new Scope();
+	/** The binding creates a new instance with any request.
+	 */
 	public static final Scope NO_SCOPE = new Scope();
 }

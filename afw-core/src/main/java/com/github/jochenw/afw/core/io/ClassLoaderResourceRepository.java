@@ -118,6 +118,12 @@ public class ClassLoaderResourceRepository implements IResourceRepository {
 		}
 	}
 
+	/**
+	 * Sets a logger, that is being used to debug this object.
+	 * By default, no logging is done.
+	 * @param pLogger The logger, that is being invoked to emit
+	 *   debugging information.
+	 */
 	public void setLogger(Consumer<String> pLogger) {
 		logger = pLogger;
 	}

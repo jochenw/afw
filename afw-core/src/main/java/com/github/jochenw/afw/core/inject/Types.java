@@ -19,10 +19,38 @@ import java.lang.reflect.ParameterizedType;
 
 import javax.annotation.Nonnull;
 
+
+/**
+ * This is a helper class, that should aim in the creation of bindings for
+ * fields, and methods, that are using Generics. Using this works as follows:
+ * Suggest, that you want to create a binding for the following field:
+ * <pre>
+ *     private @Inject List&lt;String&gt; stringList;
+ * </pre>
+ * The problem is, that you can't simply create a binding for a list, like
+ * <pre>
+ *     b.bind(List.class).toInstance(new ArrayList&lt;String&gt;());
+ * </pre>
+ * because this binding would only apply to raw lists, and not to lists with
+ * the generic type &lt;String&gt;.
+ * However, you can do this:
+ * <pre>
+ *     final Type&lt;List&lt;String&gt;&gt; stringListType = new Types.Type&lt;ListString&gt;&gt;(){};
+ *     b.bind(stringListType).toInstance(new ArrayList&lt;String&gt;());
+ * </pre>
+ * Not exactly obvious, not really comfortable, but it works!
+ */
 public class Types {
+	/**
+	 * A generic class, that supports access to its parameter type at runtime.
+	 * @param <T> The parameter type.
+	 */
 	public static class Type<T extends Object> {
 		private @Nonnull final java.lang.reflect.Type rawType;
 
+		/**
+		 * Creates a new instance.
+		 */
 		public Type() {
 			final java.lang.reflect.Type t = getClass().getGenericSuperclass();
 			if (t instanceof Class) {
@@ -40,6 +68,9 @@ public class Types {
 			}
 		}
 
+		/** Returns the parameter type.
+		 * @return The parameter type.
+		 */
 		public @Nonnull java.lang.reflect.Type getRawType() {
 			return rawType;
 		}

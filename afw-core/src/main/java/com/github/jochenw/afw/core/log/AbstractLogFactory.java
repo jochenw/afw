@@ -17,6 +17,9 @@ package com.github.jochenw.afw.core.log;
 
 import com.github.jochenw.afw.core.ResourceLocator;
 
+
+/** Abstract base class for implementations of {@link ILogFactory}.
+ */
 public abstract class AbstractLogFactory implements ILogFactory {
 	private boolean initialized;
 	private ResourceLocator resourceLocator;

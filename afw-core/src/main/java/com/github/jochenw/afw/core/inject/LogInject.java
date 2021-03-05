@@ -21,10 +21,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
+/** This annotation can be used to request the injection of loggers.
+ * The request is satisfied by using an {@link OnTheFlyBinder}.
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 public @interface LogInject {
+	/** Returns the loggers id. Defaults to the fully qualified name of the
+	 * class, which declares the loggers field.
+	 * @return The loggers id. Defaults to the fully qualified name of the
+	 * class, which declares the loggers field.
+	 */
 	String id() default "";
+	/** If an {@link com.github.jochenw.afw.core.log.IMLog} is being injected: Declares the method name.
+	 * Otherwise, this is being ignored.
+	 * @return The method name, if an {@link com.github.jochenw.afw.core.log.IMLog}
+	 *   is being injected. Otherwise, this is being ignored.
+	 */
 	String mName() default "";
 }

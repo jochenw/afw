@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 
 import com.github.jochenw.afw.core.ILifecycleController;
 import com.github.jochenw.afw.core.ILifecycleController.TerminableListener;
+import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory;
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.log.IMLog;
@@ -49,6 +50,9 @@ import com.github.jochenw.afw.core.util.Functions;
 import com.github.jochenw.afw.core.util.Strings;
 
 
+/** Default implementation of {@link OnTheFlyBinder}, for use
+ * with the {@link SimpleComponentFactory}.
+ */
 public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 	@Override
 	public <O> void findConsumers(IComponentFactory pCf, Class<?> pType, Consumer<Consumer<O>> pConsumerSink) {

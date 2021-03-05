@@ -32,7 +32,14 @@ import com.github.jochenw.afw.core.inject.OnTheFlyBinder.ScopedProvider;
 import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory.Binding;
 
 
+
+/**
+ * A builder for instances of {@link SimpleComponentFactory}.
+ */
 public class SimpleComponentFactoryBuilder extends ComponentFactoryBuilder<SimpleComponentFactoryBuilder> {
+	/**
+	 * Creates a new instance.
+	 */
 	public SimpleComponentFactoryBuilder() {
 		componentFactoryClass(SimpleComponentFactory.class);
 		onTheFlyBinder(new DefaultOnTheFlyBinder());
