@@ -238,7 +238,6 @@ public interface IPluginRegistry {
 	 * Adds a new plugin to an extension point with the default plugin id.
 	 * @param <O> The extension points type.
 	 * @param pType The extension points type.
-	 * @param pId The extension points id.
 	 * @param pPlugin The plugin, that is being added.
 	 * @throws NoSuchElementException No such extension point has been registered.
 	 */

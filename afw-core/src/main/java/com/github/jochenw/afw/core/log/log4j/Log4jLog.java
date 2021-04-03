@@ -18,6 +18,7 @@ package com.github.jochenw.afw.core.log.log4j;
 import org.apache.log4j.Logger;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
+import com.github.jochenw.afw.core.log.ILog;
 
 
 /** Implementation of {@link ILog}, which is based on Apache Log4j 1.

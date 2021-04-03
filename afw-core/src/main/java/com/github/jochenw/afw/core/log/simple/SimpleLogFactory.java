@@ -23,6 +23,7 @@ import java.io.Writer;
 import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
 import com.github.jochenw.afw.core.log.ILog.Level;
+import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 /** Very simple implementation of {@link ILogFactory}, which is not based on any

@@ -53,7 +53,7 @@ public interface IPropertyFactory {
     /** Returns a string property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
-     * @param pDefaultValue
+     * @param pDefaultValue The default value, which is being used, if the property is not available.
      * @return A property object with the given key,
      *   and the given default value.
      */
@@ -61,7 +61,7 @@ public interface IPropertyFactory {
     /** Returns a string property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
-     * @param pDefaultValue
+     * @param pDefaultValue The default value, which is being used, if the property is not available.
      * @param pListener A change listener, which is being attached to the property object.
      * @return A property object with the given key,
      *   and the given default value.

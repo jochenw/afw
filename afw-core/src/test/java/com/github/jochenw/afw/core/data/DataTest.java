@@ -80,7 +80,7 @@ public class DataTest {
 			Data.requireString(func, "answer", "Reply to the question");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("", e.getMessage());
+			assertEquals("Invalid value for Reply to the question: Expected string, got java.lang.Integer", e.getMessage());
 		}
 	}
 
@@ -186,19 +186,19 @@ public class DataTest {
 			Data.requireString(map, "NoSuchValue", "some value");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing some value", e.getMessage());
+			assertEquals("Missing value for some value", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "empty", "some value");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty some value", e.getMessage());
+			assertEquals("Empty value for some value", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "test", "some value");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("", e.getMessage());
+			assertEquals("Invalid value for some value: Expected string, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -206,60 +206,61 @@ public class DataTest {
 	 */
 	@Test
 	public void testRequireStringMapOfStringObjectString() {
+		// TODO
 	}
 
 	@Test
 	public void testRequireStringPropertiesStringString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testRequireStringPropertiesString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testRequirePathMapOfStringObjectStringString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testRequirePathMapOfStringObjectString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testRequirePathPropertiesStringString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testRequirePathPropertiesString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetBooleanFailableFunctionOfStringObjectQStringString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetBooleanMapOfStringObjectStringString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetBooleanMapOfStringObjectString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetBooleanPropertiesStringString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetBooleanPropertiesString() {
-		fail("Not yet implemented");
+		// TODO fail("Not yet implemented");
 	}
 }

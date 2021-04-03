@@ -25,6 +25,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
+import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 

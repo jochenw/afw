@@ -16,6 +16,7 @@
 package com.github.jochenw.afw.core.log.simple;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
+import com.github.jochenw.afw.core.log.ILog;
 
 
 /** Very simple implementation of {@link ILog}, which is not based on any

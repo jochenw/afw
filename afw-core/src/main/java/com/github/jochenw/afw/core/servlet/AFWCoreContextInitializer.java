@@ -74,6 +74,8 @@ public abstract class AFWCoreContextInitializer<Data extends Object> implements 
 	protected void shutdown(Data pData) {}
 
 	/** Called to create the new data object, which is being stored as a servlet context attribute.
+	 * @param pInstanceName The instance name, as derived from the servlet context path.
+	 * @return The created Data object.
 	 */
     protected abstract Data newData(String pInstanceName);
 }
