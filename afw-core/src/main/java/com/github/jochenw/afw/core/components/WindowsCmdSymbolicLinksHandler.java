@@ -3,28 +3,16 @@
  */
 package com.github.jochenw.afw.core.components;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.DosFileAttributeView;
-import java.nio.file.attribute.DosFileAttributes;
-import java.nio.file.attribute.FileAttributeView;
-import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Executor;
 import com.github.jochenw.afw.core.util.Objects;
-import com.github.jochenw.afw.core.util.Reflection;
-import com.github.jochenw.afw.core.util.Streams;
+
 
 /** Alternative implementation of {@link ISymbolicLinksHandler}, which is using
  * the builtin facilities of "cmd.exe". Obviously, this won't work on other

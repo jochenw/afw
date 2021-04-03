@@ -6,9 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
@@ -210,10 +208,18 @@ public class Executor {
 		return "ExecOutputPuller" + getConsumerId();
 	}
 
+	/**
+	 * Sets the input handler for the external processes standard output.
+	 * @param pInput The input handler for the external processes standard output.
+	 */
 	public void setInput(FailableConsumer<OutputStream,?> pInput) {
 		input = pInput;
 	}
 
+	/**
+	 * Returns the input handler for the external processes standard output.
+	 * @return The input handler for the external processes standard output.
+	 */
 	public FailableConsumer<OutputStream,?> getInput() {
 		return input;
 	}

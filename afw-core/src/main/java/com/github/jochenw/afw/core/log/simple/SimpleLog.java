@@ -17,6 +17,10 @@ package com.github.jochenw.afw.core.log.simple;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
 
+
+/** Very simple implementation of {@link ILog}, which is not based on any
+ * external logging framework.
+ */
 public class SimpleLog extends AbstractLog {
     SimpleLog(SimpleLogFactory pFactory, String pId) {
         super(pFactory, pId);

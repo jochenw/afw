@@ -16,6 +16,7 @@
 package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -37,12 +38,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 
@@ -296,6 +302,7 @@ public class StreamsTest {
     }
 
     /** Test for {@link Streams#load(URL)}.
+     * @throws Exception The test failed.
      */
     public void testLoadUrl() throws Exception {
     	final Properties props = newTestProperties();
@@ -373,6 +380,7 @@ public class StreamsTest {
     }
 
     /** Test case for {@link Streams#of(byte[])}.
+     * @throws Exception The test failed.
      */
     public void testOfByteArray() throws Exception {
     	String string = "763209kfegLIZRD$";
@@ -404,6 +412,7 @@ public class StreamsTest {
     }
 
     /** Test case for {@link Streams#of(String, Charset)}.
+     * @throws Exception The test failed.
      */
     public void testOfStringCharset() throws Exception {
     	String string = "763209kfegLIZRD$";
@@ -418,6 +427,42 @@ public class StreamsTest {
     		fail("Expected Exception");
     	} catch (NullPointerException e) {
     		assertEquals("String", e.getMessage());
+    	}
+    }
+
+    /** Test case for {@link Streams#read(IReadable, Charset, FailableBiConsumer)}.
+     */
+    public static void testReadIReadableCharsetBiConsumer() {
+    	final Consumer<List<Object>> validator = (list) -> {
+    		assertEquals(8, list.size());
+    		while (!list.isEmpty()) {
+    			final Integer lineNumber = (Integer) list.remove(0);
+    			final String text = (String) list.remove(1);
+    			assertNotNull(lineNumber);
+    			assertNotNull(text);
+    			assertEquals("This is line " + lineNumber, text);
+    		}
+    	};
+    	for (final String sep : Arrays.asList(System.lineSeparator(), "\n", "\r\n")) {
+    		final String text0 = "This is line 0." + sep +
+    				"This is line 1." + sep +
+    				"This is line 2." + sep +
+    				"This is line 3.";
+    		final String text1 = text0 + sep;
+    		final List<Object> list0 = new ArrayList<>();
+    		final ByteArrayInputStream bais0 = new ByteArrayInputStream(text0.getBytes(StandardCharsets.UTF_8));
+			Streams.read(IReadable.of("TEXT0", () -> bais0), null, (lineNumber, line) -> {
+    			list0.add((Integer) lineNumber);
+    			list0.add((String) line);
+    		});
+    		validator.accept(list0);
+    		final List<Object> list1 = new ArrayList<>();
+    		final ByteArrayInputStream bais1 = new ByteArrayInputStream(text1.getBytes(StandardCharsets.UTF_8));
+			Streams.read(IReadable.of("TEXT0", () -> bais1), null, (lineNumber, line) -> {
+    			list1.add((Integer) lineNumber);
+    			list1.add((String) line);
+    		});
+    		validator.accept(list1);
     	}
     }
 }

@@ -15,6 +15,11 @@
  */
 package com.github.jochenw.afw.core.util;
 
+
+/** Abstract base class for creating builders.
+ * @param <S> Type of the object, that's being created by the builder.
+ * @param <T> Actual type of the builder.
+ */
 public abstract class AbstractBuilder<S,T extends AbstractBuilder<S,T>> extends AbstractMutable {
 	private S instance;
 
@@ -26,6 +31,10 @@ public abstract class AbstractBuilder<S,T extends AbstractBuilder<S,T>> extends 
 
 	protected abstract S newInstance();
 
+	/**
+	 * Makes this builder immutable, and returns the created instance.
+	 * @return The created instance
+	 */
 	public S build() {
 		if (isMutable()) {
 			S s = newInstance();

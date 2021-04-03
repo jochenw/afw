@@ -27,6 +27,9 @@ import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
 import com.github.jochenw.afw.core.util.Exceptions;
 
+
+/** Implementation of {@link ILogFactory}, which is based on Apache Log4j 2.
+ */
 public class Log4j2LogFactory extends AbstractLogFactory {
 	private Logger logger;
 

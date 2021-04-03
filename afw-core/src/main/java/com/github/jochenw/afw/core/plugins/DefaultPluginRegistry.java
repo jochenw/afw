@@ -24,17 +24,25 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 
+/** Default implementation of {@link IPluginRegistry}.
+ */
 public class DefaultPluginRegistry implements IPluginRegistry {
+	/** Key of a registered extension point.
+	 */
 	public static class Key {
 		private final @Nonnull Class<? extends Object> type;
-		private final @Nonnull String name;
-		public Key(@Nonnull Class<? extends Object> pType, String pName) {
+		private final @Nonnull String id;
+		/** Creates a new instance with the given type, and id.
+		 * @param pType The extension points type.
+		 * @param pId The extension points type.
+		 */
+		public Key(@Nonnull Class<? extends Object> pType, @Nonnull String pId) {
 			type = pType;
-			name = pName;
+			id = pId;
 		}
 		@Override
 		public int hashCode() {
-			return 31 * (31 * 1 + name.hashCode()) + type.hashCode();
+			return 31 * (31 * 1 + id.hashCode()) + type.hashCode();
 		}
 
 		@Override
@@ -46,15 +54,24 @@ public class DefaultPluginRegistry implements IPluginRegistry {
 			if (getClass() != obj.getClass())
 				return false;
 			final Key other = (Key) obj;
-			return name.equals(other.name)  &&  type.equals(other.type);
+			return id.equals(other.id)  &&  type.equals(other.type);
 		}
+		/** Returns the extension points type.
+		 * @return The extension points type.
+		 */
 		public Class<? extends Object> getType() {
 			return type;
 		}
-		public String getName() {
-			return name;
+		/** Returns the extension points id.
+		 * @return The extension points id.
+		 */
+		public String getId() {
+			return id;
 		}
 	}
+	/** Default implementation of an {@link IPluginRegistry.IExtensionPoint extension point}.
+	 * @param <O> The extension points plugin type.
+	 */
 	public static class DefaultExtensionPoint<O extends Object> implements IPluginRegistry.IExtensionPoint<O> {
 		private final List<O> plugins = new ArrayList<O>();
 		private List<O> unmodifiablePlugins = Collections.emptyList();

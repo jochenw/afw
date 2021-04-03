@@ -450,6 +450,8 @@ public class ElEvaluator {
 				return Long.valueOf(((Number) pValue).longValue());
 			} else if (pValue instanceof Float) {
 				return Double.valueOf(((Number) pValue).doubleValue());
+			} else if (pValue instanceof Boolean) {
+				return pValue;
 			} else {
 				throw new IllegalStateException("Invalid value type: " + pValue.getClass().getName());
 			}

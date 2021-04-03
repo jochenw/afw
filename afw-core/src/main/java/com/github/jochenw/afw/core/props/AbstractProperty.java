@@ -21,6 +21,10 @@ import java.util.Map;
 
 
 
+/**
+ * Abstract base implementation of {@link IProperty}.
+ * @param <O> The property type.
+ */
 public abstract class AbstractProperty<O> implements IProperty<O>, IPropertyFactory.ChangeListener {
     private final List<ChangeListener<O>> listeners = new ArrayList<>();
     private final String key;

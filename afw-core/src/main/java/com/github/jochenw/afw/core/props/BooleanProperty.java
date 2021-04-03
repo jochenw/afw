@@ -15,7 +15,15 @@
  */
 package com.github.jochenw.afw.core.props;
 
+
+/** Implemantation of a boolean {@link IProperty}.
+ */
 public class BooleanProperty extends AbstractProperty<Boolean> implements IBooleanProperty {
+	/**
+	 * Creates a new instance with the given property key, and default value.
+	 * @param pKey The property key.
+	 * @param pDefaultValue The default value.
+	 */
     public BooleanProperty(String pKey, Boolean pDefaultValue) {
         super(pKey, pDefaultValue);
     }

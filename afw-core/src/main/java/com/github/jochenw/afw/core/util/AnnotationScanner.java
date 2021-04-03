@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Searches for annotations in a text string. An annotation is something like
  *   \@SuppressWarnings(user="jwi", reason="Not Given", rules="rule0, rule1, ...")
@@ -37,29 +38,49 @@ import java.util.Map;
  * up to four hexadecimal character).
  */
 public class AnnotationScanner {
+	/** Implementation of an anntotation, that has been detected by the scanner.
+	 */
 	public static class Annotation implements Serializable {
 		private static final long serialVersionUID = 2761700259919020204L;
 		private final String name;
 		private final Map<String,String> attributes;
 
+		/** Creates a new instance, with the given name, and the given attributes.
+		 * @param pName The annotations name.
+		 * @param pAttributes The annotations attributes.
+		 */
 		public Annotation(String pName, Map<String,String> pAttributes) {
 			name = pName;
 			attributes = Collections.unmodifiableMap(pAttributes);
 		}
 
+		/** Returns the annotations name.
+		 * @return The annotations name.
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/** Returns the annotations attributes.
+		 * @return The annotations attributes.
+		 */
 		public Map<String,String> getAttributes() {
 			return attributes;
 		}
 
+		/** Returns the value of the given attribute, or null.
+		 * @param pAttrName Name of the atttribute, that is being queried.
+		 * @return The requested attribute, if it has been specified, or null.
+		 */
 		public String getAttribute(String pAttrName) {
 			return attributes.get(pAttrName);
 		}
 	}
 
+	/** Parses the given text for embedded attributes.
+	 * @param pText The text, that is being scanned.
+	 * @return List of the annotations, that has been detected, possibly empty.
+	 */
 	public static List<Annotation> parse(String pText) {
 		StringReader sr = null;
 		List<Annotation> annotations = null;
@@ -94,6 +115,10 @@ public class AnnotationScanner {
 		return annotations;
 	}
  	
+	/** Parses the given readers text for embedded attributes.
+	 * @param pReader A reader, which returns the text, that is being scanned.
+	 * @return List of the annotations, that has been detected, possibly empty.
+	 */
 	public static List<Annotation> parse(Reader pReader) {
 		try {
 			if (pReader instanceof BufferedReader) {
@@ -106,6 +131,11 @@ public class AnnotationScanner {
 		}
 	}
 
+	/** Parses the given readers text for embedded attributes.
+	 * @param pReader A reader, which returns the text, that is being scanned.
+	 * @return List of the annotations, that has been detected, possibly empty.
+	 * @throws IOException An I/O error occurred, while reading the text.
+	 */
 	public static List<Annotation> parse(BufferedReader pReader) throws IOException {
 		final List<Annotation> annotations = new ArrayList<Annotation>();
 		for (;;) {

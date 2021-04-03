@@ -15,7 +15,16 @@
  */
 package com.github.jochenw.afw.core.props;
 
+
+/**
+ * Default implementation of {@link ILongProperty}.
+ */
 public class LongProperty extends AbstractProperty<Long> implements ILongProperty {
+	/**
+	 * Creates a new instance with the given property key, and default value.
+	 * @param pKey The properties key.
+	 * @param pDefaultValue The properties default value.
+	 */
     public LongProperty(String pKey, Long pDefaultValue) {
         super(pKey, pDefaultValue);
     }

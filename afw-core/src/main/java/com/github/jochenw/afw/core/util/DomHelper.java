@@ -22,9 +22,7 @@ import org.xml.sax.Locator;
 
 import com.google.common.base.Supplier;
 
-/**
- * @author jwi
- *
+/** A helper object for parsing DOM documents.
  */
 public class DomHelper {
 	/** Exception class, which is thrown by the various assert methods.
@@ -439,11 +437,23 @@ public class DomHelper {
 		return Boolean.parseBoolean(value);
 	}
 
+	/** Returns the given attributes value, as a {@link Path} object.
+	 * @param pNode The node, which is being queried for an attribute value.
+	 * @param pName The requested attributes name.
+	 * @return The attributes value, as a {@link Path} object.
+	 */
 	public @Nonnull Path requirePathAttribute(@Nonnull Node pNode, @Nonnull String pName) {
 		final String value = requireAttribute(pNode, pName);
 		return Objects.requireNonNull(Paths.get(value));
 	}
 
+	/** Returns the given attributes value, as a {@link Path} object.
+	 * @param pNode The node, which is being queried for an attribute value.
+	 * @param pName The requested attributes name.
+	 * @param pPredicate A predicate, which tests the returned value for validity.
+	 * @param pErrorMsgSupplier Supplier of the error message, if the returned value is found to be invalid.
+	 * @return The attributes value, as a {@link Path} object.
+	 */
 	public @Nonnull Path requirePathAttribute(@Nonnull Node pNode, @Nonnull String pName, @Nonnull Predicate<Path> pPredicate,
 			                         @Nonnull Supplier<String> pErrorMsgSupplier) {
 		final Path path = requirePathAttribute(pNode, pName);
@@ -454,6 +464,16 @@ public class DomHelper {
 		}
 	}
 
+	/** Returns the content text of the given child element, as a {@link Path} object.
+	 * @param pNode The element, which is being queried for a child element.
+	 * @param pName The requested elements name.
+	 * @param pPredicate A predicate, which tests the returned value for validity.
+	 * @param pErrorMsgSupplier Supplier of the error message, if the returned value is found to be invalid.
+	 * @return The elements content text, as a {@link Path} object.
+	 * @throws LocalizableException No such child element was found, the child element is empty,
+	 *   or it's value was found to be invalid by the predicate.
+	 * @see #getPathElement(Node, String, Predicate, Function)
+	 */
 	public Path requirePathElement(@Nonnull Node pNode, @Nonnull String pName, @Nonnull Predicate<Path> pPredicate,
 			Function<String,String> pErrorMsgSupplier) {
 		final Element element = getFirstChild(pNode, pName);
@@ -472,6 +492,16 @@ public class DomHelper {
 		}
 	}
 
+	/** Returns the content text of the given child element, as a {@link Path} object.
+	 * @param pNode The element, which is being queried for a child element.
+	 * @param pName The requested elements name.
+	 * @param pPredicate A predicate, which tests the returned value for validity.
+	 * @param pErrorMsgSupplier Supplier of the error message, if the returned value is found to be invalid.
+	 * @return The elements content text, as a {@link Path} object, or null, if
+	 *   no such child element has been found, the child element was empty, or the
+	 *   child elements content failed the predicates test for validity.
+	 * @see #requirePathElement(Node, String, Predicate, Function)
+	 */
 	public Path getPathElement(@Nonnull Node pNode, @Nonnull String pName, @Nonnull Predicate<Path> pPredicate,
 			Function<String,String> pErrorMsgSupplier) {
 		final Element element = getFirstChild(pNode, pName);

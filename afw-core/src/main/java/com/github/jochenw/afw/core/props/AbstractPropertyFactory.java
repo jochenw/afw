@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Abstract base implementation of {@link IPropertyFactory}.
+ */
 public abstract class AbstractPropertyFactory implements IPropertyFactory {
     private final List<IPropertyFactory.ChangeListener> listeners = new ArrayList<>();
 

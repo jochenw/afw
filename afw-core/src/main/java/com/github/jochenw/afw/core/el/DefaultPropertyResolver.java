@@ -46,6 +46,10 @@ public class DefaultPropertyResolver extends PropertyResolver {
 	public Object getValue(Object pObject, String pProperty) {
 		Objects.requireNonNull(pObject, "Object");
 		Objects.requireNonNull(pProperty, "Property");
+		final Object o = atomicPropertyResolver.getValue(pObject, pProperty);
+		if (o != null) {
+			return o;
+		}
 		Object object = pObject;
 		String property = pProperty;
 		String context = "";

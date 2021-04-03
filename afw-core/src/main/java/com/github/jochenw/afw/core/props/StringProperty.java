@@ -15,7 +15,14 @@
  */
 package com.github.jochenw.afw.core.props;
 
+/** Default implementation of a string property.
+ */
 public class StringProperty extends AbstractProperty<String> {
+	/**
+	 * Creates a new instance with the given property key, and default value.
+	 * @param pKey The properties key.
+	 * @param pDefaultValue The properties default value. (May be null.)
+	 */
     public StringProperty(String pKey, String pDefaultValue) {
         super(pKey, pDefaultValue);
     }

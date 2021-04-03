@@ -3,10 +3,22 @@ package com.github.jochenw.afw.core.io;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+
+/** A string predicate, which implements glob matching,
+ * optionally case insensitive.
+ */
 public class RePatternMatcher implements Predicate<String> {
 	private final String re;
 	private final Pattern pattern;
 
+	/** Creates a new instance, using the given glob pattern
+	 * expression.
+	 * @param pPattern The glob pattern. If the pattern contains
+	 *   either the suffix /i, or the suffix /s, then the
+	 *   remaining pattern (with the suffix removed) will be
+	 *   interpreted case insensitive, or case sensitive,
+	 *   respectively. The default is case sensitive.
+	 */
 	public RePatternMatcher(String pPattern) {
 		final boolean caseSensitive;
 		final String pat;

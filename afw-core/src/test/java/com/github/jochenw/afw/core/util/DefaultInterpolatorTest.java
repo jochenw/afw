@@ -22,6 +22,8 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.props.DefaultInterpolator;
+
 public class DefaultInterpolatorTest {
 	private DefaultInterpolator interpolator;
 	private Properties properties;

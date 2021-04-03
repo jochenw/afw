@@ -30,6 +30,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.Function;
 
+import com.github.jochenw.afw.core.props.DefaultInterpolator;
 import com.github.jochenw.afw.core.props.Interpolator;
 
 

@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 
 import com.github.jochenw.afw.core.util.Objects;
 
+
 /** A parser for command line arguments.
  */
 public class Args {

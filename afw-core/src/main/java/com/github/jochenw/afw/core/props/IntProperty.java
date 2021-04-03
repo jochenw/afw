@@ -15,7 +15,15 @@
  */
 package com.github.jochenw.afw.core.props;
 
+
+/** Default implementation of an {@link IIntProperty integer property}.
+ */
 public class IntProperty extends AbstractProperty<Integer> implements IIntProperty {
+	/**
+	 * Creates a new instance with the given property key, and default value.
+	 * @param pKey The properties key.
+	 * @param pDefaultValue The properties default value.
+	 */
     public IntProperty(String pKey, Integer pDefaultValue) {
         super(pKey, pDefaultValue);
     }

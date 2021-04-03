@@ -79,9 +79,20 @@ public interface IPluginRegistry {
 	 * 
 	 */
 	public interface Initializer extends Consumer<IPluginRegistry> {
+		/** Returns the initializers id.
+		 * @return The initializers id.
+		 */
 		String getId();
+		/** Returns the list of initializer id's, that this one depends on.
+		 * The requirement is, that the initializers with those id's have
+		 * already been executed.
+		 * @return The initializers id.
+		 */
 		List<String> getDependsOn();
 	}
+	/**
+	 * Abstract base implementation of {@link Initializer}.
+	 */
 	public static abstract class AbstractInitializer implements Initializer {
 		private String id;
 		private List<String> dependsOn;
@@ -90,26 +101,61 @@ public interface IPluginRegistry {
 		public String getId() {
 			return id;
 		}
-		public void setId(String id) {
-			this.id = id;
+		/**
+		 * Sets the initializers id.
+		 * @param pId The initializers id.
+		 */
+		public void setId(String pId) {
+			id = pId;
 		}
 		@Override
 		public List<String> getDependsOn() {
 			return dependsOn;
 		}
-		public void setDependsOn(List<String> dependsOn) {
-			this.dependsOn = dependsOn;
+		/**
+		 * Sets the id's of the initializers, that this one depends on.
+		 * @param pDependsOn List of the initializer id's, that this one depends on.
+		 */
+		public void setDependsOn(List<String> pDependsOn) {
+			dependsOn = pDependsOn;
 		}
 	}
 
+	/** Adds an extension point to the plugin registry.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pId The extension points id.
+	 */
 	<O extends Object> void addExtensionPoint(@Nonnull Class<O> pType, @Nonnull String pId);
+	/** Adds an extension point to the plugin registry, using the default id "".
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 */
 	public default <O extends Object> void addExtensionPoint(@Nonnull Class<O> pType) {
 		addExtensionPoint(pType, "");
 	}
+	/** Returns an extension point from the plugin registry.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pId The extension points id.
+	 * @return The requested extension point, or null, if no such extension point has been registered.
+	 */
 	@Nullable <O extends Object> IExtensionPoint<O> getExtensionPoint(@Nonnull Class<O> pType, @Nonnull String pId);
+	/** Returns an extension point with the default plugin id "" from the plugin registry.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @return The requested extension point, or null, if no such extension point has been registered.
+	 */
 	public default @Nullable <O extends Object> IExtensionPoint<O> getExtensionPoint(@Nonnull Class<O> pType) {
 		return getExtensionPoint(pType, "");
 	}
+	/** Returns an extension point from the plugin registry.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pId The extension points id.
+	 * @return The requested extension point. Never null.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
 	public default @Nonnull <O extends Object> IExtensionPoint<O> requireExtensionPoint(@Nonnull Class<O> pType, @Nonnull String pId)
 		throws NoSuchElementException {
 		final IExtensionPoint<O> ep = getExtensionPoint(pType, pId);
@@ -118,6 +164,12 @@ public interface IPluginRegistry {
 		}
 		return ep;
 	}
+	/** Returns an extension point with the default plugin id "" from the plugin registry.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @return The requested extension point. Never null.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
 	public default @Nonnull <O extends Object> IExtensionPoint<O> requireExtensionPoint(@Nonnull Class<O> pType) {
 		final IExtensionPoint<O> ep = getExtensionPoint(pType);
 		if (ep == null) {
@@ -125,28 +177,72 @@ public interface IPluginRegistry {
 		}
 		return ep;
 	}
-	public default <O extends Object> void forEach(@Nonnull Class<O> pType, @Nonnull String pId, @Nonnull Consumer<O> pConsumer) {
+	/**
+	 * Invokes the given consumer on any plugin, that has been registered in an extension point.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pId The extension points id.
+	 * @param pConsumer The consumer, which is being invoked.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
+	public default <O extends Object> void forEach(@Nonnull Class<O> pType, @Nonnull String pId, @Nonnull Consumer<O> pConsumer)
+		throws NoSuchElementException {
 		requireExtensionPoint(pType, pId).forEach(pConsumer);
 	}
-	public default <O extends Object> void forEach(@Nonnull Class<O> pType, @Nonnull Consumer<O> pConsumer) {
+	/**
+	 * Invokes the given consumer on any plugin, that has been registered in an extension point
+	 * with the default plugin id "".
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pConsumer The consumer, which is being invoked.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
+	public default <O extends Object> void forEach(@Nonnull Class<O> pType, @Nonnull Consumer<O> pConsumer)
+		throws NoSuchElementException {
 		requireExtensionPoint(pType).forEach(pConsumer);
 	}
+	/**
+	 * Returns a list of all the plugins, that have been registered in an extension point.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pId The extension points id.
+	 * @return The plugins, that have been registered on the given extension point.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
 	public default <O extends Object> List<O> getPlugins(Class<O> pType, String pId) {
 		return requireExtensionPoint(pType, pId).getPlugins();
 	}
+	/**
+	 * Returns a list of all the plugins, that have been registered in an extension point
+	 * with the default plugin id "".
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @return The plugins, that have been registered on the given extension point.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
 	public default <O extends Object> List<O> getPlugins(Class<O> pType) {
 		return requireExtensionPoint(pType).getPlugins();
 	}
+	/**
+	 * Adds a new plugin to an extension point.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pId The extension points id.
+	 * @param pPlugin The plugin, that is being added.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
 	public default <O extends Object> void addPlugin(Class<O> pType, String pId, O pPlugin) {
 		requireExtensionPoint(pType, pId).addPlugin(pPlugin);
 	}
+	/**
+	 * Adds a new plugin to an extension point with the default plugin id.
+	 * @param <O> The extension points type.
+	 * @param pType The extension points type.
+	 * @param pId The extension points id.
+	 * @param pPlugin The plugin, that is being added.
+	 * @throws NoSuchElementException No such extension point has been registered.
+	 */
 	public default <O extends Object> void addPlugin(Class<O> pType, O pPlugin) {
 		requireExtensionPoint(pType).addPlugin(pPlugin);
-	}
-	public default <O extends Object> List<O> requirePlugins(Class<O> pType) {
-		return requireExtensionPoint(pType).getPlugins();
-	}
-	public default <O extends Object> List<O> requirePlugins(Class<O> pType, String pId) {
-		return requireExtensionPoint(pType, pId).getPlugins();
 	}
 }

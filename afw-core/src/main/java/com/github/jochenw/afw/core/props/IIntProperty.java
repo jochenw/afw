@@ -15,7 +15,18 @@
  */
 package com.github.jochenw.afw.core.props;
 
+
+/** Interface of an integer {@link IProperty}.
+ */
 public interface IIntProperty extends IProperty<Integer> {
+	/**
+	 * Returns the value as a primitive integer.
+	 * @return The value as a primitive integer.
+	 */
     int getIntValue();
+	/**
+	 * Returns the default value as a primitive integer.
+	 * @return The default value as a primitive integer.
+	 */
     int getIntDefaultValue();
 }

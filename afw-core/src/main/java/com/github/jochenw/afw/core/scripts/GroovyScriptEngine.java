@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,14 +16,26 @@ import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.util.Holder;
 
 import groovy.lang.Binding;
-import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyRuntimeException;
 import groovy.lang.GroovyShell;
 
+
+/** Implementation of {@link IScriptEngine} for Groovy
+ * scripts.
+ */
 public class GroovyScriptEngine implements IScriptEngine {
+	/** Implementation of {@link Script} for Groovy
+	 * scripts.
+	 */
 	public static class GroovyScript implements Script {
 		private final groovy.lang.Script gScript;
 
+		/**
+		 * Creates a new instance, which can be used
+		 * to evaluate the given script.
+		 * @param pScript The Groovy script, that can
+		 *   be evaluated.
+		 */
 		public GroovyScript(groovy.lang.Script pScript) {
 			gScript = pScript;
 		}
@@ -53,8 +64,11 @@ public class GroovyScriptEngine implements IScriptEngine {
 				if (node == null) {
 					throw gre;
 				} else {
+					@SuppressWarnings("unused")
 					final String text = node.getText();
+					@SuppressWarnings("unused")
 					final int lineNumber = node.getLineNumber();
+					@SuppressWarnings("unused")
 					final int columnNumber = node.getColumnNumber();
 					throw gre;
 				}

@@ -29,7 +29,12 @@ public class ElEvaluatorTest {
 	private static final ElReader reader = new ElReader();
 
 	@Test
-	public void test() {
+	public void testBooleanExpression() {
+		final ElExpression expr = reader.parse("nested.value");
+		Assert.assertTrue((Boolean) evaluator.evaluate(expr, toMap("nested", toMap("value", Boolean.TRUE))));
+	}
+	@Test
+	public void testSimpleExpression() {
 		final ElExpression expr = reader.parse("id != 'foo'  ||  4 > num");
 		Assert.assertTrue(((Boolean) evaluator.evaluate(expr, toMap("id", "bar", "num", Long.valueOf(5)))).booleanValue());
 		Assert.assertFalse(((Boolean) evaluator.evaluate(expr, toMap("id", "foo", "num", Long.valueOf(4)))).booleanValue());

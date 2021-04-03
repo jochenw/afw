@@ -21,6 +21,11 @@ import javax.servlet.ServletContextListener;
 
 import com.github.jochenw.afw.core.util.Strings;
 
+
+/** An abstract base class for deriving servlet context initializers, that maintain a data object
+ * as a context attribute.
+ * @param <Data> The data objects type.
+ */
 public abstract class AFWCoreContextInitializer<Data extends Object> implements ServletContextListener {
 	private static final String KEY = AFWCoreContextInitializer.class.getName() + ".KEY";
 
@@ -50,6 +55,13 @@ public abstract class AFWCoreContextInitializer<Data extends Object> implements 
 		}
 	}
 
+	/**
+	 * Returns the data object.
+	 * @param <O> The data objects type.
+	 * @param pContext The servlet context, that has been initialized, and contains the data
+	 *   object.
+	 * @return The created d
+	 */
 	public static <O> O getData(ServletContext pContext) {
 		@SuppressWarnings("unchecked")
 		final O data = (O) pContext.getAttribute(KEY);
@@ -60,6 +72,8 @@ public abstract class AFWCoreContextInitializer<Data extends Object> implements 
 	}
 	
 	protected void shutdown(Data pData) {}
-	
+
+	/** Called to create the new data object, which is being stored as a servlet context attribute.
+	 */
     protected abstract Data newData(String pInstanceName);
 }

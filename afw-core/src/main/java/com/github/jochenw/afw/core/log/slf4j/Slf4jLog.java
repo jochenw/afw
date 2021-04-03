@@ -21,11 +21,20 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
+import com.github.jochenw.afw.core.log.ILog;
 
+
+/** Implementation of {@link ILog}, which is based on SLF4J.
+ */
 public class Slf4jLog extends AbstractLog {
     private static final Marker fatal = MarkerFactory.getMarker("FATAL");
     private final Logger logger;
 
+    /**
+     * Creates a new instance with the given factory, and the given logger id.
+     * @param pFactory The logger factory, that creates this instance.
+     * @param pId The logger id.
+     */
     public Slf4jLog(Slf4jLogFactory pFactory, String pId) {
         super(pFactory, pId);
         logger = LoggerFactory.getLogger(pId);

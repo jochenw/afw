@@ -15,18 +15,31 @@
  */
 package com.github.jochenw.afw.core.util;
 
+/**
+ * Abstract base class for objects, that are initially mutable, but may become immutable.
+ */
 public class AbstractMutable {
 	private boolean immutable;
+	/**
+	 * Asserts, that this object is still mutable.
+	 * @throws IllegalStateException The instance is already immutable.
+	 */
 	public void assertMutable() {
 		if (immutable) {
 			throw new IllegalStateException("This object is no longer mutable.");
 		}
 	}
 
+	/** Returns, whether the instance is still mutable.
+	 * @return True, if this instance is still mutable, otherwise false.
+	 */
 	public boolean isMutable() {
 		return !immutable;
 	}
 
+	/** Makes this object immutable.
+	 * @throws IllegalStateException The instance is already immutable.
+	 */
 	protected void makeImmutable() {
 		assertMutable();
 		immutable = true;

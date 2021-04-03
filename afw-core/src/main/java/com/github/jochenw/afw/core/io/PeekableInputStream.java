@@ -27,7 +27,7 @@ import java.util.Objects;
 public class PeekableInputStream extends CircularBufferInputStream {
 	/**
 	 * Creates a new instance, which filters the given underlying
-	 * input streams, maintaining a buffer with the given size.
+	 * input stream, maintaining a buffer with the given size.
 	 * @param pIn The underlying input stream.
 	 * @param pBufferSize The internal buffers size.
 	 */
@@ -37,7 +37,7 @@ public class PeekableInputStream extends CircularBufferInputStream {
 
 	/**
 	 * Creates a new instance, which filters the given underlying
-	 * input streams, maintaining a buffer with the default size
+	 * input stream, maintaining a buffer with the default size
 	 * (8192).
 	 * @param pIn The underlying input stream.
 	 */
@@ -45,6 +45,15 @@ public class PeekableInputStream extends CircularBufferInputStream {
 		super(pIn);
 	}
 
+	/**
+	 * Checks, whether the given bytes are currently at the beginning
+	 * of the buffer.
+	 * @param pBuffer A byte array, which is being compared with the
+	 *   beginning of the buffer.
+	 * @return True, if the buffer currently starts with the given bytes.
+	 *   Otherwise false. If necessary, the buffer will be filled.
+	 * @throws IOException Filling the buffer failed.
+	 */
 	public boolean peek(byte[] pBuffer) throws IOException {
 		Objects.requireNonNull(pBuffer, "Buffer");
 		if (pBuffer.length > bufferSize) {

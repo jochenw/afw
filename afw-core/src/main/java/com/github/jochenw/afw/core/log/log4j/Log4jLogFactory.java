@@ -25,6 +25,9 @@ import org.apache.log4j.xml.DOMConfigurator;
 import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
 
+
+/** Implementation of {@link ILogFactory}, which is based on Apache Log4j 1.
+ */
 public class Log4jLogFactory extends AbstractLogFactory {
 	private Logger logger;
 

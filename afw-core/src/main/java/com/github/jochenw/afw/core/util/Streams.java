@@ -16,6 +16,7 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,7 +45,9 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.io.ReaderInputStream;
+import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
@@ -531,5 +534,33 @@ public class Streams {
     	final @Nonnull byte[] bytes = Objects.requireNonNull(pString, "String")
     			.getBytes(Objects.notNull(pCharset, StandardCharsets.UTF_8));
     	return of(bytes);
+    }
+
+    /**
+     * Reads the given {@link IReadable} as a text file, invoking the given consumer for
+     * every line.
+     * @param pReadable The text file, that is being read.
+     * @param pCharset The text files character set. May be null, in which case
+     *   {@link StandardCharsets#UTF_8} will be used.
+     * @param pConsumer The consumer, which is being invoked for every line of text.
+     *   The consumers arguments are the line number (beginning with 1), and the text line.
+     */
+    public static void read(IReadable pReadable, Charset pCharset, FailableBiConsumer<Integer,String,?> pConsumer) {
+    	pReadable.read((r) -> {
+    		final BufferedReader br;
+    		if (r instanceof BufferedReader) {
+    			br = (BufferedReader) r;
+    		} else {
+    			br = new BufferedReader(r);
+    		}
+    		for (int i = 1;  ;  i++) {
+    			final String line = br.readLine();
+    			if (line == null) {
+    				break;
+    			} else {
+    				pConsumer.accept(Integer.valueOf(i), line);
+    			}
+    		}
+    	}, Objects.notNull(pCharset, StandardCharsets.UTF_8));
     }
 }

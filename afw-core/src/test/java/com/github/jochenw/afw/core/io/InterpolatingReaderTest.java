@@ -6,8 +6,8 @@ import java.io.StringReader;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.props.DefaultInterpolator;
 import com.github.jochenw.afw.core.props.Interpolator;
-import com.github.jochenw.afw.core.util.DefaultInterpolator;
 import com.github.jochenw.afw.core.util.Streams;
 
 public class InterpolatingReaderTest {

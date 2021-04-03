@@ -27,7 +27,7 @@ public class WritableCharacterStreamTest {
 	public void test() throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final Writer w = new OutputStreamWriter(baos, StandardCharsets.UTF_8);
-		final WritableCharacterStream wcs = new WritableCharacterStream(w);
+		final WritableCharacterStream wcs = WritableCharacterStream.of(w, true);
 		int offset = 0;
 		while (offset < CHARS.length()) {
 			int mode = RND.nextInt(2);

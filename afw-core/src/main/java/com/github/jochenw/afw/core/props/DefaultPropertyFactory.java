@@ -27,7 +27,12 @@ import com.github.jochenw.afw.core.util.Exceptions;
 import java.net.URLConnection;
 
 
+/** Default implementation of {@link IPropertyFactory}.
+ */
 public class DefaultPropertyFactory extends AbstractPropertyFactory {
+	/** A set of properties with a time stamp. A change in the time stamp
+	 * allows to trigger a reload.
+	 */
     public static class DatedProperties {
         private final long lastModifiedDate;
         private final Map<String,String> properties;
@@ -43,16 +48,31 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
     private DatedProperties instanceProperties;
     private Map<String,String> myProperties;
 
+    /**
+     * Creates a new instance with the given URL's for factory,
+     * and custom properties.
+     * @param pPropertyUrl URL of the instance (custom) properties.
+     * @param pPropertyFactoryUrl URL of the factory properties.
+     */
     public DefaultPropertyFactory(URL pPropertyUrl, URL pPropertyFactoryUrl) {
         propertyFactoryUrl = pPropertyFactoryUrl;
         propertyUrl = pPropertyUrl;
         initProperties();
     }
 
+    /**
+     * Creates a new instance with the given properties.
+     * @param pProperties The property set.
+     */
     public DefaultPropertyFactory(Properties pProperties) {
     	this(pProperties, null);
     }
 
+    /**
+     * Creates a new instance with the given factory, and instance (custom) properties.
+     * @param pFactoryProperties The factory properties.
+     * @param pInstanceProperties The instance (custom) properties.
+     */
     public DefaultPropertyFactory(Properties pFactoryProperties, Properties pInstanceProperties) {
     	final Function<Properties,Map<String,String>> mapCreator = (p) -> {
     		final Map<String,String> map = new HashMap<>();
@@ -135,6 +155,9 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
         return Collections.unmodifiableMap(myProperties);
     }
 
+    /**
+     * Called to reload the properties.
+     */
     public synchronized void reload() {
         if (!isUptodate(factoryProperties, propertyFactoryUrl)
                 ||  !isUptodate(instanceProperties, propertyUrl)) {
@@ -161,9 +184,17 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
         return loadedLastModifiedTime != currentLastModifiedTime;
     }
 
+    /**
+     * Returns the URL of the factory properties.
+     * @return The URL of the factory properties.
+     */
     public URL getFactoryUrl() {
         return propertyFactoryUrl;
     }
+    /**
+     * Returns the URL of the instance (custom) properties.
+     * @return The URL of the instance (custom) properties.
+     */
     public URL getInstanceUrl() {
         return propertyUrl;
     }

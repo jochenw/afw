@@ -15,33 +15,65 @@ import com.github.jochenw.afw.core.el.tree.ElExpression;
 import com.github.jochenw.afw.core.template.SimpleTemplate.Context;
 import com.github.jochenw.afw.core.util.Generics;
 
+
+/**
+ * This template compiler is used internally by the {@link SimpleTemplateEngine}
+ * for parsing template files.
+ * @param <M> Type of the data model.
+ */
 public class SimpleTemplateCompiler<M extends Map<String,Object>> {
+	/**
+	 * Abstract base class for deriving block constructs in the compiled template.
+	 * @param <T> The data model type.
+	 */
 	public abstract static class Block<T> {
 		private final List<Consumer<Context<T>>> list = new ArrayList<>();
 		private final int lineNumber;
 		protected Block(int pLineNumber) {
 			lineNumber = pLineNumber;
 		}
+		/** Adds a consumer to the list of context consumers.
+		 * @param pConsumer The consumer, which is being added.
+		 */
 		public void add(Consumer<Context<T>> pConsumer) {
 			list.add(pConsumer);
 		}
+		/**
+		 * Returns the list of context consumers.
+		 * @return The list of context consumers.
+		 */
 		public List<Consumer<Context<T>>> getList() {
 			return list;
 		}
+		/** Returns the blocks line number.
+		 * @return The blocks line number.
+		 */
 		public int getLineNumber() {
 			return lineNumber;
 		}
 	}
+	/** The outer block is the templates root block.
+	 * @param <T> The data model type.
+	 */
 	public static class OuterBlock<T> extends Block<T> {
+		/** Creates a new instance with line number 1.
+		 */
 		public OuterBlock() {
 			super(1);
 		}
 	}
+	/** An if block represents an optional part of the template.
+	 * @param <T> The data model type.
+	 */
 	public static class IfBlock<T> extends Block<T> {
 		private final ElExpression expr;
 		private final List<Consumer<Context<T>>> elseList = new ArrayList<>();
 		private boolean haveElse;
 
+		/** Creates anew instance with the given line number, and condition.
+		 * @param pLineNumber The if blocks line number.
+		 * @param pExpr The if blocks condition.
+		 */
 		public IfBlock(int pLineNumber, ElExpression pExpr) {
 			super(pLineNumber);
 			expr = pExpr;
@@ -55,27 +87,56 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 				super.add(pConsumer);
 			}
 		}
+		/** Starts an else-subblock.
+		 */
 		public void startElse() {
 			haveElse = true;
 		}
+		/** Returns, whether there is an else-subblock.
+		 * @return True, if there is an else-subblock.
+		 */
 		public boolean hasElse() {
 			return haveElse;
 		}
+		/** Returns the condition.
+		 * @return The condition, that determines, whether the if block is
+		 * included in the output, or not.
+		 */
 		public ElExpression getExpression() {
 			return expr;
 		}
+		/**
+		 * Returns the list of context consumers.
+		 * @param pValue True, if the main block is being returned.
+		 *   False for the else subblock.
+		 * @return The list of context consumers.
+		 */
 		public List<Consumer<Context<T>>> getList(boolean pValue) {
 			return pValue ? getList() : elseList;
 		}
 	}
+	/**  A for block represents a repeatable part of the template.
+	 * @param <T> The data model type.
+	 */
 	public static class ForBlock<T> extends Block<T> {
 		private final String listVar, loopVar;
+		/** Creates a new instance with the given loop variable, and list variable.
+		 * @param pLineNumber The for block's line number. (Number of the blocks declaration)
+		 * @param pLoopVar The loop variable.
+		 * @param pListVar The list variable.
+		 */
 		public ForBlock(int pLineNumber, String pLoopVar, String pListVar) {
 			super(pLineNumber);
 			listVar = pListVar;
 			loopVar = pLoopVar;
 		}
+		/** Returns the list variable.
+		 * @return The list variable.
+		 */
 		public String getListVar() { return listVar; }
+		/** Returns the loop variable.
+		 * @return The loop variable.
+		 */
 		public String getLoopVar() { return loopVar; }
 	}
 	private final PropertyResolver propertyResolver;
@@ -83,6 +144,13 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 	private final ElEvaluator elEvalutor;
 	private final String uri;
 
+	/** Creates a new instance with the given property resolver, EL expression parser, EL expression
+	 * evaluator, and the given template URI.
+	 * @param pResolver The property resolver, which is being used to resolve variables in the model.
+	 * @param pReader The EL expression parser.
+	 * @param pEvaluator The EL expression evaluator.
+	 * @param pUri The template URI.
+	 */
 	public SimpleTemplateCompiler(PropertyResolver pResolver, ElReader pReader, ElEvaluator pEvaluator, String pUri) {
 		propertyResolver = pResolver;
 		elReader = pReader;
@@ -94,6 +162,10 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 	private Block<M> currentBlock;
 	private int lineNumber;
 
+	/** Called to parse, and compile the template.
+	 * @param pLines The template lines.
+	 * @return The parsed, and compiled, template.
+	 */
 	public SimpleTemplate<M> compile(String[] pLines) {
 		stack = new ArrayList<>();
 		currentBlock = new OuterBlock<M>();
@@ -108,7 +180,8 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 					try {
 						elExpr = elReader.parse(expr);
 					} catch (RuntimeException re) {
-						throw new IllegalStateException("Failed to parse if expression in line " + lineNumber + ": " + re.getMessage());
+						throw new IllegalStateException("Failed to parse if expression in " + uri
+								                        + ", line " + lineNumber + ": " + re.getMessage());
 					}
 					final IfBlock<M> ifBlock = new IfBlock<M>(lineNumber, elExpr);
 					stack.add(currentBlock);
@@ -118,39 +191,47 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 						if (currentBlock instanceof IfBlock) {
 							final IfBlock<M> ifBlock = (IfBlock<M>) currentBlock;
 							if (ifBlock.hasElse()) {
-								throw new IllegalStateException("Unexpected <%else%> at line " + lineNumber + " (Expected <%/if%>)");
+								throw new IllegalStateException("Unexpected <%else%> at " + uri
+										                        + ", line " + lineNumber + " (Expected <%/if%>)");
 							} else {
 								ifBlock.startElse();
 							}
 						} else if (currentBlock instanceof ForBlock) {
-							throw new IllegalStateException("Unexpected <%else%> at line " + lineNumber + " (Expected <%/for%>)");
+							throw new IllegalStateException("Unexpected <%else%> at " + uri
+									                        + ", line " + lineNumber + " (Expected <%/for%>)");
 						} else {
-							throw new IllegalStateException("Unexpected <%else%> at line " + lineNumber);
+							throw new IllegalStateException("Unexpected <%else%> at " + uri
+									                        + ", line " + lineNumber);
 						}
 					} else {
-						throw new IllegalStateException("Failed to parse else statement at line " + lineNumber);
+						throw new IllegalStateException("Failed to parse else statement at " + uri +
+								                        ", line " + lineNumber);
 					}
 				} else if (command.startsWith("/if")) {
 					if ("/if".equals(command.trim())) {
 						if (currentBlock instanceof IfBlock) {
 							final IfBlock<M> ifBlock = (IfBlock<M>) currentBlock;
 							if (stack.isEmpty()) {
-								throw new IllegalStateException("Unexpected /if outside of any block.");
+								throw new IllegalStateException("At " + uri + ", line " + lineNumber
+										                        + ": /if outside of any block.");
 							}
 							currentBlock = stack.remove(stack.size()-1);
 							currentBlock.add((c) -> {
 								final ElExpression el = ifBlock.getExpression();
-								final Boolean b = (Boolean) elEvalutor.evaluate(el, c.getModel());
+								final Boolean b = evaluate(el, c.getModel());
 								final List<Consumer<Context<M>>> list = ifBlock.getList(b != null  &&  b.booleanValue());
 								list.forEach((cons) -> cons.accept(c));
 							});
 						} else if (currentBlock instanceof ForBlock) {
-							throw new IllegalStateException("Unexpected <%/if%> at line " + lineNumber + " (Expected <%/for%>)");
+							throw new IllegalStateException("Unexpected <%/if%> at " + uri
+									                        + ", line " + lineNumber + " (Expected <%/for%>)");
 						} else {
-							throw new IllegalStateException("Unexpected <%/if%> at line " + lineNumber);
+							throw new IllegalStateException("Unexpected <%/if%> at " + uri
+									                        + ", line " + lineNumber);
 						}
 					} else {
-						throw new IllegalStateException("Failed to parse /if statement at line " + lineNumber);
+						throw new IllegalStateException("Failed to parse /if statement at " + uri
+								                        + ", line " + lineNumber);
 					}
 				} else if (command.startsWith("for")) {
 					final StringTokenizer st = new StringTokenizer(command.substring("for".length()), " ");
@@ -161,7 +242,8 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 						if (st.hasMoreTokens()) {
 							final String inToken = st.nextToken();
 							if (!"in".equals(inToken)) {
-								throw new IllegalStateException("Expected <loopVar> in <listVar> at line " + lineNumber);
+								throw new IllegalStateException("Expected <loopVar> in <listVar> at " + uri
+										                        + ", line " + lineNumber);
 							}
 							if (st.hasMoreTokens()) {
 								listVar = st.nextToken();
@@ -176,11 +258,13 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 						listVar = null;
 					}
 					if (loopVar == null  ||  listVar == null) {
-						throw new IllegalStateException("Unable to parse for statement at line " + lineNumber);
+						throw new IllegalStateException("Unable to parse for statement at " + uri
+								                        + ", line " + lineNumber);
 					}
 					if (loopVar.indexOf('.') != -1) {
-						throw new IllegalStateException("Invalid loop variable in for statement at line " + lineNumber
-							+ " (Expected atomic variable name without '.', got " + loopVar + ")");
+						throw new IllegalStateException("Invalid loop variable in for statement at " + uri
+								+ ", line " + lineNumber
+								+ " (Expected atomic variable name without '.', got " + loopVar + ")");
 					}
 					final ForBlock<M> ifBlock = new ForBlock<M>(lineNumber, loopVar, listVar);
 					stack.add(currentBlock);
@@ -190,7 +274,8 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 						if (currentBlock instanceof ForBlock) {
 							final ForBlock<M> forBlock = (ForBlock<M>) currentBlock;
 							if (stack.isEmpty()) {
-								throw new IllegalStateException("Unexpected /for outside of any block.");
+								throw new IllegalStateException("At " + uri + ", line " + lineNumber
+										                        + ": Unexpected /for outside of any block.");
 							}
 							currentBlock = stack.remove(stack.size()-1);
 							currentBlock.add((c) -> {
@@ -199,7 +284,9 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 									final Object o = propertyResolver.getValue(contextMap, forBlock.getListVar());
 									final Iterable<Object> list;
 									if (o == null) {
-										throw new IllegalStateException("List variable " + forBlock.getListVar() + " resolved to null at line " + forBlock.getLineNumber());
+										throw new IllegalStateException("List variable " + forBlock.getListVar()
+										                                + " resolved to null at " + uri
+										                                + ", line " + forBlock.getLineNumber());
 									} else if (o instanceof Object[]) {
 										final Object[] array = (Object[]) o;
 										list = Arrays.asList(array);
@@ -209,7 +296,8 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 										list = iter;
 									} else {
 										throw new IllegalStateException("List variable resolved to an instance of "
-												+ o.getClass() + " at line " + forBlock.getLineNumber() + " (which isn't iterable).");
+												+ o.getClass() + " at " + uri + ", line "
+												+ forBlock.getLineNumber() + " (which isn't iterable).");
 									}
 									final Map<String,Object> map = new HashMap<>(contextMap);
 									@SuppressWarnings("unchecked")
@@ -241,9 +329,11 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 		if (!stack.isEmpty()) {
 			final Block<M> block = stack.remove(stack.size()-1);
 			if (block instanceof IfBlock) {
-				throw new IllegalStateException("At end of file: Unterminated if statement, beginning at line " + block.lineNumber);
+				throw new IllegalStateException("At end of file " + uri
+						                        + ": Unterminated if statement, beginning at line " + block.lineNumber);
 			} else if (block instanceof ForBlock) {
-				throw new IllegalStateException("At end of file: Unterminated for statement, beginning at line " + block.lineNumber);
+				throw new IllegalStateException("At end of file " + uri
+						                        + ": Unterminated for statement, beginning at line " + block.lineNumber);
 			}
 		}
 		if (currentBlock == null  ||  !(currentBlock instanceof OuterBlock)) {
@@ -256,6 +346,22 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 		return result;
 	}
 
+	protected boolean evaluate (ElExpression pExpression, M pModel) {
+		final Object o = elEvalutor.evaluate(pExpression, pModel);
+		if (o == null) {
+			throw new IllegalStateException("At " + uri + ", line " + lineNumber
+                    + ": Expression evaluates to null.");
+		}
+		if (o instanceof Boolean) {
+			return ((Boolean) o).booleanValue();
+		} else if (o instanceof String) {
+			return Boolean.parseBoolean((String) o);
+		} else {
+			throw new IllegalStateException("At " + uri + ", line " + lineNumber
+					                        + ": Expression evaluates to invalid object "
+					                        + o.getClass().getName());
+		}
+	}
 	protected void compile(String pLine) {
 		String value = pLine;
 		for(;;) {
@@ -271,11 +377,11 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 				currentBlock.add((c) -> c.write(v));
 				final int endOffset = value.indexOf("}");
 				if (endOffset == -1) {
-					throw new IllegalStateException("Unterminated variable reference at line " + num);
+					throw new IllegalStateException("Unterminated variable reference at " + uri + ", line " + num);
 				}
 				final int nextOffset = value.indexOf("${");
 				if (nextOffset != -1  &&  nextOffset < endOffset) {
-					throw new IllegalStateException("Nested variable reference at line " + num);
+					throw new IllegalStateException("Nested variable reference at " + uri + ", line " + num);
 				}
 				final String varName = value.substring(0, endOffset);
 				value = value.substring(endOffset+"}".length());
@@ -283,7 +389,7 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 					final String variable = varName;
 					final Object o = propertyResolver.getValue(c.getModel(), variable);
 					if (o == null) {
-						throw new NullPointerException("Variable resolved to null at line " + num + ": " + variable);
+						throw new NullPointerException("Variable resolved to null at " + uri + ", line " + num + ": " + variable);
 					}
 					c.write(o.toString());
 				});

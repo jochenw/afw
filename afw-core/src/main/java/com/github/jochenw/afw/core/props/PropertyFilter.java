@@ -17,6 +17,25 @@ package com.github.jochenw.afw.core.props;
 
 import java.util.Properties;
 
+
+/** A property filter is an object, that updates a given
+ * set of properties, returning an updated set.
+ * Examples of a property filter could be:
+ * <ul>
+ *   <li>An interpolator, that resolves property references.</li>
+ *   <li>An enhancer, that adds more properties.</li>
+ *   <li>An purger, that removes properties.</li>
+ * </ul>
+ */
 public interface PropertyFilter {
+	/**
+	 * Called to filter the given set of properties.
+	 * It is implementation specific, whether a new
+	 * object is returned, or the same object
+	 * (after in-place modifications).
+	 * @param pProperties The properties, that are
+	 *   being filtered.
+	 * @return The filtered set of properties.
+	 */
 	public Properties filter(Properties pProperties);
 }

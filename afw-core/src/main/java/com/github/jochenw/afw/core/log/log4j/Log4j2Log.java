@@ -21,9 +21,16 @@ import org.apache.logging.log4j.Logger;
 import com.github.jochenw.afw.core.log.AbstractLog;
 
 
+/** Implementation of {@link ILog}, which is based on Apache Log4j 2.
+ */
 public class Log4j2Log extends AbstractLog {
     private final Logger logger;
 
+    /**
+     * Creates a new instance with the given factory, and logger id.
+     * @param pFactory The logger factory, that creates this instance.
+     * @param pId The logger id.
+     */
     public Log4j2Log(Log4j2LogFactory pFactory, String pId) {
         super(pFactory, pId);
         logger = LogManager.getLogger(pId);

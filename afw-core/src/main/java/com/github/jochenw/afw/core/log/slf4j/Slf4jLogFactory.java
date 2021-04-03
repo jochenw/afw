@@ -17,7 +17,11 @@ package com.github.jochenw.afw.core.log.slf4j;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
+import com.github.jochenw.afw.core.log.ILogFactory;
 
+
+/** Implementation of {@link ILogFactory}, which is based on SLF4J.
+ */
 public class Slf4jLogFactory extends AbstractLogFactory {
     @Override
     protected AbstractLog newLog(String pId) {

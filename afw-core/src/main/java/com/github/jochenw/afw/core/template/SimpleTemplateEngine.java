@@ -19,7 +19,7 @@ import com.github.jochenw.afw.core.util.Exceptions;
 
 
 /** Simple, standalone, implementation of {@link ITemplateEngine}. The main advantage
- * is, that you don't need Freemarker, or whatever.
+ * is, that you don't need Freemarker, or whatever, else.
  */
 public class SimpleTemplateEngine implements ITemplateEngine<Map<String,Object>> {
 	private PropertyResolver propertyResolver;

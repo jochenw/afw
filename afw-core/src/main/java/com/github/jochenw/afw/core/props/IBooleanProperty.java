@@ -15,7 +15,17 @@
  */
 package com.github.jochenw.afw.core.props;
 
+/** Interface of a boolean {@link IProperty}.
+ */
 public interface IBooleanProperty extends IProperty<Boolean> {
+	/**
+	 * Returns the value as a primitive boolean.
+	 * @return The value as a primitive boolean.
+	 */
     boolean getBooleanValue();
+	/**
+	 * Returns the default value as a primitive boolean.
+	 * @return The default value as a primitive boolean.
+	 */
     boolean getBooleanDefaultValue();
 }

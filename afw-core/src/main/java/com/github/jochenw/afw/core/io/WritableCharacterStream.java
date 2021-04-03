@@ -38,45 +38,76 @@ public class WritableCharacterStream implements AutoCloseable, Flushable, Append
 	private Charset charSet;
 	private BufferedWriter bw;
 
+	/** Creates a new instance, which is actually writing to the given {@link BufferedWriter}.
+	 * @param pWriter The actual target of the data, that is written to this character
+	 *   stream.
+	 */
 	public WritableCharacterStream(BufferedWriter pWriter) {
 		bw = pWriter;
 		charSet = null;
 	}
 
-	public WritableCharacterStream(Writer pWriter) {
-		this(new BufferedWriter(pWriter));
-	}
-
+	/** Creates a new instance, which is actually writing to the given
+	 * {@link BufferedOutputStream}, using the given character set for conversion
+	 * of characters to bytes.
+	 * @param pOs The actual target of the data, that is written to this character
+	 *   stream.
+	 * @param pCharSet The character set, that is being used for conversion
+	 *   of characters to bytes
+	 */
 	public WritableCharacterStream(BufferedOutputStream pOs, Charset pCharSet) {
-		this(new OutputStreamWriter(pOs, pCharSet));
+		this(new BufferedWriter(new OutputStreamWriter(pOs, pCharSet)));
 		charSet = pCharSet;
 	}
 
-	public WritableCharacterStream(OutputStream pOut, Charset pCharSet) {
-		this(new BufferedOutputStream(pOut), pCharSet);
-		charSet = pCharSet;
-	}
-
+	/**
+	 * @return The character set, that is being used for conversion
+	 *   of characters to bytes, if any. Null, if no conversion occurs.
+	 */
 	public Charset getCharSet() {
 		return charSet;
 	}
-	
+
+	/** Writes the given character sequence to the target stream.
+	 * @param pValue The character sequence, which is being written.
+	 * @throws IOException An I/O error occurred while writing the data.
+	 */
 	public void write(CharSequence pValue) throws IOException {
 		write(pValue, 0, pValue.length());
 	}
 
-	public void write(char[] pBuffer) throws IOException {
-		bw.write(pBuffer);
+	/** Writes the given character array to the target stream.
+	 * @param pArray The character array, which is being written.
+	 * @throws IOException An I/O error occurred while writing the data.
+	 */
+	public void write(char[] pArray) throws IOException {
+		bw.write(pArray);
 	}
 
+	/** Writes the given character to the target stream.
+	 * @param pChar The character, which is being written.
+	 * @throws IOException An I/O error occurred while writing the data.
+	 */
 	public void write(int pChar) throws IOException {
 		bw.write(pChar);
 	}
 
-	public void write(char[] pBuffer, int pOffset, int pLength) throws IOException {
-		bw.write(pBuffer, pOffset, pLength);
+	/** Writes a part of the given character array to the target stream.
+	 * @param pArray The character array, which is being written.
+	 * @param pOffset Offset of the first character, which is being written.
+	 * @param pLength The number of characters, that are being written.
+	 * @throws IOException An I/O error occurred while writing the data.
+	 */
+	public void write(char[] pArray, int pOffset, int pLength) throws IOException {
+		bw.write(pArray, pOffset, pLength);
 	}
 
+	/** Writes a part of the given character sequence to the target stream.
+	 * @param pValue The character sequence, which is being written.
+	 * @param pOffset Offset of the first character, which is being written.
+	 * @param pLength The number of characters, that are being written.
+	 * @throws IOException An I/O error occurred while writing the data.
+	 */
 	public void write(CharSequence pValue, int pOffset, int pLength) throws IOException {
 		if (pOffset < 0) {
 			throw new IllegalArgumentException("The Offset must not be lower than zero.");
@@ -104,56 +135,66 @@ public class WritableCharacterStream implements AutoCloseable, Flushable, Append
 		bw.close();
 	}
 
-	public static WritableCharacterStream newInstance(BufferedWriter pWriter, boolean pClose) {
+	/**
+	 * Creates a new instance, which is actually writing to the given
+	 * target {@link Writer}.
+	 * @param pWriter The actual data target.
+	 * @param pMayCloseStream True, if closing the created instance may
+	 *   close the actual data target.
+	 * @return The created instance.
+	 */
+	public static WritableCharacterStream of(Writer pWriter, boolean pMayCloseStream) {
 		Objects.requireNonNull(pWriter, "Writer");
-		if (pClose) {
-			return new WritableCharacterStream(pWriter);
-		} else {
-			return new WritableCharacterStream(Streams.uncloseableWriter(pWriter));
-		}
-	}
-
-	public static WritableCharacterStream newInstance(Writer pWriter, boolean pClose) {
-		Objects.requireNonNull(pWriter, "Writer");
-		final BufferedWriter bw;
-		if (pClose) {
+		if (pMayCloseStream) {
+			final BufferedWriter bw;
 			if (pWriter instanceof BufferedWriter) {
 				bw = (BufferedWriter) pWriter;
 			} else {
 				bw = new BufferedWriter(pWriter);
 			}
+			return new WritableCharacterStream(bw);
 		} else {
-			bw = new BufferedWriter(Streams.uncloseableWriter(pWriter));
+			return new WritableCharacterStream(new BufferedWriter(Streams.uncloseableWriter(pWriter)));
 		}
-		return new WritableCharacterStream(bw);
 	}
 
-	public static WritableCharacterStream newInstance(BufferedOutputStream pOut, Charset pCharSet, boolean pClose) {
+	/**
+	 * Creates a new instance, which is actually writing to the given
+	 * target {@link OutputStream}.
+	 * @param pOut The actual data target.
+	 * @param pCharSet The character set, which is being used for conversion
+	 *   of characters into bytes.
+	 * @param pMayCloseStream True, if closing the created instance may
+	 *   close the actual data target.
+	 * @return The created instance.
+	 */
+	public static WritableCharacterStream of(OutputStream pOut, Charset pCharSet, boolean pMayCloseStream) {
 		Objects.requireNonNull(pOut, "Out");
 		Objects.requireNonNull(pCharSet, "CharSet");
-		if (pClose) {
-			return new WritableCharacterStream(pOut, pCharSet);
+		if (pMayCloseStream) {
+			final BufferedOutputStream bos;
+			if (pOut instanceof BufferedOutputStream) {
+				bos = (BufferedOutputStream) pOut;
+			} else {
+				bos = new BufferedOutputStream(pOut);
+			}
+			return new WritableCharacterStream(bos, pCharSet);
 		} else {
-			return new WritableCharacterStream(Streams.uncloseableStream(pOut), pCharSet);
+			return new WritableCharacterStream(new BufferedOutputStream(Streams.uncloseableStream(pOut)), pCharSet);
 		}
 	}
 
-	public static WritableCharacterStream newInstance(BufferedOutputStream pOut, boolean pClose) {
-		return newInstance(pOut, StandardCharsets.UTF_8, pClose);
-	}
-
-	public static WritableCharacterStream newInstance(OutputStream pOut, Charset pCharSet, boolean pClose) {
-		Objects.requireNonNull(pOut, "Out");
-		Objects.requireNonNull(pCharSet, "CharSet");
-		if (pClose) {
-			return new WritableCharacterStream(pOut, pCharSet);
-		} else {
-			return new WritableCharacterStream(Streams.uncloseableStream(pOut), pCharSet);
-		}
-	}
-
-	public static WritableCharacterStream newInstance(OutputStream pOut, boolean pClose) {
-		return newInstance(pOut, StandardCharsets.UTF_8, pClose);
+	/**
+	 * Creates a new instance, which is actually writing to the given
+	 * target {@link OutputStream}, using {@link StandardCharsets#UTF_8}
+	 * for conversion of characters into bytes.
+	 * @param pOut The actual data target.
+	 * @param pMayCloseStream True, if closing the created instance may
+	 *   close the actual data target.
+	 * @return The created instance.
+	 */
+	public static WritableCharacterStream of(OutputStream pOut, boolean pMayCloseStream) {
+		return of(pOut, StandardCharsets.UTF_8, pMayCloseStream);
 	}
 
 	@Override

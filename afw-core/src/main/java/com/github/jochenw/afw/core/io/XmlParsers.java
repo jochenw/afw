@@ -36,7 +36,16 @@ import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Sax;
 
 
+/** A utility class for working with XML parsers.
+ */
 public class XmlParsers {
+	/**
+	 * Parses the given {@link InputSource} into a DOM document, which is then
+	 * passed to the given {@link Consumer}.
+	 * @param pSource The XML documents data source.
+	 * @param pDocumentConsumer The consumer, that should receive the created DOM
+	 *   document.
+	 */
 	public static void parse(InputSource pSource, Consumer<Document> pDocumentConsumer) {
 		try {
 			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -49,18 +58,39 @@ public class XmlParsers {
 		}
 	}
 
+	/**
+	 * Parses the given {@link InputStream} into a stream of SAX event stream,
+	 * which is then passed to the given {@link ContentHandler}.
+	 * @param pStream The XML documents data source.
+	 * @param pSystemId The documents system id, for use in error messages.
+	 * @param pHandler The SAX handler, which is receiving the SAX event stream
+	 */
 	public static void parse(InputStream pStream, String pSystemId, ContentHandler pHandler) {
 		final InputSource isource = new InputSource(pStream);
 		isource.setSystemId(pSystemId);
 		Sax.parse(isource, pHandler);
 	}
 
+	/**
+	 * Parses the given {@link InputSource} into a DOM document, which is then
+	 * passed to the given {@link Consumer}.
+	 * @param pStream The XML documents data source.
+	 * @param pSystemId The documents system id, for use in error messages.
+	 * @param pDocumentConsumer The consumer, that should receive the created DOM
+	 *   document.
+	 */
 	public static void parse(InputStream pStream, String pSystemId, Consumer<Document> pDocumentConsumer) {
 		final InputSource isource = new InputSource(pStream);
 		isource.setSystemId(pSystemId);
 		parse(isource, pDocumentConsumer);
 	}
 
+	/**
+	 * Parses the given {@link File} into a stream of SAX event stream,
+	 * which is then passed to the given {@link ContentHandler}.
+	 * @param pFile The XML documents data source.
+	 * @param pHandler The SAX handler, which is receiving the SAX event stream
+	 */
 	public static void parse(File pFile, ContentHandler pHandler) {
 		try (InputStream in = new FileInputStream(pFile)) {
 			parse(in, pFile.getAbsolutePath(), pHandler);
@@ -69,6 +99,12 @@ public class XmlParsers {
 		}
 	}
 
+	/**
+	 * Parses the given {@link Path} into a stream of SAX event stream,
+	 * which is then passed to the given {@link ContentHandler}.
+	 * @param pPath The XML documents data source.
+	 * @param pHandler The SAX handler, which is receiving the SAX event stream
+	 */
 	public static void parse(Path pPath, ContentHandler pHandler) {
 		try (InputStream in = Files.newInputStream(pPath)) {
 			parse(in, pPath.toAbsolutePath().toString(), pHandler);
@@ -77,6 +113,12 @@ public class XmlParsers {
 		}
 	}
 
+	/**
+	 * Parses the given {@link URL} into a stream of SAX event stream,
+	 * which is then passed to the given {@link ContentHandler}.
+	 * @param pUrl The XML documents data source.
+	 * @param pHandler The SAX handler, which is receiving the SAX event stream
+	 */
 	public static void parse(URL pUrl, ContentHandler pHandler) {
 		try (InputStream in = pUrl.openStream()) {
 			parse(in, pUrl.toExternalForm(), pHandler);
@@ -85,6 +127,13 @@ public class XmlParsers {
 		}
 	}
 
+	/**
+	 * Parses the given {@link File} into a DOM document, which is then
+	 * passed to the given {@link Consumer}.
+	 * @param pFile The XML documents data source.
+	 * @param pDocumentConsumer The consumer, that should receive the created DOM
+	 *   document.
+	 */
 	public static void parse(File pFile, Consumer<Document> pDocumentConsumer) {
 		try (InputStream in = new FileInputStream(pFile)) {
 			parse(in, pFile.getAbsolutePath(), pDocumentConsumer);
@@ -93,6 +142,13 @@ public class XmlParsers {
 		}
 	}
 
+	/**
+	 * Parses the given {@link Path} into a DOM document, which is then
+	 * passed to the given {@link Consumer}.
+	 * @param pPath The XML documents data source.
+	 * @param pDocumentConsumer The consumer, that should receive the created DOM
+	 *   document.
+	 */
 	public static void parse(Path pPath, Consumer<Document> pDocumentConsumer) {
 		try (InputStream in = Files.newInputStream(pPath)) {
 			parse(in, pPath.toAbsolutePath().toString(), pDocumentConsumer);
@@ -101,6 +157,13 @@ public class XmlParsers {
 		}
 	}
 
+	/**
+	 * Parses the given {@link URL} into a DOM document, which is then
+	 * passed to the given {@link Consumer}.
+	 * @param pUrl The XML documents data source.
+	 * @param pDocumentConsumer The consumer, that should receive the created DOM
+	 *   document.
+	 */
 	public static void parse(URL pUrl, Consumer<Document> pDocumentConsumer) {
 		try (InputStream in = pUrl.openStream()) {
 			parse(in, pUrl.toExternalForm(), pDocumentConsumer);

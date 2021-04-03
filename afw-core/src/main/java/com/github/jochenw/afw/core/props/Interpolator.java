@@ -21,15 +21,55 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 
+/**
+ * Interface of a property filter, which updates property values by interpolation.
+ */
 public interface Interpolator extends PropertyFilter {
+	/** Interface of a set of properties, that can be interpolated.
+	 */
 	public interface StringSet {
+		/**
+		 * Returns an iterator over the full property set.
+		 * @return An iterator over the full property set.
+		 */
 		public Iterator<Map.Entry<String,String>> getValues();
+		/**
+		 * Returns the value of the given property.
+		 * @param pKey Key of the property, that is being queried.
+		 * @return Value of the property, that is being queried.
+		 */
 		public String getValue(String pKey);
+		/**
+		 * Sets the value of the given property.
+		 * @param pKey Key of the property, that is being updated.
+		 * @param pValue Value of the property, that is being updated.
+		 */
 		public void setValue(String pKey, String pValue);
 	}
+	/**
+	 * Returns, whether the given property value can be interpolated.
+	 * (Whether it returns a property reference, like "abc${foo}def".)
+	 * @param pValue The property value, that is being checked.
+	 * @return True, if the property value can be interpolated.
+	 *   False otherwise.
+	 */
 	public boolean isInterpolatable(String pValue);
+	/** Called to interpolate the given property value, assuming that
+	 * {@link #isInterpolatable(String)} has returned true on the same
+	 * value.
+	 * @param pValue The property value, that should be interpolated.
+	 * @return The resulting property value, after interpolation.
+	 */
 	public String interpolate(String pValue);
+	/** Called to interpolate the given property set in-place: The
+	 * original values are lost, if any modifications are done.
+	 * @param pValues The property set, that is being updated.
+	 */
 	public void interpolate(StringSet pValues);
+	/** Called to interpolate the given property map in-place: The
+	 * original values are lost, if any modifications are done.
+	 * @param pProperties The property set, that is being updated.
+	 */
 	public default void interpolate(final Map<Object,Object> pProperties) {
 		final StringSet stringSet = new StringSet() {
 			@Override

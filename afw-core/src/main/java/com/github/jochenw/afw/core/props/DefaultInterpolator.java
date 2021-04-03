@@ -13,42 +13,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.props;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
-import com.github.jochenw.afw.core.props.Interpolator;
+import javax.annotation.Nonnull;
+
+import com.github.jochenw.afw.core.util.Objects;
 
 
+/**
+ * Default implementation of {@link Interpolator}.
+ * Replaces property references, like "abc${foo}def" with the
+ * respective property values.
+ */
 public class DefaultInterpolator implements Interpolator {
 	private String startToken;
 	private String endToken;
 	private final Function<String,String> propertyProvider;
 
+	/**
+	 * Returns a function, that resolves property values.
+	 * @return A function, that resolves property values.
+	 */
 	public Function<String, String> getPropertyProvider() {
 		return propertyProvider;
 	}
 
-	public void setStartToken(String startToken) {
-		this.startToken = startToken;
+	/**
+	 * Sets a property references start token, for example
+	 * "${".
+	 * @param pStartToken The start token of a property
+	 * reference.
+	 */
+	public void setStartToken(String pStartToken) {
+		startToken = pStartToken;
 	}
 
-	public void setEndToken(String endToken) {
-		this.endToken = endToken;
+	/**
+	 * Sets a property references end token, for example
+	 * "}".
+	 * @param pEndToken The end token of a property
+	 * reference.
+	 */
+	public void setEndToken(String pEndToken) {
+		endToken = pEndToken;
 	}
 
-	public DefaultInterpolator(Function<String,String> pPropertyProvider) {
+	/**
+	 * Creates a new instance with the given property provider.
+	 * @param pPropertyProvider A function, which is invoked
+	 *   to resolve property values, that are being referenced.
+	 */
+	public DefaultInterpolator(@Nonnull Function<String,String> pPropertyProvider) {
 		propertyProvider = pPropertyProvider;
 	}
 
-	public DefaultInterpolator(final Properties pProps) {
+	/**
+	 * Creates a new instance with a property provider, that
+	 * resolves a property value by looking into the given
+	 * property set.
+	 * @param pProps A property set, which acts as the backend
+	 *   for looking up property values.
+	 */
+	public DefaultInterpolator(final @Nonnull Properties pProps) {
 		Objects.requireNonNull(pProps, "Properties");
 		propertyProvider = (s) -> pProps.getProperty(s);
 	}
 	
+	/**
+	 * Returns a property references start token, for example
+	 * "${".
+	 * @return The start token of a property
+	 * reference.
+	 */
 	public String getStartToken() {
 		if (startToken == null) {
 			return "${";
@@ -57,6 +98,12 @@ public class DefaultInterpolator implements Interpolator {
 		}
 	}
 
+	/**
+	 * Returns a property references end token, for example
+	 * "${".
+	 * @return The end token of a property
+	 * reference.
+	 */
 	public String getEndToken() {
 		if (endToken == null) {
 			return "}";

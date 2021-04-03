@@ -15,7 +15,17 @@
  */
 package com.github.jochenw.afw.core.props;
 
+/** Interface of a long {@link IProperty}.
+ */
 public interface ILongProperty extends IProperty<Long> {
+	/**
+	 * Returns the value as a primitive long.
+	 * @return The value as a primitive long.
+	 */
     long getLongValue();
+	/**
+	 * Returns the default value as a primitive long.
+	 * @return The default value as a primitive long.
+	 */
     long getLongDefaultValue();
 }
