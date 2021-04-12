@@ -44,23 +44,41 @@ import com.github.jochenw.afw.core.util.DomHelper.LocalizableException;
 public class LocalizableDocument {
 	private static final String KEY = Locator.class.getName();
 
+	/** An object, which can provide a {@link Locator}, thus indicating a location,
+	 * from which the object has been created.
+	 */
 	public static class Localizable {
 		private final Locator locator;
 
+		/**
+		 * Creates a new instance with the given {@link Locator}.
+		 * @param pLocator The {@link Locator}, that is being
+		 *   provided by this object.
+		 */
 		public Localizable(Locator pLocator) {
 			locator = pLocator;
 		}
 
+		/** Returns the objects {@link Locator location}.
+		 * @return The objects {@link Locator location}.
+		 */
 		public Locator getLocator() {
 			return locator;
 		}
 	}
-	
+
+	/** A SAX parser, that is being used to create a {@link LocalizableDocument}.
+	 */
 	public static class Handler implements ContentHandler {
 		private final Document nodeFactory;
 		private Node currentNode;
 		private Locator locator;
 
+		/** Creates a new instance, that uses the given {@link Document}
+		 * as a {@link Node node} factory.
+		 * @param pDocument A document, that is being used as a as
+		 * {@link Node node} factory.
+		 */
 		public Handler(Document pDocument) {
 			nodeFactory = pDocument;
 		}
@@ -146,6 +164,10 @@ public class LocalizableDocument {
 	private final Document document;
 	private final DomHelper domHelper = new DomHelper();
 
+	/**
+	 * Creates a new instance with the given {@link Document}.
+	 * @param pDocument A {@link Document}, that has been parsed.
+	 */
 	public LocalizableDocument(Document pDocument) {
 		document = pDocument;
 		domHelper.setLocationProvider((node) -> getLocator(node));

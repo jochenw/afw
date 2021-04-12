@@ -17,7 +17,15 @@ package com.github.jochenw.afw.core.util;
 
 import javax.annotation.Nullable;
 
+
+/** Utility class for working with Generics.
+ */
 public class Generics {
+	/** Tricks the compiler into believing a cast.
+	 * @param <O> The casts result type.
+	 * @param pObject The object, which is being casted.
+	 * @return The input object, after casting.
+	 */
 	public static @Nullable <O extends Object> O cast(@Nullable Object pObject) {
 		@SuppressWarnings("unchecked")
 		final @Nullable O o = (O) pObject;

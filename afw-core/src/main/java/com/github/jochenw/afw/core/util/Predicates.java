@@ -17,6 +17,10 @@ package com.github.jochenw.afw.core.util;
 
 import java.util.function.Predicate;
 
+
+/**
+ * Utility class for working with instances of {@link Predicate}.
+ */
 public class Predicates {
 	/** A {@link Predicate}, which is always true, or false.
 	 * @param pValue The created predicates result.

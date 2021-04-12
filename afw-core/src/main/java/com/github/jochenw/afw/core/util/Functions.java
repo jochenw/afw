@@ -26,6 +26,10 @@ import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+
+/** Utility class, which mimicks the java.util.function package, except that unchecked exceptions are
+ * generally permitted.
+ */
 public class Functions {
 	/** Failable version of {@link Consumer}.
 	 * @param <T1> The type being consumed.

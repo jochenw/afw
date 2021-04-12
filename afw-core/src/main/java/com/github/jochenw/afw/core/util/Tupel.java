@@ -2,19 +2,36 @@ package com.github.jochenw.afw.core.util;
 
 import java.util.Objects;
 
+
+/** A tupel of two objects (the attributes). Typically, this is used as a result type,
+ * if a method is actually returning two values. In that case, the Tupel can act as a
+ * wrapper sobject for both.
+ * @param <O1> Type of the first attribute.
+ * @param <O2> Type of the second attribute.
+ */
 public class Tupel<O1, O2> {
 	private final O1 attribute1;
 	private final O2 attribute2;
 
+	/** Creates a new instance, which wraps the given objects.
+	 * @param pAttribute1 The first attribute.
+	 * @param pAttribute2 The second attribute.
+	 */
 	public Tupel(O1 pAttribute1, O2 pAttribute2) {
 		attribute1 = pAttribute1;
 		attribute2 = pAttribute2;
 	}
 
+	/** Returns the first attribute.
+	 * @return The first attribute.
+	 */
 	public O1 getAttribute1() {
 		return attribute1;
 	}
 
+	/** Returns the second attribute.
+	 * @return The second attribute.
+	 */
 	public O2 getAttribute2() {
 		return attribute2;
 	}

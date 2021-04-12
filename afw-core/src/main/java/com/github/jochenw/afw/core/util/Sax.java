@@ -36,7 +36,13 @@ import org.xml.sax.helpers.LocatorImpl;
 
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
+
+/**
+ * Utility class for working with SAX handlers.
+ */
 public class Sax {
+	/** Abstract base class for implementing SAX handlers.
+	 */
 	public abstract static class AbstractContentHandler implements ContentHandler {
 		private int level;
 		private Locator locator;
@@ -44,6 +50,9 @@ public class Sax {
 		private FailableConsumer<String,SAXException> textElementConsumer;
 		private int textElementLevel;
 
+		/** Returns the handlers current location.
+		 * @return The handlers current location.
+		 */
 		public Locator getDocumentLocator() {
 			if (locator == null) {
 				return null;
@@ -156,6 +165,11 @@ public class Sax {
 		}
 	}
 
+	/** Parses the given XML file, using the given SAX handler.
+	 * @param pFile The XML file, which is being parsed.
+	 * @param pHandler The SAX handler, which is being invoked to consume the
+	 *   XML file's SAX events.
+	 */
 	public static void parse(File pFile, ContentHandler pHandler) {
 		try (InputStream in = new FileInputStream(pFile)) {
 			final InputSource isource = new InputSource(in);
@@ -166,6 +180,11 @@ public class Sax {
 		}
 	}
 
+	/** Parses the given XML file, using the given SAX handler.
+	 * @param pUrl The URL, from which to read the XML file, that is being parsed.
+	 * @param pHandler The SAX handler, which is being invoked to consume the
+	 *   XML file's SAX events.
+	 */
 	public static void parse(URL pUrl, ContentHandler pHandler) {
 		try (InputStream in = pUrl.openStream()) {
 			final InputSource isource = new InputSource(in);
@@ -176,6 +195,11 @@ public class Sax {
 		}
 	}
 
+	/** Parses the given XML file, using the given SAX handler.
+	 * @param pPath The XML file, which is being parsed.
+	 * @param pHandler The SAX handler, which is being invoked to consume the
+	 *   XML file's SAX events.
+	 */
 	public static void parse(Path pPath, ContentHandler pHandler) {
 		try (InputStream in = Files.newInputStream(pPath)) {
 			final InputSource isource = new InputSource(in);
@@ -187,11 +211,21 @@ public class Sax {
 	}
 
 
+	/** Parses the given XML file, using the given SAX handler.
+	 * @param pIn The {@link InputStream}, from which to read the XML file, that is being parsed.
+	 * @param pHandler The SAX handler, which is being invoked to consume the
+	 *   XML file's SAX events.
+	 */
 	public static void parse(InputStream pIn, ContentHandler pHandler) {
 		final InputSource isource = new InputSource(pIn);
 		parse(isource, pHandler);
 	}
 
+	/** Parses the given XML file, using the given SAX handler.
+	 * @param pSource The {@link InputSource}, from which to read the XML file, that is being parsed.
+	 * @param pHandler The SAX handler, which is being invoked to consume the
+	 *   XML file's SAX events.
+	 */
 	public static void parse(InputSource pSource, ContentHandler pHandler) {
 		try {
 			final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -274,6 +308,10 @@ public class Sax {
 		}
 	}
 
+	/** Creates a clone of the given {@link Locator}.
+	 * @param pLocator The {@link Locator}, which is being cloned. May be null.
+	 * @return The clone, that has been created, or null. (If the input has been null.)
+	 */
 	public static @Nullable Locator clone(@Nullable Locator pLocator) {
 		if (pLocator == null) {
 			return null;

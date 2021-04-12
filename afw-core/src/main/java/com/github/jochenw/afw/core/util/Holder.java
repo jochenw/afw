@@ -15,17 +15,34 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import javax.annotation.Nullable;
+
+/** A {@link Holder} is an envelope for another object. Holders are typically used in Lambda's, when
+ * you need a final object (the Holder), that is mutable.
+ * @param <T> Type of the wrapped object.
+ */
 public class Holder<T> {
 	private T value;
 
-	public T get() {
+	/** Returns the wrapped object. May be null, if there the wrapped object hasn't been set.
+	 * @return The wrapped object. May be null, if there the wrapped object hasn't been set.
+	 */
+	public @Nullable T get() {
 		return value;
 	}
 
+	/** Sets the wrapped object.
+	 * @param pValue The wrapped object. 
+	 */
 	public void set(T pValue) {
 		value = pValue;
 	}
 
+	/** Converts the Holder into a thread safe version, that wraps the same object.
+	 * @param <O> Type of the wrapped object.
+	 * @param pHolder The Holder, that is being converted.
+	 * @return A thread safe Holder, which is wrapping the same object.
+	 */
 	public static <O> Holder<O> synchronizedHolder(Holder<O> pHolder) {
 		return new Holder<O>() {
 			@Override

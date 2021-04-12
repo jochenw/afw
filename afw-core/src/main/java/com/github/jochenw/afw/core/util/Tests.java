@@ -27,7 +27,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+
+/** Utility class for unit tests.
+ */
 public class Tests {
+	/** A pair of files. Typically, the input file must not be modified.
+	 * The output file, however, has been created by copying the input file,
+	 * and may be modified.
+	 */
 	public static class TestFilePair {
 		private final File inputFile;
 		private final File outputFile;
@@ -35,52 +42,106 @@ public class Tests {
 			inputFile = pInputFile;
 			outputFile = pOutputFile;
 		}
+		/** Returns the input file.
+		 * @return The input file.
+		 */
 		public File getInputFile() {
 			return inputFile;
 		}
+		/** Returns the output file.
+		 * @return The output file.
+		 */
 		public File getOutputFile() {
 			return outputFile;
 		}
 	}
+	/**
+	 * Returns the URL of a resource file.
+	 * @param pResource The resource file's URI.
+	 * @return the URL of the requested resource file, which has been located using
+	 *   the current threads context class loader.
+	 */
 	public static URL requireResource(String pResource) {
 		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		return requireResource(cl, pResource);
 	}
 
+	/**
+	 * Asserts, that the given object is not null.
+	 * @param pMessage The error message, which is being used, if the test fails.
+	 * @param pObject The object, that is being tested.
+	 */
 	public static void assertNotNull(String pMessage, Object pObject) {
 		if (pObject == null) {
 			fail(pMessage);
 		}
 	}
 	
+	/**
+	 * Returns the URL of a resource file.
+	 * @param pCl The class loader, which is being used to locate the resource file.
+	 * @param pResource The resource file's URI.
+	 * @return the URL of the requested resource file, which has been located using
+	 *   the given context class loader.
+	 */
 	public static final URL requireResource(ClassLoader pCl, String pResource) {
 		final URL url = pCl.getResource(pResource);
 		assertNotNull("Failed to locate resource: " + pResource + " (via ClassLoader " + pCl + ")", url);
 		return url;
 	}
 
+	/**
+	 * Returns a File object, which represents a resource file.
+	 * @param pResource The resource file's URI.
+	 * @return A File object, which represents the requested resource file, which has been located using
+	 *   the current threads context class loader.
+	 */
 	public static File requireFileResource(String pResource) {
 		final URL url = requireResource(pResource);
 		return assertFileResource(url);
 	}
 
+	/**
+	 * Returns a File object, which represents a resource file.
+	 * @param pCl The class loader, which is being used to locate the resource file.
+	 * @param pResource The resource file's URI.
+	 * @return A File object, which represents the requested resource file, which has been located using
+	 *   the given context class loader.
+	 */
 	public static File requireFileResource(ClassLoader pCl, String pResource) {
 		final URL url = requireResource(pCl, pResource);
 		return assertFileResource(url);
 	}
 
+	/**
+	 * Asserts, that the given numbers are equal.
+	 * @param pMessage The error message, which is being used, if the test fails.
+	 * @param pExpect The expected integer value.
+	 * @param pGot The actual integer value.
+	 */
 	public static void assertEquals(String pMessage, int pExpect, int pGot) {
 		if (pExpect != pGot) {
 			fail(pMessage);
 		}
 	}
 
+	/**
+	 * Asserts, that the given objects are equal.
+	 * @param pMessage The error message, which is being used, if the test fails.
+	 * @param pExpect The expected object.
+	 * @param pGot The actual object.
+	 */
 	public static void assertEquals(String pMessage, Object pExpect, Object pGot) {
 		if (!pExpect.equals(pGot)) {
 			fail(pMessage);
 		}
 	}
 
+	/**
+	 * Asserts, that the byte arrays are equal.
+	 * @param pExpect The expected byte array.
+	 * @param pGot The actual byte array.
+	 */
 	public static void assertEquals(byte[] pExpect, byte[] pGot) {
 		assertEquals(pExpect.length, pGot.length);
 		for (int i = 0;  i < pExpect.length;  i++) {
@@ -88,44 +149,81 @@ public class Tests {
 		}
 	}
 
+	/**
+	 * Asserts, that the given objects are equal.
+	 * @param pExpect The expected object.
+	 * @param pGot The actual object.
+	 */
 	public static void assertEquals(Object pExpect, Object pGot) {
 		if (!pExpect.equals(pGot)) {
 			fail("Assertion failed, expected " + pExpect + ", got " + pGot);
 		}
 	}
 
+	/**
+	 * Asserts, that the given numbers are equal.
+	 * @param pExpect The expected integer value.
+	 * @param pGot The actual integer value.
+	 */
 	public static void assertEquals(int pExpect, int pGot) {
 		if (pExpect != pGot) {
 			fail("Assertion failed, expected " + pExpect + ", got " + pGot);
 		}
 	}
 
+	/**
+	 * Asserts, that the given URL represents a file resource.
+	 * @param pUrl The URL, that is being checked.
+	 * @return A File object, which represents the same resource.
+	 */
 	public static File assertFileResource(URL pUrl) {
 		assertEquals("file", pUrl.getProtocol());
 		return new File(pUrl.getFile());
 	}
 
+	/** Asserts, that the given value is true.
+	 * @param pMessage An error message, that is being used, if the test fails.
+	 * @param pValue The value, that is being tested.
+	 */
 	public static void assertTrue(String pMessage, boolean pValue) {
 		if (!pValue) {
 			fail(pMessage);
 		}
 	}
 
+	/** Asserts, that the given value is true.
+	 * @param pValue The value, that is being tested.
+	 */
 	public static void assertTrue(boolean pValue) {
 		if (!pValue) {
 		    fail("Assertion failed, expected true, got false");
 		}
 	}
 
+	/**
+	 * Called to indicate, that a test has failed.
+	 * @param pMessage The error message
+	 * @throws IllegalStateException Thrown as an indication of the failed test.
+	 */
 	public static void fail(String pMessage) {
 		throw new IllegalStateException(pMessage);
 	}
 	
-
+	/**
+	 * Called to create a test directory.
+	 * @param pTestClass The test class, for which a test directory is being created.
+	 * @return Path of the created test directory. Uses the test classes unqualified
+	 *   name.
+	 */
 	public static Path requireTestDirectory(Class<?> pTestClass) {
 		return requireTestDirectory(pTestClass.getSimpleName());
 	}
 
+	/**
+	 * Called to create a test directory.
+	 * @param pTestName Name of the test directory.
+	 * @return Path of the created test directory.
+	 */
 	public static Path requireTestDirectory(String pTestName) {
 		final Path junitWorkDir = requireTestDirectory().toPath();
 		final Path testDir = junitWorkDir.resolve(pTestName);
@@ -133,6 +231,13 @@ public class Tests {
 		return testDir;
 	}
 
+	/** Called to create a test directory by copying it from the given
+	 * source directory.
+	 * @param pTestClass The test class, for which a test directory is being created.
+	 * @param pSourceDir The source directory, that is being copied.
+	 * @return Path of the created test directory. Uses the test classes unqualified
+	 *   name.
+	 */
 	public static Path setupTestDirectory(Class<?> pTestClass, Path pSourceDir) {
 		final Path testDir = requireTestDirectory(pTestClass);
 		com.github.jochenw.afw.core.util.Files.removeDirectory(testDir);
@@ -140,6 +245,10 @@ public class Tests {
 		return testDir;
 	}
 
+	/**
+	 * Returns the test directories parent directory ("target/junit-work")
+	 * @return The test directories parent directory ("target/junit-work")
+	 */
 	public static File requireTestDirectory() {
 		final File targetDir = new File("target");
 		assertTrue(targetDir.isDirectory());
@@ -150,6 +259,12 @@ public class Tests {
 		return testDir;
 	}
 
+	/**
+	 * Copies the given source file to the given target file.
+	 * @param pSource The source file, that is being copied.
+	 * @param pTarget The target file, that is being created by copying the source file.
+	 * @throws IOException The copy operation has failed.
+	 */
 	public static void copy(File pSource, File pTarget) throws IOException {
 		try (InputStream in = new FileInputStream(pSource);
 			 OutputStream out = new FileOutputStream(pTarget)) {
@@ -157,6 +272,15 @@ public class Tests {
 		}
 	}
 
+	/**
+	 * Creates a test file pair by copying 
+	 * @param pUri The URI of a resource file, that is being copied.
+	 * @param pInputSuffix Suffix of the input file, that is being replaced to create the output file name.
+	 * @param pOutputSuffix Suffix of the output file, that replaces the input file suffix in the output
+	 *   files name.
+	 * @return The created {@link TestFilePair}.
+	 * @throws IOException Creating the files failed.
+	 */
 	public static TestFilePair getTestFiles(String pUri, String pInputSuffix, String pOutputSuffix) throws IOException {
 		final File inputFile = Tests.requireFileResource(pUri);
 		assertTrue(inputFile.isFile());
@@ -174,6 +298,11 @@ public class Tests {
 		return new TestFilePair(testInputFile, testOutputFile);
 	}
 
+	/**
+	 * Asserts, that the given arrays are equal
+	 * @param pGot The actual array.
+	 * @param pExpect The expected array.
+	 */
 	public static void assertArrayEquals(Object[] pGot, Object... pExpect) {
 		for (int i = 0;  i < pGot.length;  i++) {
 			assertEquals(String.valueOf(i), pExpect[i], pGot[i]);
@@ -181,6 +310,11 @@ public class Tests {
 		assertEquals(pExpect.length, pGot.length);
 	}
 
+	/**
+	 * Asserts, that the given maps are equal
+	 * @param pGot The actual map.
+	 * @param pExpect The expected map, as a sequence of key/value pairs.
+	 */
 	public static void assertMapEquals(Map<String, String> pGot, String... pExpect) {
 		for (int i = 0;  i < pExpect.length;  i += 2) {
 			final String key = pExpect[i];

@@ -277,6 +277,14 @@ public class Strings {
 		return pValue == null  ||  pValue.trim().length() == 0;
 	}
 
+	/**
+	 * Returns the given value, if it isn't null, or empty. Otherwise,
+	 * throws an Exception.
+	 * @param pValue The string value, that is being checked.
+	 * @param pName A description of the value, for use in error messages.
+	 * @return The given value, if it isn't null, or empty. Otherwise,
+	 * the given default value.
+	 */
 	public static String requireNonEmpty(String pValue, String pName) {
 		if (pValue == null) {
 			throw new NullPointerException("String value must not be null: " + pName);
@@ -287,13 +295,28 @@ public class Strings {
 		return pValue;
 	}
 
-	public static void requireTrimmedNonEmpty(String pValue, String pName) {
+	/**
+	 * Returns the given value, if it isn't null, or empty (after trimming).
+	 * Otherwise, throws an Exception.
+	 * @param pValue The string value, that is being checked.
+	 * @param pName A description of the value, for use in error messages.
+	 * @return The given value, if it isn't null, or empty. Otherwise,
+	 * the given default value.
+	 */
+	public static String requireTrimmedNonEmpty(String pValue, String pName) {
 		requireNonEmpty(pValue, pName);
 		if (pValue.trim().length() == 0) {
 			throw new NullPointerException("String value must not be empty (after trimming): " + pName);
 		}
+		return pValue;
 	}
 
+	/**
+	 * Parses the given version string into a series of integer values.
+	 * For example, "2.3.0" would yield the array {2, 3, 0}.
+	 * @param pVersionStr The version string, that is being parsed.
+	 * @return A series of integer values, that constitute the given version string.
+	 */
 	public static int[] parseVersionNumber(String pVersionStr) {
 		if (isTrimmedEmpty(pVersionStr)) {
 			throw new IllegalArgumentException("Missing, or empty, version string");
@@ -574,6 +597,14 @@ public class Strings {
 		};
 	}
 
+	/** Parses the given value into a list of strings by splitting the input
+	 * value along the given separator. This is mostly like {@link String#split(String)},
+	 * except that the separator is not a regular expression, so safe for use with
+	 * special characters.
+	 * @param pValue The string, that is being splitted.
+	 * @param pSeparator The separator string.
+	 * @return The splitted string.
+	 */
 	public static List<String> split(String pValue, String pSeparator) {
 		String value = Objects.requireNonNull(pValue, "Value");
 		final String sep = Objects.requireNonNull(pSeparator, "Separator");

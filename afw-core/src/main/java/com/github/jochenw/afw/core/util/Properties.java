@@ -23,45 +23,99 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
+
 
 /** A class for reading, and writing property files, including comments.
  */
 public class Properties {
+	/** A class, which representy an entry in the property set.
+	 */
 	public static class Entry {
 		private final @Nonnull String key, value;
 		private final @Nullable String comment;
+		/** Creates a new instance with the given key, value, and comment.
+		 * @param pKey The property key.
+		 * @param pValue The property value.
+		 * @param pComment The property comment.
+		 */
 		public Entry(@Nonnull String pKey, @Nonnull String pValue, @Nullable String pComment) {
 			key = pKey;
 			value = pValue;
 			comment = pComment;
 		}
+		/** Returns the property key.
+		 * @return The property key.
+		 */
 		public @Nonnull String getKey() { return key; }
+		/** Returns the property value.
+		 * @return The property value.
+		 */
 		public @Nonnull String getValue() { return value; }
+		/** Returns the property comment.
+		 * @return The property comment.
+		 */
 		public @Nullable String getComment() { return comment; }
 	}
 
 	private final Map<String,Entry> map = new LinkedHashMap<>();
 
+	/** Returns the property entry with the given key.
+	 * @param pKey The requested property key.
+	 * @return A property entry with the given key, if any, or null.
+	 */
 	public Entry getEntry(String pKey) {
 		return map.get(pKey);
 	}
+	/** Returns the property value with the given key.
+	 * @param pKey The requested property key.
+	 * @return A property value with the given key, if any, or null.
+	 */
 	public String getValue(String pKey) {
 		final Entry entry = getEntry(pKey);
 		return entry == null ? null : entry.getValue();
 	}
+	/** Returns the comment with the given key.
+	 * @param pKey The requested property key.
+	 * @return A property comment with the given key, if any, or null.
+	 */
 	public String getComment(String pKey) {
 		final Entry entry = getEntry(pKey);
 		return entry == null ? null : entry.getComment();
 	}
-	public void forEach(@Nonnull Consumer<Entry> pConsumer) {
-		map.values().forEach(pConsumer);
+	/**
+	 * Iterates over all the entries in the property set,
+	 * invoking the given consumer.
+	 * @param pConsumer 
+	 */
+	public void forEach(@Nonnull FailableConsumer<Entry,?> pConsumer) {
+		map.values().forEach((e) -> Functions.accept(pConsumer, e));
 	}
-	public void forEach(@Nonnull BiConsumer<String,String> pConsumer) {
-		forEach((e) -> pConsumer.accept(e.getKey(), e.getValue()));
+	/**
+	 * Iterates over all the entries in the property set,
+	 * invoking the given consumer.
+	 * @param pConsumer 
+	 */
+	public void forEach(@Nonnull FailableBiConsumer<String,String,?> pConsumer) {
+		forEach((e) -> Functions.accept(pConsumer, e.getKey(), e.getValue()));
 	}
+	/**
+	 * Adds a new entry to the property set. If an entry with the given
+	 * property key already exists, then it is being replaced by the new entry.
+	 * @param pKey The property key.
+	 * @param pValue The property value.
+	 */
 	public void put(@Nonnull String pKey, @Nonnull String pValue) {
 		put(pKey, pValue, null);
 	}
+	/**
+	 * Adds a new entry to the property set. If an entry with the given
+	 * property key already exists, then it is being replaced by the new entry.
+	 * @param pKey The property key.
+	 * @param pValue The property value.
+	 * @param pComment The property comment.
+	 */
 	public void put(@Nonnull String pKey, @Nonnull String pValue, @Nullable String pComment) {
 		map.put(pKey, new Entry(pKey, pValue, pComment));
 	}

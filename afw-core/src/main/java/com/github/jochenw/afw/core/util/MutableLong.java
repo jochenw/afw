@@ -15,17 +15,23 @@
  */
 package com.github.jochenw.afw.core.util;
 
-/**
- *
- * @author jwi
+/** A mutable {@link Number} with the properties of a {@link Long}.
  */
 public class MutableLong extends Number implements Comparable<MutableLong> {
 	private static final long serialVersionUID = 3459405672114578607L;
 	private long value;
 
+	/**
+	 * Returns the primitive number.
+	 * @return The primitive number.
+	 */
     public long getValue() {
         return value;
     }
+	/**
+	 * Sets the primitive number.
+	 * @param pValue The primitive number.
+	 */
     public void setValue(long pValue) {
         value = pValue;
     }
@@ -54,4 +60,19 @@ public class MutableLong extends Number implements Comparable<MutableLong> {
 	public double doubleValue() {
     	return (double) value;
 	}
+
+    /**
+     * Increments the primitive number by one.
+     */
+    public void inc() {
+    	setValue(getValue()+1);
+    }
+
+    /**
+     * Decrements the primitive number by one.
+     */
+    public void dec() {
+    	setValue(getValue()-1);
+    }
+
 }

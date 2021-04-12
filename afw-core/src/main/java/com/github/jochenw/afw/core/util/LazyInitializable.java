@@ -19,27 +19,44 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 
+/** A wrapper for another object. The wrapped object will be initialized lazily
+ * (upon first access).
+ * @param <O> Type of the wrapped object.
+ */
 public class LazyInitializable<O extends Object> implements Supplier<O> {
 	private final Supplier<O> supplier;
 	private final Consumer<O> initializer;
 	private volatile O instance;
 
+	/**
+	 * Creates a new instance.
+	 * @param pSupplier A supplier, which provides the wrapped objects.
+	 * @param pInitializer A consumer, which initializes the wrapped object.
+	 *   The wrapped object is not considered to be usable, until the
+	 *   initializer's invocation has finished.
+	 */
 	public LazyInitializable(Supplier<O> pSupplier, Consumer<O> pInitializer) {
 		Objects.requireNonNull(pSupplier, "Supplier");
 		supplier = pSupplier;
 		initializer = pInitializer;
 	}
 
+	/**
+	 * Returns the wrapped object. Upon the first invocation, this will invoke
+	 * the supplier, and the initializer.
+	 */
 	@Override
 	public O get() {
 		if (instance == null) {
 			synchronized(this) {
-				O o = supplier.get();
-				Objects.requireNonNull(o, "Instance");
-				if (initializer != null) {
-					initializer.accept(o);
+				if (instance == null) {
+					O o = supplier.get();
+					Objects.requireNonNull(o, "Instance");
+					if (initializer != null) {
+						initializer.accept(o);
+					}
+					instance = o;
 				}
-				instance = o;
 			}
 		}
 		return instance;
