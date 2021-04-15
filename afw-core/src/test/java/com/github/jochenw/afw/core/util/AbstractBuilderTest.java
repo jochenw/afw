@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+
+/** Test for the {@link AbstractBuilder}.
+ */
 public class AbstractBuilderTest {
 	private static class IntegerBuilder extends AbstractBuilder<Integer,IntegerBuilder> {
 		private int num;
@@ -20,6 +23,8 @@ public class AbstractBuilderTest {
 		}
 	}
 
+	/** Test case, which uses the {@link IntegerBuilder}.
+	 */
 	@Test
 	public void testIntegerBuilder() {
 		final IntegerBuilder ib = new IntegerBuilder();

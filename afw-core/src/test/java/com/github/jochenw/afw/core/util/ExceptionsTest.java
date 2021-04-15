@@ -24,7 +24,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+
+/** Test for {@link Exceptions}.
+ */
 public class ExceptionsTest {
+	/** Test case for {@link Exceptions#show(Throwable)}.
+	 */
     @Test
     public void testSimpleShow() {
         final NullPointerException npe = new NullPointerException();
@@ -65,6 +70,9 @@ public class ExceptionsTest {
         }
     }
 
+	/** Test case for {@link Exceptions#show(Throwable, Class)}.
+	 * @throws IOException The test failed.
+	 */
     @Test
     public void testOneExceptionDeclared() throws IOException {
         final NullPointerException npe = new NullPointerException();
@@ -112,6 +120,10 @@ public class ExceptionsTest {
         }
     }
 
+	/** Test case for {@link Exceptions#show(Throwable, Class, Class)}.
+	 * @throws IOException The test failed.
+	 * @throws SAXException The test failed.
+	 */
     @Test
     public void testTwoExceptionDeclared() throws IOException, SAXException {
         final NullPointerException npe = new NullPointerException();
@@ -166,6 +178,8 @@ public class ExceptionsTest {
         }
     }
 
+    /** Test case for {@link Exceptions#toString(Throwable)}.
+     */
     @Test
     public void testThrowableToString() {
     	final String stackTrace = Exceptions.toString(new NullPointerException());

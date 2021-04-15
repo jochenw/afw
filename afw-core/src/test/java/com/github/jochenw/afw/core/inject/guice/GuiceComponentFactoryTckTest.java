@@ -20,7 +20,13 @@ import com.github.jochenw.afw.core.inject.InjectTests;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+/** Test for the {@link GuiceComponentFactory}.
+ */
 public class GuiceComponentFactoryTckTest extends TestCase {
+	/**
+	 * Returns a test suite for running tests on on the {@link GuiceComponentFactoryBuilder}. 
+	 * @return A test suite for running tests on on the {@link GuiceComponentFactoryBuilder}.
+	 */
 	public static Test suite() {
 		return InjectTests.testTckCompliance(new GuiceComponentFactoryBuilder());
 	}

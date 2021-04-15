@@ -26,7 +26,12 @@ import com.github.jochenw.afw.core.plugins.DependencyResolver.DuplicateNodeIdExc
 import com.github.jochenw.afw.core.plugins.DependencyResolver.Node;
 import com.github.jochenw.afw.core.plugins.DependencyResolver.UnknownNodeIdException;
 
+
+/** Test for the {@link DependencyResolver}.
+ */
 public class DependencyResolverTest {
+	/** Test case for detecting a duplicate id.
+	 */
 	@Test
 	public void testDuplicateId() {
 		final Object object0 = new Object();
@@ -45,6 +50,8 @@ public class DependencyResolverTest {
 		}
 	}
 
+	/** Test case for detecting an unknown id.
+	 */
 	@Test
 	public void testUnknownId() {
 		final Object object0 = new Object();
@@ -62,6 +69,8 @@ public class DependencyResolverTest {
 		}
 	}
 
+	/** Test case for detecting a circular dependency.
+	 */
 	@Test
 	public void testCircularDependency() {
 		final Object object0 = new Object();
@@ -82,6 +91,8 @@ public class DependencyResolverTest {
 		}
 	}
 
+	/** Test case for a successfully resolved graph.
+	 */
 	@Test
 	public void testSuccess() {
 		final Object object0 = new Object();
@@ -98,6 +109,8 @@ public class DependencyResolverTest {
 		assertNode(nodes.get(2), "c", node2.getDependsOn(), object2);
 	}
 
+	/** Test case for a successfully resolved graph on a reversed node list.
+	 */
 	@Test
 	public void testSuccessAfterReverse() {
 		final Object object0 = new Object();

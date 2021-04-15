@@ -47,6 +47,8 @@ import com.github.jochenw.afw.core.plugins.IPluginRegistry.Initializer;
 import com.github.jochenw.afw.core.util.Streams;
 
 
+/** Test for the {@link PluginListParser}.
+ */
 public class PluginListParserTest {
 	private static final String XML_EMPTY_LIST =
 			"<pluginList xmlns='" + PluginListParser.PluginListHandler.NS_100 + "'>\n"
@@ -107,7 +109,9 @@ public class PluginListParserTest {
 		return newSchema("100");
 	}
 
-	@SuppressWarnings("javadoc")
+	/**
+	 * A test plugin.
+	 */
 	public static class MyPlugin extends AbstractInitializer {
 		@Override
 		public void accept(IPluginRegistry pRegistry) {
@@ -115,7 +119,8 @@ public class PluginListParserTest {
 		}
 	}
 
-	@SuppressWarnings("javadoc")
+	/** Another test plugin.
+	 */
 	public static class APlugin extends AbstractInitializer {
 		@Override
 		public void accept(IPluginRegistry pRegistry) {
@@ -125,7 +130,8 @@ public class PluginListParserTest {
 			pRegistry.addExtensionPoint(List.class);
 		}
 	}
-	@SuppressWarnings("javadoc")
+	/** Yet another test plugin.
+	 */
 	public static class BPlugin extends AbstractInitializer {
 		@Override
 		public void accept(IPluginRegistry pRegistry) {
@@ -140,8 +146,9 @@ public class PluginListParserTest {
 			+ "  <plugin id='MyPlugin' class='" + MyPlugin.class.getName() + "'/>"
 			+ "</pluginList>";
 
-	@SuppressWarnings("javadoc")
-	@Test
+	/** Test case for parsing a file with a single plugin.
+	 * @throws Exception The test failed.
+	 */
 	public void testSinglePlugin() throws Exception {
 		final String xmlSinglePlugin100 = XML_SINGLE_PLUGIN;
 		final String xmlSinglePlugin101 = XML_SINGLE_PLUGIN.replace(PluginListParser.PluginListHandler.NS_100, PluginListParser.PluginListHandler.NS_101);
@@ -170,7 +177,9 @@ public class PluginListParserTest {
 			+ "  <plugin id='MyPlugin' class='" + MyPlugin.class.getName() + "'/>"
 			+ "</pluginList>";
 
-	@SuppressWarnings("javadoc")
+	/** Test case for parsing a file with several plugins, and dependencies.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testPluginDependencies() throws Exception {
 		final String xmlPluginDependencies100 = XML_PLUGIN_DEPENDENCIES;

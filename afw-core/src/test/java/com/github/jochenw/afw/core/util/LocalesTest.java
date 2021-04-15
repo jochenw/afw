@@ -6,7 +6,12 @@ import java.util.Locale;
 
 import org.junit.Test;
 
+
+/** Test for the {@link Locales} class.
+ */
 public class LocalesTest {
+	/** Test case for {Locales#requireLocale(String)}.
+	 */
 	@Test
 	public void testRequireLocale() {
 		assertEquals(Locale.ENGLISH, Locales.requireLocale("en"));
@@ -27,6 +32,8 @@ public class LocalesTest {
 		}
 	}
 
+	/** Test case for {Locales#getLocale(String)}.
+	 */
 	public void testGetLocale() {
 		assertEquals(Locale.ENGLISH, Locales.getLocale("en"));
 		assertEquals(Locale.ENGLISH, Locales.getLocale("EN"));

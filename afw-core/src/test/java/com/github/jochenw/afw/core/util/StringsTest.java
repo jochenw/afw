@@ -233,6 +233,8 @@ public class StringsTest {
     	assertFalse(predCi.test("Bar"));
     }
 
+    /** Test case for {@link Strings#split(String, String)}.
+     */
     @Test
     public void testSplit() {
     	final String value0 = "a b c d";

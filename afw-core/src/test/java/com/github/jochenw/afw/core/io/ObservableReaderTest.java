@@ -11,7 +11,12 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.MutableBoolean;
 
+/** Test for the {@link ObservableReader}.
+ */
 public class ObservableReaderTest {
+	/** Test case for reading a simple character array.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void test() throws Exception {
 		final String expect = "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz";

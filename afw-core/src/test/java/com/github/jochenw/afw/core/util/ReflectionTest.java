@@ -22,6 +22,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+/** Test for {@link Reflection}.
+ */
 public class ReflectionTest {
 	@SuppressWarnings("unused")
 	private static class A {
@@ -79,7 +81,9 @@ public class ReflectionTest {
 			this.property3 = property3;
 		}
 	}
-	
+
+	/** Test case for {@link Reflection#setValue(Object, String, Object)}.
+	 */
 	@Test
 	public void testSetValue() {
 		final B b = new B();
@@ -96,6 +100,8 @@ public class ReflectionTest {
 		}
 	}
 
+	/** Test case for {@link Reflection#getGetters(Class)}.
+	 */
 	@Test
 	public void testGetGetters() {
 		final Map<String, Method> getters = Reflection.getGetters(B.class);

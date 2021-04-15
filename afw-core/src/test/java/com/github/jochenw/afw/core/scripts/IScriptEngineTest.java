@@ -10,7 +10,12 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.scripts.IScriptEngine.Script;
 import com.github.jochenw.afw.core.util.Scripts;
 
+
+/** Test for the {@link IScriptEngine}.
+ */
 public class IScriptEngineTest {
+	/** Basic test case.
+	 */
 	@Test
 	public void test() {
 		final URL url = getClass().getResource("simple-script.groovy");

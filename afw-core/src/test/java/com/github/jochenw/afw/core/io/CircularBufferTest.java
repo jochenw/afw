@@ -7,7 +7,12 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+/** Test for the {@link CircularByteBuffer}, and the {@link CircularCharBuffer}.
+ */
 public class CircularBufferTest {
+	/** Test case for the {@link CircularByteBuffer}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testCircularByteBuffer() throws Exception {
 		final CircularByteBuffer cbb = new CircularByteBuffer(20);
@@ -59,6 +64,9 @@ public class CircularBufferTest {
 		assertFalse(cbb.hasBytes());
 	}
 
+	/** Test case for the {@link CircularCharBuffer}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testCircularCharBuffer() {
 		final CircularCharBuffer ccb = new CircularCharBuffer(20);

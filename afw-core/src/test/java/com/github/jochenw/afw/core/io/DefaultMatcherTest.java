@@ -18,9 +18,14 @@ package com.github.jochenw.afw.core.io;
 import org.junit.Assert;
 import org.junit.Test;
 
+
+/** Test for the {@link DefaultMatcher}.
+ */
 public class DefaultMatcherTest {
+	/** Test case for case sensitive matching.
+	 */
 	@Test
-	public void tesCaseSensitive() {
+	public void testCaseSensitive() {
 		final DefaultMatcher dm = new DefaultMatcher("**/*.java");
 		Assert.assertFalse(dm.isMatchingAll());
 		Assert.assertTrue(dm.test("com/foo/bar.java"));
@@ -30,6 +35,8 @@ public class DefaultMatcherTest {
 		Assert.assertTrue(dm.test("My.java"));
 	}
 
+	/** Test case for case insensitive matching.
+	 */
 	@Test
 	public void testCaseInsensitive() {
 		final DefaultMatcher dm = new DefaultMatcher("**/*.java", false);
@@ -41,6 +48,8 @@ public class DefaultMatcherTest {
 		Assert.assertTrue(dm.test("My.java"));
 	}
 
+	/** Test case for matching directory patterns without a directory in the path.
+	 */
 	@Test
 	public void testNoDirectoryInPath() {
 		final DefaultMatcher dm = new DefaultMatcher("**/.classpath");
@@ -49,6 +58,8 @@ public class DefaultMatcherTest {
 		final DefaultMatcher dm2 = new DefaultMatcher("**/.settings/**/*");
 		Assert.assertTrue(dm2.test(".settings/org.eclipse.core.resources.prefs"));
 	}
+	/** Test case for matching with a prefix.
+	 */
 	@Test
 	public void testPrefix() {
 		final DefaultMatcher dm = new DefaultMatcher("main/**/*");

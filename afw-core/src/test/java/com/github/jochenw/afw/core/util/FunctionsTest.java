@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableBiFunction;
-import com.github.jochenw.afw.core.util.Functions.FailableBiIntFunction;
 import com.github.jochenw.afw.core.util.Functions.FailableBiIntPredicate;
 import com.github.jochenw.afw.core.util.Functions.FailableBiLongPredicate;
 import com.github.jochenw.afw.core.util.Functions.FailableBiPredicate;
@@ -30,7 +29,11 @@ import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
 import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
 
 
+/** Test for {@link Functions}.
+ */
 public class FunctionsTest {
+	/** A special Exception class, for use in tests.
+	 */
     public static class SomeException extends Exception {
         private static final long serialVersionUID = -4965704778119283411L;
 
@@ -40,16 +43,27 @@ public class FunctionsTest {
             super(pMsg);
         }
 
+        /** Sets the throwable.
+         * @param pThrowable The throwable, which is being thrown, if {@link #test()} is being invoked.
+         */
         public void setThrowable(Throwable pThrowable) {
             t = pThrowable;
         }
 
+        /** Tests, whether a throwable has been set. If so, throws it.
+         * Otherwise, does nothing.
+         * @throws Throwable A throwable, that has been configured in advance
+         *   by invoking {@link #setThrowable(Throwable)}.
+         */
         public void test() throws Throwable {
             if (t != null) {
                 throw t;
             }
         }
     }
+   
+    /** A helper object for use in tests.
+     */
     public static class Testable {
         private Throwable t;
 
@@ -57,24 +71,48 @@ public class FunctionsTest {
             t = pTh;
         }
 
+        /** Sets the throwable.
+         * @param pThrowable The throwable, which is being thrown, if {@link #test()} is being invoked.
+         */
         public void setThrowable(Throwable pThrowable) {
             t = pThrowable;
         }
 
+        /** Tests, whether a throwable has been set. If so, throws it.
+         * Otherwise, does nothing.
+         * @throws Throwable A throwable, that has been configured in advance
+         *   by invoking {@link #setThrowable(Throwable)}.
+         */
         public void test() throws Throwable {
             test(t);
         }
 
+        /** Tests, whether the given throwable is null. If so, throws it.
+         * Otherwise, does nothing.
+         * @param pThrowable The throwable, which is being tested.
+         * @throws Throwable The given {@link #setThrowable(Throwable)}.
+         */
         public void test(Throwable pThrowable) throws Throwable {
             if (pThrowable != null) {
                 throw pThrowable;
             }
         }
 
+        /** Tests, whether a throwable has been configure by invoking {@link #setThrowable(Throwable)}.
+         * If so, throws it. Otherwise, does nothing.
+         * @throws Throwable The configured {@link #setThrowable(Throwable)}.
+         * @return The value Zero (Integer.valueOf(0)).
+         */
         public Integer testInt() throws Throwable {
             return testInt(t);
         }
 
+        /** Tests, whether the given throwable is null. If so, throws it.
+         * Otherwise, does nothing.
+         * @param pThrowable The throwable, which is being tested.
+         * @throws Throwable The given {@link #setThrowable(Throwable)}.
+         * @return The value Zero (Integer.valueOf(0)).
+         */
         public Integer testInt(Throwable pThrowable) throws Throwable {
             if (pThrowable != null) {
                 throw pThrowable;
@@ -83,6 +121,8 @@ public class FunctionsTest {
         }
     }
 
+    /** A helper object, which fails on every second instantiation.
+     */
     public static class FailureOnOddInvocations {
         private static int invocation;
         FailureOnOddInvocations() throws SomeException {
@@ -93,29 +133,47 @@ public class FunctionsTest {
         }
     }
 
+    /** A helper object, on which we can check, whether it has been closed.
+     */
     public static class CloseableObject {
         private boolean closed;
 
+        /** Called to test, whether the given {@link Throwable} is null.
+         * If so, throws it. Otherwise, does nothing.
+         * @param pTh The {@link Throwable}, which is being tested.
+         * @throws Throwable The given {@link Throwable}.
+         */
         public void run(Throwable pTh) throws Throwable {
             if (pTh != null) {
                 throw pTh;
             }
         }
 
+        /** Resets the object to it's initial state (not closed).
+         */
         public void reset() {
             closed = false;
         }
 
+        /** Changes the object's state to closed.
+         */
         public void close() {
             closed = true;
         }
 
+        /** Returns, whether the object is closed.
+         * @return True, if the object is closed.
+         */
         public boolean isClosed() {
             return closed;
         }
     }
 
-    @Test
+    /** Tests, whether we can instantiate the Functions class.
+     * @throws Exception The test failed.
+     */
+    @SuppressWarnings("deprecation")
+	@Test
     public void testCreate() throws Exception {
     	final Constructor<Functions> constructor = Functions.class.getDeclaredConstructor();
     	if (!constructor.isAccessible()) {
@@ -125,6 +183,8 @@ public class FunctionsTest {
     	assertNotNull(functions);
     }
 
+    /** Test case for {@link Functions#run(FailableRunnable)}.
+     */
     @Test
     public void testRunnable() {
         FailureOnOddInvocations.invocation = 0;
@@ -138,6 +198,8 @@ public class FunctionsTest {
         Functions.run(FailureOnOddInvocations::new);
     }
 
+    /** Test case for {@link Functions#asRunnable(FailableRunnable)}.
+     */
     @Test
     public void testAsRunnable() {
         FailureOnOddInvocations.invocation = 0;
@@ -152,6 +214,8 @@ public class FunctionsTest {
         runnable.run();
     }
 
+    /** Test case for {@link Functions#call(FailableCallable)}.
+     */
     @Test
     public void testCallable() {
         FailureOnOddInvocations.invocation = 0;
@@ -164,6 +228,8 @@ public class FunctionsTest {
         assertNotNull(instance);
     }
 
+    /** Test case for {@link Functions#asCallable(FailableCallable)}.
+     */
     @Test
     public void testAsCallable() {
         FailureOnOddInvocations.invocation = 0;
@@ -183,6 +249,8 @@ public class FunctionsTest {
         assertNotNull(instance);
     }
 
+    /** Test case for {@link Functions#accept(FailableConsumer)}.
+     */
     @Test
     public void testAcceptConsumer() {
         final IllegalStateException ise = new IllegalStateException();
@@ -206,6 +274,8 @@ public class FunctionsTest {
         Functions.accept(Testable::test, testable);
     }
 
+    /** Test case for {@link Functions#asConsumer(FailableConsumer)}.
+     */
     @Test
     public void testAsConsumer() {
         final IllegalStateException ise = new IllegalStateException();
@@ -230,6 +300,8 @@ public class FunctionsTest {
         Functions.accept(Testable::test, testable);
     }
 
+    /** Test case for {@link Functions#accept(FailableBiConsumer)}.
+     */
     @Test
     public void testAcceptBiConsumer() {
         final IllegalStateException ise = new IllegalStateException();
@@ -252,6 +324,8 @@ public class FunctionsTest {
         Functions.accept(Testable::test, testable, (Throwable) null);
     }
 
+    /** Test case for {@link Functions#asBiConsumer(FailableBiConsumer)}.
+     */
     @Test
     public void testAsBiConsumer() {
         final IllegalStateException ise = new IllegalStateException();
@@ -275,6 +349,8 @@ public class FunctionsTest {
         consumer.accept(testable, null);
     }
 
+    /** Test case for {@link Functions#apply(FailableFunction)}.
+     */
     @Test
     public void testApplyFunction() {
         final IllegalStateException ise = new IllegalStateException();
@@ -300,6 +376,8 @@ public class FunctionsTest {
         assertEquals(0, i.intValue());
     }
 
+    /** Test case for {@link Functions#asFunction(FailableFunction)}.
+     */
     @Test
     public void testAsFunction() {
         final IllegalStateException ise = new IllegalStateException();
@@ -327,6 +405,8 @@ public class FunctionsTest {
         assertEquals(0, function.apply(null).intValue());
     }
 
+    /** Test case for {@link Functions#apply(FailableBiFunction)}.
+     */
     @Test
     public void testApplyBiFunction() {
         final IllegalStateException ise = new IllegalStateException();
@@ -411,6 +491,8 @@ public class FunctionsTest {
     	}
     }
 
+    /** Test case for {@link Functions#asBiFunction(FailableBiFunction)}.
+     */
     @Test
     public void testAsBiFunction() {
         final IllegalStateException ise = new IllegalStateException();
@@ -438,6 +520,8 @@ public class FunctionsTest {
         assertEquals(0, biFunction.apply(testable, null).intValue());
     }
 
+    /** Test case for {@link Functions#get(FailableSupplier)}.
+     */
     @Test
     public void testGetFromSupplier() {
         FailureOnOddInvocations.invocation = 0;
@@ -450,6 +534,8 @@ public class FunctionsTest {
         assertNotNull(instance);
     }
 
+    /** Test case for {@link Functions#asSupplier(FailableSupplier)}.
+     */
     @Test
     public void testAsSupplier() {
         FailureOnOddInvocations.invocation = 0;
@@ -464,6 +550,8 @@ public class FunctionsTest {
         assertNotNull(instance);
     }
 
+    /** Test case for {@link Functions#tryWithResources(FailableRunnable, FailableRunnable...)}.
+     */
     @Test
     public void testTryWithResources() {
         final CloseableObject co = new CloseableObject();

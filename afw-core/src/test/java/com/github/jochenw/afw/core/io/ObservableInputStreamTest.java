@@ -11,7 +11,13 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.MutableBoolean;
 
+
+/** Test for the {@link ObservableInputStream}.
+ */
 public class ObservableInputStreamTest {
+	/** Test for reading a simple byte array.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void test() throws Exception {
 		final String expect = "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz";

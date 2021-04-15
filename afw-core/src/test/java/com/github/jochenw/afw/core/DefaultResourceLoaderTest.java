@@ -16,19 +16,20 @@ import java.net.URLStreamHandler;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Streams;
 
 /**
- * @author jwi
- *
+ * Test case for the {@link DefaultResourceLoader}.
  */
 public class DefaultResourceLoaderTest {
-	private URL URL0, URL1, URL2;
+	private URL URL0, URL1;
 
+	/** Called to initialize the URL fields, before the tests are actually running.
+	 * @throws Exception An error occurred.
+	 */
 	@Before
 	public void initUrls() throws Exception {
 		final URLStreamHandler ush = new URLStreamHandler() {
@@ -64,6 +65,8 @@ public class DefaultResourceLoaderTest {
 		URL1 = new URL("test", "", 0, "prod/x/y/Bar.properties", ush);
 	}
 
+	/** Test case for {@link DefaultResourceLoader#getResource(ClassLoader, String)}
+	 */
 	@Test
 	public void testExplicitClassLoader() {
 		final ClassLoader cl = newClassLoader();
@@ -83,6 +86,8 @@ public class DefaultResourceLoaderTest {
 		
 	}
 
+	/** Test case for {@link DefaultResourceLoader#getResource(String)}
+	 */
 	@Test
 	public void testImplicitClassLoader() {
 		final ClassLoader cl = newClassLoader();

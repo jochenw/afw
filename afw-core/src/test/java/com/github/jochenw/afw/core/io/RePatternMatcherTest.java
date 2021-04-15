@@ -4,7 +4,12 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+
+/** Test for the {@link RePatternMatcher}.
+ */
 public class RePatternMatcherTest {
+	/** Basic test case.
+	 */
 	@Test
 	public void test() {
 		assertMatch("LICENSE*", "LICENSE");

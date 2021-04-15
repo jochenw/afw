@@ -24,15 +24,23 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.el.tree.ElExpression;
 
 
+/** Test for the {@link ElEvaluator}.
+ */
 public class ElEvaluatorTest {
 	private static final ElEvaluator evaluator = new ElEvaluator(new DefaultPropertyResolver());
 	private static final ElReader reader = new ElReader();
 
+	/**
+	 * Test case for a boolean value in a non-atomic object.
+	 */
 	@Test
 	public void testBooleanExpression() {
 		final ElExpression expr = reader.parse("nested.value");
 		Assert.assertTrue((Boolean) evaluator.evaluate(expr, toMap("nested", toMap("value", Boolean.TRUE))));
 	}
+	/**
+	 * Test case for a boolean expression, that uses atomic values.
+	 */
 	@Test
 	public void testSimpleExpression() {
 		final ElExpression expr = reader.parse("id != 'foo'  ||  4 > num");

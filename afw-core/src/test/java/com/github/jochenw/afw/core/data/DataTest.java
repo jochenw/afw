@@ -209,56 +209,78 @@ public class DataTest {
 		// TODO
 	}
 
+	/** Test case for {@link Data#requireString(Properties, String, String)}.
+	 */
 	@Test
 	public void testRequireStringPropertiesStringString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#requireString(Properties, String)}.
+	 */
 	@Test
 	public void testRequireStringPropertiesString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#requirePath(Map, String, String)}.
+	 */
 	@Test
 	public void testRequirePathMapOfStringObjectStringString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#requirePath(Map, String)}.
+	 */
 	@Test
 	public void testRequirePathMapOfStringObjectString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#requirePath(Properties, String, String)}.
+	 */
 	@Test
 	public void testRequirePathPropertiesStringString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#requirePath(Properties, String)}.
+	 */
 	@Test
 	public void testRequirePathPropertiesString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#getBoolean(FailableFunction, String, String)}.
+	 */
 	@Test
 	public void testGetBooleanFailableFunctionOfStringObjectQStringString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#getBoolean(Map, String, String)}.
+	 */
 	@Test
 	public void testGetBooleanMapOfStringObjectStringString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#getBoolean(Map, String)}.
+	 */
 	@Test
 	public void testGetBooleanMapOfStringObjectString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#getBoolean(Properties, String, String)}.
+	 */
 	@Test
 	public void testGetBooleanPropertiesStringString() {
 		// TODO fail("Not yet implemented");
 	}
 
+	/** Test case for {@link Data#getBoolean(Map, String)}.
+	 */
 	@Test
 	public void testGetBooleanPropertiesString() {
 		// TODO fail("Not yet implemented");

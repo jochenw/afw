@@ -17,12 +17,12 @@ package com.github.jochenw.afw.core.inject.simple;
 
 import junit.framework.TestCase;
 
+/** Test for the TCK compliance of the {@link SimpleComponentFactory}.
+ */
 public class SimpleComponentFactoryTckTest extends TestCase {
-/*
-	public static Test suite() {
-		return InjectTests.testTckCompliance(new SimpleComponentFactoryBuilder());
-	}
-*/
+	/** Not an actual test, because the {@link SimpleComponentFactory} isn't actually
+	 * TCK compliant.
+	 */
 	public void testDummy() {
 	}
 }

@@ -49,7 +49,11 @@ import org.atinject.tck.auto.accessories.Cupholder;
 import org.atinject.tck.auto.accessories.SpareTire;
 
 
+/** Tests for dependency injection.
+ */
 public class InjectTests {
+	/** A test component with various injectable fields, and methods.
+	 */
 	public static class Component {
 		@Inject
 		private IComponentFactory componentFactory;
@@ -63,13 +67,20 @@ public class InjectTests {
 		private ILog log2;
 		@LogInject
 		private ILog log3;
-	
+
+		/** An injectable method.
+		 * @param pMap1 An injectable map with the name "1".
+		 * @param pMap2 An injectable, unnamed map.
+		 */
 		public @Inject void init(@Named(value="1") Map<String,Object> pMap1, Map<String,Object> pMap2) {
 			map1 = pMap1;
 			map2 = pMap2;
 		}
 	}
 
+	/** Test case for using a {@link ComponentFactoryBuilder}.
+	 * @param pComponentFactoryBuilder The component factory builder, which is being tested.
+	 */
 	public static void testComponentFactory(ComponentFactoryBuilder<?> pComponentFactoryBuilder) {
 		final Map<String,Object> map1 = new HashMap<>();
 		final Map<String,Object> map2 = new HashMap<>();
@@ -108,6 +119,10 @@ public class InjectTests {
 		Assert.assertNotSame(component.log3, component.log);
 	}
 
+	/** Test case for a TCP compliant {@link ComponentFactoryBuilder}.
+	 * @param pComponentFactoryBuilder The component factory builder, which is being tested.
+	 * @return A JUnit test, that can be executed as part of the test suite.
+	 */
 	public static Test testTckCompliance(ComponentFactoryBuilder<?> pComponentFactoryBuilder) {
 		final Module module = new Module() {
 			@Override

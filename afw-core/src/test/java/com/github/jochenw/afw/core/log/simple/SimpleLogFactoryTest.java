@@ -26,7 +26,11 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILog.Level;
 
+/** Test for the {@link SimpleLogFactory}.
+ */
 public class SimpleLogFactoryTest {
+	/** Basic test case.
+	 */
     @Test
     public void test() {
         final StringWriter sw = new StringWriter();

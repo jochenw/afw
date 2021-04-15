@@ -41,6 +41,7 @@ public class ClassLoaderResourceRepositoryTest {
 
 	/**
 	 * Test case for proper handling of URL's with blanks in the path.
+	 * @throws Exception The test failed.
 	 */
 	@Test
 	public void testPathWithBlanks() throws Exception {

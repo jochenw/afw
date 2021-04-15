@@ -6,7 +6,12 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
+
+/** Test for {@link Files}.
+ */
 public class FilesTest {
+	/** Test case for {@link Files#resolve(String)} on Linux.
+	 */
 	@Test
 	public void testRelativizeOnLinux() {
 		Assume.assumeTrue("Not running on Linux/Unix", Systems.isLinuxOrUnix());
@@ -26,6 +31,8 @@ public class FilesTest {
 		}
 	}
 
+	/** Test case for {@link Files#resolve(String)} on Windows.
+	 */
 	@Test
 	public void testRelativizeOnWindows() {
 		Assume.assumeTrue("Not running on Windows", Systems.isWindows());

@@ -24,8 +24,12 @@ import org.junit.Test;
 
 
 
-
+/** Test for the {@link PeekableInputStream}.
+ */
 public class PeekableInputStreamTest {
+	/** Test case for readinga byte array.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void test() throws Exception {
 		// Create a random input stream.

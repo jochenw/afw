@@ -30,10 +30,16 @@ import java.util.Random;
 import org.junit.Assume;
 import org.junit.Test;
 
+
+/** Test for the {@link CircularBufferInputStream}.
+ */
 public class CircularBufferInputStreamTest {
 	private final Random rnd = new Random(1530960934483l); // System.currentTimeMillis(), when this test was written.
 	                                                       // Always using the same seed should ensure a reproducable test.
 
+	/** Standard test for small to medium-sized files.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void test() throws Exception {
 		final byte[] inputBuffer = newInputBuffer();
@@ -81,6 +87,9 @@ public class CircularBufferInputStreamTest {
 	}
 
 
+	/** Test for large files, disabled by default.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testLargeFiles() throws Exception {
 		final String slowTests = System.getenv("COMMONS_SLOW_TESTS");

@@ -22,9 +22,15 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+
+/** Test for the {@link DirectoryScanner}.
+ */
 public class DirectoryScannerTest {
 	private static final DirectoryScanner ds = new DirectoryScanner();
 
+	/**
+	 * Test for finding all files (no includes, or excludes specified).
+	 */
 	@Test
 	public void testAllFiles() {
 		final Set<String> files = new HashSet<>();
@@ -37,6 +43,9 @@ public class DirectoryScannerTest {
 		Assert.assertTrue(files.contains("test/resources/com/github/jochenw/afw/test/mod/test.properties"));
 	}
 
+	/**
+	 * Test for removing the prefix.
+	 */
 	@Test
 	public void testSrcMain() {
 		final Set<String> files = new HashSet<>();

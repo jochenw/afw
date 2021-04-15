@@ -21,13 +21,15 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.SimpleResourceWorker;
-import com.github.jochenw.afw.core.SimpleResourceWorker.ResCallable;
 import com.github.jochenw.afw.core.SimpleResourceWorker.ResRunnable;
 import com.github.jochenw.afw.core.SimpleResourceWorker.SimpleResourceTracker;
 
 import org.junit.Assert;
 
+
+/**
+ * Test suite for the {@link SimpleResourceWorker}.
+ */
 public class SimpleResourceWorkerTest {
 	private static final class SimpleResource implements AutoCloseable {
 		private Long closingTime;

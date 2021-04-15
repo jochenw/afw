@@ -59,6 +59,9 @@ import com.github.jochenw.afw.core.util.HttpConnector.HttpConnection;
 /** Test case for the {@link HttpConnector}.
  */
 public class HttpConnectorTest {
+	/** Test for performing a simple HTTP request.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testHttpRequest() throws Exception {
 		final String stringToSend = "abcdefghijklmnopqrstuvwxyz\n0123456789\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
@@ -147,6 +150,9 @@ public class HttpConnectorTest {
 		return handler;
 	}
 
+	/** Test for performing a simple HTTPS request.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testHttpsRequest() throws Exception {
 		final String stringToSend = "abcdefghijklmnopqrstuvwxyz\n0123456789\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n";

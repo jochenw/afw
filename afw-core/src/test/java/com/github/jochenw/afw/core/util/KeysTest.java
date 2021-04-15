@@ -19,25 +19,42 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.crypt.DefaultKeyHandler;
 import com.github.jochenw.afw.core.crypt.IKeyHandler;
 
+
+/** Test for the {@link Keys} class.
+ */
 public class KeysTest {
+	/** Test for encryption/decryption, using a {@link IKeyHandler}, and without a password.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testEncryptDecryptUsingKeyHandlerNoPassword() throws Exception {
 		final IKeyHandler kh = new DefaultKeyHandler();
 		test("keystore0.jks", kh, null);
 	}
 
+	/** Test for encryption/decryption, using a {@link IKeyHandler}, and a password.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testEncryptDecryptUsingKeyHandlerAndPassword() throws Exception {
 		final IKeyHandler kh = new DefaultKeyHandler();
 		test("keystore1.jks", kh, "123456");
 	}
 
+	/** Test for encryption/decryption, using static methods from the {@link Keys} class,
+	 * and without a password.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testEncryptDecryptUsingKeysNoPassword() throws Exception {
 		final IKeyHandler kh = newKeysHandler();
 		test("keystore2.jks", kh, null);
 	}
 
+	/** Test for encryption/decryption, using static methods from the {@link Keys} class,
+	 * and a password.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testEncryptDecryptUsingKeysAndPassword() throws Exception {
 		final IKeyHandler kh = newKeysHandler();

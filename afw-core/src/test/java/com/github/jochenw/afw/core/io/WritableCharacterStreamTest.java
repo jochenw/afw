@@ -11,6 +11,9 @@ import java.util.Random;
 
 import org.junit.Test;
 
+
+/** Test for the {@link WritableCharStream}.
+ */
 public class WritableCharacterStreamTest {
 	private static final Random RND = new Random(1568496373721l); // System.currentTimeMillis() when this test was written.
 	private static final String CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -23,6 +26,9 @@ public class WritableCharacterStreamTest {
 		CHARS = sb.toString();
 	}
 
+	/** Basic test case
+	 * @throws IOException The test failed.
+	 */
 	@Test
 	public void test() throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();

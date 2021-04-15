@@ -15,25 +15,20 @@
  */
 package com.github.jochenw.afw.core.io;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringReader;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Random;
 
-import org.junit.Assume;
 import org.junit.Test;
 
+/** Test for the {@link CircularBufferInputStream}.
+ */
 public class CircularBufferReaderTest {
 	private final Random rnd = new Random(1530960934483l); // System.currentTimeMillis(), when this test was written.
 	                                                       // Always using the same seed should ensure a reproducable test.
 
+	/** Standard test for small to medium-sized files.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void test() throws Exception {
 		final char[] inputBuffer = newInputBuffer();

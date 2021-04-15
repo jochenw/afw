@@ -10,7 +10,13 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.Streams;
 
+/**
+ * Test for the {@link ReaderInputStream}.
+ */
 public class ReaderInputStreamTest {
+	/** Test case for reading a simple byte array into a byte buffer.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testSimpleReadIntoBuffer() throws Exception {
 		final String s = "01234567890abcdefghijklmnopqrstu\u00E4\u00F6\u00FC";
@@ -28,6 +34,9 @@ public class ReaderInputStreamTest {
 		assertEquals(s, baos.toString(StandardCharsets.UTF_8.name()));
 	}
 
+	/** Test case for reading a simple byte array byte by byte.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testSimpleReadSingleBytes() throws Exception {
 		final String s = "01234567890abcdefghijklmnopqrstu\u00E4\u00F6\u00FC";

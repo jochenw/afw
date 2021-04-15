@@ -26,6 +26,8 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.ILifecycleController.TerminableListener;
 
+/** Test for the {@link DefaultLifecycleController}.
+ */
 public class DefaultLifecycleControllerTest {
 	private static class Startable implements TerminableListener {
 		private Long startTime, shutdownTimee;
@@ -59,6 +61,8 @@ public class DefaultLifecycleControllerTest {
 		}
 	}
 
+	/** Test case for the {@link DefaultLifecycleController}.
+	 */
 	@Test
 	public void testDefaultLifecycleController() {
 		final List<Startable> startables = new ArrayList<>(10);

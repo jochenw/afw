@@ -12,7 +12,11 @@ import com.github.jochenw.afw.core.data.IObjectComparator.Listener;
 
 import org.junit.Assert;
 
+/** Test for the {@link DefaultObjectComparator}.
+ */
 public class DefaultObjectComparatorTest {
+	/** Test case for atomic values.
+	 */
 	@Test
 	public void testAtomicValues() {
 		compare("3", "2", "", "Expected \"3\", got \"2\"");
@@ -22,6 +26,8 @@ public class DefaultObjectComparatorTest {
 		compare(Boolean.TRUE, "true", "", "Expected true, got \"true\"");
 	}
 
+	/** Test case for list values.
+	 */
 	@Test
 	public void testListValues() {
 		Object[] objectArrayFourElements = new Object[] {"42", "17", "3", Boolean.TRUE};
@@ -36,6 +42,8 @@ public class DefaultObjectComparatorTest {
 				"[1]", "Expected \"17\", got 17i", "[3]", "Expected true, got false");
 	}
 
+	/** Test case for map values.
+	 */
 	@Test
 	public void testMapValues() {
 		final Map<String,Object> twoElementMap = new HashMap<>();

@@ -47,6 +47,9 @@ public class ArgsTest {
 		assertResult(list, "file", "foo.txt", "otherFile", "bar.txt", "anotherFile", "baz.log", "noChecks", null);
 	}
 
+	/**
+	 * Test case for an option, that needs a value, but none is specified.
+	 */
 	@Test
 	public void testMissingValue() {
 		final List<String> list = new ArrayList<>();

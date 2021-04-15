@@ -24,9 +24,13 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.AnnotationScanner.Annotation;
 
+/** Test for the {@link AnnotationScanner}.
+ */
 public class AnnotationScannerTest {
 	private static final String EXAMPLE = "@SuppressWarnings(user=\"jwi\", reason=\"Not Given\", rule=\"SomeRule\")";
 
+	/** Test case for scanning valid annotations.
+	 */
 	@Test
 	public void testValidAnnotations() {
 		String warnings = EXAMPLE;
@@ -62,6 +66,8 @@ public class AnnotationScannerTest {
 		assertTrue(annotations.isEmpty());
 	}
 	
+	/** Test case for scanning invalid annotations.
+	 */
 	@Test
 	public void testInvalidAnnotations() {
 		try {

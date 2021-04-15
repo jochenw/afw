@@ -32,17 +32,20 @@ import java.util.Properties;
 
 import org.junit.Test;
 
+
+/** Test for the {@link DefaultPropertyFactory}.
+ */
 public class DefaultPropertyFactoryTest {
     private Path tmpDir;
 
-    public Path getTmpDir() throws IOException {
+    private Path getTmpDir() throws IOException {
         if (tmpDir == null) {
             tmpDir = Files.createTempDirectory("props");
         }
         return tmpDir;
     }
 
-    public DefaultPropertyFactory newFactory() throws IOException {
+    private DefaultPropertyFactory newFactory() throws IOException {
         final Path tmpdir = getTmpDir();
         URL factoryUrl = DefaultPropertyFactoryTest.class.getResource("test-factory.properties");
         URL instanceUrl = DefaultPropertyFactoryTest.class.getResource("test.properties");
@@ -68,6 +71,10 @@ public class DefaultPropertyFactoryTest {
         return pOut.toUri().toURL();
     }
 
+
+    /** Test case for the {@link IProperty.ChangeListener}
+     * @throws Exception The test failed.
+     */
     @Test
     public void test() throws Exception {
         MutableInteger mi = new MutableInteger();
@@ -122,5 +129,4 @@ public class DefaultPropertyFactoryTest {
         assertEquals(-1, ip2.getIntValue());
         assertEquals("fooBarBaz", sp.getValue());
     }
-
 }

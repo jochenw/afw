@@ -3,8 +3,6 @@
  */
 package com.github.jochenw.afw.core.io;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -14,7 +12,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
@@ -38,6 +35,9 @@ public class AbstractFileVisitorTest {
 		testList.forEach((c) -> list.add("test/java/" + c.getName().replace('.', '/') + ".java"));
 		return list;
 	}
+	/** Test case for {@link AbstractFileVisitor#AbstractFileVisitor(boolean)} with "withBasedir=true".
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testWithBasedir() throws Exception {
 		final List<String> expectedNames = expectedFiles().stream().map((s) -> "src/" + s).collect(Collectors.toList());
@@ -60,6 +60,9 @@ public class AbstractFileVisitorTest {
 		Assert.assertTrue(expectedNames.isEmpty());
 	}
 
+	/** Test case for {@link AbstractFileVisitor#AbstractFileVisitor(boolean)} with "withBasedir=false".
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testWithoutBasedir() throws Exception {
 		final List<String> rejectedNames = expectedFiles().stream().map((s) -> "src/" + s).collect(Collectors.toList());

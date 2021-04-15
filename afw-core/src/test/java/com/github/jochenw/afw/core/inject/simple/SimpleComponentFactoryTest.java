@@ -27,12 +27,18 @@ import com.github.jochenw.afw.core.util.Holder;
 
 
 
+/** Test for the {@link SimpleComponentFactoryBuilder}.
+ */
 public class SimpleComponentFactoryTest {
+	/** Runs the standard tests for the {@link SimpleComponentFactoryBuilder}.
+	 */
 	@Test
 	public void testSimpleComponentFactory() {
 		InjectTests.testComponentFactory(new SimpleComponentFactoryBuilder());
 	}
 
+	/** Tests, whether the {@link IComponentFactoryAware} interface is honoured.
+	 */
 	@Test
 	public void testComponentFactoryAware() {
 		final Holder<IComponentFactory> cfHolder = new Holder<>();

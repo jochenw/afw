@@ -20,8 +20,11 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.inject.InjectTests;
 
 
-
+/** Test for the {@link GuiceComponentFactoryBuilder}.
+ */
 public class GuiceComponentFactoryTest {
+	/** Runs the test suite on the {@link GuiceComponentFactoryBuilder}.
+	 */
 	@Test
 	public void testGuiceComponentFactoryBuilder() {
 		InjectTests.testComponentFactory(new GuiceComponentFactoryBuilder());

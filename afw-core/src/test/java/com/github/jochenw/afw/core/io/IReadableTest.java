@@ -18,7 +18,13 @@ import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Holder;
 import com.github.jochenw.afw.core.util.Streams;
 
+
+/** Test for {@link IReadable}.
+ */
 public class IReadableTest {
+	/** Test case for {@link IReadable#of(Path)}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testPath() throws Exception {
 		final Path p = Paths.get("pom.xml");
@@ -46,6 +52,9 @@ public class IReadableTest {
 		}
 	}
 
+	/** Test case for {@link IReadable#of(Path)}, and {@link IReadable#repeatable()}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testPathRepeatable() throws Exception {
 		final Path p = Paths.get("pom.xml");
@@ -72,6 +81,9 @@ public class IReadableTest {
 		assertTrue(r1.isRepeatable());
 	}
 
+	/** Test case for {@link IReadable#of(File)}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testFile() throws Exception {
 		final File f = new File("pom.xml");
@@ -95,6 +107,9 @@ public class IReadableTest {
 		}
 	}
 
+	/** Test case for {@link IReadable#of(File)}, and {@link IReadable#repeatable()}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testFileRepeatable() throws Exception {
 		final File f = new File("pom.xml");
@@ -103,6 +118,9 @@ public class IReadableTest {
 		validateRepeatable(r1, "pom.xml", f.length());
 	}
 
+	/** Test case for {@link IReadable#of(URL)}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testUrl() throws Exception {
 		final Path p = Paths.get("pom.xml");
@@ -112,6 +130,9 @@ public class IReadableTest {
 		validateNonRepeatable(r, url.toExternalForm(), Files.size(p));
 	}
 
+	/** Test case for {@link IReadable#of(URL)}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testUrlRepeatable() throws Exception {
 		final Path p = Paths.get("pom.xml");

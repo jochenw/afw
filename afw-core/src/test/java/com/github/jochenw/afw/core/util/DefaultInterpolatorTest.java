@@ -24,16 +24,22 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.props.DefaultInterpolator;
 
+/** Test for the {@link DefaultInterpolator}.
+ */
 public class DefaultInterpolatorTest {
 	private DefaultInterpolator interpolator;
 	private Properties properties;
 
+	/** Initializes the internal variables.
+	 */
 	@Before
 	public void init() {
 		properties = newProperties();
 		interpolator = newInterpolator();
 	}
-	
+
+	/** Test case for interpolating a simple string.
+	 */
 	@Test
 	public void testInterpolateString() {
 		assertFalse(interpolator.isInterpolatable("target"));
@@ -46,6 +52,8 @@ public class DefaultInterpolatorTest {
 		assertEquals("hsql:file:target/test/db/mydb", interpolator.interpolate("hsql:file:${dbDir}/mydb"));
 	}
 
+	/** Test case for interpolating properties.
+	 */
 	@Test
 	public void testInterpolateProperties() {
 		final Properties props = new Properties();

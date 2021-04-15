@@ -4,7 +4,12 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+
+/** Test for the {@link Holder} class.
+ */
 public class HolderTest {
+	/** Basic test case.
+	 */
 	@Test
 	public void test() {
 		final Holder<String> holder = new Holder<String>();

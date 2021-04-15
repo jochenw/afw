@@ -9,7 +9,12 @@ import java.nio.file.Path;
 import org.junit.Assert;
 import org.junit.Test;
 
+
+/** Test for the {@link Tests} class.
+ */
 public class TestsTest {
+	/** Test case for {@link Tests#requireResource(ClassLoader, String)}.
+	 */
 	@Test
 	public void testRequireResource() {
 		final ClassLoader cl = new ClassLoader(Thread.currentThread().getContextClassLoader()) {
@@ -36,6 +41,8 @@ public class TestsTest {
 		Thread.currentThread().setContextClassLoader(cl.getParent());
 	}
 
+	/** Test case for {@link Tests#fail(String)}.
+	 */
 	@Test
 	public void testFail() {
 		try {
@@ -46,6 +53,8 @@ public class TestsTest {
 		}
 	}
 
+	/** Test case for {@link Tests#requireTestDirectory()}.
+	 */
 	@Test
 	public void testRequireTestDirectory() {
 		final File file = Tests.requireTestDirectory();
@@ -58,6 +67,8 @@ public class TestsTest {
 		assertTrue(Files.isDirectory(f2));
 	}
 
+	/** Test case for {@link Tests#assertEquals(byte[], byte[])}.
+	 */
 	@Test
 	public void testAssertEqualsByteArrays() {
 		Tests.assertEquals("Foo".getBytes(StandardCharsets.UTF_8), new byte[] {'F', 'o', 'o'});
@@ -69,6 +80,8 @@ public class TestsTest {
 		}
 	}
 
+	/** Test case for {@link Tests#assertEquals(int, int)}.
+	 */
 	@Test
 	public void testAssertEqualsInts() {
 		Tests.assertEquals(4, 2+2);
@@ -80,6 +93,8 @@ public class TestsTest {
 		}
 	}
 
+	/** Test case for {@link Tests#assertEquals(Object, Object)}.
+	 */
 	@Test
 	public void testAssertEqualsObjects() {
 		Tests.assertEquals("FooBar", "Foo" + "Bar");
@@ -91,6 +106,8 @@ public class TestsTest {
 		}
 	}
 
+	/** Test case for {@link Tests#assertTrue(boolean)}.
+	 */
 	@Test
 	public void testAssertTrue() {
 		Tests.assertTrue(true);

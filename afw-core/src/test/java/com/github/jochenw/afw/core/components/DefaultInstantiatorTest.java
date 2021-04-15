@@ -13,7 +13,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
+
+/** Test for the {@link DefaultInstantiator}.
+ */
 public class DefaultInstantiatorTest {
+	/** A bean class with multiple properties, of different types.
+	 */
 	public static class ABean {
 		protected int intProperty;
 		protected Integer intObjProperty;

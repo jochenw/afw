@@ -28,6 +28,8 @@ import com.github.jochenw.afw.core.csv.CsvReader.CsvRow;
 import com.github.jochenw.afw.core.util.Tests;
 
 
+/** Test for the {@link CsvReader}.
+ */
 public class CsvReaderTest {
 	private static final String LINE1 = "\"Stammdaten\";\"288362\";\"42/17\";\"IE\";\"verwendbar\";" +
 								 "\"Weihnachtstischsets Papier in Stoffoptik 12er 30 x 40 cm FSC\";" +
@@ -48,6 +50,9 @@ public class CsvReaderTest {
 								 "\"Chantal,Sammy,neu,Goldstern\";\"288362_A,288362_B,288362_C,288362_D\";" +
 								 "\"CB1,CB2,CB5,CB6,CB7,CB3,CB4,CB9,CB8\";\"45/17\";"; 
 
+	/** Test case for {@link CsvRow#getHeaderArray()}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testHeader() throws Exception {
 		final FinalizableConsumer<CsvRow> consumer = new FinalizableConsumer<CsvRow>() {
@@ -79,6 +84,9 @@ public class CsvReaderTest {
 		run(consumer);
 	}
 
+	/** Test case for {@link CsvRow#getRowAsArray()}.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testParser() throws Exception {
 		final CsvParser parser = new CsvParser("\r\n", "\"", ";");
@@ -154,6 +162,10 @@ public class CsvReaderTest {
 		run(consumer);
 	}
 
+	/**
+	 * Test case for counting lines.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testCountLines() throws Exception {
 		final FinalizableConsumer<CsvRow> consumer = new FinalizableConsumer<CsvRow>() {
@@ -170,6 +182,10 @@ public class CsvReaderTest {
 		run(consumer);
 	}
 
+	/**
+	 * Test case for reading the first row.
+	 * @throws Exception The test failed.
+	 */
 	@Test
 	public void testFirstRow() throws Exception {
 		final FinalizableConsumer<CsvRow> consumer = new FinalizableConsumer<CsvRow>() {
