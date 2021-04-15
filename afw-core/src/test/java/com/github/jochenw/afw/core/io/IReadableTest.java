@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,6 +32,21 @@ public class IReadableTest {
 		assertTrue(Files.isRegularFile(p));
 		final IReadable r1 = IReadable.of(p);
 		validateNonRepeatable(r1, "pom.xml", Files.size(p));
+	}
+
+	/** Test case for {@link IReadable#of(String)}.
+	 * @throws Exception The test failed.
+	 */
+	@Test
+	public void testString() throws Exception {
+		final String manifestPath = "src/main/resources/META-INF/MANIFEST.MF";
+		final URL manifestUrl = Paths.get("target/test-classes/META-INF/MANIFEST.MF").toUri().toURL();
+		final IReadable r0 = IReadable.of("pom.xml", "");
+		validateNonRepeatable(r0, "pom.xml", Files.size(Paths.get("pom.xml")));
+		final IReadable r1 = IReadable.of("resource:META-INF/MANIFEST.MF", "");
+		validateNonRepeatable(r1, manifestUrl.toString(), Files.size(Paths.get(manifestPath)));
+		final IReadable r2 = IReadable.of("default:MANIFEST.MF", "META-INF");
+		validateNonRepeatable(r2, manifestUrl.toString(), Files.size(Paths.get(manifestPath)));
 	}
 
 	private void validateNonRepeatable(final IReadable pReadable, String pName, long pNumBytes) throws IOException {
