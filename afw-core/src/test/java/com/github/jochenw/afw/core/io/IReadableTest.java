@@ -39,14 +39,15 @@ public class IReadableTest {
 	 */
 	@Test
 	public void testString() throws Exception {
-		final String manifestPath = "src/main/resources/META-INF/MANIFEST.MF";
-		final URL manifestUrl = Paths.get("target/test-classes/META-INF/MANIFEST.MF").toUri().toURL();
+		final String xsdFileUri = "com/github/jochenw/afw/core/plugins/plugin-list-100.xsd";
+		final String xsdFilePath = "src/main/resources/" + xsdFileUri;
+		final URL xsdFileUrl = Paths.get("target/classes/" + xsdFileUri).toUri().toURL();
 		final IReadable r0 = IReadable.of("pom.xml", "");
 		validateNonRepeatable(r0, "pom.xml", Files.size(Paths.get("pom.xml")));
-		final IReadable r1 = IReadable.of("resource:META-INF/MANIFEST.MF", "");
-		validateNonRepeatable(r1, manifestUrl.toString(), Files.size(Paths.get(manifestPath)));
-		final IReadable r2 = IReadable.of("default:MANIFEST.MF", "META-INF");
-		validateNonRepeatable(r2, manifestUrl.toString(), Files.size(Paths.get(manifestPath)));
+		final IReadable r1 = IReadable.of("resource:" + xsdFileUri, "");
+		validateNonRepeatable(r1, xsdFileUrl.toString(), Files.size(Paths.get(xsdFilePath)));
+		final IReadable r2 = IReadable.of("default:plugin-list-100.xsd", "com/github/jochenw/afw/core/plugins");
+		validateNonRepeatable(r2, xsdFileUrl.toString(), Files.size(Paths.get(xsdFilePath)));
 	}
 
 	private void validateNonRepeatable(final IReadable pReadable, String pName, long pNumBytes) throws IOException {
