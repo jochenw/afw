@@ -62,7 +62,7 @@ public abstract class ArgsHandler<O extends Object> {
 	/** Called to process the command line arguments.
 	 * @param pArgs The command line arguments.
 	 */
-	public void main(String[] pArgs) {
+	public void run(String[] pArgs) {
 		final O options = parse(pArgs);
 		try {
 			run(options);

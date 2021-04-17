@@ -5,7 +5,7 @@ import java.util.Objects;
 
 /** A tupel of two objects (the attributes). Typically, this is used as a result type,
  * if a method is actually returning two values. In that case, the Tupel can act as a
- * wrapper sobject for both.
+ * wrapper object for both.
  * @param <O1> Type of the first attribute.
  * @param <O2> Type of the second attribute.
  */
@@ -16,7 +16,7 @@ public class Tupel<O1, O2> {
 	/** Creates a new instance, which wraps the given objects.
 	 * @param pAttribute1 The first attribute.
 	 * @param pAttribute2 The second attribute.
-	 */
+c	 */
 	public Tupel(O1 pAttribute1, O2 pAttribute2) {
 		attribute1 = pAttribute1;
 		attribute2 = pAttribute2;
@@ -48,5 +48,17 @@ public class Tupel<O1, O2> {
 		@SuppressWarnings("unchecked")
 		final Tupel<O1,O2> other = (Tupel<O1,O2>) pOther;
 		return Objects.equals(getAttribute1(), other.getAttribute1())  &&  Objects.equals(getAttribute2(), other.getAttribute2());
+	}
+
+	/**
+	 * Creates a new instance with the given attributes.
+	 * @param pAttribute1 The first attribute.
+	 * @param pAttribute2 The second attribute.
+	 * @param <O1> The first attribute's type.
+	 * @param <O2> The second attribute's type.
+	 * @return The created {@link Tupel}, which has the given attributes.
+	 */
+	public static <O1,O2> Tupel<O1,O2> of(O1 pAttribute1, O2 pAttribute2) {
+		return new Tupel<O1,O2>(pAttribute1, pAttribute2);
 	}
 }

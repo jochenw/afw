@@ -135,14 +135,14 @@ public class ArgsHandlerTest {
 				validated0.set();
 			}
 		};
-		argsHandler0.main(new String[]{"-projectPath", "src",
+		argsHandler0.run(new String[]{"-projectPath", "src",
 				                       "-wmHomeDir", "target",
 				                       "-isUrl", "http://127.0.0.1:5555",
 				                       "-isUser", "Administrator",
 				                       "-isPass", "manage"});
 		assertTrue(validated0.isSet());
 		try {
-			argsHandler0.main(new String[]{"-wmHomeDir", "target",
+			argsHandler0.run(new String[]{"-wmHomeDir", "target",
                     					   "-isUrl", "http://127.0.0.1:5555",
                     					   "-isUser", "Administrator",
                     					   "-isPass", "manage"});
@@ -151,7 +151,7 @@ public class ArgsHandlerTest {
 			assertEquals("Required option missing: -projectPath", e.getMessage());
 		}
 		try {
-			argsHandler0.main(new String[]{"-projectPath", "src",
+			argsHandler0.run(new String[]{"-projectPath", "src",
                     					   "-isUrl", "http://127.0.0.1:5555",
                     					   "-isUser", "Administrator",
                     					   "-isPass", "manage"});
