@@ -346,7 +346,7 @@
             </executions>
             <configuration>
               <excludes>
-                <exclude>com/github/jochenw/afw/core/el/jcc/*</exclude>
+                <exclude>com/github/jochenw/afw/core/el/jcc/**/*.class</exclude>
               </excludes>
             </configuration>
           </plugin>
