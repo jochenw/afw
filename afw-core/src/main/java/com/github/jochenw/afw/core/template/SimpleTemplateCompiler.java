@@ -173,7 +173,7 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 			final String line = pLines[i];
 			lineNumber = i+1;
 			if (line.startsWith("<%")  &&  line.endsWith("%>")) {
-				final String command = line.substring("<%".length(), line.length()-"%>".length());
+				final String command = line.substring("<%".length(), line.length()-"%>".length()).trim();
 				if (command.startsWith("if")) {
 					final String expr = command.substring(2);
 					final ElExpression elExpr;
@@ -241,7 +241,7 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 						loopVar = st.nextToken().trim();
 						if (st.hasMoreTokens()) {
 							final String inToken = st.nextToken();
-							if (!"in".equals(inToken)) {
+							if (!"in".equals(inToken)  &&  !":".equals(inToken)) {
 								throw new IllegalStateException("Expected <loopVar> in <listVar> at " + uri
 										                        + ", line " + lineNumber);
 							}
@@ -321,6 +321,8 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 					} else {
 						throw new IllegalStateException("Failed to parse /if statement at line " + lineNumber);
 					}
+				} else {
+					throw new IllegalStateException("Invalid command at line " + lineNumber + ": " + command);
 				}
 			} else {
 				compile(line);
