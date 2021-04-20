@@ -10,7 +10,8 @@ import javax.annotation.Nullable;
 public class Locales {
 	/**
 	 * Returns the {@link Locale} with the given language tag.
-	 * @param pLanguageTag
+	 * @param pLanguageTag The language tag, for which to query a locale.
+	 *   For example: "en-US", "en_us", or "de".
 	 * @return The matching Locale, if any, or null.
 	 * @throws NullPointerException The input parameter is null.
 	 */
@@ -25,7 +26,8 @@ public class Locales {
 
 	/**
 	 * Returns the {@link Locale} with the given language tag.
-	 * @param pLanguageTag
+	 * @param pLanguageTag The language tag, for which to query a locale.
+	 *   For example: "en-US", "en_us", or "de".
 	 * @return The matching Locale. Never null.
 	 * @throws NullPointerException The input parameter is null.
 	 * @throws IllegalArgumentException No matching Locale was found.

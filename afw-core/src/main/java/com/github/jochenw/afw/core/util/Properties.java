@@ -87,7 +87,7 @@ public class Properties {
 	/**
 	 * Iterates over all the entries in the property set,
 	 * invoking the given consumer.
-	 * @param pConsumer 
+	 * @param pConsumer  The consumer, which ought to process the property entries.
 	 */
 	public void forEach(@Nonnull FailableConsumer<Entry,?> pConsumer) {
 		map.values().forEach((e) -> Functions.accept(pConsumer, e));
@@ -95,7 +95,7 @@ public class Properties {
 	/**
 	 * Iterates over all the entries in the property set,
 	 * invoking the given consumer.
-	 * @param pConsumer 
+	 * @param pConsumer The consumer, which ought to process the properties.
 	 */
 	public void forEach(@Nonnull FailableBiConsumer<String,String,?> pConsumer) {
 		forEach((e) -> Functions.accept(pConsumer, e.getKey(), e.getValue()));

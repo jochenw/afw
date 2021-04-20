@@ -35,11 +35,11 @@ public abstract class ArgsHandler<O extends Object> {
 	@FunctionalInterface
 	public interface OptionHandler<T> {
 		/** Called to process an option value.
-		 * @param pCtx
-		 * @param pOptionBean
+		 * @param pCtx The option context, which allows to retrieve the value.
+		 * @param pOptionBean The option bean, which is being configured.
 		 * @param pOptionName The actual option name, as given by the user.
 		 * @param pMainOptionName The main option name.
-		 * @throws Exception
+		 * @throws Exception Processing the option value has failed.
 		 */
 		public void accept(Args.Context pCtx, T pOptionBean, String pOptionName, String pMainOptionName) throws Exception;
 	}
