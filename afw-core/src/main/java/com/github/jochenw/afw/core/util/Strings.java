@@ -500,6 +500,8 @@ public class Strings {
 	 * the given matcher description. The matcher description will be
 	 * interpreted as follows:
 	 * <ol>
+	 *   <li>A leading '!' (if present), inverts the matchers meaning: The matcher
+	 *     will match input strings, that do *not* match the remaining pattern.</li>
 	 *   <li>A regular expression, introduced by the prefix "re:".</li>
 	 *   <li>A glob pattern, containing either of the characters
 	 *     '?' (a single, but arbitrary character), or '*' (an arbitrary
@@ -514,6 +516,13 @@ public class Strings {
 	 */
 	public static @Nonnull Predicate<String> matcher(@Nonnull String pMatcher) {
 		@Nonnull String matcher = Objects.requireNonNull(pMatcher, "Matcher");
+		final boolean excluding;
+		if (matcher.startsWith("!")) {
+			excluding = true;
+			matcher = matcher.substring(1);
+		} else {
+			excluding = false;
+		}
 		final boolean caseInsensitive;
 		if (matcher.endsWith("/i")) {
 			caseInsensitive = true;
@@ -543,10 +552,16 @@ public class Strings {
 		} else {
 			if (caseInsensitive) {
 				final String lcMatcher = matcher.toLowerCase();
-				return (s) -> s.toLowerCase().equals(lcMatcher);
+				return (s) -> {
+					final boolean stringMatch = s.toLowerCase().equals(lcMatcher);
+					return excluding ? !stringMatch : stringMatch;
+				};
 			} else {
 				final String m = matcher;
-				return (s) -> s.equals(m);
+				return (s) -> {
+					final boolean stringMatch = s.equals(m);
+					return excluding ? !stringMatch : stringMatch;
+				};
 			}
 		}
 		final Pattern pattern;
@@ -555,7 +570,14 @@ public class Strings {
 		} else {
 			pattern = Pattern.compile(patternStr);
 		}
-		return (s) -> pattern.matcher(s).matches();
+		return (s) -> {
+			final boolean patternMatch = pattern.matcher(s).matches();
+			if (excluding) {
+				return !patternMatch;
+			} else {
+				return patternMatch;
+			}
+		};
 	}
 	
 	/** Parses the given string into a list of matchers, by tokenizing the string,
@@ -579,21 +601,44 @@ public class Strings {
 	public static @Nonnull Predicate<String> matchers(@Nonnull String pMatchers, @Nonnull String pSeparator) {
 		final @Nonnull String matchers = Objects.requireNonNull(pMatchers, "Matchers");
 		final @Nonnull String separator = Objects.requireNonNull(pSeparator, "Separator");
-		final List<Predicate<String>> predicates = new ArrayList<>();
+		final List<Predicate<String>> includingPredicates = new ArrayList<>();
+		final List<Predicate<String>> excludingPredicates = new ArrayList<>();
 		for (StringTokenizer st = new StringTokenizer(matchers, separator);  st.hasMoreTokens();  ) {
 			final String matcher = st.nextToken();
-			predicates.add(matcher(matcher));
+			if (matcher.startsWith("!")) {
+				excludingPredicates.add(matcher(matcher.substring(1)));
+			} else {
+				includingPredicates.add(matcher(matcher));
+			}
 		}
-		if (predicates.isEmpty()) {
+		if (includingPredicates.isEmpty()  &&  excludingPredicates.isEmpty()) {
 			throw new IllegalArgumentException("No matcher definitions found.");
 		}
 		return (s) -> {
-			for (Predicate<String> pred : predicates) {
-				if (pred.test(s)) {
-					return true;
+			boolean included;
+			if (includingPredicates.isEmpty()) {
+				included = true;
+			} else {
+				included = false;
+				for (Predicate<String> pred : includingPredicates) {
+					if (pred.test(s)) {
+						included = true;
+						break;
+					}
 				}
 			}
-			return false;
+			if (included) {
+				if (!excludingPredicates.isEmpty()) {
+					for (Predicate<String> pred : excludingPredicates) {
+						if (pred.test(s)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			} else {
+				return false;
+			}
 		};
 	}
 
