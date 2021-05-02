@@ -23,16 +23,14 @@ import com.github.jochenw.afw.core.io.AbstractFileVisitor;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Streams;
 
-/**
- * @author jwi
- *
+/** Default implementation of {@link IZipFileHandler}
  */
 public class DefaultZipHandler implements IZipFileHandler {
 	@Override
 	public void createZipFile(Path pSourceDir, Path pZipFile, boolean pBaseDirIncludedInPath) {
 		final Path zipFileDir = pZipFile.getParent();
 		try {
-			if (!Files.isDirectory(zipFileDir)) {
+			if (zipFileDir != null  &&  !Files.isDirectory(zipFileDir)) {
 				throw new IOException("Unable to create zip file, because target directory doesn't exist: " + zipFileDir);
 			}
 			Files.deleteIfExists(pZipFile);
@@ -93,7 +91,9 @@ public class DefaultZipHandler implements IZipFileHandler {
 				}
 				final Path path = pTargetDir.resolve(p);
 				final Path dir = path.getParent();
-				Files.createDirectories(dir);
+				if (dir != null) {
+					Files.createDirectories(dir);
+				}
 				try (OutputStream os = Files.newOutputStream(path)) {
 					Streams.copy(zis, os);
 				}
@@ -126,7 +126,6 @@ public class DefaultZipHandler implements IZipFileHandler {
 
 			@Override
 			public int read(byte[] b, int off, int len) throws IOException {
-				// TODO Auto-generated method stub
 				return in.read(b, off, len);
 			}
 

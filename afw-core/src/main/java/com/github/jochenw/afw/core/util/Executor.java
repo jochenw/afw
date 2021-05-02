@@ -68,13 +68,32 @@ public class Executor {
 	 * @return The external processes exit code.
 	 */
 	public int run(@Nullable Path pDir, @Nonnull String[] pCmd, @Nullable String[] pEnv,
-			       @Nonnull Listener pListener) {
-		final @Nonnull Listener listener = Objects.requireNonNull(pListener, "Listener");
+			       @Nullable Listener pListener) {
+		final @Nonnull Listener listener = Objects.notNull(pListener, this::getDefaultListener);
 		return run(pDir, pCmd, pEnv, pListener.getStdOutputConsumer(),
 				   pListener.getErrorOutputConsumer(),
 				   (i) -> { listener.accept(i);});
 	}
 
+	protected @Nonnull Listener getDefaultListener() {
+		return new Listener() {
+			@Override
+			public Consumer<InputStream> getStdOutputConsumer() {
+				return null;
+			}
+
+			@Override
+			public Consumer<InputStream> getErrorOutputConsumer() {
+				return null;
+			}
+
+			@Override
+			public void accept(int pStatus) {
+				// Do nothing.
+			}
+		};
+	}
+	
 	/** Called to execute the command {@code pCmd}, using the environment {@code pEnv},
 	 * in the directory {@code pDir}.
 	 * @param pDir The directory, where to execute the command. May be null, in which
@@ -94,9 +113,9 @@ public class Executor {
 	 * @return The external processes exit code.
 	 */
 	public int run(@Nullable Path pDir, @Nonnull String[] pCmd, @Nullable String[] pEnv,
-			        @Nullable Consumer<InputStream> pStdOutputConsumer,
-			        @Nullable Consumer<InputStream> pErrOutputConsumer,
-			        @Nullable IntConsumer pExitCodeHandler) {
+			       @Nullable Consumer<InputStream> pStdOutputConsumer,
+			       @Nullable Consumer<InputStream> pErrOutputConsumer,
+			       @Nullable IntConsumer pExitCodeHandler) {
 		try {
 			final File dir = pDir == null ? null : pDir.toFile();
 			final Process pr = Runtime.getRuntime().exec(pCmd, pEnv, dir);

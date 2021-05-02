@@ -99,7 +99,7 @@ public abstract class ArgsHandler<O extends Object> {
 		return new Listener() {
 			@Override
 			public RuntimeException error(String pMsg) {
-				return error(pMsg);
+				return ArgsHandler.this.error(pMsg);
 			}
 
 			@Override
