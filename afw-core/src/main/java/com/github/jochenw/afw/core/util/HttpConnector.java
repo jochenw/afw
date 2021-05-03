@@ -106,6 +106,7 @@ public class HttpConnector {
 	 */
 	public void setTruststore(Path pTruststore, String pTruststorePassword) {
 		trustStore = pTruststore;
+		trustStorePassword = pTruststorePassword;
 	}
 
 	/**

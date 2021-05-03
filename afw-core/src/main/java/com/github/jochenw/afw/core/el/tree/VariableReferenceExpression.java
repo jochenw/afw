@@ -15,11 +15,13 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
 
 /**
  * An expression, which is being evaluated by referencing a property in the data model.
  */
-public class VariableReferenceExpression {
+public class VariableReferenceExpression implements Serializable {
+	private static final long serialVersionUID = 6604745293504046349L;
 	private final String var;
 
 	/**

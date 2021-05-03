@@ -29,10 +29,12 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	private final Executor executor = new Executor();
 
 	@Override
-	protected void createSymbolicDirLink(@Nonnull Path pTarget, Path pLink) {
+	protected void createSymbolicDirLink(@Nonnull Path pTarget, @Nonnull Path pLink) {
 		final @Nonnull Path target = Objects.requireNonNull(pTarget, "Target");
+		final @Nonnull Path link = Objects.requireNonNull(pLink, "Link");
+		final @Nonnull Path fileName = Objects.requireNonNull(link.getFileName(), "File name"); 
 		final Path dir = Objects.notNull(pLink.getParent(), () -> Paths.get("."));
-		final String[] command = { CMD_EXE, "/c", "mklink", "/j", "/d", pLink.getFileName().toString(),
+		final String[] command = { CMD_EXE, "/c", "mklink", "/j", "/d", fileName.toString(),
 				                   target.toAbsolutePath().toString() };
 		executor.run(dir, command, null, null, null, null);
 	}

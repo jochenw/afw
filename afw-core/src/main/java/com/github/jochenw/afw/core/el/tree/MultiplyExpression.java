@@ -15,12 +15,15 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
 
 /**
  * An expression for adding or subtracting items.
  */
-public class MultiplyExpression {
-    /**
+public class MultiplyExpression implements Serializable {
+	private static final long serialVersionUID = 1328072851579351454L;
+
+	/**
      * The operators, which are handled by this expression.
      */
     public enum Op {

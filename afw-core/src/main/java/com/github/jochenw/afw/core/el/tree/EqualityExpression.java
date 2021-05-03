@@ -15,11 +15,15 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
+
 /**
  * An equality expression.
  */
-public class EqualityExpression {
-    /**
+public class EqualityExpression implements Serializable {
+	private static final long serialVersionUID = -441090213494783920L;
+
+	/**
      * Enumeration of the equality operators.
      */
     public enum Op {

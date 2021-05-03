@@ -14,6 +14,9 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.crypt.DefaultKeyHandler;
@@ -102,7 +105,7 @@ public class KeysTest {
 			}
 		};
 	};
-	protected void test(String pFileName, IKeyHandler pHandler, String pKeyPassword) throws IOException {
+	protected void test(@Nonnull String pFileName, @Nonnull IKeyHandler pHandler, @Nullable String pKeyPassword) throws IOException {
 		final Path dir = Paths.get("target/unit-tests/KeysTest");
 		final Path file = dir.resolve(pFileName);
 		java.nio.file.Files.createDirectories(dir);

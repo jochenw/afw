@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -56,6 +57,9 @@ public class PluginListParser {
 	/** Interface of an initializer specification, as read by the parser.
 	 */
 	public interface IInitializerSpec {
+		/** Default return value for {@link #getProperties()}.
+		 */
+		static final Map<String,String> EMPTY_MAP = new HashMap<>();
 		/**
 		 * Returns the initializers class name.
 		 * @return The initializers class name.
@@ -78,7 +82,7 @@ public class PluginListParser {
 		 * Returns the set of bean properties, which are supposed to be set on the initializer.
 		 * @return the set of bean properties, which are supposed to be set on the initializer.
 		 */
-		public @Nonnull default Map<String,String> getProperties() { return null; }
+		public @Nonnull default Map<String,String> getProperties() { return EMPTY_MAP; }
 	}
 	/** Interface of a listener for initializer specifications.
 	 * The {@link PluginListHandler} requires such a listener to report what it reads.
@@ -116,7 +120,6 @@ public class PluginListParser {
 		
 		private String id, className;
 		private List<String> dependsOnList;
-		private Map<String,String> properties;
 		private String propertyName, propertyValue;
 		private StringBuilder propertyValueSb = new StringBuilder();
 		
@@ -135,7 +138,6 @@ public class PluginListParser {
 				  }
 				  id = className = null;
 				  dependsOnList = null;
-				  properties = null;
 				  id = pAttrs.getValue(XMLConstants.NULL_NS_URI, "id");
 				  if (id == null  ||  id.trim().length() == 0) {
 					  throw error("Expected attribute is missing, or empty: pluginList/plugin/@id");
@@ -211,11 +213,6 @@ public class PluginListParser {
 					  @Override
 					  public String getClassName() {
 						  return className;
-					  }
-
-					  @Override
-					  public Map<String, String> getProperties() {
-						  return properties;
 					  }
 				  };
 				  listener.accept(spec);

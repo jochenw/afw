@@ -41,8 +41,8 @@ public class DataTest {
 	@Test
 	public void testGetStringFailableFunctionOfStringObjectQStringString() {
 		final Map<String, Object> map = getMap();
-		assertEquals("bar", Data.getString(map::get, "foo", (String) null));
-		assertNull(Data.getString(map::get, "bar", null));
+		assertEquals("bar", Data.getString(map::get, "foo", "foo"));
+		assertNull(Data.getString(map::get, "bar", "bar"));
 		try {
 			Data.getString(map::get, "test", "Description of test");
 			fail("Expected Exception");
@@ -57,7 +57,7 @@ public class DataTest {
 	public void testRequireStringFailableFunctionOfStringObjectQStringString() {
 		final Map<String, Object> map = getMap();
 		final FailableFunction<String, Object, ?> func = (s) -> { return map.get(s); };
-		assertEquals("bar", Data.requireString(func, "foo", (String) null));
+		assertEquals("bar", Data.requireString(func, "foo", "foo"));
 		try {
 			Data.requireString(func, "bar", "baz");
 			fail("Expected Exception");
@@ -90,7 +90,7 @@ public class DataTest {
 	public void testRequirePathFailableFunctionOfStringObjectQStringString() {
 		final Map<String, Object> map = getMap();
 		final FailableFunction<String, Object, ?> func = (s) -> { return map.get(s); };
-		assertEquals("bar", Data.requirePath(func, "foo", (String) null).toString());
+		assertEquals("bar", Data.requirePath(func, "foo", "foo").toString());
 		try {
 			Data.requirePath(func, "bar", "baz");
 			fail("Expected Exception");
@@ -117,8 +117,8 @@ public class DataTest {
 	@Test
 	public void testGetStringMapOfStringObjectStringString() {
 		final Map<String, Object> map = getMap();
-		assertEquals("bar", Data.getString(map, "foo", (String) null));
-		assertNull(Data.getString(map, "bar", null));
+		assertEquals("bar", Data.getString(map, "foo", "foo"));
+		assertNull(Data.getString(map, "bar", "bar"));
 		try {
 			Data.getString(map, "test", "Description of test");
 			fail("Expected Exception");
@@ -134,7 +134,7 @@ public class DataTest {
 	public void testGetStringMapOfStringObjectString() {
 		final Map<String, Object> map = getMap();
 		assertEquals("bar", Data.getString(map, "foo"));
-		assertNull(Data.getString(map, "bar", null));
+		assertNull(Data.getString(map, "bar", "bar"));
 		try {
 			Data.getString(map, "test");
 			fail("Expected Exception");
@@ -149,8 +149,8 @@ public class DataTest {
 	@Test
 	public void testGetStringPropertiesStringString() {
 		final Properties map = getProperties();
-		assertEquals("bar", Data.getString(map, "foo", (String) null));
-		assertNull(Data.getString(map, "bar", null));
+		assertEquals("bar", Data.getString(map, "foo", "foo"));
+		assertNull(Data.getString(map, "bar", "bar"));
 		try {
 			Data.getString(map, "test", "Description of test");
 			fail("Expected Exception");
@@ -181,7 +181,7 @@ public class DataTest {
 	@Test
 	public void testRequireStringMapOfStringObjectStringString() {
 		final Map<String,Object> map = getMap();
-		assertEquals("bar", Data.requireString(map, "foo", null));
+		assertEquals("bar", Data.requireString(map, "foo", "foo"));
 		try {
 			Data.requireString(map, "NoSuchValue", "some value");
 			fail("Expected Exception");

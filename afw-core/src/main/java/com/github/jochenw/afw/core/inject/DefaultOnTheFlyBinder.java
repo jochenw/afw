@@ -302,25 +302,23 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 	@Override
 	public <O> void findBindings(IComponentFactory pCf, Class<?> pType,
 			BiConsumer<Key<O>, ScopedProvider<O>> pBindingSink) {
-		if (pType instanceof Class) {
-			final Class<?> cl = (Class<?>) pType;
-			if (cl.isAnnotationPresent(Singleton.class)) {
-				final ScopedProvider<O> scopedProvider = new ScopedProvider<O>() {
-					@Override
-					public O get() {
-						@SuppressWarnings("unchecked")
-						final O o = (O) pCf.newInstance(cl);
-						return o;
-					}
+		final Class<?> cl = (Class<?>) pType;
+		if (cl.isAnnotationPresent(Singleton.class)) {
+			final ScopedProvider<O> scopedProvider = new ScopedProvider<O>() {
+				@Override
+				public O get() {
+					@SuppressWarnings("unchecked")
+					final O o = (O) pCf.newInstance(cl);
+					return o;
+				}
 
-					@Override
-					public Scope getScope() {
-						return Scopes.SINGLETON;
-					}
+				@Override
+				public Scope getScope() {
+					return Scopes.SINGLETON;
+				}
 
-				};
-				pBindingSink.accept(new Key<O>(pType), scopedProvider);
-			}
+			};
+			pBindingSink.accept(new Key<O>(pType), scopedProvider);
 		}
 	}
 }

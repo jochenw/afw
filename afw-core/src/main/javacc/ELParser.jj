@@ -16,6 +16,7 @@ PARSER_BEGIN(ELParser)
 
 package com.github.jochenw.afw.core.el.jcc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -314,10 +315,10 @@ RelationalExpression RelationalExpression () :
 
 AddExpression AddExpression () :
 {
-  Object startExpression;
+  Serializable startExpression;
   AddExpression.Op operator;
-  Object expression;
-  List<Object> expressions = null;
+  Serializable expression;
+  List<Serializable> expressions = null;
 }
 {
   startExpression = MultiplyExpression ()
@@ -331,7 +332,7 @@ AddExpression AddExpression () :
 
       {
     if (expressions == null) {
-      expressions = new ArrayList<Object>();
+      expressions = new ArrayList<Serializable>();
       expressions.add(startExpression);
     }
     expressions.add(operator);

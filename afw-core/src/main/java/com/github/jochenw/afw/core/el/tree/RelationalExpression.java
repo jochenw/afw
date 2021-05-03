@@ -15,12 +15,15 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
 
 /**
  * A relational expression.
  */
-public class RelationalExpression {
-    /**
+public class RelationalExpression implements Serializable {
+	private static final long serialVersionUID = 4195452105598645126L;
+
+	/**
      * Enumeration of the relational operators.
      */
     public enum Op {

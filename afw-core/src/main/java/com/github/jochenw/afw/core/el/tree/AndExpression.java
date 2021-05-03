@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,8 +23,9 @@ import java.util.List;
 /**
  * An "and" expression.
  */
-public class AndExpression {
-    private final List<EqualityExpression> items;
+public class AndExpression implements Serializable {
+	private static final long serialVersionUID = 4979351601788101217L;
+	private final List<EqualityExpression> items;
 
     /**
      * Creates a new instance with the given items.

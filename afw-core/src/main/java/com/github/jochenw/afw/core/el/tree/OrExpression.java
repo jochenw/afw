@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,8 +23,9 @@ import java.util.List;
 /**
  * An "or" expression.
  */
-public class OrExpression {
-    private final List<AndExpression> items;
+public class OrExpression implements Serializable {
+	private static final long serialVersionUID = 8986714670332919378L;
+	private final List<AndExpression> items;
 
     /**
      * Creates a new instance with the given items.

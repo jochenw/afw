@@ -15,13 +15,15 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
 
 /**
  * An expression, which constitutes a single value. For example,
  * a constant value, a variable reference, or a placeholder
  * reference.
  */
-public class ValueExpression {
+public class ValueExpression implements Serializable {
+	private static final long serialVersionUID = 7032680077947015321L;
 	private final ElExpression elExpression;
 	private final Boolean booleanValue;
 	private final Long longValue;

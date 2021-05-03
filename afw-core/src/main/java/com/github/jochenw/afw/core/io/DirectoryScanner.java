@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
@@ -78,29 +79,29 @@ public class DirectoryScanner {
 	}
 
 	private static class ContextImpl implements Context {
-		private @Nonnull Path baseDir;
-		private @Nonnull Path file;
-		private @Nonnull String uri;
-		private @Nonnull BasicFileAttributes attrs;
+		private Path baseDir;
+		private Path file;
+		private String uri;
+		private BasicFileAttributes attrs;
 
 		@Override
 		public Path getBaseDir() {
-			return baseDir;
+			return Objects.requireNonNull(baseDir);
 		}
 
 		@Override
 		public Path getFile() {
-			return file;
+			return Objects.requireNonNull(file);
 		}
 
 		@Override
 		public String getUri() {
-			return uri;
+			return Objects.requireNonNull(uri);
 		}
 
 		@Override
 		public BasicFileAttributes getAttrs() {
-			return attrs;
+			return Objects.requireNonNull(attrs);
 		}
 	}
 

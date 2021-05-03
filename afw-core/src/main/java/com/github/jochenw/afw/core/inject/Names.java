@@ -45,6 +45,13 @@ public class Names {
 			return value;
 		}
 
+		
+		
+		@Override
+		public int hashCode() {
+			return java.util.Objects.hash(value);
+		}
+
 		@Override
 		public boolean equals(Object pOther) {
 			if (pOther == null) {

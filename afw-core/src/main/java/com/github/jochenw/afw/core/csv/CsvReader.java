@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
+
 import com.github.jochenw.afw.core.io.ReadableCharacterStream;
 
 
@@ -83,14 +85,10 @@ public class CsvReader {
 	 * @param pConsumer The consumer, which is being notified.
 	 */
 	public void parse(InputStream pIn, Consumer<CsvRow> pConsumer) {
-		if (pIn instanceof BufferedInputStream) {
-			parse((BufferedInputStream) pIn, pConsumer);
-		} else {
-			try (ReadableCharacterStream rcs = ReadableCharacterStream.newInstance(pIn, false)) {
-				parse(rcs, pConsumer);
-			} catch (IOException ioe) {
-				throw new UncheckedIOException(ioe);
-			}
+		try (ReadableCharacterStream rcs = ReadableCharacterStream.newInstance(pIn, false)) {
+			parse(rcs, pConsumer);
+		} catch (IOException ioe) {
+			throw new UncheckedIOException(ioe);
 		}
 	}
 

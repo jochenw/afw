@@ -15,12 +15,15 @@
  */
 package com.github.jochenw.afw.core.el.tree;
 
+import java.io.Serializable;
 
 /**
  * An expression for inverting the logical meaning of
  * another expression.
  */
-public class UnaryExpression {
+public class UnaryExpression implements Serializable {
+	private static final long serialVersionUID = 7351814301502101436L;
+
 	/** The unary expressions operator.
 	 */
 	public static enum Op {
