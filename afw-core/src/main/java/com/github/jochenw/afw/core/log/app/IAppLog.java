@@ -6,7 +6,10 @@ package com.github.jochenw.afw.core.log.app;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -94,9 +97,9 @@ public interface IAppLog {
     public default void log(Level pLevel, String pMsg, Throwable pTh) {
     	if (isEnabled(pLevel)) {
     		final FailableConsumer<OutputStream,IOException> consumer = (out) -> {
-    			final PrintStream ps = new PrintStream(out);
-    			pTh.printStackTrace(ps);
-    			ps.flush();
+    			final PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, Charset.defaultCharset()));
+    			pTh.printStackTrace(pw);
+    			pw.flush();
     		};
     		log(pLevel, pMsg, consumer);
     	}

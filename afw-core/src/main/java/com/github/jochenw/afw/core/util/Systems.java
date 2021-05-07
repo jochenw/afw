@@ -1,10 +1,11 @@
 package com.github.jochenw.afw.core.util;
 
+import java.util.Locale;
 
 /** Utility class, which provides information about the operating system.
  */
 public class Systems {
-	private static String OS = System.getProperty("os.name").toLowerCase();
+	private static String OS = System.getProperty("os.name").toLowerCase(Locale.US);
 	private static boolean isWindows = OS.contains("win");
 	private static boolean isMac = OS.contains("mac");
 	private static boolean isLinuxOrUnix = (OS.contains("nix") || OS.contains("nux") || OS.contains("aix") || OS.contains("sunos"));

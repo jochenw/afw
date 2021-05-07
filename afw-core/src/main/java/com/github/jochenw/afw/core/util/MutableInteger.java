@@ -38,8 +38,20 @@ public class MutableInteger extends Number implements Comparable<MutableInteger>
     }
 
     @Override
-	public int compareTo(MutableInteger pOthetMutableInteger) {
-    	return Integer.compare(value, pOthetMutableInteger.getValue());
+	public int compareTo(MutableInteger pOtherMutableInteger) {
+    	return Integer.compare(value, pOtherMutableInteger.getValue());
+	}
+
+    @Override
+	public boolean equals(Object pObj) {
+    	// This Integer is mutable, so we can't simply compare the values.
+		return super.equals(pObj);
+	}
+
+	@Override
+	public int hashCode() {
+    	// This Integer is mutable, so we can't simply use the values hash code.
+		return super.hashCode();
 	}
 
     @Override

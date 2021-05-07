@@ -42,6 +42,18 @@ public class MutableLong extends Number implements Comparable<MutableLong> {
 	}
 
     @Override
+	public boolean equals(Object pObj) {
+    	// This Long is mutable, so we can't simply compare the values.
+		return super.equals(pObj);
+	}
+
+	@Override
+	public int hashCode() {
+    	// This Long is mutable, so we can't simply use the values hash code.
+		return super.hashCode();
+	}
+
+    @Override
 	public int intValue() {
     	return (int) value;
 	}

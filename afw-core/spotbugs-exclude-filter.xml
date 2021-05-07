@@ -22,14 +22,25 @@
   put here to instruct spotbugs it must ignore them.
 -->
 <FindBugsFilter>
-  <Match>
+  <And>
+    <Bug code="ES"/>
     <Class name="com.github.jochenw.afw.core.inject.DefaultOnTheFlyBinder"/>
-    <Method name="getPropInjectProvider"/>
-    <Bug pattern="ES_COMPARING_STRINGS_WITH_EQ"/>
-  </Match>
-  <Match>
-    <Class name="com.github.jochenw.afw.core.io.CircularBufferInputStreamTest"/>
-    <Method name="newInputBuffer"/>
-    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
-  </Match>
+  </And>
+  <And>
+    <Bug code="Nm"/>
+    <Class name="~com.github.jochenw.afw.core.el.jcc\.[^.]+"/>
+  </And>
+  <LastVersion value="-1" relOp="NEQ"/>
+  <And>
+    <Class name="com.github.jochenw.afw.core.plugins.DependencyResolver$DuplicateNodeIdException"/>
+    <Bug pattern="SE_BAD_FIELD"/>
+  </And>
+  <And>
+    <Class name="com.github.jochenw.afw.core.plugins.DependencyResolver$UnknownNodeIdException"/>
+    <Bug pattern="SE_BAD_FIELD"/>
+  </And>
+  <And>
+    <Class name="~com.github.jochenw.afw.core.el.jcc\.[^.]+"/>
+    <Bug pattern="DM_DEFAULT_ENCODING"/>
+  </And>
 </FindBugsFilter>

@@ -57,9 +57,6 @@ public class PluginListParser {
 	/** Interface of an initializer specification, as read by the parser.
 	 */
 	public interface IInitializerSpec {
-		/** Default return value for {@link #getProperties()}.
-		 */
-		static final Map<String,String> EMPTY_MAP = new HashMap<>();
 		/**
 		 * Returns the initializers class name.
 		 * @return The initializers class name.
@@ -84,6 +81,10 @@ public class PluginListParser {
 		 */
 		public @Nonnull default Map<String,String> getProperties() { return EMPTY_MAP; }
 	}
+	/** Default return value for {@link #getProperties()}.
+	 */
+	static final Map<String,String> EMPTY_MAP = new HashMap<>();
+
 	/** Interface of a listener for initializer specifications.
 	 * The {@link PluginListHandler} requires such a listener to report what it reads.
 	 */

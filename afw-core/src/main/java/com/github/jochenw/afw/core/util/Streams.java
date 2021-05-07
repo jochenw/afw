@@ -440,7 +440,7 @@ public class Streams {
      *   object.
      * @throws IOException Reading the input stream has failed.
      */
-    public static Properties load(InputStream pIn, String pUri) throws IOException {
+    public static @Nonnull Properties load(InputStream pIn, String pUri) throws IOException {
     	final Properties props = new Properties();
     	if (pUri.endsWith(".xml")) {
     		props.loadFromXML(pIn);
@@ -456,7 +456,7 @@ public class Streams {
      * @return The contents of the given file, as a {@link java.util.Properties}
      *   object.
      */
-    public static Properties load(Path pPath) {
+    public static @Nonnull Properties load(Path pPath) {
     	return Streams.apply(pPath, (in) -> { return load(in, pPath.getFileName().toString()); });
     }
 
@@ -466,7 +466,7 @@ public class Streams {
      * @return The contents of the given file, as a {@link java.util.Properties}
      *   object.
      */
-    public static java.util.Properties load(File pFile) {
+    public static @Nonnull java.util.Properties load(File pFile) {
     	return Streams.apply(pFile, (in) -> { return load(in, pFile.getName()); });
     }
 
@@ -476,7 +476,7 @@ public class Streams {
      * @return The contents of the given URL, as a {@link java.util.Properties}
      *   object.
      */
-    public static java.util.Properties load(URL pUrl) {
+    public static @Nonnull java.util.Properties load(URL pUrl) {
     	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
     }
 

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
@@ -551,9 +552,9 @@ public class Strings {
 			patternStr = sb.toString();
 		} else {
 			if (caseInsensitive) {
-				final String lcMatcher = matcher.toLowerCase();
+				final String lcMatcher = matcher.toLowerCase(Locale.getDefault());
 				return (s) -> {
-					final boolean stringMatch = s.toLowerCase().equals(lcMatcher);
+					final boolean stringMatch = s.toLowerCase(Locale.getDefault()).equals(lcMatcher);
 					return excluding ? !stringMatch : stringMatch;
 				};
 			} else {

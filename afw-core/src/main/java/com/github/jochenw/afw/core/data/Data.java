@@ -53,8 +53,8 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Object requireString(@Nonnull FailableFunction<String,Object,?> pData, @Nonnull String pKey,
-			                             @Nonnull String pDescription) {
+	public static @Nonnull String requireString(@Nonnull FailableFunction<String,Object,?> pData, @Nonnull String pKey,
+			                                    @Nonnull String pDescription) {
 		Object value = getValue(pData, pKey);
 		if (value == null) {
 			throw new NullPointerException("Missing value for " + pDescription);
@@ -110,7 +110,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Object getString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey, @Nonnull String pDescription) {
+	public static @Nullable String getString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey, @Nonnull String pDescription) {
 		return getString(pMap::get, pKey, pDescription);
 	}
 	/** Extracts a string from the given map.
@@ -120,7 +120,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Object getString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
+	public static @Nullable String getString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
 		return requireString(pMap::get, pKey, "map value " + pKey);
 	}
 	/** Extracts a string from the given properties.
@@ -131,7 +131,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Object getString(@Nonnull Properties pProperties, @Nonnull String pKey, @Nonnull String pDescription) {
+	public static @Nullable String getString(@Nonnull Properties pProperties, @Nonnull String pKey, @Nonnull String pDescription) {
 		return getString(pProperties::get, pKey, pDescription);
 	}
 	/** Extracts a string from the given map.
@@ -141,7 +141,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Object getString(@Nonnull Properties pProperties, @Nonnull String pKey) {
+	public static @Nullable String getString(@Nonnull Properties pProperties, @Nonnull String pKey) {
 		return getString(pProperties::get, pKey, "property " + pKey);
 	}
 	/** Extracts a non-empty string from the given map.
@@ -153,8 +153,8 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Object requireString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey,
-			                             @Nonnull String pDescription) {
+	public static @Nonnull String requireString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey,
+			                                    @Nonnull String pDescription) {
 		return requireString(pMap::get, pKey, pDescription);
 	}
 	/** Extracts a non-empty string from the given map.
@@ -165,7 +165,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Object requireString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
+	public static @Nonnull String requireString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
 		return requireString(pMap::get, pKey, "Map value " + pKey);
 	}
 	/** Extracts a non-empty string from the given property set.
@@ -189,7 +189,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Object requireString(@Nonnull Properties pProperties, @Nonnull String pKey) {
+	public static @Nonnull String requireString(@Nonnull Properties pProperties, @Nonnull String pKey) {
 		return requireString(pProperties::get, pKey, "Map value " + pKey);
 	}
 	/** Extracts a path value from the given map.

@@ -45,8 +45,10 @@ public class CsvWriter implements AutoCloseable {
 	 *   first line.
 	 */
 	public CsvWriter(OutputStream pOut, String[] pHeader) {
+		// This used to be a simple header = pHeader, but Spotbugs doesn't like this.
+		header = new String[pHeader.length];
+		System.arraycopy(pHeader, 0, header, 0, pHeader.length);
 		try {
-			header = pHeader;
 			lineSeparator = System.lineSeparator();
 			final BufferedOutputStream myBos;
 			if (pOut instanceof BufferedOutputStream) {

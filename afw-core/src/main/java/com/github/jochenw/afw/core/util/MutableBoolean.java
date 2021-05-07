@@ -43,7 +43,19 @@ public class MutableBoolean implements Serializable, Comparable<MutableBoolean> 
 		return Boolean.compare(value, pOtherMutableBoolean.getValue());
 	}
 
-    /**
+    @Override
+	public boolean equals(Object pObj) {
+    	// This Boolean is mutable, so we can't simply compare the values.
+		return super.equals(pObj);
+	}
+
+	@Override
+	public int hashCode() {
+    	// This Boolean is mutable, so we can't simply use the values hash code.
+		return super.hashCode();
+	}
+
+	/**
      * Shortcut for {@link #setValue(boolean) setValue(true)}.
      */
 	public void set() {

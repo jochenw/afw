@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.core.io;
 
 import java.io.File;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -14,6 +15,7 @@ import java.util.zip.ZipInputStream;
 
 import com.github.jochenw.afw.core.io.IResourceRepository;
 import com.github.jochenw.afw.core.io.IResourceRepository.IResource;
+import com.github.jochenw.afw.core.util.Exceptions;
 
 
 /**
@@ -119,9 +121,26 @@ public class ZipFileResourceRepository implements IResourceRepository {
 		if (resource instanceof ZipFileResource) {
 			final ZipFileResource zfr = (ZipFileResource) resource;
 			@SuppressWarnings("resource")
-			final ZipFile zf = new ZipFile(zfr.zipFile.toFile());
-			final ZipEntry ze = zf.getEntry(zfr.entry);
-			return zf.getInputStream(ze);
+			ZipFile zf = null;
+			try {
+				zf = new ZipFile(zfr.zipFile.toFile());
+				final ZipFile zfFinal = zf;
+				final ZipEntry ze = zfFinal.getEntry(zfr.entry);
+				final InputStream in = zfFinal.getInputStream(ze);
+				final FilterInputStream result = new FilterInputStream(in) {
+					@Override
+					public void close() throws IOException {
+						super.close();
+						zfFinal.close();
+					}
+				};
+				return result;
+			} catch (Throwable t) {
+				if (zf != null) {
+					try { zf.close(); } catch (IOException e) { /* Ignore this, and throw the cause. */ }
+				}
+				throw Exceptions.show(t);
+			}
 		} else {
 			throw new IllegalArgumentException("Invalid resource type: " + resource.getClass().getName());
 		}
@@ -141,9 +160,22 @@ public class ZipFileResourceRepository implements IResourceRepository {
 			if (resource instanceof ZipFileResource) {
 				final ZipFileResource zfr = (ZipFileResource) resource;
 				@SuppressWarnings("resource")
-				final ZipFile zf = new ZipFile(zfr.zipFile.toFile());
-				final ZipEntry ze = zf.getEntry(zfr.getUri());
-				return zf.getInputStream(ze);
+				ZipFile zf = new ZipFile(zfr.zipFile.toFile());
+				try {
+					final ZipEntry ze = zf.getEntry(zfr.getUri());
+					return new FilterInputStream(zf.getInputStream(ze)) {
+						@Override
+						public void close() throws IOException {
+							super.close();
+							zf.close();
+						}
+					};
+				} catch (Throwable t) {
+					if (zf != null) {
+						try { zf.close(); } catch (Throwable th) { /* Ignore this, throw the cause. */ }
+					}
+					throw Exceptions.show(t);
+				}
 			} else {
 				throw new IllegalArgumentException("Invalid resource type: " + resource.getClass().getName());
 			}

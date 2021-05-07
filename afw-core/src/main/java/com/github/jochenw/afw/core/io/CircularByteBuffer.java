@@ -257,7 +257,7 @@ public class CircularByteBuffer {
 	 * @return The converted byte buffer.
 	 */
 	public String toString() {
-		return new String(getBytes());
+		return new String(getBytes(), Charset.defaultCharset());
 	}
 	/** Converts the current contents of the byte buffer into
 	 * a string, applying the given character set.

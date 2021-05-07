@@ -19,6 +19,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.Locator;
+import org.xml.sax.helpers.LocatorImpl;
 
 import com.google.common.base.Supplier;
 
@@ -29,14 +30,26 @@ public class DomHelper {
 	 */
 	public static class LocalizableException extends RuntimeException {
 		private static final long serialVersionUID = 618692900801230917L;
-		private @Nullable final Locator locator;
+		private final String systemId, publicId;
+		private final int lineNumber, columnNumber;
+
 		/** Creates a new instance with the given error location, the given message, and no cause.
 		 * @param pLocator The error location.
 		 * @param pMessage The error message.
 		 */
 		public LocalizableException(@Nullable Locator pLocator, @Nonnull String pMessage) {
 			super(pMessage);
-			locator = Sax.clone(pLocator);
+			if (pLocator == null) {
+				systemId = null;
+				publicId = null;
+				lineNumber = -1;
+				columnNumber = -1;
+			} else {
+				systemId = pLocator.getSystemId();
+				publicId = pLocator.getPublicId();
+				lineNumber = pLocator.getLineNumber();
+				columnNumber = pLocator.getColumnNumber();
+			}
 		}
 		/** Creates a new instance with the given error location, the given message, and the given cause.
 		 * @param pLocator The error location.
@@ -45,7 +58,17 @@ public class DomHelper {
 		 */
 		public LocalizableException(@Nullable Locator pLocator, @Nonnull String pMessage, @Nonnull Throwable pCause) {
 			super(pMessage, pCause);
-			locator = Sax.clone(pLocator);
+			if (pLocator == null) {
+				systemId = null;
+				publicId = null;
+				lineNumber = -1;
+				columnNumber = -1;
+			} else {
+				systemId = pLocator.getSystemId();
+				publicId = pLocator.getPublicId();
+				lineNumber = pLocator.getLineNumber();
+				columnNumber = pLocator.getColumnNumber();
+			}
 		}
 		/** Creates a new instance with the given error location, no message, and the given cause.
 		 * @param pLocator The error location.
@@ -53,14 +76,58 @@ public class DomHelper {
 		 */
 		public LocalizableException(@Nullable Locator pLocator, @Nonnull Throwable pCause) {
 			super(pCause);
-			locator = Sax.clone(pLocator);
+			if (pLocator == null) {
+				systemId = null;
+				publicId = null;
+				lineNumber = -1;
+				columnNumber = -1;
+			} else {
+				systemId = pLocator.getSystemId();
+				publicId = pLocator.getPublicId();
+				lineNumber = pLocator.getLineNumber();
+				columnNumber = pLocator.getColumnNumber();
+			}
 		}
 		/**
 		 * Returns the error location, if available, or null.
 		 * @return The error location, if available, or null.
 		 */
 		public @Nullable Locator getLocator() {
-			return locator;
+			if (systemId == null  &&  publicId == null  &&  lineNumber == -1  &&  columnNumber == -1) {
+				return null;
+			} else {
+				final LocatorImpl locator = new LocatorImpl();
+				locator.setColumnNumber(columnNumber);
+				locator.setLineNumber(lineNumber);
+				locator.setPublicId(publicId);
+				locator.setSystemId(systemId);
+				return locator;
+			}
+		}
+
+		/** Returns the system id of the exceptions location.
+		 * @return The system id of the exceptions location.
+		 */
+		public String getSystemId() {
+			return systemId;
+		}
+		/** Returns the public id of the exceptions location.
+		 * @return The public id of the exceptions location.
+		 */
+		public String getPublicId() {
+			return publicId;
+		}
+		/** Returns the linue number of the exceptions location.
+		 * @return The line number of the exceptions location.
+		 */
+		public int getLineNumber() {
+			return lineNumber;
+		}
+		/** Returns the column number of the exceptions location.
+		 * @return The column number of the exceptions location.
+		 */
+		public int getColumnNumber() {
+			return columnNumber;
 		}
 	}
 	/** Implementation class for the various getChildren methods.
