@@ -240,8 +240,8 @@ public class Tests {
 	 */
 	public static Path setupTestDirectory(Class<?> pTestClass, Path pSourceDir) {
 		final Path testDir = requireTestDirectory(pTestClass);
-		com.github.jochenw.afw.core.util.Files.removeDirectory(testDir);
-		com.github.jochenw.afw.core.util.Files.copyDirectory(pSourceDir, testDir);
+		com.github.jochenw.afw.core.util.FileUtils.removeDirectory(testDir);
+		com.github.jochenw.afw.core.util.FileUtils.copyDirectory(pSourceDir, testDir);
 		return testDir;
 	}
 

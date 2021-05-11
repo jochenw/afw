@@ -92,7 +92,7 @@ public class DefaultZipHandlerTest {
 		zfh.createZipFile(srcDir, zipFile, true);
 		final Path workSrcDir = workDir.resolve("src");
 		if (Files.exists(workSrcDir)) {
-			com.github.jochenw.afw.core.util.Files.removeDirectory(workSrcDir);
+			com.github.jochenw.afw.core.util.FileUtils.removeDirectory(workSrcDir);
 		}
 		zfh.extractZipFile(workDir, zipFile);
 		final AbstractFileVisitor fv = new AbstractFileVisitor(true) {

@@ -15,26 +15,14 @@
  */
 package com.github.jochenw.afw.core.util;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.io.UncheckedIOException;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.Function;
-
-import com.github.jochenw.afw.core.props.DefaultInterpolator;
-import com.github.jochenw.afw.core.props.Interpolator;
 
 
 /** Utility class for working with files, and directories.
+ * @deprecated Use {@link FileUtils}.
  */
 public class Files {
 	/** Copies the directory {@code pSource}, to the directory {@code pTrget}.
@@ -45,23 +33,7 @@ public class Files {
 	 * @throws UncheckedIOException Copying failed.
 	 */
 	public static void copyDirectory(final Path pSource, final Path pTarget) {
-		try {
-			java.nio.file.Files.walk(pSource).forEach(a -> {
-				final Path relativePath = pSource.relativize(a);
-				final Path b = pTarget.resolve(relativePath);
-				try {
-					if (java.nio.file.Files.isDirectory(a)) {
-						java.nio.file.Files.createDirectories(b);
-					} else {
-						java.nio.file.Files.copy(a, b, StandardCopyOption.REPLACE_EXISTING);
-					}
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			});
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		FileUtils.copyDirectory(pSource, pTarget);
 	}
 
 	/** Copies the directory {@code pSource}, to the directory {@code pTarget}.
@@ -74,31 +46,7 @@ public class Files {
 	 * @throws UncheckedIOException Copying failed.
 	 */
 	public static void copyDirectory(final Path pSource, final Path pTarget, Function<String,String> pMapper) {
-		try {
-			java.nio.file.Files.walk(pSource).forEach(a -> {
-				final Path relativePath = pSource.relativize(a);
-				final Path b = pTarget.resolve(relativePath);
-				try {
-					if (java.nio.file.Files.isDirectory(a)) {
-						java.nio.file.Files.createDirectories(b);
-					} else {
-						final Interpolator interpolator = new DefaultInterpolator(pMapper);
-						final StringWriter sw = new StringWriter();
-						try (Reader reader = java.nio.file.Files.newBufferedReader(a, StandardCharsets.UTF_8)) {
-							Streams.copy(reader, sw);
-						}
-						final String contents = interpolator.interpolate(sw.toString());
-						try (Writer w = java.nio.file.Files.newBufferedWriter(b)) {
-							w.write(contents);
-						}
-					}
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			});
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		FileUtils.copyDirectory(pSource, pTarget, pMapper);
 	}
 
 	/**
@@ -107,24 +55,7 @@ public class Files {
 	 * @throws UncheckedIOException Removal failed.
 	 */
 	public static void removeDirectory(Path pDir) {
-		final FileVisitor<Path> sfv = new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path pFile, BasicFileAttributes pAttrs) throws IOException {
-				java.nio.file.Files.delete(pFile);
-				return super.visitFile(pFile, pAttrs);
-			}
-
-			@Override
-			public FileVisitResult postVisitDirectory(Path pDir, IOException pExc) throws IOException {
-				java.nio.file.Files.delete(pDir);
-				return super.postVisitDirectory(pDir, pExc);
-			}
-		};
-		try {
-			java.nio.file.Files.walkFileTree(pDir, sfv);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		FileUtils.removeDirectory(pDir);
 	}
 
 	/** <p>Constructs a path, which is guaranteed to be within the base directory {@code pBaseDir}.</p>
@@ -137,17 +68,7 @@ public class Files {
 	 *   name, and outside the base directory.
 	 */
 	public static Path resolve(Path pBaseDir, String pRelativePath) {
-		final Path path = java.nio.file.Paths.get(pRelativePath);
-		if (path.isAbsolute()) {
-			if (isWithin(pBaseDir, path)) {
-				return path;
-			} else {
-				throw new IllegalArgumentException("Invalid path: " + path
-						+ " (Not within " + pBaseDir + ")");
-			}
-		} else {
-			return pBaseDir.resolve(path);
-		}
+		return FileUtils.resolve(pBaseDir, pRelativePath);
 	}
 
 	/** Checks, whether a given file, or directory, is located within another directory.
@@ -157,15 +78,7 @@ public class Files {
 	 *     directory {@code pDir}, otherwise false.
 	 */
 	public static boolean isWithin(Path pDir, Path pPath) {
-		Path p = pPath;
-		while (p != null) {
-			if (p.equals(pDir)) {
-				return true;
-			} else {
-				p = p.getParent();
-			}
-		}
-		return false;
+		return FileUtils.isWithin(pDir, pPath);
 	}
 
 	/**
