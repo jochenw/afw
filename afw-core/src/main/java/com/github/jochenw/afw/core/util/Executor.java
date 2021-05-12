@@ -6,6 +6,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
@@ -18,6 +24,8 @@ import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 /** A component for executing commands as external processes.
  */
 public class Executor {
+	private static final @Nonnull ExecutorService DEFAULT_EXECUTOR_SERVICE = Executors.newFixedThreadPool(5);
+
 	/** Interface of a listener, which is being notified about the external processes
 	 * status.
 	 */
@@ -53,6 +61,32 @@ public class Executor {
 	public static final Consumer<InputStream> CONSUMER_COPY_TO_SYSTEM_ERR = (in) -> {
 		Streams.copy(in, System.err);
 	};
+
+	private ExecutorService executorService;
+
+	/** Sets the {@link ExecutorService}, which is being used to launch threads. May be null,
+	 * in which case a {@link Executor#DEFAULT_EXECUTOR_SERVICE default executor service}
+	 * will be used.
+	 * @param pExecutorService The {@link ExecutorService}, which is being used to launch threads. May be null,
+	 * in which case a {@link Executor#DEFAULT_EXECUTOR_SERVICE default executor service}
+	 * will be used. 
+	 */
+	public void setExecutorService(@Nullable ExecutorService pExecutorService) {
+		executorService = pExecutorService;
+	}
+	/** Returns the {@link ExecutorService}, which is being used to launch threads. By default,
+	 * a {@link Executor#DEFAULT_EXECUTOR_SERVICE default executor service} will be used.
+	 * @return The {@link ExecutorService}, which is being used to launch threads. Never null,
+	 * because a {@link Executor#DEFAULT_EXECUTOR_SERVICE default executor service}
+	 * is available. 
+	 */
+	public @Nonnull ExecutorService getExecutorService() {
+		if (executorService == null) {
+			return DEFAULT_EXECUTOR_SERVICE;
+		} else {
+			return executorService;
+		}
+	}
 
 	/** Called to execute the command {@code pCmd}, using the environment {@code pEnv},
 	 * in the directory {@code pDir}.
@@ -119,50 +153,36 @@ public class Executor {
 		try {
 			final File dir = pDir == null ? null : pDir.toFile();
 			final Process pr = Runtime.getRuntime().exec(pCmd, pEnv, dir);
-			// Number of active threads
-			final MutableInteger mi = new MutableInteger();
-			mi.setValue(2);
-			startConsumer(pr.getInputStream(), pStdOutputConsumer, () -> {
-				synchronized(mi) {
-					mi.dec();
-				}
-			});
-			startConsumer(pr.getErrorStream(), pErrOutputConsumer, () -> {
-				synchronized(mi) {
-					mi.dec();
-				}
-			});
+			final List<Callable<Object>> callables = new ArrayList<>();
+			final MutableInteger status = new MutableInteger();
+			callables.add(startConsumer(pr.getInputStream(), pStdOutputConsumer));
+			callables.add(startConsumer(pr.getErrorStream(), pErrOutputConsumer));
 			if (input != null) {
-				final Runnable runnable = () -> Functions.accept(input, pr.getOutputStream());
-				final Thread t = new Thread(runnable, getThreadName());
-				t.setDaemon(isUsingDaemonThreads());
-				t.start();
+				callables.add(() -> {
+					Functions.accept(input, pr.getOutputStream());
+					return null;
+				});
 			}
-			final int status = pr.waitFor();
-			for (;;) {
-				final int numberOfThreads;
-				synchronized(mi) {
-					numberOfThreads = mi.getValue();
-					if (numberOfThreads == 0) {
-						break;
-					}
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-					}
+			callables.add(() -> {
+				final int stat = pr.waitFor();
+				status.setValue(stat);
+				if (pExitCodeHandler != null) {
+					pExitCodeHandler.accept(stat);
 				}
+				return null;
+			});
+			final List<Future<Object>> futures = getExecutorService().invokeAll(callables);
+			for (Future<Object> future : futures) {
+				future.get();
 			}
-			if (pExitCodeHandler != null) {
-				pExitCodeHandler.accept(status);
-			}
-			return status;
+			return status.getValue();
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
 	}
 
-	protected void startConsumer(@Nonnull InputStream pIn, Consumer<InputStream> pConsumer, Runnable pTerminator) {
-		final Runnable runnable = () -> {
+	protected Callable<Object> startConsumer(@Nonnull InputStream pIn, Consumer<InputStream> pConsumer) {
+		return () -> {
 			if (pConsumer != null) {
 				pConsumer.accept(pIn);
 			} else {
@@ -180,11 +200,8 @@ public class Executor {
 					}
 				}
 			}
-			pTerminator.run();
+			return null;
 		};
-		final Thread t = new Thread(runnable, getThreadName());
-		t.setDaemon(isUsingDaemonThreads());
-		t.start();
 	}
 
 	private boolean isUsingDaemonThreads = true;
