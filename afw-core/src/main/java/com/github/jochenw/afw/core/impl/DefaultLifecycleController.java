@@ -110,8 +110,12 @@ public class DefaultLifecycleController implements ILifecycleController {
 	}
 
 	@Override
-	public void removeListener(Listener pListener) {
-		switch(state) {
+	public synchronized void removeListener(Listener pListener) {
+		final int st;
+		synchronized (this) {
+			st = state;
+		}
+		switch(st) {
 		case 0:
 			startableListeners.remove(pListener);
 			break;
