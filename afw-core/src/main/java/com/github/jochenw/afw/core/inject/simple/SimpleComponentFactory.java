@@ -194,14 +194,17 @@ public class SimpleComponentFactory implements IComponentFactory {
 
 		@Override
 		public T get() {
-			if (!initialized) {
-				synchronized(this) {
+			final T inst;
+			synchronized(this) {
+				if (initialized) {
+					inst = instance;
+				} else {
 					if (!created) {
 						instance = provider.get();
 						created = true;
 					}
+					inst = instance;
 					if (!initialized) {
-						instance = provider.get();
 						if (!initializing) {
 							initializing = true;
 							init(instance);
@@ -210,7 +213,7 @@ public class SimpleComponentFactory implements IComponentFactory {
 					}
 				}
 			}
-			return instance;
+			return inst;
 		}
 	}
 	protected Binding<?> newBinding(Provider<?> pProvider, Scope pScope) {
