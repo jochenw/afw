@@ -121,7 +121,7 @@ public class Data {
 	 *   is not a string.
 	 */
 	public static @Nullable String getString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
-		return requireString(pMap::get, pKey, "map value " + pKey);
+		return requireString(pMap::get, pKey, "Map key " + pKey);
 	}
 	/** Extracts a string from the given properties.
 	 * @param pProperties The property set, from which a value is being extracted.
@@ -166,7 +166,7 @@ public class Data {
 	 *   is empty, or not a string.
 	 */
 	public static @Nonnull String requireString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
-		return requireString(pMap::get, pKey, "Map value " + pKey);
+		return requireString(pMap::get, pKey, "Map key " + pKey);
 	}
 	/** Extracts a non-empty string from the given property set.
 	 * @param pProperties The property set, from which a value is being extracted.
@@ -190,7 +190,7 @@ public class Data {
 	 *   is empty, or not a string.
 	 */
 	public static @Nonnull String requireString(@Nonnull Properties pProperties, @Nonnull String pKey) {
-		return requireString(pProperties::get, pKey, "Map value " + pKey);
+		return requireString(pProperties::get, pKey, "Property " + pKey);
 	}
 	/** Extracts a path value from the given map.
 	 * @param pMap The map, from which a value is being extracted.
@@ -214,7 +214,7 @@ public class Data {
 	 *   is empty, or not a string.
 	 */
 	public static @Nonnull Path requirePath(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
-		return requirePath(pMap::get, pKey, "Map value " + pKey);
+		return requirePath(pMap::get, pKey, "Map key " + pKey);
 	}
 	/** Extracts a path value from the given property set.
 	 * @param pProperties The property set, from which a value is being extracted.
@@ -238,7 +238,7 @@ public class Data {
 	 *   is empty, or not a string.
 	 */
 	public static @Nonnull Path requirePath(@Nonnull Properties pProperties, @Nonnull String pKey) {
-		return requirePath(pProperties::get, pKey, "Map value " + pKey);
+		return requirePath(pProperties::get, pKey, "Property " + pKey);
 	}
 	/** Extracts a boolean value from the given data store.
 	 * @param pData The data store, from which a value is being extracted.
@@ -259,7 +259,7 @@ public class Data {
 				return (Boolean) value;
 			} else {
 				throw new IllegalArgumentException("Invalid value for " + pDescription
-						                        + ": Expected string, got " + value.getClass().getName());
+						                        + ": Expected boolean, or string, got " + value.getClass().getName());
 			}
 		}
 	}
@@ -282,7 +282,7 @@ public class Data {
 	 *   is not a string.
 	 */
 	public static @Nullable Boolean getBoolean(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
-		return getBoolean(pMap::get, pKey, "Map value " + pKey);
+		return getBoolean(pMap::get, pKey, "Map key " + pKey);
 	}
 	/** Extracts a boolean value from the given property set.
 	 * @param pProperties The property set, from which a value is being extracted.

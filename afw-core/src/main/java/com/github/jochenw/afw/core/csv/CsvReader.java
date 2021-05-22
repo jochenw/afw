@@ -15,7 +15,6 @@
  */
 package com.github.jochenw.afw.core.csv;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -23,8 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import javax.annotation.Nonnull;
 
 import com.github.jochenw.afw.core.io.ReadableCharacterStream;
 
