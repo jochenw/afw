@@ -44,7 +44,7 @@ public abstract class ArgsHandler<O extends Object> {
 		public void accept(Args.Context pCtx, T pOptionBean, String pOptionName, String pMainOptionName) throws Exception;
 	}
 	/** A registered option
-     * @param <T> Type of the option bean.
+         * @param <T> Type of the option bean.
 	 */
 	public interface Option<T> extends OptionHandler<T> {
 		/** Returns the main option name.
@@ -53,6 +53,11 @@ public abstract class ArgsHandler<O extends Object> {
 		public String getMainOptionName();
 	}
 
+        /** Called to parse the given arguments array, returning an option bean.
+         * @param pArgs The array of command line arguments.
+         * @return The option bean, that has been created, and configured by
+         *   parsing the command line arguments.
+         */
 	protected O parse(String[] pArgs) {
 		final O o = newOptionBean();
 		Args.parse(getListener(o), pArgs);
@@ -66,35 +71,38 @@ public abstract class ArgsHandler<O extends Object> {
 		final O options = parse(pArgs);
 		try {
 			run(options);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throw Exceptions.show(t);
 		}
 	}
 
+        /** Called to create a {@link Args.Listener}, which will be called
+         * whenever the use of a command line option has been detected.
+         * @param pOptionBean The option bean, that is being configured
+         *   by the listener.
+         * @return The created listener.
+         */
 	protected Args.Listener getListener(O pOptionBean){
 		final Map<String,Option<O>> options = new HashMap<>();
-		final OptionRegistry<O> registry = new OptionRegistry<O>() {
-			@Override
-			public void register(@Nonnull OptionHandler<O> pHandler, @Nonnull String... pOptionNames) {
-				final OptionHandler<O> handler = Objects.requireNonNull(pHandler, "Handler");
-				final String[] optionNames = com.github.jochenw.afw.core.util.Objects.requireAllNonNull(pOptionNames, "Option Names");
-				if (optionNames.length == 0) {
-					throw new IllegalArgumentException("At least one option name is required.");
-				}
-				final String mainOptionName = optionNames[0];
-				final Option<O> option = new Option<O>() {
-					@Override
-					public String getMainOptionName() { return mainOptionName; }
-					@Override
-					public void accept(Context pCtx, O pOptionBean, String pName, String pMainOptionName) throws Exception {
-						handler.accept(pCtx, pOptionBean, pName, pMainOptionName);
-					}
-				};
-				for (String optionName : optionNames) {
-					options.put(optionName, option);
-				}
-			}
-		};
+		final OptionRegistry<O> registry = (@Nonnull OptionHandler<O> pHandler, @Nonnull String... pOptionNames) -> {
+                    final OptionHandler<O> handler = Objects.requireNonNull(pHandler, "Handler");
+                    final String[] optionNames = com.github.jochenw.afw.core.util.Objects.requireAllNonNull(pOptionNames, "Option Names");
+                    if (optionNames.length == 0) {
+                        throw new IllegalArgumentException("At least one option name is required.");
+                    }
+                    final String mainOptionName = optionNames[0];
+                    final Option<O> option = new Option<O>() {
+                        @Override
+                        public String getMainOptionName() { return mainOptionName; }
+                        @Override
+                        public void accept(Context pCtx, O pOptionBean, String pName, String pMainOptionName) throws Exception {
+                            handler.accept(pCtx, pOptionBean, pName, pMainOptionName);
+                        }
+                    };
+                    for (String optionName : optionNames) {
+                        options.put(optionName, option);
+                    }
+                };
 		registerOptions(registry);
 		return new Listener() {
 			@Override
@@ -110,17 +118,36 @@ public abstract class ArgsHandler<O extends Object> {
 				}
 				try {
 					option.accept(pCtx, pOptionBean, pName, option.getMainOptionName());
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					throw Exceptions.show(t);
 				}
 			}
 		};
 	}
 
+        /** Creates a new option bean.
+         * @return The created option bean.
+         */
 	protected abstract O newOptionBean();
+        /** Called to report an error.
+         * @param pMsg The error message.
+         * @return An Exception, which may be thrown. (If the handler
+         * didn't already throw an Exception itself.)
+         */
 	protected abstract RuntimeException error(String pMsg);
+        /** Called to register possible options in the option registry.
+         * @param pRegistry The registry, on which possible options may
+         *   be invoked.
+         */
 	protected void registerOptions(OptionRegistry<O> pRegistry) {
-		pRegistry.register((ctx, o, name, mainOptionName) -> { throw error(null); }, "help", "h", "?");
+		pRegistry.register((ctx, o, name, mainOptionName) -> {
+                    throw error(null);
+                }, "help", "h", "?");
 	}
+        /** Called to perform the actual task, as configured by the given option
+         * bean.
+         * @param pOptions
+         * @throws Exception 
+         */
 	protected abstract void run(O pOptions) throws Exception;
 }

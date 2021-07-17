@@ -14,6 +14,11 @@ import javax.annotation.Nullable;
 /** Abstract base implementation of {@link ISymbolicLinksHandler}.
  */
 public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHandler {
+        /** Called to assert, that the given path is actually a directory.
+         * @param pTarget The path, which is being checked.
+         * @throws IllegalArgumentException The path doesn't refer to a
+         *   directory.
+         */
 	protected void assertDirectory(Path pTarget) {
 		final Path target = Objects.requireNonNull(pTarget, "The target must not be null.");
 		if (!Files.isDirectory(target)) {
@@ -21,6 +26,11 @@ public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHand
 		}
 	}
 
+        /** Called to assert, that the given path is actually a file.
+         * @param pTarget The path, which is being checked.
+         * @throws IllegalArgumentException The path doesn't refer to a
+         *   file.
+         */
 	protected void assertFile(Path pTarget) {
 		final Path target = Objects.requireNonNull(pTarget, "The target must not be null.");
 		if (!Files.exists(target)  ||  Files.isDirectory(target)) {
@@ -28,23 +38,52 @@ public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHand
 		}
 	}
 
-	protected abstract void createSymbolicDirLink(@Nonnull Path pTarget, @Nonnull Path pLink);
+        /** Creates a symbolic directory link.
+         * @param pTarget The directory, to which the link is supposed to
+         *   refer.
+         * @param pLink The path of the link, that is being created.
+         */
+        protected abstract void createSymbolicDirLink(@Nonnull Path pTarget, @Nonnull Path pLink);
+        /** Creates a symbolic file link.
+         * @param pTarget The file, to which the link is supposed to
+         *   refer.
+         * @param pLink The path of the link, that is being created.
+         */
 	protected abstract void createSymbolicFileLink(@Nonnull Path pTarget, @Nonnull Path pLink);
+        /** Checks, whether the given object is a symbolic link.
+         * @param pPath The path, which is being checked.
+         * @return If the object is a symbolic link: Path of the object, to which the link refers.
+         *   Otherwise null.
+         */
 	protected abstract @Nullable Path checkSymbolicLink(@Nonnull Path pPath);
+        /** Removes a symbolic link.
+         * @param pPath Path of the symbolic link, that is being removed.
+         */
 	protected abstract void removeSymbolicLink(@Nonnull Path pPath);
 
+        /** Creates a directory link.
+         * @param pTarget Path of the directory, to which the created
+         *   link should refer to.
+         * @param pLink Path of the link, that is being created.
+         */
 	@Override
 	public void createDirectoryLink(@Nonnull Path pTarget, @Nonnull Path pLink) {
 		assertDirectory(pTarget);
 		createSymbolicDirLink(pTarget, pLink);
 	}
 
+        /** Creates a file link.
+         * @param pTarget Path of the file, to which the created
+         *   link should refer to.
+         * @param pLink Path of the link, that is being created.
+         */
 	@Override
 	public void createFileLink(Path pTarget, Path pLink) throws UnsupportedOperationException {
 		assertFile(pTarget);
 		createSymbolicFileLink(pTarget, pLink);
 	}
 
+        
 	@Override
 	public Path checkLink(Path pPath) {
 		final Path path = Objects.requireNonNull(pPath, "The path must not be null.");

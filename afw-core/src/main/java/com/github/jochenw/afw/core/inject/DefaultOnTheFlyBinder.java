@@ -109,13 +109,22 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 	@Override
 	public <O> Provider<O> getProvider(IComponentFactory pCf, Field pField) {
 		for (Annotation a : pField.getAnnotations()) {
-			if (a instanceof LogInject) {
-				return getLogInjectProvider(pCf, pField, (LogInject) a);
-			} else if (a instanceof PropInject) {
-				return getPropInjectProvider(pCf, pField, (PropInject) a);
+			final Provider<O> provider = getProviderByAnnotation(pCf, pField, a);
+			if (provider != null) {
+				return provider;
 			}
 		}
 		return null;
+	}
+
+	protected <O> Provider<O> getProviderByAnnotation(IComponentFactory pCf, Field pField, Annotation a) {
+		if (a instanceof LogInject) {
+			return getLogInjectProvider(pCf, pField, (LogInject) a);
+		} else if (a instanceof PropInject) {
+			return getPropInjectProvider(pCf, pField, (PropInject) a);
+		} else {
+			return null;
+		}
 	}
 
 	protected <O> Provider<O> getPropInjectProvider(IComponentFactory pCf, Field pField, PropInject pPropInject) {

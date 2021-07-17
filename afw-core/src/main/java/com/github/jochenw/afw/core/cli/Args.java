@@ -232,7 +232,7 @@ public class Args {
 		private final @Nonnull List<String> args;
 		private String arg;
 		private String name;
-		private Set<String> singleOptionNames = new HashSet<>();
+		private final Set<String> singleOptionNames = new HashSet<>();
 
 		public ContextImpl(@Nonnull Listener pListener, @Nonnull List<String> pArgs) {
 			args = Objects.requireNonNull(pArgs, "Args");
@@ -295,8 +295,10 @@ public class Args {
 
 		@Override
 		public String getSingleValue() throws ArgsException {
-			singleOptionNames.add(getName());
-			return getValue();
+		    if (!singleOptionNames.add(getName())) {
+                        throw listener.error("The option " + name + " may be used only once.");
+                    }
+		    return getValue();
 		}
 
 		@Override

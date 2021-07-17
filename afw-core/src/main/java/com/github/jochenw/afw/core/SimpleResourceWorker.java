@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Objects;
 
 import com.github.jochenw.afw.core.util.Exceptions;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.annotation.Nonnull;
 
 
 /** This class is responsible for collecting resources, that must
@@ -116,21 +120,33 @@ public class SimpleResourceWorker {
 		}
 	}
 
+        /** Called from {@link SimpleResourceTracker#track(java.lang.Object)} to
+         * assert, that the given object can be tracked. This is the
+         * case, if, and only if, {@link #closeResource(java.lang.Object, boolean)}
+         * can close it. The default implementation returns true, if the object
+         * is an instance of {@link AutoCloseable}, or an instance of
+         * {@link HttpURLConnection}. The former includes, for example,
+         * instances of {@link Connection}, {@link Statement}, or
+         * {@link ResultSet}.
+         * @param pResource The object, which is being tracked.
+         */
 	protected void assertTrackable(Object pResource) {
-		Objects.requireNonNull(pResource, "Resource");
-		if (!(pResource instanceof AutoCloseable)
-			&&  !(pResource instanceof HttpURLConnection)) {
-			throw new IllegalStateException("Invalid resource: " + pResource.getClass().getName());
+		final @Nonnull Object resource = Objects.requireNonNull(pResource, "Resource");
+		if (!(resource instanceof AutoCloseable)
+			&&  !(resource instanceof HttpURLConnection)) {
+			throw new IllegalStateException("Invalid resource: "
+                                + resource.getClass().getName());
 		}
 	}
 
 	protected void closeResource(Object pResource, boolean pCommit) throws Throwable {
-		if (pResource instanceof AutoCloseable) {
-			((AutoCloseable) pResource).close();
+		final @Nonnull Object resource = Objects.requireNonNull(pResource, "Resource");
+		if (resource instanceof AutoCloseable) {
+			((AutoCloseable) resource).close();
 		} else if (pResource instanceof HttpURLConnection) {
-			((HttpURLConnection) pResource).disconnect();
+			((HttpURLConnection) resource).disconnect();
 		} else {
-			throw new IllegalStateException("Invalid resource: " + pResource.getClass().getName());
+			throw new IllegalStateException("Invalid resource: " + resource.getClass().getName());
 		}
 	}
 

@@ -82,9 +82,14 @@ public class Objects {
 	 * @param pMessage The exceptions message, if the input value is null.
 	 * @return The input value, if non-null.
 	 */
-	public static @Nonnull <T> T requireNonNull(T pValue, String pMessage) {
-        if (pValue == null)
-            throw new NullPointerException(pMessage);
+	public static @Nonnull <T> T requireNonNull(@Nullable T pValue, String pMessage) {
+        if (pValue == null) {
+        	if (pMessage == null) {
+        		throw new NullPointerException();
+        	} else {
+        		throw new NullPointerException(pMessage);
+        	}
+	    }
         return pValue;
 	}
 

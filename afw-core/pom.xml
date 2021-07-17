@@ -369,6 +369,7 @@
                 </goals>
                 <configuration>
                   <failOnError>false</failOnError>
+                  <fork>false</fork>
                   <excludeFilterFile>spotbugs-exclude-filter.xml</excludeFilterFile>
                 </configuration>
               </execution>

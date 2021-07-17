@@ -19,7 +19,6 @@ import java.net.URL;
 
 import javax.annotation.Nullable;
 
-import org.apache.logging.log4j.util.Strings;
 
 
 /**
@@ -54,7 +53,7 @@ public class DefaultResourceLoader extends ResourceLocator {
 	 * @param pResourcePrefix The resource prefix
 	 */
 	public DefaultResourceLoader(@Nullable String pApplicationName, @Nullable String pInstanceName,
-			                     @Nullable String pResourcePrefix) {
+			             @Nullable String pResourcePrefix) {
 		setApplicationName(pApplicationName);
 		setInstanceName(pInstanceName);
 		resourcePrefix = pResourcePrefix;
@@ -89,9 +88,17 @@ public class DefaultResourceLoader extends ResourceLocator {
 		return findResource(pUri, pClassLoader);
 	}
 
+        /** Called internally from {@link #getResource(ClassLoader,String)}
+         * to implement the possible application of the {@link #getResourcePrefix()}.
+         * @param pUri The URI, which is being searched.
+         * @param pCl The ClassLoader, which is being used for searching.
+         * @return An URL, which matches the specified URI, and can be
+         *   loaded through the given ClassLoader, or null, if no such resource
+         *   has been found.
+         */
 	protected URL findResource(String pUri, ClassLoader pCl) {
 		final String rp = getResourcePrefix();
-		if (Strings.isEmpty(rp)) {
+		if (rp == null  ||  rp.length() == 0) {
 			return pCl.getResource(pUri);
 		} else {
 			if (rp.endsWith("/")) {
