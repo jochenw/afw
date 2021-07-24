@@ -5,6 +5,7 @@ package com.github.jochenw.afw.core.cli;
 
 /** This Exception is thrown by the {@link Args CLI arguments
  * parser} in the default error handler.
+ * @deprecated Use the {@link Cli} class.
  */
 public class ArgsException extends RuntimeException {
 	private static final long serialVersionUID = 8007300717914272977L;

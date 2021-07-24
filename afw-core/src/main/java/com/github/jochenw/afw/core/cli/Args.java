@@ -20,6 +20,7 @@ import com.github.jochenw.afw.core.util.Objects;
 
 
 /** A parser for command line arguments.
+ * @deprecated Use the {@link Cli} class.
  */
 public class Args {
 	/** The Context object is provided by the command line parser when invoking

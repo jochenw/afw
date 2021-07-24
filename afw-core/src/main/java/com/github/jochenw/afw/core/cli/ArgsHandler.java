@@ -14,6 +14,7 @@ import com.github.jochenw.afw.core.util.Exceptions;
  * Abstract base class for deriving Main classes. The implementation follows
  * the assumption, that subclasses should be derivable from a Main class.
  * @param <O> Type of the option bean.
+ * @deprecated Use the {@link Cli} class.
  */
 public abstract class ArgsHandler<O extends Object> {
 	/**
