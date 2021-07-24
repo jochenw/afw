@@ -101,7 +101,12 @@ public class Cli<B> {
 		public Option(Cli<O> pCli, String pPrimaryName, String[] pSecondaryNames) {
 			cli = pCli;
 			primaryName = pPrimaryName;
-			secondaryNames = pSecondaryNames;
+			if (pSecondaryNames == null) {
+				secondaryNames = new String[0];
+			} else {
+				secondaryNames = new String[ pSecondaryNames.length];
+				System.arraycopy(pSecondaryNames, 0, secondaryNames, 0, pSecondaryNames.length);
+			}
 		}
 
 		/** Returns the {@link Cli cli}, that created this option.
