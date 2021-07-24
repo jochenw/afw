@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -213,8 +214,12 @@ public class Cli<B> {
 		/** Returns the options secondary names.
 		 * @return The options secndary names.
 		 */
-		public String[] getSecondaryNames() {
-			return secondaryNames;
+		public List<String> getSecondaryNames() {
+			if (secondaryNames == null) {
+				return Collections.emptyList();
+			} else {
+				return Arrays.asList(secondaryNames);
+			}
 		}
 	}
 
@@ -444,12 +449,10 @@ public class Cli<B> {
 				if (s.equals(opt.getPrimaryName())) {
 					return true;
 				}
-				final String[] secondaryNames = opt.getSecondaryNames();
-				if (secondaryNames != null) {
-					for (String sn : secondaryNames) {
-						if (s.equals(sn)) {
-							return true;
-						}
+				final List<String> secondaryNames = opt.getSecondaryNames();
+				for (String sn : secondaryNames) {
+					if (s.equals(sn)) {
+						return true;
 					}
 				}
 			}
@@ -460,13 +463,11 @@ public class Cli<B> {
 			duplicateName = pOption.getPrimaryName();
 		}
 		if (duplicateName == null) {
-			final String[] secondaryNames = pOption.getSecondaryNames();
-			if (secondaryNames != null) {
-				for (String sn : secondaryNames) {
-					if (existingOptionTest.test(sn)) {
-						duplicateName = sn;
-						break;
-					}
+			final List<String> secondaryNames = pOption.getSecondaryNames();
+			for (String sn : secondaryNames) {
+				if (existingOptionTest.test(sn)) {
+					duplicateName = sn;
+					break;
 				}
 			}
 		}
