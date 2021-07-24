@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nonnull;
+
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Functions;
 import com.github.jochenw.afw.core.util.Objects;
@@ -567,7 +569,8 @@ public class Cli<B> {
 					break;
 				}
 			}
-			if (optionValues.containsKey(option.getPrimaryName())) {
+			final @Nonnull Option<?,B> optn = Objects.requireNonNull(option);
+			if (optionValues.containsKey(optn.getPrimaryName())) {
 				throw error("Option " + option.getPrimaryName() + " may be repeated only once.");
 			}
 			String value = optValue;
@@ -629,7 +632,7 @@ public class Cli<B> {
 
 					@Override
 					public RuntimeException error(String pMsg) {
-						return error(pMsg);
+						return Cli.this.error(pMsg);
 					}
 				};
 				try {
