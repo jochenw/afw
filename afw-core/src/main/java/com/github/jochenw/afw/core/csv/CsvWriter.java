@@ -98,17 +98,6 @@ public class CsvWriter implements AutoCloseable {
 				}
 			}
 		}
-		if (w != null) {
-			Writer w = this.w;
-			this.w = null;
-			try {
-				w.close();
-			} catch (Throwable t) {
-				if (th == null) {  // In case of multiple exceptions, throw the first.
-					th = t;
-				}
-			}
-		}
 		if (bos != null) {
 			OutputStream os = bos;
 			bos = null;

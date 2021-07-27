@@ -68,9 +68,6 @@ public class DefaultPropertyResolver extends PropertyResolver {
 				object = atomicPropertyResolver.requireValue(object, topMostProperty);
 				if (secondaryProperty.length() == 0) {
 					return object;
-				} else if (object == null) {
-					throw new NullPointerException("Intermediate value null for property " + context
-							+ " while resolving " + pProperty);
 				} else {
 					property = secondaryProperty;
 				}
