@@ -59,11 +59,7 @@ public class Names {
 			}
 			if (pOther instanceof NamedImpl) {
 				final NamedImpl other = (NamedImpl) pOther;
-				if (value == null) {
-					return other.value == null;
-				} else {
-					return value.equals(other.value);
-				}
+				return value.equals(other.value);
 			} else {
 				return false;
 			}

@@ -58,7 +58,7 @@ public class SimpleComponentFactory implements IComponentFactory {
 	public abstract static class Binding<T> implements Supplier<T> {
 	}
 
-	protected class MetaData {
+	protected static class MetaData {
 		private final Consumer<Object> initializer;
 		private final Provider<Object> instantiator;
 
