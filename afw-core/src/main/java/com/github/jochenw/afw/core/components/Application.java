@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.github.jochenw.afw.core.ILifecycleController;
 import com.github.jochenw.afw.core.impl.DefaultLifecycleController;
 import com.github.jochenw.afw.core.inject.IComponentFactory;
+import com.github.jochenw.afw.core.inject.ComponentFactoryBuilder;
 import com.github.jochenw.afw.core.inject.ComponentFactoryBuilder.Module;
 import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactoryBuilder;
 import com.github.jochenw.afw.core.log.ILogFactory;
@@ -53,12 +54,16 @@ public class Application {
 	}
 
 	protected @Nonnull IComponentFactory newComponentFactory() {
-		final SimpleComponentFactoryBuilder scfb = new SimpleComponentFactoryBuilder();
-		scfb.module(newModule());
+		final ComponentFactoryBuilder<?> cfb = newComponentFactoryBuilder();
+		cfb.module(newModule());
 		if (module != null) {
-			scfb.module(module);
+			cfb.module(module);
 		}
-		return scfb.build();
+		return cfb.build();
+	}
+
+	protected ComponentFactoryBuilder<?> newComponentFactoryBuilder() {
+		return new SimpleComponentFactoryBuilder();
 	}
 
 	/**

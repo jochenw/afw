@@ -21,6 +21,9 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.lang.reflect.UndeclaredThrowableException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 
 /**
  * Utility class for working with Exceptions. Provides static utility methods.
@@ -157,4 +160,19 @@ public class Exceptions {
     	pw.close();
     	return sw.toString();
     }
+
+    /** Checks, whether the given throwable is caused by an instance of the given class.
+     * If so, returns the cause. Otherwise, returns null.
+     * @param pTh The throwable, that is being checked.
+     * @param pType The type of the cause.
+     * @return The cause, if it meets the requested criteria, otherwise null.
+     */
+	public static @Nullable <E extends Throwable> E getCause(@Nonnull Throwable pTh, @Nonnull Class<E> pType) {
+		final Throwable cause = pTh.getCause();
+		if (cause != null  &&  cause != pTh  &&  pType.isAssignableFrom(cause.getClass())) {
+			return pType.cast(cause);
+		} else {
+			return null;
+		}
+	}
 }

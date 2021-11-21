@@ -17,6 +17,8 @@ package com.github.jochenw.afw.core.util;
 
 import java.io.Serializable;
 
+import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
+
 /**
  * Utility class, providing the ability to store a mutable boolean value.
  */
@@ -69,4 +71,35 @@ public class MutableBoolean implements Serializable, Comparable<MutableBoolean> 
 	public boolean isSet() {
 		return value;
 	}
+
+	/**
+	 * Asserts the mutable booleans current state by invoking the given {@link FailableRunnable},
+	 * if the mutable boolean isn't set.
+	 * @param pRunnable The runnable to invoke, if the mutable boolean isn't set.
+	 */
+	public void assertTrue(FailableRunnable<?> pRunnable) {
+		assertValue(true, pRunnable);
+	}
+
+	/**
+	 * Asserts the mutable booleans current state by invoking the given {@link FailableRunnable},
+	 * if the mutable boolean is set.
+	 * @param pRunnable The runnable to invoke, if the mutable boolean is set.
+	 */
+	public void assertFalse(FailableRunnable<?> pRunnable) {
+		assertValue(false, pRunnable);
+	}
+
+	/**
+	 * Asserts the mutable booleans current state by invoking the given {@link FailableRunnable},
+	 * if the mutable boolean isn't as given by the parameter {@link pExpect}.
+	 * @param pExpect The expected state of the mutable boolean.
+	 * @param pRunnable The runnable to invoke, if the mutable boolean is set.
+	 */
+	public void assertValue(boolean pExpect, FailableRunnable<?> pRunnable) {
+		if (value != pExpect) {
+			Functions.run(pRunnable);
+		}
+	}
+
 }

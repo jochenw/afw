@@ -31,8 +31,118 @@ import java.util.function.Supplier;
  * generally permitted.
  */
 public class Functions {
+	/**
+	 * Represents an operation that accepts a single {@code short}-valued argument and
+	 * returns no result.  This is the primitive type specialization of
+	 * {@link Consumer} for {@code short}.  Unlike most other functional interfaces,
+	 * {@code ShortConsumer} is expected to operate via side-effects.
+	 *
+	 * <p>This is a <a href="package-summary.html">functional interface</a>
+	 * whose functional method is {@link #accept(short)}.
+	 *
+	 * @see Consumer
+	 * @since 0.6
+	 */
+	@FunctionalInterface
+	public interface ShortConsumer {
+	    /**
+	     * Performs this operation on the given argument.
+	     *
+	     * @param pValue the input argument
+	     */
+		public void accept(short pValue);
+	}
+
+	/**
+	 * Represents an operation that accepts a single {@code byte}-valued argument and
+	 * returns no result.  This is the primitive type specialization of
+	 * {@link Consumer} for {@code byte}.  Unlike most other functional interfaces,
+	 * {@code ShortConsumer} is expected to operate via side-effects.
+	 *
+	 * <p>This is a <a href="package-summary.html">functional interface</a>
+	 * whose functional method is {@link #accept(byte)}.
+	 *
+	 * @see Consumer
+	 * @since 0.6
+	 */
+	@FunctionalInterface
+	public interface ByteConsumer {
+	    /**
+	     * Performs this operation on the given argument.
+	     *
+	     * @param pValue the input argument
+	     */
+		public void accept(byte pValue);
+	}
+
+	/**
+	 * Represents an operation that accepts a single {@code boolean}-valued argument and
+	 * returns no result.  This is the primitive type specialization of
+	 * {@link Consumer} for {@code boolean}.  Unlike most other functional interfaces,
+	 * {@code ShortConsumer} is expected to operate via side-effects.
+	 *
+	 * <p>This is a <a href="package-summary.html">functional interface</a>
+	 * whose functional method is {@link #accept(byte)}.
+	 *
+	 * @see Consumer
+	 * @since 0.6
+	 */
+	@FunctionalInterface
+	public interface BooleanConsumer {
+	    /**
+	     * Performs this operation on the given argument.
+	     *
+	     * @param pValue the input argument
+	     */
+		public void accept(boolean pValue);
+	}
+
+	/**
+	 * Represents an operation that accepts a single {@code float}-valued argument and
+	 * returns no result.  This is the primitive type specialization of
+	 * {@link Consumer} for {@code float}.  Unlike most other functional interfaces,
+	 * {@code ShortConsumer} is expected to operate via side-effects.
+	 *
+	 * <p>This is a <a href="package-summary.html">functional interface</a>
+	 * whose functional method is {@link #accept(float)}.
+	 *
+	 * @see Consumer
+	 * @since 0.6
+	 */
+	@FunctionalInterface
+	public interface FloatConsumer {
+	    /**
+	     * Performs this operation on the given argument.
+	     *
+	     * @param pValue the input argument
+	     */
+		public void accept(float pValue);
+	}
+
+	/**
+	 * Represents an operation that accepts a single {@code double}-valued argument and
+	 * returns no result.  This is the primitive type specialization of
+	 * {@link Consumer} for {@code double}.  Unlike most other functional interfaces,
+	 * {@code ShortConsumer} is expected to operate via side-effects.
+	 *
+	 * <p>This is a <a href="package-summary.html">functional interface</a>
+	 * whose functional method is {@link #accept(double)}.
+	 *
+	 * @see Consumer
+	 * @since 0.6
+	 */
+	@FunctionalInterface
+	public interface DoubleConsumer {
+	    /**
+	     * Performs this operation on the given argument.
+	     *
+	     * @param pValue the input argument
+	     */
+		public void accept(double pValue);
+	}
+
 	/** Failable version of {@link Consumer}.
-	 * @param <T1> The type being consumed.
+	 * @param <T1> Thes type being consumed.
 	 * @param <T2> The exception type being thrown by the consumer.
 	 * @see Consumer
 	 */
