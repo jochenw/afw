@@ -180,7 +180,7 @@
   	<dependency>
   		<groupId>com.google.inject</groupId>
   		<artifactId>guice</artifactId>
-  		<version>4.2.2</version>
+  		<version>5.0.1</version>
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
@@ -209,15 +209,9 @@
     </dependency>
     <dependency>
     	<groupId>org.bouncycastle</groupId>
-    	<artifactId>bcprov-jdk15to18</artifactId>
-    	<version>1.67</version>
-    	<scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>bouncycastle</groupId>
-    	<artifactId>bouncycastle-jce-jdk13</artifactId>
-    	<version>112</version>
-    	<scope>test</scope>
+    	<artifactId>bcprov-jdk15on</artifactId>
+    	<version>1.69</version>
+    	<scope>provided</scope>
     </dependency>
     <dependency>
     	<groupId>org.apache.groovy</groupId>
@@ -230,6 +224,12 @@
     	<artifactId>h2</artifactId>
     	<version>1.4.200</version>
     	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.bouncycastle</groupId>
+    	<artifactId>bcpkix-jdk15on</artifactId>
+    	<scope>provided</scope>
+    	<version>1.69</version>
     </dependency>
   </dependencies>
   <reporting>
