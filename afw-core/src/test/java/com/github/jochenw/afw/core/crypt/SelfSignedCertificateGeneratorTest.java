@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,9 +15,13 @@ import java.security.KeyStore.Entry;
 import java.security.KeyStore.Entry.Attribute;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.util.Set;
 
 import org.junit.Test;
@@ -29,24 +34,39 @@ public class SelfSignedCertificateGeneratorTest {
 	 * @throws Exception The test failed.
 	 */
 	@Test
-	public void testCreateSelfSignedCertificate() throws Exception {
+	public void testCreateSelfSignedCertificateWithDefaultKeyHandler() throws Exception {
+		final SelfSignedCertificateGenerator scgen = new SelfSignedCertificateGenerator();
+		validate(scgen);
+	}
+
+	/** Test case for {@link SelfSignedCertificateGenerator#createSelfSignedCertificate}.
+	 * @throws Exception The test failed.
+	 */
+	@Test
+	public void testCreateSelfSignedCertificateWithBcKeyHandler() throws Exception {
+		final SelfSignedCertificateGenerator scgen = new SelfSignedCertificateGenerator();
+		scgen.setKeyHandler(new BcKeyHandler());
+		validate(scgen);
+	}
+
+	protected void validate(SelfSignedCertificateGenerator pGenerator) throws KeyStoreException, IOException, NoSuchAlgorithmException,
+			CertificateException, UnrecoverableEntryException {
 		final Path keyStorePath = Paths.get("target/unit-tests/SelfSignedCertificateGeneratorTest/keystore.jks");
 		Files.createDirectories(keyStorePath.getParent());
 		Files.deleteIfExists(keyStorePath);
 		assertFalse(Files.isRegularFile(keyStorePath));
-		final SelfSignedCertificateGenerator scgen = new SelfSignedCertificateGenerator();
-		scgen.setAlias("selfsigned");
-		scgen.setCountry("DE");
-		scgen.setFileName(keyStorePath.toString());
-		scgen.setLocation("The Net");
-		scgen.setName("127.0.0.1");
-		scgen.setOrganization("Organized? Me?");
-		scgen.setOrgUnit("None at all");
-		scgen.setStateOrProvince("Somewhere");
-		scgen.setStorePassword("okayokay");
-		scgen.setValidInDays(9999);
-		scgen.createSelfSignedCertificate();
-		scgen.setLogger(System.out::println);
+		pGenerator.setAlias("selfsigned");
+		pGenerator.setCountry("DE");
+		pGenerator.setFileName(keyStorePath.toString());
+		pGenerator.setLocation("The Net");
+		pGenerator.setName("127.0.0.1");
+		pGenerator.setOrganization("Organized? Me?");
+		pGenerator.setOrgUnit("None at all");
+		pGenerator.setStateOrProvince("Somewhere");
+		pGenerator.setStorePassword("okayokay");
+		pGenerator.setValidInDays(9999);
+		pGenerator.createSelfSignedCertificate();
+		pGenerator.setLogger(System.out::println);
 		assertTrue(Files.isRegularFile(keyStorePath));
 		try (InputStream in = Files.newInputStream(keyStorePath)) {
 			final KeyStore keyStore = KeyStore.getInstance("jks");
