@@ -24,7 +24,8 @@ import com.github.jochenw.afw.core.util.Tupel;
 
 
 /**
- * Default implementation of {@link IKeyHandler}, using RSA.
+ * Default implementation of {@link IKeyHandler}. Uses JCE, if possible,
+ * otherwise Bouncycastle.
  */
 public class DefaultKeyHandler implements IKeyHandler {
 	@Override

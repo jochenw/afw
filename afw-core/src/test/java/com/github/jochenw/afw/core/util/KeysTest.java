@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.crypt.JceKeyHandler;
+import com.github.jochenw.afw.core.crypt.BcKeyHandler;
 import com.github.jochenw.afw.core.crypt.DefaultKeyHandler;
 import com.github.jochenw.afw.core.crypt.IKeyHandler;
 
@@ -42,6 +43,24 @@ public class KeysTest {
 	@Test
 	public void testEncryptDecryptUsingKeyHandlerAndPassword() throws Exception {
 		final IKeyHandler kh = new DefaultKeyHandler();
+		test("keystore1.jks", kh, "123456");
+	}
+
+	/** Test for encryption/decryption, using a {@link BcKeyHandler}, and without a password.
+	 * @throws Exception The test failed.
+	 */
+	@Test
+	public void testEncryptDecryptUsingBcKeyHandlerNoPassword() throws Exception {
+		final IKeyHandler kh = new BcKeyHandler();
+		test("keystore0.jks", kh, null);
+	}
+
+	/** Test for encryption/decryption, using a {@link IKeyHandler}, and a password.
+	 * @throws Exception The test failed.
+	 */
+	@Test
+	public void testEncryptDecryptUsingBcKeyHandlerAndPassword() throws Exception {
+		final IKeyHandler kh = new BcKeyHandler();
 		test("keystore1.jks", kh, "123456");
 	}
 
