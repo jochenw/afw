@@ -406,6 +406,14 @@ public interface ILog {
     void entering(String pMethod, String pMessage);
     /**
      * Logs a message, that the given method is being entered,
+     * appending the given  arguments, with log level
+     * {@link ILog.Level#DEBUG}.
+     * @param pMethod Name of the method, that's being entered.
+     * @param pArgs The extra message arguments.
+     */
+    void entering(String pMethod, Object... pArgs);
+    /**
+     * Logs a message, that the given method is being entered,
      * appending the given extra message, and the given
      * arguments, with log level {@link ILog.Level#DEBUG}.
      * @param pMethod Name of the method, that's being entered.
@@ -533,6 +541,19 @@ public interface ILog {
      * @param pArgs The extra messages arguments.
      */
     void exiting(String pMethod, String pMessage, Object... pArgs);
+    /**
+     * Logs a message, that the given method is being left,
+     * and the given result values,
+     * with log level {@link ILog.Level#DEBUG}.
+     * The extra message is created using
+     * {@link String#join(CharSequence, CharSequence...)},
+     * using the separator string ", ", the extra message
+     * string, and the given arguments.
+     * @param pMethod Name of the method, that's being left.
+     * @param pMessage The extra messages format string.
+     * @param pArgs The extra messages arguments.
+     */
+    void exiting(String pMethod, Object... pArgs);
     /**
      * Logs a message, that the given method is being left,
      * and an extra message, with log level {@link ILog.Level#DEBUG}.

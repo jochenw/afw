@@ -61,6 +61,18 @@ public abstract class AbstractLog implements ILog {
         return sb.toString();
     }
 
+    protected String asMessage(String pMethod, String pSep, Object... pArgs) {
+        final StringBuilder sb = new StringBuilder();
+        if (pMethod != null) {
+            sb.append(pMethod);
+            sb.append(pSep);
+        }
+        if (pArgs != null  &&  pArgs.length > 0) {
+            Strings.append(sb, pArgs);
+        }
+        return sb.toString();
+    }
+
     protected String asMessageF(String pMethod, String pSep, String pFormat, Object... pArgs) {
         final StringBuilder sb = new StringBuilder();
         if (pMethod != null) {
@@ -133,7 +145,7 @@ public abstract class AbstractLog implements ILog {
     @Override
     public void info(String pMethod, Throwable pTh) {
         if (isInfoEnabled()) {
-            log(Level.INFO, asMessage(pMethod, SEP_STD, null), pTh);
+            log(Level.INFO, asMessage(pMethod, SEP_STD, (Object[]) null), pTh);
         }
     }
 
@@ -147,7 +159,7 @@ public abstract class AbstractLog implements ILog {
     @Override
     public void warn(String pMethod, Throwable pTh) {
         if (isWarnEnabled()) {
-            log(Level.WARN, asMessage(pMethod, SEP_STD, null), pTh);
+            log(Level.WARN, asMessage(pMethod, SEP_STD, (String) null), pTh);
         }
     }
 
@@ -161,7 +173,7 @@ public abstract class AbstractLog implements ILog {
     @Override
     public void error(String pMethod, Throwable pTh) {
         if (isErrorEnabled()) {
-            log(Level.ERROR, asMessage(pMethod, SEP_STD, null), pTh);
+            log(Level.ERROR, asMessage(pMethod, SEP_STD, (String) null), pTh);
         }
     }
 
@@ -175,7 +187,7 @@ public abstract class AbstractLog implements ILog {
     @Override
     public void fatal(String pMethod, Throwable pTh) {
         if (isFatalEnabled()) {
-            log(Level.FATAL, asMessage(pMethod, SEP_STD, null), pTh);
+            log(Level.FATAL, asMessage(pMethod, SEP_STD, (String) null), pTh);
         }
     }
 
@@ -287,7 +299,7 @@ public abstract class AbstractLog implements ILog {
     @Override
     public void entering(String pMethod) {
         if (isDebugEnabled()) {
-            log(Level.DEBUG, asMessage(pMethod, SEP_ENT, null));
+            log(Level.DEBUG, asMessage(pMethod, SEP_ENT, (String) null));
         }
     }
 
@@ -295,6 +307,13 @@ public abstract class AbstractLog implements ILog {
     public void entering(String pMethod, String pMessage) {
         if (isDebugEnabled()) {
             log(Level.DEBUG, asMessage(pMethod, SEP_ENT, pMessage));
+        }
+    }
+
+    @Override
+    public void entering(String pMethod, Object... pArgs) {
+        if (isDebugEnabled()) {
+            log(Level.DEBUG, asMessage(pMethod, SEP_ENT, pArgs));
         }
     }
 
@@ -315,7 +334,7 @@ public abstract class AbstractLog implements ILog {
     @Override
     public void exiting(String pMethod) {
         if (isDebugEnabled()) {
-            log(Level.DEBUG, asMessage(pMethod, SEP_EXT, null));
+            log(Level.DEBUG, asMessage(pMethod, SEP_EXT, (String) null));
         }
     }
 
@@ -386,6 +405,13 @@ public abstract class AbstractLog implements ILog {
     public void exiting(String pMethod, String pMessage, Object pResult) {
         if (isDebugEnabled()) {
             log(Level.DEBUG, asMessage(pMethod, SEP_EXT, pMessage, pResult));
+        }
+    }
+
+    @Override
+    public void exiting(String pMethod, Object... pArgs) {
+        if (isDebugEnabled()) {
+            log(Level.DEBUG, asMessage(pMethod, SEP_EXT, pArgs));
         }
     }
 

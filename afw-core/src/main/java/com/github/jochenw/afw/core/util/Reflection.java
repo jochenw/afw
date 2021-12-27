@@ -452,4 +452,18 @@ public class Reflection {
 			throw Exceptions.show(t);
 		}
 	}
+
+	/**
+	 * A generic cast operation, that can be used without compiler warnings, or the like.
+	 * @param <O> The target type of the cast. (The type, to which the input object is being
+	 * casted to.
+	 * @param pObject The source object, that is being casted to the target type.
+	 * @return The source object. The compiler will now assume, that this object has the
+	 *   target type.
+	 */
+	public static <O> O cast(Object pObject) {
+		@SuppressWarnings("unchecked")
+		final O o = (O) pObject;
+		return o;
+	}
 }

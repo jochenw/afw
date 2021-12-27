@@ -126,7 +126,7 @@ public class DefaultMLog implements IMLog {
     @Override
     public void info(Throwable pTh) {
         if (log.isInfoEnabled()) {
-            log.log(Level.INFO, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
+            log.log(Level.INFO, log.asMessage(method, AbstractLog.SEP_STD, (String) null), pTh);
         }
     }
 
@@ -140,7 +140,7 @@ public class DefaultMLog implements IMLog {
     @Override
     public void warn(Throwable pTh) {
         if (log.isWarnEnabled()) {
-            log.log(Level.WARN, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
+            log.log(Level.WARN, log.asMessage(method, AbstractLog.SEP_STD, (String) null), pTh);
         }
     }
 
@@ -154,7 +154,7 @@ public class DefaultMLog implements IMLog {
     @Override
     public void error(Throwable pTh) {
         if (log.isErrorEnabled()) {
-            log.log(Level.ERROR, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
+            log.log(Level.ERROR, log.asMessage(method, AbstractLog.SEP_STD, (String) null), pTh);
         }
     }
 
@@ -168,7 +168,7 @@ public class DefaultMLog implements IMLog {
     @Override
     public void fatal(Throwable pTh) {
         if (log.isErrorEnabled()) {
-            log.log(Level.FATAL, log.asMessage(method, AbstractLog.SEP_STD, null), pTh);
+            log.log(Level.FATAL, log.asMessage(method, AbstractLog.SEP_STD, (String) null), pTh);
         }
     }
 
@@ -280,7 +280,7 @@ public class DefaultMLog implements IMLog {
     @Override
     public void entering() {
         if (log.isDebugEnabled()) {
-            log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_ENT, null));
+            log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_ENT, (String) null));
         }
     }
 
@@ -308,7 +308,7 @@ public class DefaultMLog implements IMLog {
     @Override
     public void exiting() {
         if (log.isDebugEnabled()) {
-            log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_EXT, null));
+            log.log(Level.DEBUG, log.asMessage(method, AbstractLog.SEP_EXT, (String) null));
         }
     }
 
