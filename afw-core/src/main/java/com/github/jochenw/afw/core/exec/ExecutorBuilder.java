@@ -15,8 +15,21 @@
  */
 package com.github.jochenw.afw.core.exec;
 
+import com.github.jochenw.afw.core.util.FileUtils;
+import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Objects;
+import com.github.jochenw.afw.core.util.Streams;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +40,7 @@ import java.util.List;
  */
 public class ExecutorBuilder {
     private final List<String> cmdLine = new ArrayList<>();
+    private FailableConsumer<InputStream,?> stdOutHandler, stdErrHandler;
 
     /** Sets the executable, that is being executed.
      * As a side-effect, clears the argument list.
@@ -117,7 +131,314 @@ i     */
     }
 
     /**
+     * Sets the {@code stream handler}, which is being invoked to process the
+     * external processes stdout byte stream.
+     * @param pStdOutHandler The {@code stream handler}, which is being invoked to process the
+     * external processes stdout byte stream.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pStdOutHandler} is null.
+     * @see #stdOut(File)
+     * @see #stdOut(FailableConsumer)
+     * @see #stdOut(FailableSupplier)
+     * @see #stdOut(Path)
+     * @see #stdOut(OutputStream)
+     */
+    public ExecutorBuilder stdOutHandler(FailableConsumer<InputStream,?> pStdOutHandler) {
+    	stdOutHandler = Objects.requireNonNull(pStdOutHandler, "StdOutHandler");
+    	return this;
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stdout byte stream. The created handler will write to the
+     * {@link OutputStream}, that is returned by the given {@link FailableSupplier}.
+     * @param pSupplier The {@link FailableSupplier supplier}, which returns an
+     * {@code output stream}, to which the external processes output stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pSupplier} is null.
+     * @see #stdOut(File)
+     * @see #stdOut(FailableConsumer)
+     * @see #stdOut(Path)
+     * @see #stdOut(OutputStream)
+     * @see #stdOutHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdOut(FailableSupplier<OutputStream,?> pSupplier) {
+    	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
+    	final FailableConsumer<InputStream,?> stdOutHandler = (in) -> {
+    		final OutputStream out = Objects.requireNonNull(supplier.get(), "OutputStream");
+    		Streams.copy(in, out);
+    		out.flush();
+    	};
+    	return stdOutHandler(stdOutHandler);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stdout byte stream. The created handler will write to the given
+     * {@link OutputStream}.
+     * @param pOutputStream The {@code output stream}, to which the external processes
+     *   output stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pOutputStream} is null.
+     * @see #stdOut(File)
+     * @see #stdOut(FailableConsumer)
+     * @see #stdOut(FailableSupplier)
+     * @see #stdOut(Path)
+     * @see #stdOutHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdOut(OutputStream pOutputStream) {
+		final OutputStream out = Objects.requireNonNull(pOutputStream, "OutputStream");
+		return stdOut((FailableSupplier<OutputStream, ?>) () -> out);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stdout byte stream. The created handler will write to the given
+     * {@link Path file}.
+     * @param pOutputFile The {@code output file}, to which the external processes
+     *   output stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pOutputFile} is null.
+     * @see #stdOut(File)
+     * @see #stdOut(FailableConsumer)
+     * @see #stdOut(FailableSupplier)
+     * @see #stdOut(OutputStream)
+     * @see #stdOutHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdOut(Path pOutputFile) {
+    	final Path outputFile = Objects.requireNonNull(pOutputFile, "OutputFile");
+    	final FailableSupplier<OutputStream,?> supplier = () -> {
+    		FileUtils.createDirectoryFor(outputFile);
+    		final OutputStream out = Files.newOutputStream(outputFile);
+    		return new BufferedOutputStream(out);
+    	};
+    	return stdOut(supplier);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stdout byte stream. The created handler will write to the given
+     * {@link File file}.
+     * @param pOutputFile The {@code output file}, to which the external processes
+     *   output stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pOutputFile} is null.
+     * @see #stdOut(FailableConsumer)
+     * @see #stdOut(FailableSupplier)
+     * @see #stdOut(OutputStream)
+     * @see #stdOut(Path)
+     * @see #stdOutHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdOut(File pOutputFile) {
+    	return stdOut(Objects.requireNonNull(pOutputFile, "File").toPath());
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stdout byte stream. The created handler will invoke the given
+     * {@link FailableConsumer consumer} with the received output.
+     * @param pConsumer The {@link FailableConsumer consumer}, to which the external processes
+     *   output stream will be sent.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pConsumer} is null.
+     */
+    public ExecutorBuilder stdOut(FailableConsumer<byte[],?> pConsumer) {
+    	final FailableConsumer<byte[],?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+    	final FailableConsumer<InputStream,?> stdOutConsumer = (in) -> {
+    		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		Streams.copy(in, baos);
+    		consumer.accept(baos.toByteArray());
+    	};
+    	return stdOutHandler(stdOutConsumer);
+    }
+
+    /**
+     * Sets the {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream.
+     * @param pStdErrHandler The {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pStdOutHandler} is null.
+     * @see #stdErr(File)
+     * @see #stdErr(FailableConsumer)
+     * @see #stdErr(FailableSupplier)
+     * @see #stdErr(Path)
+     * @see #stdErr(OutputStream)
+     */
+    public ExecutorBuilder stdErrHandler(FailableConsumer<InputStream,?> pStdErrHandler) {
+    	stdErrHandler = Objects.requireNonNull(pStdErrHandler, "StdErrHandler");
+    	return this;
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream. The created handler will write to the
+     * {@link OutputStream}, that is returned by the given {@link FailableSupplier}.
+     * @param pSupplier The {@link FailableSupplier supplier}, which returns an
+     * {@code output stream}, to which the external processes error stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pSupplier} is null.
+     * @see #stdErr(File)
+     * @see #stdErr(FailableConsumer)
+     * @see #stdErr(Path)
+     * @see #stdErr(OutputStream)
+     * @see #stdErrHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdErr(FailableSupplier<OutputStream,?> pSupplier) {
+    	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
+    	final FailableConsumer<InputStream,?> stdErrHandler = (in) -> {
+    		final OutputStream out = Objects.requireNonNull(supplier.get(), "OutputStream");
+    		Streams.copy(in, out);
+    		out.flush();
+    	};
+    	return stdErrHandler(stdErrHandler);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream. The created handler will write to the
+     * {@link Writer}, that is returned by the given {@link FailableSupplier},
+     * using the given {@link Charset character set} for conversion of bytes into
+     * characters.
+     * @param pSupplier The {@link FailableSupplier supplier}, which returns an
+     * {@code output stream}, to which the external processes error stream will be written.
+     * @param pCharset The {@link Charset character set}, which is being used for
+     * conversion of bytes into characters. Defaults to {@link StandardCharsets#UTF_8}.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pSupplier} is null.
+     * @see #stdErr(File)
+     * @see #stdErr(FailableConsumer)
+     * @see #stdErr(Path)
+     * @see #stdErr(OutputStream)
+     * @see #stdErrHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdErr(FailableSupplier<Writer,?> pSupplier, Charset pCharset) {
+    	final FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
+    	final Charset cs = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	final FailableConsumer<InputStream,?> stdErrHandler = (in) -> {
+    		final Writer w = Objects.requireNonNull(supplier.get(), "Writer");
+    		Streams.copy(in, w, cs);
+    		w.flush();
+    	};
+    	return stdErrHandler(stdErrHandler);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream. The created handler will write to the given
+     * {@link OutputStream}.
+     * @param pOutputStream The {@code output stream}, to which the external processes
+     *   error stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pOutputStream} is null.
+     * @see #stdErr(File)
+     * @see #stdErr(FailableConsumer)
+     * @see #stdErr(FailableSupplier)
+     * @see #stdErr(Path)
+     * @see #stdErrHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdErr(OutputStream pOutputStream) {
+		final OutputStream out = Objects.requireNonNull(pOutputStream, "OutputStream");
+		return stdErr((FailableSupplier<OutputStream, ?>) () -> out);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream. The created handler will write to the given
+     * {@link Writer}, using the given character set for conversion of bytes to characters.
+     * @param pWriter The {@link Writer writer}, to which the external processes
+     *   error stream will be written.
+     * @param pCharset The {@link Charset}, which will be used for conversion of bytes
+     *   into characters. Defaults to {@link StandardCharsets#UTF_8}.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pOutputStream} is null.
+     * @see #stdErr(File)
+     * @see #stdErr(FailableConsumer)
+     * @see #stdErr(FailableSupplier)
+     * @see #stdErr(Path)
+     * @see #stdErrHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdErr(Writer pWriter, Charset pCharset) {
+		final Writer w = Objects.requireNonNull(pWriter, "Writer");
+		return stdErr((FailableSupplier<Writer, ?>) () -> w, pCharset);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream. The created handler will write to the given
+     * {@link Path file}.
+     * @param pOutputFile The {@code output file}, to which the external processes
+     *   output stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pOutputFile} is null.
+     * @see #stdErr(File)
+     * @see #stdErr(FailableConsumer)
+     * @see #stdErr(FailableSupplier)
+     * @see #stdErr(OutputStream)
+     * @see #stdErrHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdErr(Path pOutputFile) {
+    	final Path outputFile = Objects.requireNonNull(pOutputFile, "OutputFile");
+    	final FailableSupplier<OutputStream,?> supplier = () -> {
+    		FileUtils.createDirectoryFor(outputFile);
+    		final OutputStream out = Files.newOutputStream(outputFile);
+    		return new BufferedOutputStream(out);
+    	};
+    	return stdErr(supplier);
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream. The created handler will write to the given
+     * {@link File file}.
+     * @param pOutputFile The {@code output file}, to which the external processes
+     *   error stream will be written.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pOutputFile} is null.
+     * @see #stdErr(FailableConsumer)
+     * @see #stdErr(FailableSupplier)
+     * @see #stdErr(OutputStream)
+     * @see #stdErr(Path)
+     * @see #stdErrHandler(FailableConsumer)
+     */
+    public ExecutorBuilder stdErr(File pOutputFile) {
+    	return stdErr(Objects.requireNonNull(pOutputFile, "File").toPath());
+    }
+
+    /**
+     * Creates, and sets a {@code stream handler}, which is being invoked to process the
+     * external processes stderr byte stream. The created handler will invoke the given
+     * {@link FailableConsumer consumer} with the received output.
+     * @param pConsumer The {@link FailableConsumer consumer}, to which the external processes
+     *   error stream will be sent.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@code pConsumer} is null.
+     */
+    public ExecutorBuilder stdErr(FailableConsumer<byte[],?> pConsumer) {
+    	final FailableConsumer<byte[],?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+    	final FailableConsumer<InputStream,?> stdOutConsumer = (in) -> {
+    		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		Streams.copy(in, baos);
+    		consumer.accept(baos.toByteArray());
+    	};
+    	return stdErrHandler(stdOutConsumer);
+    }
+
+    /**
      * Creates an {@link Executor} with the current configuration.
      * @return The created {@link Executor}.
+     * @throws IllegalStateException The {@link Executor executor's} configuration is incomplete.
      */
+    public Executor build() {
+    	if (cmdLine.isEmpty()) {
+    		throw new IllegalStateException("No executable has been set. Did you invoke either of the exec() methods?");
+    	}
+    	final FailableConsumer<InputStream,?> outHandler = Objects.notNull(stdOutHandler, () -> {
+    		return (in) -> Streams.readAndDiscard(in);
+    	});
+    	final FailableConsumer<InputStream,?> errHandler = Objects.notNull(stdErrHandler, () -> {
+    		return (in) -> Streams.readAndDiscard(in);
+    	});
+    	return new Executor(cmdLine.toArray(new String[cmdLine.size()]), outHandler, errHandler);
+    }
 }

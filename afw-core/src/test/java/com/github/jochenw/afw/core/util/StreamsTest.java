@@ -174,6 +174,20 @@ public class StreamsTest {
     }
 
     /**
+     * Test for {@link Streams#copy(java.io.InputStream, java.io.Writer, java.nio.charset.Charset)}.
+     * @throws Exception The test failed.
+     */
+    @Test
+    public void testCopyInputStreamWriterCharset() throws Exception {
+    	final String snippet = "This is a text, which contains ascii characters, and non-ascii characters: "
+				   + "\u00c4\u00e4\u00d6\u000f6\u00dc\u00fc\u00df.\n";
+    	final StringWriter sw = new StringWriter();
+    	Streams.copy(new ByteArrayInputStream(snippet.getBytes(StandardCharsets.UTF_8)), sw,
+    			     StandardCharsets.UTF_8);
+    	assertEquals(snippet, sw.toString());
+    }
+
+    /**
      * Test for {@link Streams#copy(java.io.InputStream, java.io.OutputStream, int)}.
      */
     @Test

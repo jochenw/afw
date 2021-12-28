@@ -47,6 +47,7 @@ import javax.annotation.Nullable;
 
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.io.ReaderInputStream;
+import com.github.jochenw.afw.core.io.WriterOutputStream;
 import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableFunction;
@@ -80,6 +81,28 @@ public class Streams {
     }
 
     /**
+     * Reads, and discards the contents of the given {@link InputStream}.
+     * The {@link InputStream} isn't closed.
+     * @param pIn The {@link InputStream} to read from.
+     * @throws NullPointerException The parameter {@code pIn} is null.
+     * @throws UncheckedIOException An I/O error occurred while reading the input stream.
+     */
+    public static void readAndDiscard(InputStream pIn) {
+    	final InputStream in = Objects.requireNonNull(pIn, "InputStream");
+    	final byte[] buffer = new byte[8192];
+    	try {
+    		for (;;) {
+    			final int res = in.read(buffer);
+    			if (res == -1) {
+    				break;
+    			}
+    		}
+    	} catch (IOException e) {
+    		throw new UncheckedIOException(e);
+    	}
+    }
+
+    /**
      * Returns the contents of the given {@link InputStream}, as a
      * string. The {@link InputStream} isn't closed.
      * @param pIn The {@link InputStream} to read from. Will be closed.
@@ -110,6 +133,23 @@ public class Streams {
     }
 
     /** Copies the contents of the given {@link InputStream} to the given
+     * {@link Writer}, using a buffer of 8192 bytes. Neither stream
+     * is closed. Equivalent to invoking
+     * {@link #copy(java.io.InputStream, java.io.Writer, int, Charset)}
+     * with a buffer size of 8192 bytes.
+     * @param pIn The {@link InputStream} to read from.
+     * @param pWriter The {@link Writer} to write to.
+     * @param pCharset The Character set to use for conversion of bytes into characters.
+     * @see #copy(java.io.InputStream, java.io.OutputStream, int) 
+     * @see #copy(java.io.Reader, java.io.Writer)
+     * @see #copy(java.io.InputStream, java.io.OutputStream, int)
+     */
+    public static void copy(InputStream pIn, Writer pWriter, Charset pCharset) {
+        copy(pIn, pWriter, 8192, pCharset);
+    }
+
+
+    /** Copies the contents of the given {@link InputStream} to the given
      * {@link OutputStream}, using a buffer of {@code pBufSize} bytes.
      * Neither stream is closed.
      * @param pIn The {@link InputStream} to read from.
@@ -133,6 +173,30 @@ public class Streams {
         } catch (IOException e) {
             throw Exceptions.newUncheckedIOException(e);
         }
+    }
+
+    /** Copies the contents of the given {@link InputStream} to the given
+     * {@link Writer}, using a buffer of {@code pBufSize} bytes.
+     * Neither stream is closed.
+     * @param pIn The {@link InputStream} to read from.
+     * @param pWriter The {@link Writer} to write to.
+     * @param pBufSize The buffer size to use, in bytes (performance).
+     * @param pCharset The character set, which is going to be used for
+     * conversion of bytes into characters. Defaults to
+     * {@link StandardCharsets#UTF_8}.
+     * @see #copy(java.io.InputStream, java.io.OutputStream) 
+     * @see #copy(java.io.Reader, java.io.Writer)
+     * @see #copy(java.io.InputStream, java.io.OutputStream, int)
+     */
+    public static void copy (InputStream pIn, Writer pWriter, int pBufSize, Charset pCharset) {
+    	final Charset cs = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	final WriterOutputStream out = new WriterOutputStream(pWriter, cs);
+		copy(pIn, out);
+		try {
+			out.flush();
+		} catch (IOException e) {
+			throw Exceptions.show(e);
+		}
     }
 
     /**

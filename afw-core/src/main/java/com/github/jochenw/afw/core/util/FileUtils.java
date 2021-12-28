@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -193,5 +194,33 @@ public class FileUtils {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	/**
+	 * Checks, whether the given file's directory exists. If not, creates it.
+	 * @param pFile The file, for which to create the directory.
+	 * @throws NullPointerException The parameter {@code pFile} is null.
+	 * @throws UncheckedIOException The directory could not be created.
+	 */
+	public static void createDirectoryFor(Path pFile) {
+		final Path file = Objects.requireNonNull(pFile, "Path");
+		final Path dir = file.getParent();
+		if (dir != null) {
+			try {
+				Files.createDirectories(dir);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
+	/**
+	 * Checks, whether the given file's directory exists. If not, creates it.
+	 * @param pFile The file, for which to create the directory.
+	 * @throws NullPointerException The parameter {@code pFile} is null.
+	 * @throws UncheckedIOException The directory could not be created.
+	 */
+	public static void createDirectoryFor(File pFile) {
+		createDirectoryFor(Objects.requireNonNull(pFile, "File").toPath());
 	}
 }

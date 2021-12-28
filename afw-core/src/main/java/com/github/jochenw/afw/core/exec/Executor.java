@@ -15,6 +15,11 @@
  */
 package com.github.jochenw.afw.core.exec;
 
+import java.io.InputStream;
+
+import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.util.Objects;
+
 /**
  *
  */
@@ -28,12 +33,19 @@ public class Executor {
     }
 
     private final String[] cmdLine;
+    private FailableConsumer<InputStream,?> stdOutHandler, stdErrHandler;
 
     /**
      * Creates a new instance with the given configuration.
      * @param pCmdLine The command line to execute.
+     * @param pStdOutHandler The handler for the external processes stdout stream.
+     * @param pStdErrHandler The handler for the external processes stderr stream.
+     * @throws NullPointerException Either of the parameters is null.
      */
-    public Executor(String[] pCmdLine) {
-        cmdLine = pCmdLine;
+    public Executor(String[] pCmdLine, FailableConsumer<InputStream,?> pStdOutHandler,
+    		        FailableConsumer<InputStream,?> pStdErrHandler) {
+        cmdLine = Objects.requireAllNonNull(pCmdLine, "CmdLineArg");
+        stdOutHandler = Objects.requireNonNull(pStdOutHandler, "StdOutHandler");
+        stdErrHandler = Objects.requireNonNull(pStdErrHandler, "StdErrHandler");
     }
 }
