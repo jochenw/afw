@@ -39,8 +39,8 @@ import java.util.List;
  *
  */
 public class ExecutorBuilder {
-    private final List<String> cmdLine = new ArrayList<>();
-    private FailableConsumer<InputStream,?> stdOutHandler, stdErrHandler;
+	private final List<String> cmdLine = new ArrayList<>();
+    private ProcessOutputHandler stdOutHandler, stdErrHandler;
 
     /** Sets the executable, that is being executed.
      * As a side-effect, clears the argument list.
@@ -143,7 +143,7 @@ i     */
      * @see #stdOut(Path)
      * @see #stdOut(OutputStream)
      */
-    public ExecutorBuilder stdOutHandler(FailableConsumer<InputStream,?> pStdOutHandler) {
+    public ExecutorBuilder stdOutHandler(ProcessOutputHandler pStdOutHandler) {
     	stdOutHandler = Objects.requireNonNull(pStdOutHandler, "StdOutHandler");
     	return this;
     }
@@ -164,7 +164,7 @@ i     */
      */
     public ExecutorBuilder stdOut(FailableSupplier<OutputStream,?> pSupplier) {
     	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
-    	final FailableConsumer<InputStream,?> stdOutHandler = (in) -> {
+    	final ProcessOutputHandler stdOutHandler = (in) -> {
     		final OutputStream out = Objects.requireNonNull(supplier.get(), "OutputStream");
     		Streams.copy(in, out);
     		out.flush();
@@ -244,7 +244,7 @@ i     */
      */
     public ExecutorBuilder stdOut(FailableConsumer<byte[],?> pConsumer) {
     	final FailableConsumer<byte[],?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
-    	final FailableConsumer<InputStream,?> stdOutConsumer = (in) -> {
+    	final ProcessOutputHandler stdOutConsumer = (in) -> {
     		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     		Streams.copy(in, baos);
     		consumer.accept(baos.toByteArray());
@@ -265,7 +265,7 @@ i     */
      * @see #stdErr(Path)
      * @see #stdErr(OutputStream)
      */
-    public ExecutorBuilder stdErrHandler(FailableConsumer<InputStream,?> pStdErrHandler) {
+    public ExecutorBuilder stdErrHandler(ProcessOutputHandler pStdErrHandler) {
     	stdErrHandler = Objects.requireNonNull(pStdErrHandler, "StdErrHandler");
     	return this;
     }
@@ -286,7 +286,7 @@ i     */
      */
     public ExecutorBuilder stdErr(FailableSupplier<OutputStream,?> pSupplier) {
     	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
-    	final FailableConsumer<InputStream,?> stdErrHandler = (in) -> {
+    	final ProcessOutputHandler stdErrHandler = (in) -> {
     		final OutputStream out = Objects.requireNonNull(supplier.get(), "OutputStream");
     		Streams.copy(in, out);
     		out.flush();
@@ -315,7 +315,7 @@ i     */
     public ExecutorBuilder stdErr(FailableSupplier<Writer,?> pSupplier, Charset pCharset) {
     	final FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
     	final Charset cs = Objects.notNull(pCharset, StandardCharsets.UTF_8);
-    	final FailableConsumer<InputStream,?> stdErrHandler = (in) -> {
+    	final ProcessOutputHandler stdErrHandler = (in) -> {
     		final Writer w = Objects.requireNonNull(supplier.get(), "Writer");
     		Streams.copy(in, w, cs);
     		w.flush();
@@ -416,7 +416,7 @@ i     */
      */
     public ExecutorBuilder stdErr(FailableConsumer<byte[],?> pConsumer) {
     	final FailableConsumer<byte[],?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
-    	final FailableConsumer<InputStream,?> stdOutConsumer = (in) -> {
+    	final ProcessOutputHandler stdOutConsumer = (in) -> {
     		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     		Streams.copy(in, baos);
     		consumer.accept(baos.toByteArray());
@@ -442,3 +442,4 @@ i     */
     	return new Executor(cmdLine.toArray(new String[cmdLine.size()]), outHandler, errHandler);
     }
 }
+

@@ -80,6 +80,29 @@ public class JdbcHelperTest {
 		assertTrue(success.isSet());
 	}
 
+	/** Test for conversion of local time objects to database objects, and back.
+	 */
+	@Test
+	public void testTimeConversions() {
+		final Application application = getApplication(null);
+		final Worker worker = application.getComponentFactory().requireInstance(Worker.class);
+		final JdbcHelper helper = worker.getJdbcHelper();
+		final ZoneId zoneId = ZoneId.of("Europe/Berlin");
+		final ZonedDateTime expectedZonedDateTimeValue = ZonedDateTime.of(2021, 11, 21, 12, 56, 0, 0, zoneId);
+		final LocalDateTime expectedLocalDateTimeValue = expectedZonedDateTimeValue.toLocalDateTime();
+		final Timestamp timeStamp = helper.asTimestamp(expectedLocalDateTimeValue);
+		final LocalDateTime actualLocalDateTimeValue = helper.asLocalDateTime(timeStamp);
+		assertEquals(expectedLocalDateTimeValue, actualLocalDateTimeValue);
+		final LocalDate expectedLocalDate = expectedLocalDateTimeValue.toLocalDate();
+		final Date date = helper.asDate(expectedLocalDate);
+		final LocalDate actualLocalDate = helper.asLocalDate(date);
+		assertEquals(expectedLocalDate, actualLocalDate);
+		final LocalTime expectedLocalTime = expectedLocalDateTimeValue.toLocalTime();
+		final Time time = helper.asTime(expectedLocalTime);
+		final LocalTime actualLocalTime = helper.asLocalTime(time);
+		assertEquals(expectedLocalTime, actualLocalTime);
+	}
+	
 	/** Test for {@link Worker.Context#executeUpdate()}.
 	 */
 	@Test
@@ -193,7 +216,7 @@ public class JdbcHelperTest {
 				assertEquals(dateColumnValue, row.nextDate());
 				assertEquals(timeColumnValue, row.nextTime());
 				assertEquals(zonedDateTimeColumnValue, row.nextZonedDateTime(zoneId));
-				assertEquals(localDateTimeColumnValue, row.nextLocalDateTime(zoneId));
+				assertEquals(localDateTimeColumnValue, row.nextLocalDateTime());
 				assertEquals(localDateColumnValue, row.nextLocalDate(zoneId));
 				assertEquals(localTimeColumnValue, row.nextLocalTime(zoneId));
 				row.reset();
@@ -209,7 +232,7 @@ public class JdbcHelperTest {
 				  .nextDate((d) -> assertEquals(dateColumnValue, d))
 				  .nextTime((t) -> assertEquals(timeColumnValue, t))
 				  .nextZonedDateTime((z) -> assertEquals(zonedDateTimeColumnValue, z), zoneId)
-				  .nextLocalDateTime((l) -> assertEquals(localDateTimeColumnValue, l), zoneId)
+				  .nextLocalDateTime((l) -> assertEquals(localDateTimeColumnValue, l))
 				  .nextLocalDate((l) -> assertEquals(localDateColumnValue, l), zoneId)
 				  .nextLocalTime((l) -> assertEquals(localTimeColumnValue, l), zoneId);
 			}, Long.valueOf(1));
@@ -225,7 +248,7 @@ public class JdbcHelperTest {
 				assertNull(row.nextDate());
 				assertNull(row.nextTime());
 				assertNull(row.nextZonedDateTime(zoneId));
-				assertNull(row.nextLocalDateTime(zoneId));
+				assertNull(row.nextLocalDateTime());
 				assertNull(row.nextLocalDate(zoneId));
 				assertNull(row.nextLocalTime(zoneId));
 				row.reset();
@@ -241,7 +264,7 @@ public class JdbcHelperTest {
 				  .nextDate((d) -> assertNull(d))
 				  .nextTime((t) -> assertNull(t))
 				  .nextZonedDateTime((z) -> assertNull(z), zoneId)
-				  .nextLocalDateTime((l) -> assertNull(l), zoneId)
+				  .nextLocalDateTime((l) -> assertNull(l))
 				  .nextLocalDate((l) -> assertNull(l), zoneId)
 				  .nextLocalTime((l) -> assertNull(l), zoneId);
 			}, Long.valueOf(2));

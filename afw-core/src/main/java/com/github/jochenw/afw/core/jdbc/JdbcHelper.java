@@ -37,13 +37,14 @@ import com.github.jochenw.afw.core.util.Functions.ShortConsumer;
  */
 public class JdbcHelper {
 	private static final ZoneId UTC = ZoneId.of("GMT");
-	private ZoneId dbZoneId = UTC;
+	private @Nonnull ZoneId dbZoneId = UTC;
+	private @Nonnull ZoneId appZoneId = ZoneId.systemDefault();
 
 	/** Returns the database time zone id.
 	 * @return The database time zone id.
 	 */
 	public @Nonnull ZoneId getDbZoneId() {
-		return Objects.requireNonNull(dbZoneId, "DbZoneId");
+		return dbZoneId;
 	}
 
 	/** Sets the database time zone id.
@@ -52,6 +53,21 @@ public class JdbcHelper {
 	public @Inject void setDbZoneId(@Named(value="db") ZoneId pDbZoneId) {
 		dbZoneId = Objects.requireNonNull(pDbZoneId, "DbZoneId");
 	}
+
+	/** Returns the application time zone id.
+	 * @return The application time zone id.
+	 */
+	public @Nonnull ZoneId getAppZoneId() {
+		return appZoneId;
+	}
+
+	/** Sets the application time zone id.
+	 * @param pAppZoneId The application time zone id.
+	 */
+	public @Inject void setAppZoneId(ZoneId pAppZoneId) {
+		appZoneId = Objects.requireNonNull(pAppZoneId, "AppZoneId");
+	}
+
 
 	/** Abstract representation of a row in the {@link ResultSet}. Allows a code style, that is
 	 * independent from JDBC.
@@ -632,8 +648,8 @@ public class JdbcHelper {
 		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return The next ZonedDateTime in the column list.
 		 */
-		public @Nullable LocalDateTime nextLocalDateTime(@Nullable ZoneId pZoneId) {
-			return getLocalDateTime(++index, pZoneId);
+		public @Nullable LocalDateTime nextLocalDateTime() {
+			return getLocalDateTime(++index);
 		}
 
 		/** Passes the next value in the column list as a LocalDateTime to the
@@ -643,10 +659,9 @@ public class JdbcHelper {
 		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Row nextLocalDateTime(@Nonnull Consumer<LocalDateTime> pConsumer,
-				                              @Nullable ZoneId pZoneId) {
+		public @Nonnull Row nextLocalDateTime(@Nonnull Consumer<LocalDateTime> pConsumer) {
 			final Consumer<LocalDateTime> consumer = Objects.requireNonNull(pConsumer, "Consumer");
-			consumer.accept(getLocalDateTime(++index, pZoneId));
+			consumer.accept(getLocalDateTime(++index));
 			return this;
 		}
 
@@ -656,23 +671,17 @@ public class JdbcHelper {
 		 * @return The double object with the given index in the column list,
 		 *   possibly null.
 		 */
-		public @Nullable LocalDateTime getLocalDateTime(int pIndex, @Nullable ZoneId pZoneId) {
+		public @Nullable LocalDateTime getLocalDateTime(int pIndex) {
 			try {
 				final Timestamp timestamp = rs.getTimestamp(pIndex);
 				if (timestamp == null) {
 					return null;
 				} else {
-					return asZonedDateTime(timestamp, pZoneId).toLocalDateTime();
+					return asLocalDateTime(timestamp);
 				}
 			} catch (SQLException e) {
 				throw Exceptions.show(e);
 			}
-		}
-
-		protected ZonedDateTime asZonedDateTime(java.util.Date pDate, ZoneId pZoneId) {
-			ZoneId zoneId = com.github.jochenw.afw.core.util.Objects.notNull(pZoneId, UTC);
-			return ZonedDateTime.ofInstant(pDate.toInstant(), dbZoneId)
-					.withZoneSameInstant(zoneId);
 		}
 
 		/** Returns the next Timestamp in the column list.
@@ -809,10 +818,7 @@ public class JdbcHelper {
 				if (date == null) {
 					return null;
 				} else {
-					ZoneId zoneId = com.github.jochenw.afw.core.util.Objects.notNull(pZoneId, UTC);
-					final ZonedDateTime zdtDb = ZonedDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), dbZoneId);
-					final ZonedDateTime zdt = zdtDb.withZoneSameInstant(zoneId);
-					return zdt.toLocalDate();
+					return asLocalDate(date);
 				}
 			} catch (SQLException e) {
 				throw Exceptions.show(e);
@@ -853,10 +859,7 @@ public class JdbcHelper {
 				if (time == null) {
 					return null;
 				} else {
-					final ZoneId zoneId = com.github.jochenw.afw.core.util.Objects.notNull(pZoneId, UTC);
-					final ZonedDateTime zdtDb = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time.getTime()), dbZoneId);
-					final ZonedDateTime zdt = zdtDb.withZoneSameInstant(zoneId);
-					return zdt.toLocalTime();
+					return asLocalTime(time);
 				}
 			} catch (SQLException e) {
 				throw Exceptions.show(e);
@@ -1029,14 +1032,11 @@ public class JdbcHelper {
 			final Timestamp ts = Timestamp.from(zdtDb.toInstant());
 			pStmt.setTimestamp(pInd, ts);
 		} else if (pParam instanceof LocalDateTime) {
-			final LocalDateTime ldt = (LocalDateTime) pParam;
-			pStmt.setTimestamp(pInd, Timestamp.valueOf(ldt));
+			pStmt.setTimestamp(pInd, asTimestamp((LocalDateTime) pParam));
 		} else if (pParam instanceof LocalDate) {
-			final LocalDate ld = (LocalDate) pParam;
-			pStmt.setDate(pInd, Date.valueOf(ld));
+			pStmt.setDate(pInd, asDate((LocalDate) pParam));
 		} else if (pParam instanceof LocalTime) {
-			final LocalTime lt = (LocalTime) pParam;
-			pStmt.setTime(pInd, Time.valueOf(lt));
+			pStmt.setTime(pInd, asTime((LocalTime) pParam));
 		} else if (pParam instanceof Timestamp) {
 			pStmt.setTimestamp(pInd, (Timestamp) pParam);
 		} else if (pParam instanceof Date) {
@@ -1051,4 +1051,76 @@ public class JdbcHelper {
 			throw new IllegalStateException("Invalid parameter type: " + pParam.getClass().getName());
 		}
 	}
+
+	/** Converts a local dateTime value from the {@link #getAppZoneId() applications time zone}
+	 * to a timestamp, which is suitable for storage into the database.
+	 * @param pLocalDateTimeValue A local dateTime value, in the applications time zone.
+	 * @return A timestamp, which represents the same local dateTime value, and is suitable for
+	 *   storage into the database.
+	 */
+	public Timestamp asTimestamp(LocalDateTime pLocalDateTimeValue) {
+		final ZonedDateTime zdtApp = ZonedDateTime.of(pLocalDateTimeValue, getAppZoneId());
+		final ZonedDateTime zdtDb = zdtApp.withZoneSameInstant(getDbZoneId());
+		return Timestamp.from(zdtDb.toInstant());
+	}
+
+	/** Converts a database timestamp into a local dateTime value in the
+	 * {@link #getAppZoneId() applications time zone}.
+	 * @param pTimestamp A database timestamp.
+	 * @return A local dateTime value, which represents the same timestamp.
+	 */
+	public LocalDateTime asLocalDateTime(Timestamp pTimestamp) {
+		final ZonedDateTime zdtDb = ZonedDateTime.ofInstant(pTimestamp.toInstant(), getDbZoneId());
+		final ZonedDateTime zdtApp = zdtDb.withZoneSameInstant(getAppZoneId());
+		return zdtApp.toLocalDateTime();
+	}
+
+	/** Converts a local date value from the {@link #getAppZoneId() applications time zone}
+	 * to a date, which is suitable for storage into the database.
+	 * @param pLocalDateValue A local date value, in the applications time zone.
+	 * @return A date, which represents the same local dateTime value, and is suitable for
+	 *   storage into the database.
+	 */
+	public Date asDate(LocalDate pLocalDateValue) {
+		final ZonedDateTime zdtApp = ZonedDateTime.of(pLocalDateValue, ZERO_TIME, getAppZoneId());
+		final ZonedDateTime zdtDb = zdtApp.withZoneSameInstant(getDbZoneId());
+		return new Date(zdtDb.toInstant().toEpochMilli());
+	}
+	private static final LocalTime ZERO_TIME = LocalTime.of(0, 0, 0, 0);
+
+	/** Converts a database date into a local date value in the
+	 * {@link #getAppZoneId() applications time zone}.
+	 * @param pDate A database date.
+	 * @return A local dateTime value, which represents the same date.
+	 */
+	public LocalDate asLocalDate(Date pDate) {
+		final ZonedDateTime zdtDb = ZonedDateTime.ofInstant(Instant.ofEpochMilli(pDate.getTime()), getDbZoneId());
+		final ZonedDateTime zdtApp = zdtDb.withZoneSameInstant(getAppZoneId());
+		return zdtApp.toLocalDate();
+	}
+
+	/** Converts a local time value from the {@link #getAppZoneId() applications time zone}
+	 * to a time, which is suitable for storage into the database.
+	 * @param pLocalTimeValue A local time value, in the applications time zone.
+	 * @return A time, which represents the same local time value, and is suitable for
+	 *   storage into the database.
+	 */
+	public Time asTime(LocalTime pLocalTimeValue) {
+		final ZonedDateTime zdtApp = ZonedDateTime.of(ZERO_DATE, pLocalTimeValue, getAppZoneId());
+		final ZonedDateTime zdtDb = zdtApp.withZoneSameInstant(getDbZoneId());
+		return new Time(zdtDb.toInstant().toEpochMilli());
+	}
+	private static final LocalDate ZERO_DATE = LocalDate.of(2021, 1, 1);
+
+	/** Converts a database time into a local time value in the
+	 * {@link #getAppZoneId() applications time zone}.
+	 * @param pTime A database time.
+	 * @return A local time value, which represents the same date.
+	 */
+	public LocalTime asLocalTime(Time pTime) {
+		final ZonedDateTime zdtDb = ZonedDateTime.ofInstant(Instant.ofEpochMilli(pTime.getTime()), getDbZoneId());
+		final ZonedDateTime zdtApp = zdtDb.withZoneSameInstant(getAppZoneId());
+		return zdtApp.toLocalTime();
+	}
+
 }
