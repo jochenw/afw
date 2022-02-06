@@ -15,6 +15,7 @@ import com.github.jochenw.afw.core.util.MutableBoolean;
 
 /** Test for the {@link ArgsHandler}.
  */
+@SuppressWarnings("deprecation")
 public class ArgsHandlerTest {
 	private abstract class AbstractArgsHandler extends ArgsHandler<WmTestSuiteRunnerOptions> {
 		@Override

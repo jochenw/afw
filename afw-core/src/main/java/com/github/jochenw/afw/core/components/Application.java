@@ -1,5 +1,8 @@
 package com.github.jochenw.afw.core.components;
 
+import java.lang.reflect.Constructor;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -11,10 +14,14 @@ import com.github.jochenw.afw.core.inject.IComponentFactory;
 import com.github.jochenw.afw.core.inject.ComponentFactoryBuilder;
 import com.github.jochenw.afw.core.inject.ComponentFactoryBuilder.Module;
 import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactoryBuilder;
+import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.log.ILogFactory;
+import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
+import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
 import com.github.jochenw.afw.core.props.IPropertyFactory;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
+
 
 /** An abstract base class for deriving application singletons.
  */
@@ -110,5 +117,92 @@ public class Application {
 			}
 		}
 		return propertyFactory;
+	}
+
+	/** Creates a new {@link Application} with the given module, logger factory,
+	 * and property factory.
+	 * @param pModule A module for creating the component factory.
+	 * @param pLogFile Path of the log file. May be null, in which case logging
+	 *   occurs on {@link System#out}.
+	 * @param pLogLevel Log level of the log file. May be null, in which case
+	 *   {@link Level#INFO} is chosen as the default.
+	 * @param pPropertyUris Paths of the Property files. At least one of these
+	 *   files must exist. If multiple such files exist, then they are being
+	 *   merged into a set of properties, with increasing priority.
+	 * @return The created {@link Application}.
+	 */
+	public static Application of(Module pModule, @Nullable String pLogFile, String pLogLevel,
+			                     String... pPropertyUris) {
+		final Path logFile = pLogFile == null ? null : Paths.get(pLogFile);
+		final Level logLevel = pLogLevel == null ? null : Level.valueOf(pLogLevel.toUpperCase());
+		return of(Application.class, pModule, logFile, logLevel, pPropertyUris);
+	}
+
+	/** Creates a new {@link Application} with the given module, logger factory,
+	 * and property factory.
+	 * @param pModule A module for creating the component factory.
+	 * @param pLogFile Path of the log file. May be null, in which case logging
+	 *   occurs on {@link System#out}.
+	 * @param pLogLevel Log level of the log file. May be null, in which case
+	 *   {@link Level#INFO} is chosen as the default.
+	 * @param pPropertyUris Paths of the Property files. At least one of these
+	 *   files must exist. If multiple such files exist, then they are being
+	 *   merged into a set of properties, with increasing priority.
+	 * @return The created {@link Application}.
+	 */
+	public static Application of(Module pModule, @Nullable Path pLogFile, Level pLogLevel,
+			                     String... pPropertyUris) {
+		return of(Application.class, pModule, pLogFile, pLogLevel, pPropertyUris);
+	}
+
+	/** Creates a new {@link Application} with the given module, logger factory,
+	 * and property factory.
+	 * @param pType Type of the Application.
+	 * @param pModule A module for creating the component factory.
+	 * @param pLogFile Path of the log file. May be null, in which case logging
+	 *   occurs on {@link System#out}.
+	 * @param pLogLevel Log level of the log file. May be null, in which case
+	 *   {@link Level#INFO} is chosen as the default.
+	 * @param pPropertyUris Paths of the Property files. At least one of these
+	 *   files must exist. If multiple such files exist, then they are being
+	 *   merged into a set of properties, with increasing priority.
+	 * @return The created {@link Application}.
+	 * <T> Type of the Application.
+	 */
+	public static <A extends Application> A of(Class<A> pType, Module pModule, @Nullable Path pLogFile, Level pLogLevel,
+            String... pPropertyUris) {
+		try {
+			@SuppressWarnings("unchecked")
+			final Constructor<Application> cons = (Constructor<Application>) pType.getDeclaredConstructor(Module.class, FailableSupplier.class, FailableSupplier.class);
+			final FailableSupplier<ILogFactory,?> lfSupplier = () -> SimpleLogFactory.of(pLogFile, pLogLevel);
+			final FailableSupplier<IPropertyFactory,?> pfSupplier = () -> DefaultPropertyFactory.of(pPropertyUris);
+			final Application app = cons.newInstance(pModule, lfSupplier, pfSupplier);
+			@SuppressWarnings("unchecked")
+			final A a = (A) app;
+			return a;
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
+	}
+
+	/** Creates a new {@link Application} with the given module, logger factory,
+	 * and property factory.
+	 * @param pType Type of the Application.
+	 * @param pModule A module for creating the component factory.
+	 * @param pLogFile Path of the log file. May be null, in which case logging
+	 *   occurs on {@link System#out}.
+	 * @param pLogLevel Log level of the log file. May be null, in which case
+	 *   {@link Level#INFO} is chosen as the default.
+	 * @param pPropertyUris Paths of the Property files. At least one of these
+	 *   files must exist. If multiple such files exist, then they are being
+	 *   merged into a set of properties, with increasing priority.
+	 * @return The created {@link Application}.
+	 * <T> Type of the Application.
+	 */
+	public static <A extends Application> A of(Class<A> pType, Module pModule, @Nullable String pLogFile, String pLogLevel,
+            String... pPropertyUris) {
+		final Path logFile = pLogFile == null ? null : Paths.get(pLogFile);
+		final Level logLevel = pLogLevel == null ? null : Level.valueOf(pLogLevel.toUpperCase());
+		return of(pType, pModule, logFile, logLevel, pPropertyUris);
 	}
 }

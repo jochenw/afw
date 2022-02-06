@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.props;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
@@ -23,8 +24,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
+import javax.annotation.Nonnull;
+
 import com.github.jochenw.afw.core.util.Exceptions;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 /** Default implementation of {@link IPropertyFactory}.
@@ -202,5 +208,64 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
 	@Override
 	public synchronized String getPropertyValue(String pKey) {
 		return myProperties.get(pKey);
+	}
+
+	/** Creates a new instance by reading the given property files, in that order. (Later files
+	 * take precedence over former files.) It is an error, if neither of the property files exist.
+	 * @param pUris The locations, where to look for property files.
+	 * @return The created instance.
+	 * @throws NullPointerException The parameter {@code pUris}, or either of the elements
+	 * is null.
+	 * @throws IllegalStateException Neither of the given files was found.
+	 */
+	public static DefaultPropertyFactory of(@Nonnull String... pUris) {
+		return of(true, pUris);
+	}
+
+	/** Creates a new instance by reading the given property files, in that order. (Later files
+	 * take precedence over former files.) It is an error, if neither of the property files exist.
+	 * @param pFileRequired The value true indicates, that at least one of the files must exist.
+	 *   Otherwise, a property factory without any properties may be returned.
+	 * @param pUris The locations, where to look for property files.
+	 * @return The created instance.
+	 * @throws NullPointerException The parameter {@code pUris}, or either of the elements
+	 * is null.
+	 * @throws IllegalStateException Neither of the given files was found, and the parameter
+	 * {@code pRequired} is true.
+	 */
+	public static DefaultPropertyFactory of(boolean pFileRequired, @Nonnull String... pUris) {
+		final Properties props = new Properties();
+		boolean found = false;
+		for (String uri : pUris) {
+			final Path p1 = Paths.get(uri + ".xml");
+			final Path p2 = Paths.get(uri);
+			final Path p;
+			if (Files.isRegularFile(p2)) {
+				p = p2;
+			} else if (Files.isRegularFile(p1)) {
+				p = p1;
+			} else {
+				p = null;
+			}
+			final Properties pr = new Properties();
+			if (p != null) {
+				try (InputStream in = Files.newInputStream(p)) {
+					if (p.getFileName().toString().endsWith(".xml")) {
+						pr.loadFromXML(in);
+					} else {
+						pr.load(in);
+					}
+				} catch (IOException e) {
+					throw Exceptions.show(e);
+				}
+				props.putAll(pr);
+				found = true;
+			}
+		}
+		if (!found  &&  pFileRequired) {
+			throw new IllegalStateException("Neither of the following property files has been found: "
+					+ String.join(", ", pUris));
+		}
+		return new DefaultPropertyFactory(props);
 	}
 }

@@ -173,22 +173,24 @@ public class Functions {
 		public void accept(T1 pObject1, T2 pObject2) throws T3;
 	}
 
-    /** Failable version of {@link BiConsumer}, where the first parameter is a primitive integer.
-	 * @param <I> The first type being consumed.
-	 * @param <T> The exception type being thrown by the consumer.
+	/** Failable version of {@link BiConsumer}, where the first argument is a primitive integer.
+	 * @param <T2> The first type being consumed.
+	 * @param <T3> The exception type being thrown by the consumer.
 	 * @see BiConsumer
 	 */
 	@FunctionalInterface
-	public interface FailableBiIntConsumer<I extends Object, T extends Throwable> {
+	public interface FailableBiIntConsumer<T2 extends Object, T3 extends Throwable> {
 		/** Called to consume the given objects.
-		 * @param pObject1 The first input parameter being consumed, a primitive integer.
-		 * @param pObject2 The second input parameter being consumed.
-		 * @throws T The exception type being thrown by the consumer.
+		 * @param pObject1 The first object being consumed.
+		 * @param pObject2 The second object being consumed.
+		 * @see BiConsumer#accept(Object,Object)
+		 * @throws T3 The exception type being thrown by the consumer.
 		 */
-		public void accept(int pObject1, I pObject2) throws T;
+		public void accept(int pObject1, T2 pObject2) throws T3;
 	}
 
-        /** Failable version of {@link BiConsumer}, where the first parameter is a primitive long.
+
+    /** Failable version of {@link BiConsumer}, where the first parameter is a primitive long.
 	 * @param <I> The first type being consumed.
 	 * @param <T> The exception type being thrown by the consumer.
 	 * @see BiConsumer

@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.crypt.JceKeyHandler;
 import com.github.jochenw.afw.core.crypt.BcKeyHandler;
 import com.github.jochenw.afw.core.crypt.DefaultKeyHandler;
 import com.github.jochenw.afw.core.crypt.IKeyHandler;

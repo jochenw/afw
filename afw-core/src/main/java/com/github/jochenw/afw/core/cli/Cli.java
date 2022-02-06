@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Functions;
 import com.github.jochenw.afw.core.util.Objects;
+
 import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
@@ -412,6 +413,73 @@ public class Cli<B> {
 		}
 	}
 
+	/** Implementation of {@link Option} for enum values.
+	 * @param <O> Type of the option bean.
+	 * @param <T> Type of the enum.
+	 */
+	public static class EnumOption<O,T extends Enum<T>> extends Option<T,O>
+	{
+		private final Class<T> type;
+	
+		/** Creates a new instance with the given cli.
+		 * @param pCli The builder, that creates this option.
+		 * @param pType Type of the enum parameter.
+		 * @param pPrimaryName The options primary name.
+		 * @param pSecondaryNames The options secondary names, if any, or null.
+		 */
+		public EnumOption(Cli<O> pCli, Class<T> pType, String pPrimaryName, String[] pSecondaryNames) {
+			super(pCli, pPrimaryName, pSecondaryNames);
+			type = pType;
+		}
+
+		@Override
+		protected T asValue(String pValue) {
+			final Enum<?> en;
+			try {
+				@SuppressWarnings("unchecked")
+				final Enum<?> e = (Enum<?>) Enum.valueOf(type, pValue);
+				en = e;
+			} catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException("Invalid value for parameter "
+						+ getPrimaryName() + ": " + pValue);
+			}
+			@SuppressWarnings("unchecked")
+			final T t = (T) en;
+			return t;
+		}
+
+		@Override
+		public EnumOption<O, T> required() {
+			super.required();
+			return this;
+		}
+
+		@Override
+		public EnumOption<O, T> required(boolean pRequired) {
+			super.required(pRequired);
+			return this;
+		}
+
+		@Override
+		public EnumOption<O, T> repeatable() {
+			super.repeatable();
+			return this;
+		}
+
+		@Override
+		public EnumOption<O, T> repeatable(boolean pRepeatable) {
+			super.repeatable(pRepeatable);
+			return this;
+		}
+
+		/** Returns the Enum parameters type.
+		 * @return The Enum parameters type.
+		 */
+		public Class<T> getType() {
+			return type;
+		}
+	}
+
 	private final B bean;
 	private final Map<String,Option<?,B>> options = new HashMap<>();
 	private Function<String,RuntimeException> errorHandler;
@@ -492,6 +560,18 @@ public class Cli<B> {
 		return option(new PathOption<>(this, pPrimaryName, pSecondaryNames));
 	}
 
+	/** Creates an option builder, that takes an {@link Enum} value.
+	 * @param pType Type of the Enum parameter.
+	 * @param pPrimaryName The options primary name.
+	 * @param pSecondaryNames The options secondary names.
+	 * @return The created option builder.
+	 * <T> Type of the Enum parameter.
+	 */
+	public <T extends Enum<T>> EnumOption<B,T> enumOption(Class<T> pType, String pPrimaryName,
+			String... pSecondaryNames) {
+		return option(new EnumOption<B,T>(this, pType, pPrimaryName, pSecondaryNames));
+	}
+	
 	/** Creates an option builder, that takes a boolean value.
 	 * @param pPrimaryName The options primary name.
 	 * @param pSecondaryNames The options secondary names.
@@ -599,6 +679,14 @@ public class Cli<B> {
 			option.setPresent(true);
 			optionValues.put(option.getPrimaryName(), value);
 		}
+		options.entrySet().forEach((en) -> {
+			final String optionName = en.getKey();
+			final Option<?,B> option = en.getValue();
+			final String defaultValue = option.getDefaultValue();
+			if (defaultValue != null  &&  !optionValues.containsKey(optionName)) {
+				optionValues.put(optionName, defaultValue);
+			}
+		});
 		for (Map.Entry<String,String> en : optionValues.entrySet()) {
 			final String optionName = en.getKey();
 			final String optionValue = en.getValue();
@@ -664,5 +752,14 @@ public class Cli<B> {
 				throw error(msg);
 			}
 		}
+	}
+
+	/** Creates  new instance, which configures the given bean.
+	 * @param <T> The instances bean type.
+	 * @param pBean The instances bean, that is being configured.
+	 * @return The created instance.
+	 */
+	public static <T> Cli<T> of(T pBean) {
+		return new Cli<T>(pBean);
 	}
 }

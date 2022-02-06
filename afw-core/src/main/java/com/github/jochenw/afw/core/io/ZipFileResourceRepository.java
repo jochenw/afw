@@ -13,7 +13,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import com.github.jochenw.afw.core.io.IResourceRepository;
 import com.github.jochenw.afw.core.io.IResourceRepository.IResource;
 import com.github.jochenw.afw.core.util.Exceptions;
 

@@ -15,16 +15,26 @@
  */
 package com.github.jochenw.afw.core.log.simple;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
 import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.FileUtils;
+import com.github.jochenw.afw.core.util.Objects;
 
 /** Very simple implementation of {@link ILogFactory}, which is not based on any
  * external logging framework.
@@ -133,5 +143,72 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	@Override
 	protected void init() {
 		// Does nothing.
+	}
+
+	/**
+	 * Creates a new instance, which is logging to the given log file,
+	 * using the given log level.
+	 * @param pLogFile The log file to use. May be null, or empty, in
+	 *   which case {@link System#out} will be used for logging.
+	 * @param pLogLevel The log level to use. May be null, or empty, in
+	 *   which case {@link Level#INFO} will be used as the log level.
+	 * @return The created instance of {@link SimpleLogFactory}.
+	 */
+	public static @Nonnull ILogFactory of(@Nullable String pLogFile, @Nullable String pLogLevel) {
+		final Path logPath;
+		if (pLogFile == null  ||  pLogFile.length() == 0) {
+			logPath = null;
+		} else {
+			logPath = Paths.get(pLogFile);
+		}
+		return of(logPath, pLogLevel);
+	}
+
+	/**
+	 * Creates a new instance, which is logging to the given log file,
+	 * using the given log level.
+	 * @param pLogFile The log file to use. May be null, or empty, in
+	 *   which case {@link System#out} will be used for logging.
+	 * @param pLogLevel The log level to use. May be null, or empty, in
+	 *   which case {@link Level#INFO} will be used as the log level.
+	 * @return The created instance of {@link SimpleLogFactory}.
+	 */
+	public static @Nonnull ILogFactory of(@Nullable Path pLogFile, @Nullable String pLogLevel) {
+		Level level = null;
+		if (pLogLevel != null  &&  pLogLevel.length() > 0) {
+			try {
+				level = Level.valueOf(pLogLevel.toUpperCase());
+			} catch (IllegalArgumentException e) {
+				level = null;
+			}
+		}
+		return of(pLogFile, level);
+	}
+
+	/**
+	 * Creates a new instance, which is logging to the given log file,
+	 * using the given log level.
+	 * @param pLogFile The log file to use. May be null, or empty, in
+	 *   which case {@link System#out} will be used for logging.
+	 * @param pLogLevel The log level to use. May be null, or empty, in
+	 *   which case {@link Level#INFO} will be used as the log level.
+	 * @return The created instance of {@link SimpleLogFactory}.
+	 */
+	public static @Nonnull ILogFactory of(@Nullable Path pLogFile, @Nullable Level pLogLevel) {
+		final SimpleLogFactory slf;
+		if (pLogFile == null) {
+			slf = new SimpleLogFactory(System.out);
+		} else {
+			try {
+				FileUtils.createDirectoryFor(pLogFile);
+				final OutputStream out = new FileOutputStream(pLogFile.toFile(), true);
+				final BufferedOutputStream bos = new BufferedOutputStream(out);
+				slf = new SimpleLogFactory(new PrintStream(bos));
+			} catch (IOException e) {
+				throw Exceptions.show(e);
+			}
+		}
+		slf.setLevel(Objects.notNull(pLogLevel, Level.INFO));
+		return slf;
 	}
 }

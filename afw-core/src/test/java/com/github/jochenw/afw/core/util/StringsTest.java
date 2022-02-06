@@ -28,6 +28,8 @@ import java.util.function.Predicate;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.log.ILog.Level;
+
 
 /**
  * Test suite for the {@link Strings} class.
@@ -306,5 +308,12 @@ public class StringsTest {
     	assertEquals("a", values[0]);
     	assertEquals("c", values[1]);
     	assertEquals("b", values[2]);
+    }
+
+    /** Test case for {@link Strings#join(String,Class)}.
+     */
+    public void testJoinEnums() {
+    	final String joinedNames = Strings.join("|", Level.class);
+    	assertEquals("TRACE|DEBUG|INFO|WARN|ERROR|FATAL", joinedNames);
     }
 }
