@@ -70,7 +70,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		 * @param pImplementation The class, which is being instantiated by the binding.
 		 * @return A binding builder without scope, but with supplier.
 		 */
-	    ScopedBindingBuilder toClass(Class<?> pImplementation);
+	    ScopedBindingBuilder toClass(Class<? extends T> pImplementation);
 		/** Sets the bindings supplier to referencing the given {@link Key}.
 		 * @param pKey The key of the binding, that is being referenced.
 		 * @return A binding builder without scope, but with supplier.
@@ -368,35 +368,38 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 
 		@Override
 		public ScopedBindingBuilder to(Class<? extends O> pImplClass) {
+			final Class<? extends O> implClass = Objects.requireNonNull(pImplClass, "ImplClass");
 			assertNotTargeted();
 			haveTarget = true;
-			targetClass = pImplClass;
+			targetClass = implClass;
 			return this;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public ScopedBindingBuilder toClass(Class<?> pImplClass) {
+		public ScopedBindingBuilder toClass(Class<? extends O> pImplClass) {
+			final Class<? extends O> implClass = Objects.requireNonNull(pImplClass, "ImplClass");
 			assertNotTargeted();
 			haveTarget = true;
-			final Class<? extends O> cl = (Class<? extends O>) pImplClass;
+			final Class<? extends O> cl = (Class<? extends O>) implClass;
 			targetClass = cl;
 			return this;
 		}
 
 		@Override
 		public ScopedBindingBuilder to(Key<? extends O> pKey) {
+			final Key<? extends O> key = Objects.requireNonNull(pKey, "Key");
 			assertNotTargeted();
 			haveTarget = true;
-			targetKey = pKey;
+			targetKey = key;
 			return this;
 		}
 
 		@Override
 		public void toInstance(O pInstance) {
+			final O instance = Objects.requireNonNull(pInstance, "Instance");
 			assertNotTargeted();
 			haveTarget = true;
-			targetInstance = pInstance;
+			targetInstance = instance;
 			if (scope == null) {
 				scope = Scopes.SINGLETON;
 			}
@@ -700,7 +703,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 					if (provider == null) {
 						final Supplier<? extends O> supplier = pBb.targetSupplier;
 						if (supplier == null) {
-							throw new IllegalStateException("Neither of the methods to(Class), to(Key), toInstance(), toProvider(), or toConstructor() have been invoked on the BindingBuilder.");
+							throw new IllegalStateException("Neither of the methods to(Class), to(Key), toInstance(), toProvider(), or toConstructor() have been invoked on the BindingBuilder: " + pBb.key);
 						} else {
 							return () -> {
 								return supplier.get();
