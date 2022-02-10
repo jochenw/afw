@@ -255,4 +255,14 @@ public class Objects {
 			throw new IllegalStateException("Invalid type: " + pType.getName());
 		}
 	}
+
+	/** Creates an array, that contains the given elements.
+	 * @param pValues The created arrays elements.
+	 * @param <O> The arrays element type.
+	 * @return The created array
+	 */
+	@SafeVarargs
+	public static <O> @Nonnull O[] arrayOf(@Nonnull O... pValues) {
+		return pValues;
+	}
 }

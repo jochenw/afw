@@ -70,7 +70,7 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		 * @param pImplementation The class, which is being instantiated by the binding.
 		 * @return A binding builder without scope, but with supplier.
 		 */
-	    ScopedBindingBuilder toClass(Class<? extends T> pImplementation);
+	    ScopedBindingBuilder toClass(Class<?> pImplementation);
 		/** Sets the bindings supplier to referencing the given {@link Key}.
 		 * @param pKey The key of the binding, that is being referenced.
 		 * @return A binding builder without scope, but with supplier.
@@ -376,8 +376,9 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		}
 
 		@Override
-		public ScopedBindingBuilder toClass(Class<? extends O> pImplClass) {
-			final Class<? extends O> implClass = Objects.requireNonNull(pImplClass, "ImplClass");
+		public ScopedBindingBuilder toClass(Class<?> pImplClass) {
+			@SuppressWarnings("unchecked")
+			final Class<? extends O> implClass = (Class<? extends O>) Objects.requireNonNull(pImplClass, "ImplClass");
 			assertNotTargeted();
 			haveTarget = true;
 			final Class<? extends O> cl = (Class<? extends O>) implClass;
