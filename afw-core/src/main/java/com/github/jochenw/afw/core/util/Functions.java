@@ -189,6 +189,25 @@ public class Functions {
 		public void accept(int pObject1, T2 pObject2) throws T3;
 	}
 
+	/** Failable version of a {@link Consumer} with three parameters.
+	 * @param <T1> The first type being consumed.
+	 * @param <T2> The first type being consumed.
+	 * @param <T3> The first type being consumed.
+	 * @param <T4> The exception type being thrown by the consumer.
+	 * @see BiConsumer
+	 */
+	@FunctionalInterface
+	public interface FailableTriConsumer<T1 extends Object, T2 extends Object, T3 extends Object, T4 extends Throwable> {
+		/** Called to consume the given objects.
+		 * @param pObject1 The first object being consumed.
+		 * @param pObject2 The second object being consumed.
+		 * @param pObject3 The second object being consumed.
+		 * @see BiConsumer#accept(Object,Object)
+		 * @throws T4 The exception type being thrown by the consumer.
+		 */
+		public void accept(T1 pObject1, T2 pObject2, T3 pObject3) throws T4;
+	}
+
 
     /** Failable version of {@link BiConsumer}, where the first parameter is a primitive long.
 	 * @param <I> The first type being consumed.

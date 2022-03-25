@@ -15,14 +15,18 @@
  */
 package com.github.jochenw.afw.core.log.log4j;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 
+import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
 import com.github.jochenw.afw.core.log.ILogFactory;
@@ -47,12 +51,66 @@ public class Log4j2LogFactory extends AbstractLogFactory {
 	protected void init() {
 		final URL url = getUrl();
 		try (InputStream in = url.openStream()) {
-			final ConfigurationSource csource = new ConfigurationSource(in, url);
+			configure(in, url.toExternalForm());
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
+	}
+
+	protected void configure(InputStream pIn, String pUri) {
+		try {
+			final ConfigurationSource csource = new ConfigurationSource(pIn);
 			Configurator.initialize(Thread.currentThread().getContextClassLoader(), csource);
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
 		logger = LogManager.getLogger(Log4j2LogFactory.class);
-		logger.info("Log4j2 configured from " + url);
+		logger.info("Log4j2 configured from " + pUri);
+	}
+
+	/** Creates a new instance, which is being configured by reading the given {@link IReadable readable}.
+	 * @param pReadable The document, that provides the Log4j 2 configuration.
+	 * @throws NullPointerException The parameter {@code pReadable} is null.
+	 * @return The created instance.
+	 */
+	public static Log4j2LogFactory of (IReadable pReadable) {
+		final IReadable readable = Objects.requireNonNull(pReadable, "Readable");
+		final Log4j2LogFactory lf = new Log4j2LogFactory() {
+			@Override
+			protected void init() {
+				readable.read((in) -> {
+					configure(in, readable.getName());
+				});
+			}
+		};
+		lf.start();
+		return lf;
+	}
+
+	/** Creates a new instance, which is being configured by reading the given {@link Path file}.
+	 * @param pPath The file, that provides the Log4j 2 configuration.
+	 * @throws NullPointerException The parameter {@code pPath} is null.
+	 * @return The created instance.
+	 */
+	public static Log4j2LogFactory of (Path pPath) {
+		return of(IReadable.of(Objects.requireNonNull(pPath, "Path")));
+	}
+
+	/** Creates a new instance, which is being configured by reading the given {@link File file}.
+	 * @param pFile The file, that provides the Log4j 2 configuration.
+	 * @throws NullPointerException The parameter {@code pFile} is null.
+	 * @return The created instance.
+	 */
+	public static Log4j2LogFactory of (File pFile) {
+		return of(IReadable.of(Objects.requireNonNull(pFile, "File")));
+	}
+
+	/** Creates a new instance, which is being configured by reading the given {@link URL url}.
+	 * @param pUrl The URL, that provides the Log4j 2 configuration.
+	 * @throws NullPointerException The parameter {@code pUrl} is null.
+	 * @return The created instance.
+	 */
+	public static Log4j2LogFactory of (URL pUrl) {
+		return of(IReadable.of(Objects.requireNonNull(pUrl, "URL")));
 	}
 }

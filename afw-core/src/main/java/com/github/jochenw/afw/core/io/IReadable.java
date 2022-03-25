@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.core.io;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -119,10 +120,11 @@ public interface IReadable {
 	 * @throws NoLongerReadableException The {@link IReadable} isn't repeatable, and has
 	 *   already been opened.
 	 */
-	public default void read(FailableConsumer<Reader,?> pConsumer, Charset pCharset) throws NoLongerReadableException {
+	public default void read(FailableConsumer<BufferedReader,?> pConsumer, Charset pCharset) throws NoLongerReadableException {
 		read((in) -> {
-			try (Reader rdr = new InputStreamReader(in, pCharset)) {
-				pConsumer.accept(rdr);
+			try (Reader rdr = new InputStreamReader(in, pCharset);
+				 BufferedReader br = new BufferedReader(rdr)) {
+				pConsumer.accept(br);
 			}
 		});
 	}
@@ -139,11 +141,12 @@ public interface IReadable {
 	 *   already been opened.
 	 * @return The value, that has been returned by the invoked function.
 	 */
-	public default <O> O apply(FailableFunction<Reader,O,?> pFunction, Charset pCharset) throws NoLongerReadableException {
+	public default <O> O apply(FailableFunction<BufferedReader,O,?> pFunction, Charset pCharset) throws NoLongerReadableException {
 		final Holder<O> holder = new Holder<>();
 		read((in) -> {
-			try (Reader rdr = new InputStreamReader(in, pCharset)) {
-				holder.set(pFunction.apply(rdr));
+			try (Reader rdr = new InputStreamReader(in, pCharset);
+				 BufferedReader br = new BufferedReader(rdr)) {
+				holder.set(pFunction.apply(br));
 			}
 		});
 		return holder.get();

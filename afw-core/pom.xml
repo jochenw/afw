@@ -18,7 +18,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.jochenw.afw</groupId>
   <artifactId>afw-core</artifactId>
-  <version>0.5.7-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <name>AFW (Core)</name>
   <description>Application Framework (Core)</description>
   <properties>
@@ -141,7 +141,7 @@
   	<dependency>
   		<groupId>org.apache.logging.log4j</groupId>
   		<artifactId>log4j-api</artifactId>
-  		<version>2.17.1</version>
+  		<version>2.17.2</version>
   	</dependency>
   	<dependency>
   		<groupId>org.slf4j</groupId>
@@ -152,7 +152,7 @@
   	<dependency>
   		<groupId>org.apache.logging.log4j</groupId>
   		<artifactId>log4j-core</artifactId>
-  		<version>2.17.1</version>
+  		<version>2.17.2</version>
   	</dependency>
   	<dependency>
   		<groupId>javax.servlet</groupId>

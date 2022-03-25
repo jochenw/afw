@@ -17,8 +17,6 @@ package com.github.jochenw.afw.core.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,7 +27,7 @@ import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 /** A class for reading, and writing property files, including comments.
  */
-public class Properties {
+public class PropertyUtils {
 	/** A class, which representy an entry in the property set.
 	 */
 	public static class Entry {

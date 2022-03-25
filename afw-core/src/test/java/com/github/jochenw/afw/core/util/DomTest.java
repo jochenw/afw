@@ -8,28 +8,21 @@ import static org.junit.Assert.*;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.function.BiFunction;
 
 import javax.xml.XMLConstants;
 
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
 
 import com.github.jochenw.afw.core.util.DomHelper.LocalizableException;
+
 
 /**
  * @author jwi
  *
  */
 public class DomTest {
-	private static final DomHelper domHelper = newDomHelper();
-
-	private static DomHelper newDomHelper() {
-		return new DomHelper();
-	}
-
 	private static final String SAMPLE_DOCUMENT =
 			"<html xmlns:t='foo'>\n"
 			+ "<head><title>Sample Document</title></head>"

@@ -172,7 +172,6 @@ public class FunctionsTest {
     /** Tests, whether we can instantiate the Functions class.
      * @throws Exception The test failed.
      */
-    @SuppressWarnings("deprecation")
 	@Test
     public void testCreate() throws Exception {
     	final Constructor<Functions> constructor = Functions.class.getDeclaredConstructor();

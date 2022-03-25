@@ -2,32 +2,16 @@ package com.github.jochenw.afw.core.data;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.Function;
 
 import org.junit.Test;
-
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
 /**
  * Test suite for the {@link Data} class.
  */
 public class DataTest {
-	/**
-	 * Test case for {@link Data#getValue(Function, String)}.
-	 */
-	@Test
-	public void testGetValue() {
-		final Map<String, Object> map = getMap();
-		assertEquals("bar", Data.getValue(map::get, "foo"));
-		assertNull(Data.getValue(map::get, "bar"));
-	}
-
 	protected Map<String, Object> getMap() {
 		final Map<String, Object> map = new HashMap<>();
 		map.put("foo", "bar");
@@ -44,96 +28,6 @@ public class DataTest {
 		return props;
 	}
 
-	/**
-	 * Test case for {@link Data#getString(Function, String, String)}.
-	 */
-	@Test
-	public void testGetStringFailableFunctionOfStringObjectQStringString() {
-		final Map<String, Object> map = getMap();
-		assertEquals("bar", Data.getString(map::get, "foo", "foo"));
-		assertNull(Data.getString(map::get, "bar", "bar"));
-		try {
-			Data.getString(map::get, "test", "Description of test");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected string, got java.lang.Boolean",
-					e.getMessage());
-		}
-	}
-
-	/**
-	 * Test case for {@link Data#requireString(Function, String, String)}.
-	 */
-	@Test
-	public void testRequireStringFailableFunctionOfStringObjectQStringString() {
-		final Map<String, Object> map = getMap();
-		final FailableFunction<String, Object, ?> func = (s) -> {
-			return map.get(s);
-		};
-		assertEquals("bar", Data.requireString(func, "foo", "foo"));
-		try {
-			Data.requireString(func, "bar", "baz");
-			fail("Expected Exception");
-		} catch (NullPointerException e) {
-			assertEquals("Missing value for baz", e.getMessage());
-		}
-		try {
-			Data.requireString(func, "empty", "baz");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for baz", e.getMessage());
-		}
-		try {
-			Data.requireString(func, "test", "Description of test");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected string, got java.lang.Boolean",
-					e.getMessage());
-		}
-		try {
-			Data.requireString(func, "answer", "Reply to the question");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Reply to the question: Expected string, got java.lang.Integer",
-					e.getMessage());
-		}
-	}
-
-	/**
-	 * Test case for {@link Data#requirePath(Function, String, String)}.
-	 */
-	@Test
-	public void testRequirePathFailableFunctionOfStringObjectQStringString() {
-		final Map<String, Object> map = getMap();
-		final FailableFunction<String, Object, ?> func = (s) -> {
-			return map.get(s);
-		};
-		assertEquals("bar", Data.requirePath(func, "foo", "foo").toString());
-		try {
-			Data.requirePath(func, "bar", "baz");
-			fail("Expected Exception");
-		} catch (NullPointerException e) {
-			assertEquals("Missing value for baz", e.getMessage());
-		}
-		try {
-			Data.requirePath(func, "empty", "baz");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for baz", e.getMessage());
-		}
-		try {
-			Data.requirePath(func, "test", "Description of test");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected path, got java.lang.Boolean", e.getMessage());
-		}
-		Path path = Paths.get(".");
-		map.put("path", path);
-		assertSame(path, Data.requirePath(func, "path", "path"));
-		File file = new File(".");
-		map.put("file", file);
-		assertEquals(path, Data.requirePath(func, "file", "file"));
-	}
 
 	/**
 	 * Test case for {@link Data#getString(Map, String, String)}.
@@ -147,7 +41,7 @@ public class DataTest {
 			Data.getString(map, "test", "Description of test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected string, got java.lang.Boolean",
+			assertEquals("Invalid value for parameter Description of test: Expected string, got java.lang.Boolean",
 					e.getMessage());
 		}
 	}
@@ -164,7 +58,7 @@ public class DataTest {
 			Data.getString(map, "test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Map key test: Expected string, got java.lang.Boolean", e.getMessage());
+			assertEquals("Invalid value for parameter test: Expected string, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -180,7 +74,7 @@ public class DataTest {
 			Data.getString(map, "test", "Description of test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected string, got java.lang.Boolean",
+			assertEquals("Invalid value for parameter Description of test: Expected string, got java.lang.Boolean",
 					e.getMessage());
 		}
 	}
@@ -197,7 +91,7 @@ public class DataTest {
 			Data.getString(map, "test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for property test: Expected string, got java.lang.Boolean", e.getMessage());
+			assertEquals("Invalid value for parameter test: Expected string, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -212,19 +106,19 @@ public class DataTest {
 			Data.requirePath(map, "bar", "baz");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for baz", e.getMessage());
+			assertEquals("Missing value for parameter baz", e.getMessage());
 		}
 		try {
 			Data.requirePath(map, "empty", "baz");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for baz", e.getMessage());
+			assertEquals("Empty value for parameter baz", e.getMessage());
 		}
 		try {
 			Data.requirePath(map, "test", "Description of test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected path, got java.lang.Boolean", e.getMessage());
+			assertEquals("Invalid value for parameter Description of test: Expected path, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -239,19 +133,19 @@ public class DataTest {
 			Data.requireString(map, "bar");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for Map key bar", e.getMessage());
+			assertEquals("Missing value for parameter bar", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "empty");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for Map key empty", e.getMessage());
+			assertEquals("Empty value for parameter empty", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Map key test: Expected string, got java.lang.Boolean", e.getMessage());
+			assertEquals("Invalid value for parameter test: Expected string, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -266,19 +160,19 @@ public class DataTest {
 			Data.requireString(props, "NoSuchValue", "some value");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for some value", e.getMessage());
+			assertEquals("Missing value for parameter some value", e.getMessage());
 		}
 		try {
 			Data.requireString(props, "empty", "some value");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for some value", e.getMessage());
+			assertEquals("Empty value for parameter some value", e.getMessage());
 		}
 		try {
 			Data.requireString(props, "test", "some value");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for some value: Expected string, got java.lang.Boolean", e.getMessage());
+			assertEquals("Invalid value for parameter some value: Expected string, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -293,19 +187,19 @@ public class DataTest {
 			Data.requireString(props, "NoSuchValue");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for Property NoSuchValue", e.getMessage());
+			assertEquals("Missing value for parameter NoSuchValue", e.getMessage());
 		}
 		try {
 			Data.requireString(props, "empty");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for Property empty", e.getMessage());
+			assertEquals("Empty value for parameter empty", e.getMessage());
 		}
 		try {
 			Data.requireString(props, "test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Property test: Expected string, got java.lang.Boolean", e.getMessage());
+			assertEquals("Invalid value for parameter test: Expected string, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -320,26 +214,26 @@ public class DataTest {
 			Data.requireString(map, "bar", "baz");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for baz", e.getMessage());
+			assertEquals("Missing value for parameter baz", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "empty", "baz");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for baz", e.getMessage());
+			assertEquals("Empty value for parameter baz", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "test", "Description of test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected string, got java.lang.Boolean",
+			assertEquals("Invalid value for parameter Description of test: Expected string, got java.lang.Boolean",
 					e.getMessage());
 		}
 		try {
 			Data.requireString(map, "answer", "Reply to the question");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Reply to the question: Expected string, got java.lang.Integer",
+			assertEquals("Invalid value for parameter Reply to the question: Expected string, got java.lang.Integer",
 					e.getMessage());
 		}
 	}
@@ -355,26 +249,26 @@ public class DataTest {
 			Data.requireString(map, "bar");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for Map key bar", e.getMessage());
+			assertEquals("Missing value for parameter bar", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "empty");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for Map key empty", e.getMessage());
+			assertEquals("Empty value for parameter empty", e.getMessage());
 		}
 		try {
 			Data.requireString(map, "test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Map key test: Expected string, got java.lang.Boolean",
+			assertEquals("Invalid value for parameter test: Expected string, got java.lang.Boolean",
 					e.getMessage());
 		}
 		try {
 			Data.requireString(map, "answer");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Map key answer: Expected string, got java.lang.Integer",
+			assertEquals("Invalid value for parameter answer: Expected string, got java.lang.Integer",
 					e.getMessage());
 		}
 	}
@@ -390,19 +284,19 @@ public class DataTest {
 			Data.requirePath(props, "bar", "baz");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for baz", e.getMessage());
+			assertEquals("Missing value for parameter baz", e.getMessage());
 		}
 		try {
 			Data.requirePath(props, "empty", "baz");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for baz", e.getMessage());
+			assertEquals("Empty value for parameter baz", e.getMessage());
 		}
 		try {
 			Data.requirePath(props, "test", "Description of test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Description of test: Expected path, got java.lang.Boolean", e.getMessage());
+			assertEquals("Invalid value for parameter Description of test: Expected path, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -417,67 +311,19 @@ public class DataTest {
 			Data.requirePath(props, "bar");
 			fail("Expected Exception");
 		} catch (NullPointerException e) {
-			assertEquals("Missing value for Property bar", e.getMessage());
+			assertEquals("Missing value for parameter bar", e.getMessage());
 		}
 		try {
 			Data.requirePath(props, "empty");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Empty value for Property empty", e.getMessage());
+			assertEquals("Empty value for parameter empty", e.getMessage());
 		}
 		try {
 			Data.requirePath(props, "test");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Property test: Expected path, got java.lang.Boolean", e.getMessage());
-		}
-	}
-
-	/** Test case for {@link Data#getBoolean(FailableFunction, String, String)}.
-	 */
-	@Test
-	public void testGetBooleanFailableFunctionOfStringObjectQStringString() {
-		final Map<String,Object> map = getMap();
-		final FailableFunction<String,Object,?> func = map::get;
-		assertEquals(Boolean.TRUE, Data.getBoolean(func, "test", "test"));
-		assertNull(Data.getBoolean(func, "NoSuchValue", "NoSuchValue"));
-		assertEquals(Boolean.TRUE, Data.getBoolean(func, "b", "b"));
-		assertEquals(Boolean.FALSE, Data.getBoolean(func, "foo", "foo"));
-		try {
-			Data.getBoolean(func, "answer", "answer");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for answer: Expected boolean, or string, got java.lang.Integer", e.getMessage());
-		}
-		try {
-			Data.getBoolean(func, "answer", "answ");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for answ: Expected boolean, or string, got java.lang.Integer", e.getMessage());
-		}
-	}
-
-	/**
-	 * Test case for {@link Data#getBoolean(Map, String, String)}.
-	 */
-	@Test
-	public void testGetBooleanMapOfStringObjectStringString() {
-		final Map<String,Object> map = getMap();
-		assertEquals(Boolean.TRUE, Data.getBoolean(map, "test", "test"));
-		assertNull(Data.getBoolean(map, "NoSuchValue", "NoSuchValue"));
-		assertEquals(Boolean.TRUE, Data.getBoolean(map, "b", "b"));
-		assertEquals(Boolean.FALSE, Data.getBoolean(map, "foo", "foo"));
-		try {
-			Data.getBoolean(map, "answer", "answer");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for answer: Expected boolean, or string, got java.lang.Integer", e.getMessage());
-		}
-		try {
-			Data.getBoolean(map, "answer", "answ");
-			fail("Expected Exception");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for answ: Expected boolean, or string, got java.lang.Integer", e.getMessage());
+			assertEquals("Invalid value for parameter test: Expected path, got java.lang.Boolean", e.getMessage());
 		}
 	}
 
@@ -495,7 +341,7 @@ public class DataTest {
 			Data.getBoolean(map, "answer");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Map key answer: Expected boolean, or string, got java.lang.Integer", e.getMessage());
+			assertEquals("Invalid value for parameter answer: Expected string, or boolean, got java.lang.Integer", e.getMessage());
 		}
 	}
 
@@ -513,13 +359,13 @@ public class DataTest {
 			Data.getBoolean(props, "answer", "answer");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for answer: Expected boolean, or string, got java.lang.Integer", e.getMessage());
+			assertEquals("Invalid value for parameter answer: Expected string, or boolean, got java.lang.Integer", e.getMessage());
 		}
 		try {
 			Data.getBoolean(props, "answer", "answ");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for answ: Expected boolean, or string, got java.lang.Integer", e.getMessage());
+			assertEquals("Invalid value for parameter answ: Expected string, or boolean, got java.lang.Integer", e.getMessage());
 		}
 	}
 
@@ -537,7 +383,7 @@ public class DataTest {
 			Data.getBoolean(props, "answer");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Invalid value for Property answer: Expected boolean, or string, got java.lang.Integer", e.getMessage());
+			assertEquals("Invalid value for parameter answer: Expected string, or boolean, got java.lang.Integer", e.getMessage());
 		}
 	}
 }

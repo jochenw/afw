@@ -7,10 +7,10 @@ import org.junit.Assume;
 import org.junit.Test;
 
 
-/** Test for {@link Files}.
+/** Test for {@link FileUtils}.
  */
 public class FileUtilsTest {
-	/** Test case for {@link Files#resolve(String)} on Linux.
+	/** Test case for {@link FileUtils#resolve(String)} on Linux.
 	 */
 	@Test
 	public void testRelativizeOnLinux() {
@@ -31,7 +31,7 @@ public class FileUtilsTest {
 		}
 	}
 
-	/** Test case for {@link Files#resolve(String)} on Windows.
+	/** Test case for {@link FileUtils#resolve(String)} on Windows.
 	 */
 	@Test
 	public void testRelativizeOnWindows() {
@@ -41,7 +41,7 @@ public class FileUtilsTest {
 		String lclBaseLogUri = "lidl/lcl/base.log";
 		Path lidlLclBaseLog1 = FileUtils.resolve(logFileDir, lclBaseLogUri);
 		assertEquals(instanceDir + "logs/" + lclBaseLogUri, lidlLclBaseLog1.toString());
-		Path lidlLclBaseLog2 = Files.resolve(logFileDir, logFileDir.toString() + "/" + lclBaseLogUri);
+		Path lidlLclBaseLog2 = FileUtils.resolve(logFileDir, logFileDir.toString() + "/" + lclBaseLogUri);
 		assertEquals(instanceDir + "logs/" + lclBaseLogUri, lidlLclBaseLog2.toString());
 		try {
 			final String invalidPath = instanceDir.replace("webMethods99", "webMethods103");
