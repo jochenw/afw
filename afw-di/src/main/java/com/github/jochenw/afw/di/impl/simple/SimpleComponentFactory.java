@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
@@ -28,7 +30,6 @@ import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.BindingBuilder;
 import com.github.jochenw.afw.di.util.Exceptions;
 import com.github.jochenw.afw.di.util.Reflection;
-import com.google.inject.name.Named;
 
 
 public class SimpleComponentFactory extends AbstractComponentFactory {
@@ -147,8 +148,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		final Annotation[][] parameterAnnotations = pMethod.getParameterAnnotations();
 		final Binding[] parameterBindings = new Binding[parameterTypes.length];
 		for (int i = 0;  i < parameterTypes.length;  i++) {
-			final Binding b = findBinding(parameterTypes[i], parameterAnnotations[i],
-					                      "Parameter " + i + " in method" + asString(pMethod));
+			final Binding b = findBinding(parameterTypes[i], parameterAnnotations[i]);
 			if (b == null) {
 				throw new IllegalStateException("No binding registered for parameter " + i + " in method "
 						+ asString(pMethod));
@@ -177,8 +177,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				throw new IllegalStateException("The field " + pField.getName() + " in class " + pClazz.getName()
 					+ " is final. Therefore, it must not be annotated with @Inject.");
 			}
-			final Binding binding = findBinding(pField.getGenericType(), pField.getAnnotations(),
-					"Field " + pField.getName() + " in class " + pClazz.getName());
+			final Binding binding = findBinding(pField.getGenericType(), pField.getAnnotations());
 			if (binding == null) {
 				throw new IllegalStateException("No binding registered for field "
 						+ pField.getName() + " in class " + pClazz.getName());
@@ -204,17 +203,34 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return sb.toString();
 	}
 
-	protected Binding findBinding(Type pType, Annotation[] pAnnotations, String pPurpose) {
-		Binding binding = bindings.find(pType, pAnnotations, this::isAnnotationApplicable);
+	protected Binding findBinding(Type pType, Annotation[] pAnnotations) {
+		Binding binding = bindings.find(pType, pAnnotations);
 		if (binding == null) {
-			if (onTheFlyBinder != null  &&  onTheFlyBinder.isInstantiable(pType, pAnnotations, this::isAnnotationApplicable)) {
-				final Function<IComponentFactory,Object> instantiator = onTheFlyBinder.getInstance(pType, pAnnotations, this::isAnnotationApplicable);
+			if (onTheFlyBinder != null  &&  onTheFlyBinder.isInstantiable(pType, pAnnotations)) {
+				final Function<IComponentFactory,Object> instantiator = onTheFlyBinder.getInstance(pType, pAnnotations);
 				return new Binding() {
 					@Override
 					public Object apply(SimpleComponentFactory pScf) {
 						return instantiator.apply(pScf);
 					}
 				};
+			}
+		}
+		if (binding == null) {
+			if (pType instanceof ParameterizedType) {
+				final ParameterizedType pt = (ParameterizedType) pType;
+				if (pt.getRawType() == Provider.class  ||  pt.getRawType() == Supplier.class) {
+					final Type[] typeArguments = pt.getActualTypeArguments();
+					if (typeArguments.length == 1) {
+						final Type typeArgument = typeArguments[0];
+						final Binding typeArgumentBinding = findBinding(typeArgument, pAnnotations);
+						if (typeArgumentBinding == null) {
+							return null;
+						} else {
+							return new ProviderBinding(typeArgumentBinding);
+						}
+					}
+				}
 			}
 		}
 		return binding;
@@ -229,12 +245,11 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				if (result != null) {
 					throw new IllegalStateException("Multiple constructors annotated with @Inject in class " + pType.getName());
 				}
-				final Class<?>[] parameterTypes = constructor.getParameterTypes();
+				final Type[] parameterTypes = constructor.getGenericParameterTypes();
 				final Annotation[][] parameterAnnotations = constructor.getParameterAnnotations();
 				final Binding[] parameterBindings = new Binding[parameterTypes.length];
 				for (int i = 0;  i < parameterTypes.length;  i++) {
-					Binding binding = findBinding(parameterTypes[i], parameterAnnotations[i],
-							"Parameter " + i + " in constructor " + constructor);
+					Binding binding = findBinding(parameterTypes[i], parameterAnnotations[i]);
 					if (binding == null) {
 						throw new IllegalStateException("No binding registered for parameter " + i + " of constructor " + constructor);
 					}
@@ -261,11 +276,6 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return result;
 	}
 
-	protected boolean isAnnotationApplicable(Annotation pAnnotation) {
-		final Class<? extends Annotation> cl = pAnnotation.getClass();
-		return cl != Inject.class  &&  cl != Named.class;
-	}
-	
 	protected Binding asBinding(BindingBuilder<Object> pBindingBuilder) {
 		throw new IllegalStateException("Not implemented");
 	}

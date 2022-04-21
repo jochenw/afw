@@ -6,33 +6,50 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 
 public class Reflection {
-	private static final Lookup lookup = MethodHandles.lookup();
-
 	public static Supplier<Object> newInstantiator(Constructor<Object> pConstructor, IntFunction<Object> pParameterSupplier) {
 		try {
+			final Lookup privateLookup = getPrivateLookup(pConstructor.getDeclaringClass());
 			final Class<?>[] parameterTypes = pConstructor.getParameterTypes();
-			final MethodType mt = MethodType.methodType(void.class, parameterTypes);
-			final MethodHandle mh = lookup.findConstructor(pConstructor.getDeclaringClass(), mt);
-			return () -> {
-				final Object[] args = new Object[parameterTypes.length];
-				for (int i = 0;  i < parameterTypes.length;  i++) {
-					args[i] = pParameterSupplier.apply(i);
-				}
-				try {
-					return mh.invokeWithArguments(args);
-				} catch (Throwable t) {
-					throw Exceptions.show(t);
-				}
-			};
+			if (privateLookup == null) {
+				// Java 8
+				return () -> {
+					final Object[] args = new Object[parameterTypes.length];
+					for (int i = 0;  i < parameterTypes.length;  i++) {
+						args[i] = pParameterSupplier.apply(i);
+					}
+					if (!pConstructor.isAccessible()) {
+						pConstructor.setAccessible(true);
+					}
+					try {
+						return pConstructor.newInstance(args);
+					} catch (Throwable t) {
+						throw Exceptions.show(t);
+					}
+				};
+			} else {
+				final MethodType mt = MethodType.methodType(void.class, parameterTypes);
+				final MethodHandle mh = privateLookup.findConstructor(pConstructor.getDeclaringClass(), mt);
+				return () -> {
+					final Object[] args = new Object[parameterTypes.length];
+					for (int i = 0;  i < parameterTypes.length;  i++) {
+						args[i] = pParameterSupplier.apply(i);
+					}
+					try {
+						return mh.invokeWithArguments(args);
+					} catch (Throwable t) {
+						throw Exceptions.show(t);
+					}
+				};
+			}
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}

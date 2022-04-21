@@ -2,9 +2,9 @@ package com.github.jochenw.afw.di.impl.simple;
 
 import java.util.function.Function;
 
-import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.util.Exceptions;
+
 
 public abstract class AbstractBinding implements Binding {
 	private final Function<SimpleComponentFactory,Object> baseSupplier;

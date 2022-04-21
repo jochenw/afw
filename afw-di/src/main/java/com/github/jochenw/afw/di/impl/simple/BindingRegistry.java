@@ -3,6 +3,7 @@ package com.github.jochenw.afw.di.impl.simple;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
@@ -125,7 +126,9 @@ public class BindingRegistry implements IComponentFactoryAware {
 						};
 					}
 				} else {
-					baseSupplier = (scf) -> pBindingBuilder.getTargetInstance();
+					baseSupplier = (scf) -> {
+						return pBindingBuilder.getTargetInstance();
+					};
 				}
 			} else {
 				baseSupplier = (scf) -> scf.newInstance(pBindingBuilder.getTargetConstructor());
@@ -145,13 +148,12 @@ public class BindingRegistry implements IComponentFactoryAware {
 		}
 	}
 
-	public Binding find(Type pType, Annotation[] pAnnotations,
-			            Predicate<Annotation> pAnnotationPredicate) {
+	public Binding find(Type pType, Annotation[] pAnnotations) {
 		final BindingSet bindingSet = bindings.get(pType);
 		if (bindingSet == null) {
 			return null;
 		} else {
-			return bindingSet.find(pAnnotations, pAnnotationPredicate);
+			return bindingSet.find(pAnnotations);
 		}
 	}
 

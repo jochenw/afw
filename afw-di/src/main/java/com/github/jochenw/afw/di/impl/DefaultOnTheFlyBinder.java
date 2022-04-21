@@ -56,14 +56,12 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	}
 
 	@Override
-	public boolean isInstantiable(Type pType, Annotation[] pAnnotations,
-			Predicate<Annotation> pAnnotationPredicate) {
+	public boolean isInstantiable(Type pType, Annotation[] pAnnotations) {
 		return false;
 	}
 
 	@Override
-	public Function<IComponentFactory, Object> getInstance(Type pType, Annotation[] pAnnotations,
-			Predicate<Annotation> pAnnotationPredicate) {
+	public Function<IComponentFactory, Object> getInstance(Type pType, Annotation[] pAnnotations) {
 		return null;
 	}
 

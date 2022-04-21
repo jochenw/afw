@@ -55,6 +55,7 @@ public class ComponentFactoryTests {
 			b.bind(Map.class).to(HashMap.class).in(Scopes.SINGLETON);
 			b.bind(Map.class, "empty").toSupplier(() -> new Hashtable<>());
 			b.bind(CreateMapsObject.class).in(Scopes.SINGLETON);
+			b.bind(SpareTire.class).in(Scopes.SINGLETON);
 		};
 		final IComponentFactory cf = new ComponentFactoryBuilder().module(module).type(pType).build();
 		final Map<String,Object> hashMapCf1 = cf.getInstance(Map.class, "hash");
@@ -112,6 +113,7 @@ public class ComponentFactoryTests {
 		final IComponentFactory cf =
 				new ComponentFactoryBuilder()
 				.type(pType)
+				.module(module)
 				.build();
 		assertNotNull(cf);
 		assertNotSame(parentCf, cf);
@@ -125,7 +127,6 @@ public class ComponentFactoryTests {
 	}
 
 	public static void testTck(Class<? extends AbstractComponentFactory> pType) {
-		testTck(pType, false);
 		testTck(pType, true);
 	}
 
@@ -134,14 +135,16 @@ public class ComponentFactoryTests {
 			@Override
 			public void configure(Binder pBinder) {
 				pBinder.bind(Car.class).to(Convertible.class);
+				pBinder.bind(Seat.class).in(Scopes.SINGLETON);
 				pBinder.bind(Seat.class).annotatedWith(Drivers.class).to(DriversSeat.class);
 				pBinder.bind(Engine.class).to(V8Engine.class);
 				pBinder.bind(Cupholder.class);
 				pBinder.bind(Tire.class);
 				pBinder.bind(Tire.class, "spare").to(SpareTire.class);
+				pBinder.bind(SpareTire.class);
 				pBinder.bind(FuelTank.class);
 				if (pStaticInjection) {
-					pBinder.requestStaticInjection(Convertible.class, SpareTire.class);
+					pBinder.requestStaticInjection(Convertible.class, Tire.class, SpareTire.class);
 				}
 			}
 		};

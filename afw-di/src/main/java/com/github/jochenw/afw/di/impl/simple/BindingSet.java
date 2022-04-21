@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javax.inject.Inject;
+
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.Key;
 
@@ -70,7 +72,7 @@ public class BindingSet {
 		};
 	}
 
-	public Binding find(Annotation[] pAnnotations, Predicate<Annotation> pAnnotationPredicate) {
+	public Binding find(Annotation[] pAnnotations) {
 		Binding defaultBinding = null;
 		Binding classAnnotatedBinding = null;
 		for (KeyAndBinding kab : bindings) {
@@ -83,7 +85,7 @@ public class BindingSet {
 					}
 				} else {
 					for (Annotation annotation : pAnnotations) {
-						if (pAnnotationPredicate.test(annotation)) {
+						if (!(annotation instanceof Inject)) {
 							if (annotation.getClass() == annotationClass) {
 								classAnnotatedBinding = kab.getBinding();
 							}
