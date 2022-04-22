@@ -15,7 +15,9 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -27,6 +29,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -446,7 +449,7 @@ public class StreamsTest {
 
     /** Test case for {@link Streams#read(IReadable, Charset, FailableBiConsumer)}.
      */
-    public static void testReadIReadableCharsetBiConsumer() {
+    public void testReadIReadableCharsetBiConsumer() {
     	final Consumer<List<Object>> validator = (list) -> {
     		assertEquals(8, list.size());
     		while (!list.isEmpty()) {
@@ -477,6 +480,70 @@ public class StreamsTest {
     			list1.add((String) line);
     		});
     		validator.accept(list1);
+    	}
+    }
+
+    /** Test case for {@link Streams#closeListeningStream(InputStream,BooleanSupplier).
+     */
+    public void testCloseListeningStream() throws Exception {
+    	final byte[] bytes = "01234567890abcdefghijklmnopqrstuvwxyz".getBytes(StandardCharsets.UTF_8);
+    	{
+    		final CloseableInputStream cis = new CloseableInputStream(bytes);
+    		assertFalse(cis.isClosed());
+    		final MutableBoolean hookInvoked = new MutableBoolean();
+    		final InputStream in = Streams.closeListeningStream(cis, () -> { hookInvoked.set(); return true; });
+    		final byte[] output = Streams.read(in);
+    		assertArrayEquals(bytes, output);
+    		assertFalse(cis.isClosed());
+    		assertFalse(hookInvoked.isSet());
+    		in.close();
+    		assertFalse(cis.isClosed());
+    		assertTrue(hookInvoked.isSet());
+    	}
+    	{
+    		final CloseableInputStream cis = new CloseableInputStream(bytes);
+    		assertFalse(cis.isClosed());
+    		final MutableBoolean hookInvoked = new MutableBoolean();
+    		final InputStream in = Streams.closeListeningStream(cis, () -> { hookInvoked.set(); return false; });
+    		final byte[] output = Streams.read(in);
+    		assertArrayEquals(bytes, output);
+    		assertFalse(cis.isClosed());
+    		assertFalse(hookInvoked.isSet());
+    		in.close();
+    		assertTrue(cis.isClosed());
+    		assertTrue(hookInvoked.isSet());
+    	}
+    }
+
+    /** Test case for {@link Streams#closeListeningReader(Reader,BooleanSupplier).
+     */
+    public void testCloseListeningReader() throws Exception {
+    	final String bytes = "01234567890abcdefghijklmnopqrstuvwxyz";
+    	{
+    		final CloseableReader cr = new CloseableReader(bytes);
+    		assertFalse(cr.isClosed());
+    		final MutableBoolean hookInvoked = new MutableBoolean();
+    		final Reader in = Streams.closeListeningReader(cr, () -> { hookInvoked.set(); return true; });
+    		final String output = Streams.read(in);
+    		assertEquals(bytes, output);
+    		assertFalse(cr.isClosed());
+    		assertFalse(hookInvoked.isSet());
+    		in.close();
+    		assertFalse(cr.isClosed());
+    		assertTrue(hookInvoked.isSet());
+    	}
+    	{
+    		final CloseableReader cr = new CloseableReader(bytes);
+    		assertFalse(cr.isClosed());
+    		final MutableBoolean hookInvoked = new MutableBoolean();
+    		final Reader in = Streams.closeListeningReader(cr, () -> { hookInvoked.set(); return false; });
+    		final String output = Streams.read(in);
+    		assertEquals(bytes, output);
+    		assertFalse(cr.isClosed());
+    		assertFalse(hookInvoked.isSet());
+    		in.close();
+    		assertTrue(cr.isClosed());
+    		assertTrue(hookInvoked.isSet());
     	}
     }
 }
