@@ -9,9 +9,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
 import javax.inject.Provider;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
