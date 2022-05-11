@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.core.data;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.function.BiFunction;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
 import com.github.jochenw.afw.core.util.Objects;
 
 /** Utility class for working with data objects.
@@ -137,6 +139,53 @@ public class Data {
 				}
 			}
 		}
+
+		/** Interface of a path criterion, as used by
+		 * {@link Data.Accessor#requirePath(Object, String, String, PathCriterion...)}.
+		 */
+		@FunctionalInterface
+		public interface PathCriterion {
+			/** Called to test, whether the given Path {@code pPath} meets the criterion.
+			 * If so, the criterion must return null. Otherwise, the criterion should
+			 * return an error message string, making use of the given description
+			 * (a parameter name).
+			 * @param pPath The path, that is being tested by the criterion.
+			 * @param pDescription Name of the parameter, that supplied the path.
+			 * @return Error message, if the path failed to meet the criterion, or null.
+			 */
+			public String test(Path pPath, String pDescription);
+		}
+
+		/** Extracts a path from the given data store, ensuring that the path
+		 * meets the given critera.
+		 * @param pData The data store, from which a value is being extracted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @param pCriteria The criteria, that the path must meet.
+		 * @return The string, which has been retrieved.
+		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is empty, or not a string.
+		 * @throws IllegalStateException The value, which has been extracted from the data store,
+		 *   doesn't meet the given criteria.
+		 * @see Data#FILE_EXISTS
+		 * @see Data#DIR_EXISTS
+		 * @see Data#NOT_EXISTS
+		 */
+		public @Nonnull Path requirePath(@Nonnull O pData, @Nonnull String pKey,
+				                         @Nonnull String pDescription, PathCriterion... pCriteria) {
+			final Path path = requirePath(pData, pKey, pDescription);
+			if (pCriteria != null) {
+				for (PathCriterion pc : pCriteria) {
+					final String error = pc.test(path, pDescription);
+					if (error != null) {
+						throw new IllegalStateException(error);
+					}
+				}
+			}
+			return path;
+		}
+
 		/** Extracts a path value from the given map.
 		 * @param pData The data store, from which a value is being extracted.
 		 * @param pKey The key, which is being queried in the data store.
@@ -191,6 +240,36 @@ public class Data {
 	/** {@link Accessor} object for instances of {@link Properties}.
 	 */
 	public static final Accessor<Properties> PROPS_ACCESSOR = new Accessor<Properties>((props,key) -> props.get(key));
+
+	/** A {@link PathCriterion}, that tests, whether the path is an existing file.
+	 */
+	public static final PathCriterion FILE_EXISTS = (p,d) -> {
+		if (Files.isRegularFile(p)) {
+			return null;
+		} else {
+			return "Invalid value for parameter " + d + ": Expected existing file, got " + p;
+		}
+	};
+
+	/** A {@link PathCriterion}, that tests, whether the path is an existing directory.
+	 */
+	public static final PathCriterion DIR_EXISTS = (p,d) -> {
+		if (Files.isDirectory(p)) {
+			return null;
+		} else {
+			return "Invalid value for parameter " + d + ": Expected existing directory, got " + p;
+		}
+	};
+
+	/** A {@link PathCriterion}, that tests, whether the path is a non-existing item.
+	 */
+	public static final PathCriterion NOT_EXISTS = (p,d) -> {
+		if (!Files.exists(p)) {
+			return null;
+		} else {
+			return "Invalid value for parameter " + d + ": Expected a non-existing item, got " + p;
+		}
+	};
 
 	/** Extracts a string from the given map.
 	 * @param pMap The map, from which a value is being extracted.

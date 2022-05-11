@@ -2,6 +2,10 @@ package com.github.jochenw.afw.core.data;
 
 import static org.junit.Assert.*;
 
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -384,6 +388,19 @@ public class DataTest {
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
 			assertEquals("Invalid value for parameter answer: Expected string, or boolean, got java.lang.Integer", e.getMessage());
+		}
+	}
+
+	/** Test case for {@link Accessor#requirePath(Object, String, String, PathCriterion[])}.
+	 */
+	@Test
+	public void testRequireStringObjectStringStringPathCriteria() throws Exception {
+		final Path testDir = Paths.get("target/unit-tests/DataTest");
+		final Path existingFile = testDir.resolve("existingFile");
+		final Path notExistingFile = testDir.resolve("noSuchFile");
+		Files.createDirectories(testDir);
+		// Create existingFile as an empty file.
+		try (OutputStream out = Files.newOutputStream(existingFile)) {
 		}
 	}
 }
