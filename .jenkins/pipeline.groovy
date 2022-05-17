@@ -1,5 +1,7 @@
 pipeline {
     agent any
+    def defaultprops = [jenkins.stages.build.enabled="true",jenkins.stages.profiler.enabled="true"]
+    def props = readproperties defaults: defaultprops, interpolate=true, file=".jenkins/build.properties"
     tools { 
         maven 'Maven3' 
         jdk 'Java8' 
