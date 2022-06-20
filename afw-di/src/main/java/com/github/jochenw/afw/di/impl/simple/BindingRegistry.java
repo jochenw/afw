@@ -3,9 +3,9 @@ package com.github.jochenw.afw.di.impl.simple;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -19,7 +19,7 @@ import com.github.jochenw.afw.di.api.Scope;
 import com.github.jochenw.afw.di.api.Scopes;
 import com.github.jochenw.afw.di.impl.BindingBuilder;
 import com.github.jochenw.afw.di.util.Exceptions;
-import com.google.common.base.Function;
+
 
 public class BindingRegistry implements IComponentFactoryAware {
 	private final ConcurrentMap<Type,BindingSet> bindings = new ConcurrentHashMap<>();
