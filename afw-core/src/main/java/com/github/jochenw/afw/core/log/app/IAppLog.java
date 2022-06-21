@@ -9,7 +9,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -357,5 +361,43 @@ public interface IAppLog {
      */
     public default void fatal(String pMsg, Throwable pTh) {
     	log(Level.FATAL, pMsg, pTh);
+    }
+
+    /** Creates a new IAppLog with the given log level, and output file.
+     * @param pLevel The log level. May be null, in which case the default value {@link Level#INFO} is being used.
+     * @param pFile The log file. May be null, in which case the default value {@link System#out} is being used.
+     */
+    public static IAppLog of(Level pLevel, Path pFile) {
+    	final Level lvl;
+    	if (pLevel == null) {
+    		lvl = Level.INFO;
+    	} else {
+    		lvl = pLevel;
+    	}
+    	if (pFile == null  ||  "-".equals(pFile.toString())) {
+    		final SystemOutAppLog soal = new SystemOutAppLog();
+    		soal.setLevel(lvl);
+    		return soal;
+    	} else {
+    		try {
+    			final DefaultAppLog dal = new DefaultAppLog(Files.newOutputStream(pFile));
+    			dal.setLevel(lvl);
+    			return dal;
+    		} catch (IOException e) {
+    			throw new UncheckedIOException(e);
+    		}
+    	}
+    }
+
+    /** Creates a new IAppLog with the given log level, and output file.
+     * @param pLevel The log level. May be null, in which case the default value {@link Level#INFO} is being used.
+     * @param pFile The log file. May be null, in which case the default value {@link System#out} is being used.
+     */
+    public static IAppLog of(Level pLevel, String pFile) {
+    	if (pFile == null  ||  "-".equals(pFile)) {
+    		return of (pLevel, (Path) null);
+    	} else {
+    		return of(pLevel, Paths.get(pFile));
+    	}
     }
 }

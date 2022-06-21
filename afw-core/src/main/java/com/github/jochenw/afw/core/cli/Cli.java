@@ -394,7 +394,7 @@ public class Cli<B> {
 					return "Invalid value for option " + getPrimaryName()
 						+ ": Expected existing file, or directory, got " + p;
 				}
-				if (existsRequired  &&  !Files.isRegularFile(p)) {
+				if (fileRequired  &&  !Files.isRegularFile(p)) {
 					return "Invalid value for option " + getPrimaryName()
 						+ ": Expected file, got " + p;
 				}
