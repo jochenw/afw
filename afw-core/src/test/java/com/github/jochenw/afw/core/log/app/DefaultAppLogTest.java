@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -138,7 +139,7 @@ public class DefaultAppLogTest {
 	 * {@link IAppLog#of(Level, String)}.
 	 */
 	@Test
-	public void testCreate() {
+	public void testCreate() throws Exception {
 		final SystemOutAppLog soal1 = (SystemOutAppLog) IAppLog.of(null, (Path) null);
 		assertEquals(Level.INFO, soal1.getLevel());
 		final SystemOutAppLog soal2 = (SystemOutAppLog) IAppLog.of(Level.TRACE, (Path) null);
@@ -151,11 +152,14 @@ public class DefaultAppLogTest {
 		assertEquals(Level.TRACE, sol5.getLevel());
 		final SystemOutAppLog soal6 = (SystemOutAppLog) IAppLog.of(Level.INFO, "-");
 		assertEquals(Level.INFO, soal6.getLevel());
-		
-		final DefaultAppLog dal1 = (DefaultAppLog) IAppLog.of(Level.DEBUG, Paths.get("foo.log"));
+
+		Files.createDirectories(Paths.get("target"));
+		final DefaultAppLog dal1 = (DefaultAppLog) IAppLog.of(Level.DEBUG, Paths.get("target/foo.log"));
 		assertEquals(Level.DEBUG, dal1.getLevel());
-		final DefaultAppLog dal2 = (DefaultAppLog) IAppLog.of(Level.DEBUG, "foo.log");
+		Files.deleteIfExists(Paths.get("target/foo.log"));
+		final DefaultAppLog dal2 = (DefaultAppLog) IAppLog.of(Level.DEBUG, "target/foo.log");
 		assertEquals(Level.DEBUG, dal2.getLevel());
+		Files.deleteIfExists(Paths.get("target/foo.log"));
 				
 		
 	}
