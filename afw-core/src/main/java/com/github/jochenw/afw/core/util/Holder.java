@@ -15,20 +15,42 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.util.NoSuchElementException;
+import java.util.function.Supplier;
+
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** A {@link Holder} is an envelope for another object. Holders are typically used in Lambda's, when
  * you need a final object (the Holder), that is mutable.
  * @param <T> Type of the wrapped object.
  */
-public class Holder<T> {
+public class Holder<T> implements Supplier<T> {
 	private T value;
 
 	/** Returns the wrapped object. May be null, if there the wrapped object hasn't been set.
 	 * @return The wrapped object. May be null, if there the wrapped object hasn't been set.
+	 * @see #require()
+	 * @see #set(Object)
 	 */
 	public @Nullable T get() {
 		return value;
+	}
+
+	/** Returns the wrapped object. Unlike the {@link #get()} method, this one guarantees
+	 * to return a non-null value, because it throws a {@link NoSuchElementException}, if
+	 * no wrapped object has been set.
+	 * @return The wrapped object. Never null.
+	 * @throws NoSuchElementException No wrapped object has been set.
+	 * @see #get()
+	 * @see #set(Object)
+	 */
+	public @Nonnull T require() throws NoSuchElementException {
+		final T v = get();
+		if (v == null) {
+			throw new NoSuchElementException("No value has been given.");
+		}
+		return v;
 	}
 
 	/** Sets the wrapped object.

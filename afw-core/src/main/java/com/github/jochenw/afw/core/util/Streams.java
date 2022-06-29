@@ -40,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
@@ -258,7 +259,42 @@ public class Streams {
         }
     }
 
-    /** _Returns an {@link InputStream}, which returns the same
+    /** Returns an {@link InputStream}, which returns the same contents than the given,
+     * but will invoke the given hook upon closing.
+     * @param pIn The {@link InputStream} to read.
+     * @param pCloseHook The hook, which is being invoked upon closing. If the hook
+     *   returns true, then the {@link InputStream input stream in} will not be
+     *   closed.
+     * @return Another {@link InputStream}, which is actually reading
+     * {@code pIn}.
+     */
+    public static InputStream closeListeningStream(@Nonnull InputStream pIn, @Nonnull BooleanSupplier pCloseHook) {
+    	final InputStream in = Objects.requireNonNull(pIn, "InputStream");
+    	final BooleanSupplier closeHook = Objects.requireNonNull(pCloseHook, "BooleanSupplier");
+        return new FilterInputStream(in) {
+            @Override
+            public void close() throws IOException {
+            	final boolean closePrevented = closeHook.getAsBoolean();
+            	if (!closePrevented) {
+            		in.close();
+            	}
+            }
+            @Override
+            public int read(byte[] pBuffer) throws IOException {
+                return in.read(pBuffer);
+            }
+            @Override
+            public int read(byte[] pBuffer, int pOffset, int pLength) throws IOException {
+                return in.read(pBuffer, pOffset, pLength);
+            }
+            @Override
+            public int read() throws IOException {
+                return in.read();
+            }
+        };
+    }
+
+    /** Returns an {@link InputStream}, which returns the same
      * contents than the given, but prevents the latter from being
      * closed.
      * @param pIn The {@link InputStream} to read.
@@ -267,22 +303,40 @@ public class Streams {
      * method may be invoked, but it does nothing.)
      */
     public static InputStream uncloseableStream(final InputStream pIn) {
-        return new FilterInputStream(pIn) {
+    	return closeListeningStream(pIn, () -> true);
+    }
+
+    /** Returns a {@link Reader}, which returns the same contents than the given,
+     * but will invoke the given hook upon closing.
+     * @param pIn The {@link Reader} to read.
+     * @param pCloseHook The hook, which is being invoked upon closing. If the hook
+     *   returns true, then the {@code pIn} will not be
+     *   closed.
+     * @return Another {@link Reader}, which is actually reading
+     * {@code pIn}.
+     */
+    public static Reader closeListeningReader(@Nonnull Reader pIn, @Nonnull BooleanSupplier pCloseHook) {
+    	final Reader in = Objects.requireNonNull(pIn, "Reader");
+    	final BooleanSupplier closeHook = Objects.requireNonNull(pCloseHook, "BooleanSupplier");
+        return new FilterReader(in) {
             @Override
             public void close() throws IOException {
-                // Does nothing.
+            	final boolean closePrevented = closeHook.getAsBoolean();
+            	if (!closePrevented) {
+            		in.close();
+            	}
             }
             @Override
-            public int read(byte[] pBuffer) throws IOException {
-                return pIn.read(pBuffer);
+            public int read(char[] pBuffer) throws IOException {
+                return in.read(pBuffer);
             }
             @Override
-            public int read(byte[] pBuffer, int pOffset, int pLength) throws IOException {
-                return pIn.read(pBuffer, pOffset, pLength);
+            public int read(char[] pBuffer, int pOffset, int pLength) throws IOException {
+                return in.read(pBuffer, pOffset, pLength);
             }
             @Override
             public int read() throws IOException {
-                return pIn.read();
+                return in.read();
             }
         };
     }
@@ -296,24 +350,7 @@ public class Streams {
      * method may be invoked, but it does nothing.)
      */
     public static Reader uncloseableReader(final Reader pIn) {
-        return new FilterReader(pIn) {
-            @Override
-            public void close() throws IOException {
-                // Does nothing.
-            }
-            @Override
-            public int read(char[] pBuffer) throws IOException {
-                return pIn.read(pBuffer);
-            }
-            @Override
-            public int read(char[] pBuffer, int pOffset, int pLength) throws IOException {
-                return pIn.read(pBuffer, pOffset, pLength);
-            }
-            @Override
-            public int read() throws IOException {
-                return pIn.read();
-            }
-        };
+    	return closeListeningReader(pIn, () -> true);
     }
 
     /** Returns an {@link OutputStream}, which copies its output to the given, but

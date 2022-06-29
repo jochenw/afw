@@ -5,45 +5,26 @@ pipeline {
         jdk 'Java8' 
     }
     stages {
-        stage ('afw-core') {
+        stage ('build') {
             steps {
                 withMaven(
                      // Maven installation declared in the Jenkins "Global Tool Configuration"
                      maven: 'Maven3',
 
-                    // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
-                    mavenLocalRepo: '.repository',
+                     // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
+                     mavenLocalRepo: '.repository',
                 ) {
 				    script {
 				        if (isUnix()) {
-    			            sh 'mvn -fafw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            sh 'mvn -fpom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    } else {
-    			            bat 'mvn.cmd -fafw-core/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            bat 'mvn.cmd -fpom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    }
 					}
                 }
             }
         }
-        stage ('afw-bootstrap') {
-            steps {
-                withMaven(
-                     // Maven installation declared in the Jenkins "Global Tool Configuration"
-                     maven: 'Maven3',
-
-                    // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
-                    mavenLocalRepo: '.repository',
-                ) {
-				    script {
-				        if (isUnix()) {
-    			            sh 'mvn -fafw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
-					    } else {
-    			            bat 'mvn.cmd -fafw-bootstrap/pom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
-					    }
-				    }
-                }
-            }
-        }
-		stage ('profiler') {
+		stage ('collect profiler data') {
 		    steps {
                 step( [ $class: 'JacocoPublisher' ] )
 			}
