@@ -15,7 +15,6 @@ pipeline {
                      mavenLocalRepo: '.repository',
                 ) {
 				    script {
-				        def props = readproperties defaults: defaultprops, interpolate=true, file=".jenkins/build.properties"
 				        if (isUnix()) {
     			            sh 'mvn -fpom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    } else {
