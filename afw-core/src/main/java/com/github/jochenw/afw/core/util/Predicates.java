@@ -55,4 +55,68 @@ public class Predicates {
 	public static <O> Predicate<O> alwaysFalse() {
 		return always(false);
 	}
+
+	/** Tests, whether any of the given predicates is true.
+	 * @param <O> Type, on which the predicates are being applied to.
+	 * @param pPredicates List of predicates, that are being tested.
+	 * @param pValue The test value.
+	 * @return True, if any of the predicates in the list {@code pPredicates}
+	 *   returned true, when applied to the value {@code pValue}.
+	 */
+	public static <O> boolean anyOf(Iterable<Predicate<O>> pPredicates, O pValue) {
+		for (Predicate<O> predicate : pPredicates) {
+			if (predicate.test(pValue)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Tests, whether any of the given predicates is true.
+	 * @param <O> Type, on which the predicates are being applied to.
+	 * @param pPredicates List of predicates, that are being tested.
+	 * @param pValue The test value.
+	 * @return True, if any of the predicates in the list {@code pPredicates}
+	 *   returned true, when applied to the value {@code pValue}.
+	 */
+	public static <O> boolean anyOf(O pValue, Predicate<O>... pPredicates) {
+		for (Predicate<O> predicate : pPredicates) {
+			if (predicate.test(pValue)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Tests, whether all of the given predicates are true.
+	 * @param <O> Type, on which the predicates are being applied to.
+	 * @param pPredicates List of predicates, that are being tested.
+	 * @param pValue The test value.
+	 * @return True, if all of the predicates in the list {@code pPredicates}
+	 *   returned true, when applied to the value {@code pValue}.
+	 */
+	public static <O> boolean allOf(Iterable<Predicate<O>> pPredicates, O pValue) {
+		for (Predicate<O> predicate : pPredicates) {
+			if (!predicate.test(pValue)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/** Tests, whether all of the given predicates are true.
+	 * @param <O> Type, on which the predicates are being applied to.
+	 * @param pPredicates List of predicates, that are being tested.
+	 * @param pValue The test value.
+	 * @return True, if all of the predicates in the list {@code pPredicates}
+	 *   returned true, when applied to the value {@code pValue}.
+	 */
+	public static <O> boolean allOf(O pValue, Predicate<O>... pPredicates) {
+		for (Predicate<O> predicate : pPredicates) {
+			if (!predicate.test(pValue)) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
