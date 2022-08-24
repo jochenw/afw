@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
@@ -464,5 +465,21 @@ public class Data {
 	 */
 	public static @Nullable Boolean getBoolean(@Nonnull Properties pProperties, @Nonnull String pKey) {
 		return PROPS_ACCESSOR.getBoolean(pProperties, pKey, pKey);
+	}
+
+	/** Converts the given object array into a map by using every even element as a key, and the
+	 * following odd element as a value.
+	 * @param pValues The elements of the map as a list of key/value pairs: Every even element
+	 *   (a string) is a key, and the successor (odd element) is a value. 
+	 * @return
+	 */
+	public static Map<String,Object> asMap(Object... pValues) {
+		final Map<String,Object> map = new HashMap<>();
+		if (pValues != null) {
+			for (int i = 0;  i < pValues.length;  i += 2) {
+				map.put((String) pValues[i], pValues[i+1]);
+			}
+		}
+		return map;
 	}
 }

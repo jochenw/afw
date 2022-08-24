@@ -41,6 +41,7 @@ import java.util.List;
 public class ExecutorBuilder {
 	private final List<String> cmdLine = new ArrayList<>();
     private ProcessOutputHandler stdOutHandler, stdErrHandler;
+    private Path directory;
 
     /** Sets the executable, that is being executed.
      * As a side-effect, clears the argument list.
@@ -439,7 +440,13 @@ i     */
     	final FailableConsumer<InputStream,?> errHandler = Objects.notNull(stdErrHandler, () -> {
     		return (in) -> Streams.readAndDiscard(in);
     	});
-    	return new Executor(cmdLine.toArray(new String[cmdLine.size()]), outHandler, errHandler);
+    	return new Executor(cmdLine.toArray(new String[cmdLine.size()]), directory, outHandler, errHandler);
+    }
+
+    /** Returns the command line, that is being executed.
+     */
+    public List<String> getCmdLine() {
+    	return cmdLine;
     }
 }
 

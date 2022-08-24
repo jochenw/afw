@@ -15,9 +15,17 @@
  */
 package com.github.jochenw.afw.core.exec;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
+import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.util.MutableInteger;
 import com.github.jochenw.afw.core.util.Objects;
 
 /**
@@ -33,6 +41,7 @@ public class Executor {
     }
 
     private final String[] cmdLine;
+    private final Path directory;
     private FailableConsumer<InputStream,?> stdOutHandler, stdErrHandler;
 
     /**
@@ -42,10 +51,50 @@ public class Executor {
      * @param pStdErrHandler The handler for the external processes stderr stream.
      * @throws NullPointerException Either of the parameters is null.
      */
-    public Executor(String[] pCmdLine, FailableConsumer<InputStream,?> pStdOutHandler,
+    public Executor(String[] pCmdLine, Path pDirectory, FailableConsumer<InputStream,?> pStdOutHandler,
     		        FailableConsumer<InputStream,?> pStdErrHandler) {
         cmdLine = Objects.requireAllNonNull(pCmdLine, "CmdLineArg");
+        directory = pDirectory;
         stdOutHandler = Objects.requireNonNull(pStdOutHandler, "StdOutHandler");
         stdErrHandler = Objects.requireNonNull(pStdErrHandler, "StdErrHandler");
     }
+
+    public int run() {
+    	Process process;
+		try {
+			process = Runtime.getRuntime().exec(cmdLine, null, directory == null ? null : directory.toFile());
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+    	final CompletableFuture<Void> cfout = asCompletableFuture(process.getInputStream(), stdOutHandler);
+    	final CompletableFuture<Void> cferr = asCompletableFuture(process.getInputStream(), stdOutHandler);
+    	final MutableInteger exitCode = new MutableInteger();
+    	final CompletableFuture<Void>cfwait = CompletableFuture.runAsync(() -> {
+    		final int status;
+    		try {
+				status = process.waitFor();
+			} catch (InterruptedException e) {
+				throw new UndeclaredThrowableException(e);
+			}
+    		exitCode.setValue(status);
+    	});
+    	final CompletableFuture<Void> cf = CompletableFuture.allOf(cfout, cferr, cfwait);
+    	try {
+			cf.get();
+		} catch (InterruptedException|ExecutionException e) {
+			throw new UndeclaredThrowableException(e);
+		}
+    	return exitCode.getValue();
+    }
+
+	private CompletableFuture<Void> asCompletableFuture(InputStream pInputStream,
+			FailableConsumer<InputStream, ?> pStdOutHandler) {
+		return CompletableFuture.runAsync(() -> {
+			try {
+				pStdOutHandler.accept(pInputStream);
+			} catch (Throwable e) {
+				throw Exceptions.show(e);
+			}
+		});
+	}
 }

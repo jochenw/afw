@@ -655,6 +655,9 @@ public class Cli<B> {
 					break;
 				}
 			}
+			if (option == null) {
+				throw error("Option " + optName + " is not recognized.");
+			}
 			final @Nonnull Option<?,B> optn = Objects.requireNonNull(option);
 			if (optionValues.containsKey(optn.getPrimaryName())) {
 				throw error("Option " + option.getPrimaryName() + " may be repeated only once.");
