@@ -67,14 +67,17 @@ public class Executor {
 			throw new UncheckedIOException(e);
 		}
     	final CompletableFuture<Void> cfout = asCompletableFuture(process.getInputStream(), stdOutHandler);
-    	final CompletableFuture<Void> cferr = asCompletableFuture(process.getInputStream(), stdOutHandler);
+    	final CompletableFuture<Void> cferr = asCompletableFuture(process.getErrorStream(), stdOutHandler);
     	final MutableInteger exitCode = new MutableInteger();
     	final CompletableFuture<Void>cfwait = CompletableFuture.runAsync(() -> {
     		final int status;
     		try {
+    			process.getOutputStream().close();
 				status = process.waitFor();
 			} catch (InterruptedException e) {
 				throw new UndeclaredThrowableException(e);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
     		exitCode.setValue(status);
     	});

@@ -31,6 +31,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,9 +89,25 @@ public class ExecutorBuilder {
      * @see #arg(Path)
      * @see #arg(File)
      * @see #arg(String)
+     * @see #args(Iterable)
      */
     public ExecutorBuilder args(String... pArgs) {
-        cmdLine.addAll(Arrays.asList(Objects.requireAllNonNull(pArgs, "Argument")));
+        cmdLine.addAll(Arrays.asList(Objects.requireAllNonNull(pArgs, "Arguments")));
+        return this;
+    }
+
+    /** Adds arguments to the command line.
+     * @param pArgs The arguments, that are being added to the command line.
+     * @throws NullPointerException Either of the arguments is null.
+     * @return This builder.
+     * @see #arg(Path)
+     * @see #arg(File)
+     * @see #arg(String)
+     * @see #args(String[])
+     */
+    public ExecutorBuilder args(Iterable<String> pArgs) {
+    	final Iterable<String> args = Objects.requireAllNonNull(pArgs, "Arguments");
+    	args.forEach(cmdLine::add);
         return this;
     }
 
@@ -129,6 +146,62 @@ i     */
      */
     public ExecutorBuilder arg(File pArg) {
         return arg(Objects.requireNonNull(pArg, "Argument").getPath());
+    }
+
+    /** Sets the directory, where the external process will be launched.
+     * In other words: From the external processes perspective, this will
+     * be the current directory.
+     * @param pDirectory The directory, where the external process will be launched.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@link pDirectory} is null.
+     * @throws IllegalArgumentException The given directory does not exist, or is
+     *   otherwise invalid.
+     */
+    public ExecutorBuilder directory(Path pDirectory) {
+    	final Path dir = Objects.requireNonNull(pDirectory, "Directory");
+    	if (!Files.isDirectory(dir)) {
+    		throw new IllegalArgumentException("Invalid value for parameter directory:"
+    				+ " Expected existing directory, got " + pDirectory);
+    	}
+    	directory = dir;
+    	return this;
+    }
+
+    /** Sets the directory, where the external process will be launched.
+     * In other words: From the external processes perspective, this will
+     * be the current directory.
+     * @param pDirectory The directory, where the external process will be launched.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@link pDirectory} is null.
+     * @throws IllegalArgumentException The given directory does not exist, or is
+     *   otherwise invalid.
+     */
+    public ExecutorBuilder directory(File pDirectory) {
+    	final File dir = Objects.requireNonNull(pDirectory, "Directory");
+    	return directory(dir.toPath());
+    }
+
+    /** Sets the directory, where the external process will be launched.
+     * In other words: From the external processes perspective, this will
+     * be the current directory.
+     * @param pDirectory The directory, where the external process will be launched.
+     * @return This builder.
+     * @throws NullPointerException The parameter {@link pDirectory} is null.
+     * @throws IllegalArgumentException The given directory does not exist, or is
+     *   otherwise invalid.
+     */
+    public ExecutorBuilder directory(String pDirectory) {
+    	final String dir = Objects.requireNonNull(pDirectory, "Directory");
+    	return directory(Paths.get(dir));
+    }
+
+    /** Returns the directory, where the external process will be launched.
+     * In other words: From the external processes perspective, this will
+     * be the current directory.
+     * @return The directory, where the external process will be launched.
+     */
+    public Path getDirectory(String pDirectory) {
+    	return directory;
     }
 
     /**
