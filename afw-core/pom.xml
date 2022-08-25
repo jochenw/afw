@@ -255,10 +255,4 @@
       </plugin>
     </plugins>
   </reporting>
-  <scm>
-  	<connection>scm:git:https://github.com/jochenw/afw</connection>
-  	<url>https://github.com/jochenw/afw</url>
-  	<developerConnection>scm:git:https://github.com/jochenw/afw</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
 </project>
