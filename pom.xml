@@ -18,7 +18,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.jochenw.afw</groupId>
   <artifactId>afw</artifactId>
-  <version>0.6.0</version>
+  <version>0.6.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>AFW (Parent)</name>
   <description>Application Framework (Parent Project)</description>
@@ -247,6 +247,6 @@
   	<connection>scm:git:https://github.com/jochenw/afw</connection>
   	<url>https://github.com/jochenw/afw</url>
   	<developerConnection>scm:git:https://github.com/jochenw/afw</developerConnection>
-    <tag>afw-0.6.0</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
