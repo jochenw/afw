@@ -16,9 +16,9 @@ pipeline {
                 ) {
 				    script {
 				        if (isUnix()) {
-    			            sh 'mvn -fpom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            sh 'mvn -fpom.xml -Poss-release -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    } else {
-    			            bat 'mvn.cmd -fpom.xml -Pjacoco -Dmaven.test.failure.ignore=true clean install'
+    			            bat 'mvn.cmd -fpom.xml -Poss-release -Pjacoco -Dmaven.test.failure.ignore=true clean install'
 					    }
 					}
                 }

@@ -193,8 +193,8 @@
             <configuration>
               <show>protected</show>
               <nohelp>true</nohelp>
-              <failOnError>false</failOnError>
-              <failOnWarnings>false</failOnWarnings>
+              <failOnError>true</failOnError>
+              <failOnWarnings>true</failOnWarnings>
             </configuration>
             <executions>
               <execution>
