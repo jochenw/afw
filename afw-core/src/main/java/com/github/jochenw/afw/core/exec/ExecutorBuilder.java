@@ -153,7 +153,7 @@ i     */
      * be the current directory.
      * @param pDirectory The directory, where the external process will be launched.
      * @return This builder.
-     * @throws NullPointerException The parameter {@link pDirectory} is null.
+     * @throws NullPointerException The parameter {@code pDirectory} is null.
      * @throws IllegalArgumentException The given directory does not exist, or is
      *   otherwise invalid.
      */
@@ -172,7 +172,7 @@ i     */
      * be the current directory.
      * @param pDirectory The directory, where the external process will be launched.
      * @return This builder.
-     * @throws NullPointerException The parameter {@link pDirectory} is null.
+     * @throws NullPointerException The parameter {@code pDirectory} is null.
      * @throws IllegalArgumentException The given directory does not exist, or is
      *   otherwise invalid.
      */
@@ -186,7 +186,7 @@ i     */
      * be the current directory.
      * @param pDirectory The directory, where the external process will be launched.
      * @return This builder.
-     * @throws NullPointerException The parameter {@link pDirectory} is null.
+     * @throws NullPointerException The parameter {@code pDirectory} is null.
      * @throws IllegalArgumentException The given directory does not exist, or is
      *   otherwise invalid.
      */
@@ -200,8 +200,12 @@ i     */
      * be the current directory.
      * @return The directory, where the external process will be launched.
      */
-    public Path getDirectory(String pDirectory) {
-    	return directory;
+    public Path getDirectory() {
+    	if (directory == null) {
+    		return Paths.get(".");
+    	} else {
+    		return directory;
+    	}
     }
 
     /**
@@ -234,7 +238,7 @@ i     */
      * @see #stdOut(FailableConsumer)
      * @see #stdOut(Path)
      * @see #stdOut(OutputStream)
-     * @see #stdOutHandler(FailableConsumer)
+     * @see #stdErr(FailableConsumer)
      */
     public ExecutorBuilder stdOut(FailableSupplier<OutputStream,?> pSupplier) {
     	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
@@ -258,7 +262,7 @@ i     */
      * @see #stdOut(FailableConsumer)
      * @see #stdOut(FailableSupplier)
      * @see #stdOut(Path)
-     * @see #stdOutHandler(FailableConsumer)
+     * @see #stdErr(OutputStream)
      */
     public ExecutorBuilder stdOut(OutputStream pOutputStream) {
 		final OutputStream out = Objects.requireNonNull(pOutputStream, "OutputStream");
@@ -277,7 +281,7 @@ i     */
      * @see #stdOut(FailableConsumer)
      * @see #stdOut(FailableSupplier)
      * @see #stdOut(OutputStream)
-     * @see #stdOutHandler(FailableConsumer)
+     * @see #stdOut(Path)
      */
     public ExecutorBuilder stdOut(Path pOutputFile) {
     	final Path outputFile = Objects.requireNonNull(pOutputFile, "OutputFile");
@@ -301,7 +305,7 @@ i     */
      * @see #stdOut(FailableSupplier)
      * @see #stdOut(OutputStream)
      * @see #stdOut(Path)
-     * @see #stdOutHandler(FailableConsumer)
+     * @see #stdErr(File)
      */
     public ExecutorBuilder stdOut(File pOutputFile) {
     	return stdOut(Objects.requireNonNull(pOutputFile, "File").toPath());
@@ -356,7 +360,7 @@ i     */
      * @see #stdErr(FailableConsumer)
      * @see #stdErr(Path)
      * @see #stdErr(OutputStream)
-     * @see #stdErrHandler(FailableConsumer)
+     * @see #stdOut(FailableConsumer)
      */
     public ExecutorBuilder stdErr(FailableSupplier<OutputStream,?> pSupplier) {
     	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
@@ -384,7 +388,7 @@ i     */
      * @see #stdErr(FailableConsumer)
      * @see #stdErr(Path)
      * @see #stdErr(OutputStream)
-     * @see #stdErrHandler(FailableConsumer)
+     * @see #stdOut(FailableConsumer)
      */
     public ExecutorBuilder stdErr(FailableSupplier<Writer,?> pSupplier, Charset pCharset) {
     	final FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
@@ -409,7 +413,7 @@ i     */
      * @see #stdErr(FailableConsumer)
      * @see #stdErr(FailableSupplier)
      * @see #stdErr(Path)
-     * @see #stdErrHandler(FailableConsumer)
+     * @see #stdOut(OutputStream)
      */
     public ExecutorBuilder stdErr(OutputStream pOutputStream) {
 		final OutputStream out = Objects.requireNonNull(pOutputStream, "OutputStream");
@@ -430,7 +434,7 @@ i     */
      * @see #stdErr(FailableConsumer)
      * @see #stdErr(FailableSupplier)
      * @see #stdErr(Path)
-     * @see #stdErrHandler(FailableConsumer)
+     * @see #stdOut(FailableSupplier)
      */
     public ExecutorBuilder stdErr(Writer pWriter, Charset pCharset) {
 		final Writer w = Objects.requireNonNull(pWriter, "Writer");
@@ -449,7 +453,7 @@ i     */
      * @see #stdErr(FailableConsumer)
      * @see #stdErr(FailableSupplier)
      * @see #stdErr(OutputStream)
-     * @see #stdErrHandler(FailableConsumer)
+     * @see #stdOut(Path)
      */
     public ExecutorBuilder stdErr(Path pOutputFile) {
     	final Path outputFile = Objects.requireNonNull(pOutputFile, "OutputFile");
@@ -473,7 +477,7 @@ i     */
      * @see #stdErr(FailableSupplier)
      * @see #stdErr(OutputStream)
      * @see #stdErr(Path)
-     * @see #stdErrHandler(FailableConsumer)
+     * @see #stdOut(File)
      */
     public ExecutorBuilder stdErr(File pOutputFile) {
     	return stdErr(Objects.requireNonNull(pOutputFile, "File").toPath());
@@ -517,6 +521,7 @@ i     */
     }
 
     /** Returns the command line, that is being executed.
+     * @return The command line, that is being executed.
      */
     public List<String> getCmdLine() {
     	return cmdLine;

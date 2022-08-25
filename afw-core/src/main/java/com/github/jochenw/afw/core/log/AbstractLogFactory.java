@@ -41,6 +41,9 @@ public abstract class AbstractLogFactory implements ILogFactory {
 			init();
 		}
 	}
+	/**
+	 * Called to initialize the log factory.
+	 */
 	protected abstract void init();
 	@Override
 	public void shutdown() {
@@ -57,6 +60,10 @@ public abstract class AbstractLogFactory implements ILogFactory {
         return newLog(pId);
     }
 
+    /** Creates a new logger with the given id.
+     * @param pId The loggers id.
+     * @return The created  logger.
+     */
     protected abstract AbstractLog newLog(String pId);
     
     @Override

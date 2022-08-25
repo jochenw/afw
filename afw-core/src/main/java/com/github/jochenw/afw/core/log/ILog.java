@@ -550,7 +550,6 @@ public interface ILog {
      * using the separator string ", ", the extra message
      * string, and the given arguments.
      * @param pMethod Name of the method, that's being left.
-     * @param pMessage The extra messages format string.
      * @param pArgs The extra messages arguments.
      */
     void exiting(String pMethod, Object... pArgs);

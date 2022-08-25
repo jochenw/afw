@@ -612,7 +612,6 @@ public class Cli<B> {
 	 * Configures the option bean by passing the given option values to
 	 * the respective handlers.
 	 * @param pArgs The command line arguments, specifying the option values.
-	 * @param pBean The bean, which is being configured.
 	 * @return The successfully configured bean.
 	 */
 	public B parse(String[] pArgs) {

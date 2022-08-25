@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
@@ -366,6 +365,7 @@ public interface IAppLog {
     /** Creates a new IAppLog with the given log level, and output file.
      * @param pLevel The log level. May be null, in which case the default value {@link Level#INFO} is being used.
      * @param pFile The log file. May be null, in which case the default value {@link System#out} is being used.
+     * @return The created {@link IAppLog}.
      */
     public static IAppLog of(Level pLevel, Path pFile) {
     	final Level lvl;
@@ -392,6 +392,7 @@ public interface IAppLog {
     /** Creates a new IAppLog with the given log level, and output file.
      * @param pLevel The log level. May be null, in which case the default value {@link Level#INFO} is being used.
      * @param pFile The log file. May be null, in which case the default value {@link System#out} is being used.
+    * @return The created {@link IAppLog}.
      */
     public static IAppLog of(Level pLevel, String pFile) {
     	if (pFile == null  ||  "-".equals(pFile)) {

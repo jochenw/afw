@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  */
 public class DefaultObjectComparator implements IObjectComparator {
 	/** This object is used to calculate the location of a difference.
-	 *(The first argument of {@link Listener#difference(String, String)}.
+	 *(The first argument of {@link IObjectComparator.Listener#difference(String, String)}.
 	 */
 	public static class Context {
 		private final Listener listener;
@@ -76,6 +76,11 @@ public class DefaultObjectComparator implements IObjectComparator {
 	public abstract static class MapWrapper {
 		private final String prefix, suffix;
 		private final Object object;
+		/** Creates a new {@link Map map} wrapper.
+		 * @param pPrefix The prefix to use for string serialization of the wrapped object.
+		 * @param pSuffix The suffix to use for string serialization of the wrapped object.
+		 * @param pObject The wrapped object.
+		 */
 		protected MapWrapper(String pPrefix, String pSuffix, Object pObject) {
 			prefix = pPrefix;
 			suffix = pSuffix;
@@ -109,6 +114,10 @@ public class DefaultObjectComparator implements IObjectComparator {
 	 */
 	public abstract static class ListWrapper {
 		private final String prefix, suffix;
+		/** Creates a new {@link List list} wrapper.
+		 * @param pPrefix The prefix to use for string serialization of the wrapped object.
+		 * @param pSuffix The suffix to use for string serialization of the wrapped object.
+		 */
 		protected ListWrapper(String pPrefix, String pSuffix) {
 			prefix = pPrefix;
 			suffix = pSuffix;
@@ -138,6 +147,11 @@ public class DefaultObjectComparator implements IObjectComparator {
 		compare(new Context(pListener), pExpectedObject, pActualObject);
 	}
 
+	/** Called to compute the differences between two map-like objects.
+	 * @param pContext The computation context.
+	 * @param pExpMap The expected map-like object.
+	 * @param pActMap The actual map-like object.
+	 */
 	protected void compare(Context pContext, MapWrapper pExpMap, MapWrapper pActMap) {
 		final Map<String,Object> expMap = new HashMap<>();
 		pExpMap.forEach((s,o) -> expMap.put(s, o));
@@ -177,6 +191,11 @@ public class DefaultObjectComparator implements IObjectComparator {
 		});
 	}
 
+	/** Called to compute the differences between two list-like objects.
+	 * @param pContext The computation context.
+	 * @param pExpList The expected map-like object.
+	 * @param pActList The actual map-like object.
+	 */
 	protected void compare(Context pContext, ListWrapper pExpList, ListWrapper pActList) {
 		final List<Object> expList = new ArrayList<>();
 		pExpList.forEach((o) -> expList.add(o));
@@ -206,6 +225,11 @@ public class DefaultObjectComparator implements IObjectComparator {
 		}
 	}
 
+	/** Called to compute the differences between two objects.
+	 * @param pContext The computation context.
+	 * @param pExpObject The expected map-like object.
+	 * @param pActObject The actual map-like object.
+	 */
 	protected void compare(Context pContext, Object pExpObject, Object pActObject) {
 		if (pExpObject == null) {
 			if (pActObject != null) {
@@ -261,12 +285,20 @@ public class DefaultObjectComparator implements IObjectComparator {
 		return pExpectedObject.equals(pActualObject);
 	}
 
+	/** Returns, whether the given object is an atomic data entity.
+	 * @param pObject The object, that is being checked.
+	 * @return True, if the given object is atomic, otherwise false.
+	 */
 	protected boolean isAtomic(Object pObject) {
 		return pObject instanceof String
 			||  pObject instanceof Number
 			||  pObject instanceof Boolean;
 	}
 
+	/** Converts the given object into a string.
+	 * @param pObject The object. that is being serialized.
+	 * @return The serialized object.
+	 */
 	protected String asString(Object pObject) {
 		if (pObject == null) {
 			return "null";
@@ -295,10 +327,20 @@ public class DefaultObjectComparator implements IObjectComparator {
 		}
 	}
 
+	/** Tests, whether the given object is a map-like object. If so, it is valid
+	 * to invoke {@link #asMap(Object)} with it.
+	 * @param pObject The object, that is being tested.
+	 * @return True, if {@link #asMap(Object)} may be invoked with the same object.
+	 */
 	protected boolean isMap(Object pObject) {
 		return pObject instanceof Map;
 	}
 
+	/** Converts the given object into a {@link ListWrapper}. Assumes,
+	 * that {@link #isMap(Object)} has returned true for the same object.
+	 * @param pObject The object, that is being tested.
+	 * @return A {@link Map map} wrapper.
+	 */
 	protected MapWrapper asMap(Object pObject) {
 		@SuppressWarnings("unchecked")
 		final Map<String,Object> map = (Map<String,Object>) pObject;
@@ -312,12 +354,22 @@ public class DefaultObjectComparator implements IObjectComparator {
 		};
 	}
 
+	/** Tests, whether the given object is a list-like object. If so, it is valid
+	 * to invoke {@link #asList(Object)} with it.
+	 * @param pObject The object, that is being tested.
+	 * @return True, if {@link #asList(Object)} may be invoked with the same object.
+	 */
 	protected boolean isList(Object pObject) {
 		return pObject instanceof Iterable
 				||  pObject instanceof Iterator
 				||  pObject.getClass().isArray();
 	}
 
+	/** Converts the given object into a map-like object. Assumes, that {@link #isMap(Object)}
+	 * has returned true for the same object.
+	 * @param pObject The object, that is being tested.
+	 * @return A {@link Map map} wrapper.
+	 */
 	protected ListWrapper asList(Object pObject) {
 		if (pObject instanceof List) {
 			@SuppressWarnings("unchecked")

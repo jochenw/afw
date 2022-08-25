@@ -249,4 +249,20 @@
   	<developerConnection>scm:git:https://github.com/jochenw/afw</developerConnection>
     <tag>HEAD</tag>
   </scm>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <url>https://github.com/jochenw/afw</url>
+  <developers>
+    <developer>
+      <id>jwi</id>
+      <email>jochen.wiedmann@gmail.com</email>
+      <name>Jochen Wiedmann</name>
+      <organizationUrl>https://github.com/jochenw</organizationUrl>
+    </developer>
+  </developers>
 </project>

@@ -30,6 +30,10 @@ public abstract class AbstractFileVisitor extends SimpleFileVisitor<Path>{
     int level = 0;
     private final boolean baseDirIncludedInPath;
 
+    /** Creates a new instance.
+     * @param pBaseDirIncludedInPath True, if the base directory should be included in the path,
+     *   that is being given to {@link #visitFile(String, Path, BasicFileAttributes)}.
+     */
     protected AbstractFileVisitor(boolean pBaseDirIncludedInPath) {
     	baseDirIncludedInPath = pBaseDirIncludedInPath;
     }

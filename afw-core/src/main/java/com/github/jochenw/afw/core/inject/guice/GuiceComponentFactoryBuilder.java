@@ -123,6 +123,11 @@ public class GuiceComponentFactoryBuilder extends ComponentFactoryBuilder<GuiceC
 		gcf.setInjector(Guice.createInjector(module));
 	}
 
+	/** Called to apply a single AFW DI binding.
+	 * @param pGcf The component factory instance, that is being initializedd.
+	 * @param pBinder The Guice binder, that is being configured by the initialization process.
+	 * @param pBb The binding builder, that is being applied.
+	 */
 	protected void configure(GuiceComponentFactory pGcf, com.google.inject.Binder pBinder, BindingBuilder<Object> pBb) {
 		final Key<Object> key = pBb.getKey();
 		final com.google.inject.Key<Object> gKey = pGcf.asGKey(key);

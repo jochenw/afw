@@ -24,17 +24,39 @@ import com.github.jochenw.afw.core.util.Strings;
  * Abstract base class for implementations of {@link ILog}.
  */
 public abstract class AbstractLog implements ILog {
+    /** The basic separator string.
+     */
     protected static final String SEP_STD = ": ";
+    /** The separator string for entering a method.
+     */
     protected static final String SEP_ENT = ": -> ";
+    /** The separator string for exiting from a method.
+     */
     protected static final String SEP_EXT = ": <- ";
+    /** The log factory, that created this object.
+     */
     protected final AbstractLogFactory logFactory;
+    /** The loggers id.
+     */
     protected final String id;
 
+    /**
+     * Creates a new logger with the given factory, and id.
+     * @param pFactory The log factory, that created this object.
+     * @param pId The loggers id.
+     */
     protected AbstractLog(AbstractLogFactory pFactory, String pId) {
         logFactory = pFactory;
         id = pId;
     }
     
+    /** Creates a log message with the given method name, separator, and message string.
+     * @param pMethod The method name, that is being logged.
+     * @param pSep The separator string, that is being used to separate method name and
+     *   actual log message.
+     * @param pMessage The actual log message.
+     * @return The created log message.
+     */
     protected String asMessage(String pMethod, String pSep, String pMessage) {
         final StringBuilder sb = new StringBuilder();
         if (pMethod != null) {
@@ -47,6 +69,15 @@ public abstract class AbstractLog implements ILog {
         return sb.toString();
     }
 
+    /** Creates a log message with the given method name, separator, message string,
+     *   and message parameters.
+     * @param pMethod The method name, that is being logged.
+     * @param pSep The separator string, that is being used to separate method name and
+     *   actual log message.
+     * @param pMessage The actual log message, with optional parameter references.
+     * @param pArgs The message parameters, if any.
+     * @return The created log message.
+     */
     protected String asMessage(String pMethod, String pSep, String pMessage, Object... pArgs) {
         final StringBuilder sb = new StringBuilder();
         if (pMethod != null) {
@@ -61,6 +92,15 @@ public abstract class AbstractLog implements ILog {
         return sb.toString();
     }
 
+    /** Creates a log message with method name, separator
+     *   and message parameters, but without message string.
+     * @param pMethod The method name, that is being logged.
+     * @param pSep The separator string, that is being used to separate method name and
+     *   actual log message.
+     * @param pArgs The message parameters, if any.
+     * @return The created log message.
+     * @see AbstractLog#asMessageF(String, String, String, Object...)
+     */
     protected String asMessage(String pMethod, String pSep, Object... pArgs) {
         final StringBuilder sb = new StringBuilder();
         if (pMethod != null) {
@@ -73,6 +113,16 @@ public abstract class AbstractLog implements ILog {
         return sb.toString();
     }
 
+    /** Creates a log message with method name, separator
+     *   message string, and message parameters
+     * @param pMethod The method name, that is being logged.
+     * @param pSep The separator string, that is being used to separate method name and
+     *   actual log message.
+     * @param pFormat The message string, with optional parameter references.
+     * @param pArgs The message parameters, if any.
+     * @return The created log message.
+     * @see AbstractLog#asMessageF(String, String, String, Object...)
+     */
     protected String asMessageF(String pMethod, String pSep, String pFormat, Object... pArgs) {
         final StringBuilder sb = new StringBuilder();
         if (pMethod != null) {
@@ -85,7 +135,18 @@ public abstract class AbstractLog implements ILog {
         return sb.toString();
     }
 
+    /**
+    * Logs the given message, with the given log level, if that is enabled.
+    * @param pLevel The log level; nothing will be written, if the level isn't enabled.
+    * @param pMessage The log message, that is being written.
+    */
     protected abstract void log(Level pLevel, String pMessage);
+    /**
+    * Logs the given exception, with the given log level, if that is enabled.
+    * @param pLevel The log level; nothing will be written, if the level isn't enabled.
+    * @param pMessage The log message, that is being written.
+    * @param pTh The exception, that is being logged.
+    */
     protected abstract void log(Level pLevel, String pMessage, Throwable pTh);
     
     @Override

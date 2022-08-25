@@ -645,7 +645,6 @@ public class JdbcHelper {
 		}
 
 		/** Returns the next LocalDateTime in the column list.
-		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return The next ZonedDateTime in the column list.
 		 */
 		public @Nullable LocalDateTime nextLocalDateTime() {
@@ -656,7 +655,6 @@ public class JdbcHelper {
 		 * given {@link Consumer}.
 		 * @param pConsumer The {@link Consumer}, that should receive the
 		 *   (possibly null) LocalDateTime object.
-		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
 		public @Nonnull Row nextLocalDateTime(@Nonnull Consumer<LocalDateTime> pConsumer) {
@@ -667,7 +665,6 @@ public class JdbcHelper {
 
 		/** Returns the {@link LocalDateTime} object with the given index in the column list.
 		 * @param pIndex A JDBC-style column index (1-based).
-		 * @param pZoneId The returned objects time zone id. Defaults to UTC.
 		 * @return The double object with the given index in the column list,
 		 *   possibly null.
 		 */
@@ -685,7 +682,6 @@ public class JdbcHelper {
 		}
 
 		/** Returns the next Timestamp in the column list.
-		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return The next ZonedDateTime in the column list.
 		 */
 		public @Nullable Timestamp nextTimestamp() {
@@ -718,7 +714,6 @@ public class JdbcHelper {
 		}
 
 		/** Returns the next Timestamp in the column list.
-		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return The next ZonedDateTime in the column list.
 		 */
 		public @Nullable Date nextDate() {
@@ -751,7 +746,6 @@ public class JdbcHelper {
 		}
 
 		/** Returns the next Time in the column list.
-		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return The next Time in the column list.
 		 */
 		public @Nullable Time nextTime() {
@@ -867,7 +861,6 @@ public class JdbcHelper {
 		}
 
 		/** Returns the next byte array in the column list.
-		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return The next byte array in the column list.
 		 */
 		public @Nullable byte[] nextBytes() {
@@ -900,7 +893,6 @@ public class JdbcHelper {
 		}
 
 		/** Returns the next {@link InputStream} in the column list.
-		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return The next {@link InputStream} in the column list.
 		 */
 		public @Nullable InputStream nextInputStream() {

@@ -38,6 +38,7 @@ public class GuiceComponentFactory implements IComponentFactory {
 	/**
 	 * Sets the created {@link Injector}, making the component
 	 * factory usable.
+	 * @param pInjector The {@link Injector}, that will be ujsed internally.
 	 */
 	void setInjector(@Nonnull Injector pInjector) {
 		injector = Objects.requireNonNull(pInjector, "Injector");
@@ -63,6 +64,12 @@ public class GuiceComponentFactory implements IComponentFactory {
 		return o;
 	}
 
+	/**
+	 * Converts an Afw DI key to a Guice key.
+	 * @param <O> Type of the injected object.
+	 * @param pKey The key, that is being converted.
+	 * @return The converted key.
+	 */
 	protected <O> com.google.inject.Key<O> asGKey(Key<O> pKey) {
 		final com.google.inject.Key<O> key;
 		final Annotation annotation = pKey.getAnnotation();

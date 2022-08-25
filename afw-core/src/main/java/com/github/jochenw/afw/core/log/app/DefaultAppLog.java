@@ -54,6 +54,10 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 		this(Level.INFO, StandardCharsets.UTF_8, System.lineSeparator(), pOut);
 	}
 
+	/** Writes the given message, followed by a line terminator.
+	 * @param pMsg The message, that is being written to the log file.
+	 * @throws IOException Writing to the log file has failed.
+	 */
 	protected void writeLine(String pMsg) throws IOException {
 		writer.write(pMsg);
 		writer.newLine();

@@ -24,6 +24,10 @@ public class Data {
 	public static class Accessor<O extends Object> {
 		private final BiFunction<O,String,Object> function;
 
+		/** Creates a new instance with the given access function.
+		 * @param pFunction The access function, that reads a value for
+		 *   a parameter from an instance of {@code O}.
+		 */
 		protected Accessor(BiFunction<O,String,Object> pFunction) {
 			function = pFunction;
 		}
@@ -471,7 +475,7 @@ public class Data {
 	 * following odd element as a value.
 	 * @param pValues The elements of the map as a list of key/value pairs: Every even element
 	 *   (a string) is a key, and the successor (odd element) is a value. 
-	 * @return
+	 * @return The created map.
 	 */
 	public static Map<String,Object> asMap(Object... pValues) {
 		final Map<String,Object> map = new HashMap<>();

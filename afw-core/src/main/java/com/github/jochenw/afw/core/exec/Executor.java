@@ -47,6 +47,8 @@ public class Executor {
     /**
      * Creates a new instance with the given configuration.
      * @param pCmdLine The command line to execute.
+     * @param pDirectory The directory, where to launch the external process. May be
+     *   null, in which case the directory is inherited from the current process.
      * @param pStdOutHandler The handler for the external processes stdout stream.
      * @param pStdErrHandler The handler for the external processes stderr stream.
      * @throws NullPointerException Either of the parameters is null.
@@ -59,6 +61,9 @@ public class Executor {
         stdErrHandler = Objects.requireNonNull(pStdErrHandler, "StdErrHandler");
     }
 
+    /** Performs the actual launch, waits for completion, and returns the result code.
+     * @return The external processes exit code.
+     */
     public int run() {
     	Process process;
 		try {
@@ -67,7 +72,7 @@ public class Executor {
 			throw new UncheckedIOException(e);
 		}
     	final CompletableFuture<Void> cfout = asCompletableFuture(process.getInputStream(), stdOutHandler);
-    	final CompletableFuture<Void> cferr = asCompletableFuture(process.getErrorStream(), stdOutHandler);
+    	final CompletableFuture<Void> cferr = asCompletableFuture(process.getErrorStream(), stdErrHandler);
     	final MutableInteger exitCode = new MutableInteger();
     	final CompletableFuture<Void>cfwait = CompletableFuture.runAsync(() -> {
     		final int status;

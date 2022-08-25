@@ -27,22 +27,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <url>https://github.com/jochenw/afw</url>
-  <developers>
-    <developer>
-      <id>jwi</id>
-      <email>jochen.wiedmann@gmail.com</email>
-      <name>Jochen Wiedmann</name>
-      <organizationUrl>https://github.com/jochenw</organizationUrl>
-    </developer>
-  </developers>
   <build>
     <defaultGoal>clean install</defaultGoal>
     <pluginManagement>
@@ -89,7 +73,7 @@
             <version>3.2.0</version>
             <configuration>
                 <failOnWarnings>false</failOnWarnings>
-                <failOnError>true</failOnError>
+                <failOnError>false</failOnError>
                 <excludePackageNames>com.github.jochenw.afw.core.el.jcc</excludePackageNames>
                 <source>8</source>
             </configuration>
