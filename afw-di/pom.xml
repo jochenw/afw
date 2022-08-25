@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.github.jochenw.afw</groupId>
     <artifactId>afw</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>afw-di</artifactId>
   <name>AFW (DI)</name>
