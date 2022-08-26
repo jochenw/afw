@@ -23,12 +23,18 @@ package com.github.jochenw.afw.core.util;
 public abstract class AbstractBuilder<S,T extends AbstractBuilder<S,T>> extends AbstractMutable {
 	private S instance;
 
+	/** Returns this builder.
+	 * @return This builder.
+	 */
 	protected T self() {
 		@SuppressWarnings("unchecked")
 		final T t = (T) this;
 		return t;
 	}
 
+	/** Creates the instance, that the builder returns.
+	 * @return The created instance, with the builders configuration applied.
+	 */
 	protected abstract S newInstance();
 
 	/**

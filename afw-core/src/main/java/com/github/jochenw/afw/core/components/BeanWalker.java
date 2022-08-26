@@ -155,6 +155,11 @@ public class BeanWalker {
 		}
 	}
 
+	/** Called to inject a field value into a bean.
+	 * @param pBean The bean, that will be updated.
+	 * @param pField The field, that will be used to inject a value into the bean.
+	 * @param pValue The value, that will be injected into the bean.
+	 */
 	protected void setFieldValue(Object pBean, Field pField, Object pValue) {
 		try {
 			if (!pField.isAccessible()) {
@@ -166,6 +171,11 @@ public class BeanWalker {
 		}
 	}
 
+	/** Called to retrieve a field value from a bean.
+	 * @param pBean The bean, that will be updated.
+	 * @param pField The field, that will be used to retrieve a value from the bean.
+	 * @return The given fields value in the given bean.
+	 */
 	protected Object getFieldValue(Object pBean, Field pField) {
 		try {
 			if (!pField.isAccessible()) {

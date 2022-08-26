@@ -27,9 +27,10 @@ import javax.inject.Named;
 import com.github.jochenw.afw.core.inject.simple.SimpleComponentFactory;
 
 /**
- * A {@link IComponentFactory} is basically a map: In the case of
- * the {@link SimpleComponentFactory}, the map's keys are instances
- * of {@link Key}, and the values are the respective bindings.
+ * A {@code com.github.jochenw.afw.core.inject.IComponentFactory} is
+ * basically a map: In the case of the {@link SimpleComponentFactory},
+ * the map's keys are instances of {@link Key}, and the values are
+ * the respective bindings.
  * @param <O> Type of the binding, that is associated with the key.
  */
 public class Key<O extends Object> {

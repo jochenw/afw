@@ -60,6 +60,9 @@ public class Application {
 		return cf;
 	}
 
+	/** Creates a new instance, that needs initialization.
+	 * @return The created instance, which is not yet ready to use.
+	 */
 	protected @Nonnull IComponentFactory newComponentFactory() {
 		final ComponentFactoryBuilder<?> cfb = newComponentFactoryBuilder();
 		cfb.module(newModule());
@@ -69,6 +72,9 @@ public class Application {
 		return cfb.build();
 	}
 
+	/** Creates a new component factory builder, that needs initialization.
+	 * @return The created instance, which is ready for configuration.
+	 */
 	protected ComponentFactoryBuilder<?> newComponentFactoryBuilder() {
 		return new SimpleComponentFactoryBuilder();
 	}

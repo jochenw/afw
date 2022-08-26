@@ -54,6 +54,7 @@ import com.github.jochenw.afw.core.util.Strings;
  * with the {@link SimpleComponentFactory}.
  */
 public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
+	@SuppressWarnings("deprecation")
 	@Override
 	public <O> void findConsumers(IComponentFactory pCf, Class<?> pType, Consumer<Consumer<O>> pConsumerSink) {
 		final List<Method> initMethods = new ArrayList<>();
@@ -106,6 +107,7 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public <O> Provider<O> getProvider(IComponentFactory pCf, Field pField) {
 		for (Annotation a : pField.getAnnotations()) {
@@ -117,16 +119,38 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 		return null;
 	}
 
-	protected <O> Provider<O> getProviderByAnnotation(IComponentFactory pCf, Field pField, Annotation a) {
-		if (a instanceof LogInject) {
-			return getLogInjectProvider(pCf, pField, (LogInject) a);
-		} else if (a instanceof PropInject) {
-			return getPropInjectProvider(pCf, pField, (PropInject) a);
+	/** If an annotation has been detected, that the on the fly binder handles, create a
+	 * provider, that creates a matching value.
+	 * @param <O> Type of the objects, that the provider creates.
+	 * @param pCf The component factory, that may be used to request factory objects.
+	 * @param pField The field, that is being updated to inject the value, that the
+	 *   provider has created. (Used to determines the object type, that the provider
+	 *   creates.)
+	 * @param pAnnotation The annotation, that has been detected.
+	 * @return The created provider.
+	 */
+	@SuppressWarnings("deprecation")
+	protected <O> Provider<O> getProviderByAnnotation(IComponentFactory pCf, Field pField, Annotation pAnnotation) {
+		if (pAnnotation instanceof LogInject) {
+			return getLogInjectProvider(pCf, pField, (LogInject) pAnnotation);
+		} else if (pAnnotation instanceof PropInject) {
+			return getPropInjectProvider(pCf, pField, (PropInject) pAnnotation);
 		} else {
 			return null;
 		}
 	}
 
+	/** If an {@link PropInject} annotation has been detected on a field, that the on the fly
+	 * binder handles, create a provider, that creates the matching property value.
+	 * @param <O> Type of the objects, that the provider creates.
+	 * @param pCf The component factory, that may be used to request factory objects.
+	 * @param pField The field, that is being updated to inject the value, that the
+	 *   provider has created. (Used to determines the object type, that the provider
+	 *   creates.)
+	 * @param pPropInject The annotation, that has been detected.
+	 * @return The created provider.
+	 */
+	@SuppressWarnings("deprecation")
 	protected <O> Provider<O> getPropInjectProvider(IComponentFactory pCf, Field pField, PropInject pPropInject) {
 		final String id;
 		if (Strings.isEmpty(pPropInject.id())) {
@@ -230,24 +254,34 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 		}
 	}
 
-	protected <O> Provider<O> getLogInjectProvider(IComponentFactory pCf, AnnotatedElement pAnnotatable, LogInject pAnnotation) {
+	/** If an {@link LogInject} annotation has been detected on an annotated element,
+	 * that the on the fly binder handles, create a provider, that creates the
+	 * matching property value.
+	 * @param <O> Type of the objects, that the provider creates.
+	 * @param pCf The component factory, that may be used to request factory objects.
+	 * @param pAnnotatable The annotated element
+	 * @param pLogInject The annotation, that has been detected.
+	 * @return The created provider.
+	 */
+	@SuppressWarnings("deprecation")
+	protected <O> Provider<O> getLogInjectProvider(IComponentFactory pCf, AnnotatedElement pAnnotatable, LogInject pLogInject) {
 		final String id;
 		final Class<?> type;
 		if (pAnnotatable instanceof Field) {
 			final Field field = (Field) pAnnotatable;
 			type = field.getType();
-			id = Strings.notEmpty(pAnnotation.id(), field.getDeclaringClass().getName());
+			id = Strings.notEmpty(pLogInject.id(), field.getDeclaringClass().getName());
 		} else if (pAnnotatable instanceof Method) {
 			final Method method = (Method) pAnnotatable;
 			type = method.getParameterTypes()[0];
-			id = Strings.notEmpty(pAnnotation.id(), method.getDeclaringClass().getName());
+			id = Strings.notEmpty(pLogInject.id(), method.getDeclaringClass().getName());
 		} else {
 			throw new IllegalStateException("Invalid type for annotatable: " + pAnnotatable.getClass().getName());
 		}
 		if (type == ILog.class) {
 			// Nothing to do here.
 		} else if (type == IMLog.class) {
-			if (Strings.isEmpty(pAnnotation.mName())) {
+			if (Strings.isEmpty(pLogInject.mName())) {
 				throw new IllegalStateException("Missing, or empty mName attribute on @LogInject of " + pAnnotatable);
 			}
 		} else {
@@ -261,7 +295,7 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 				return o;
 			} else if (type == IMLog.class) {
 				@SuppressWarnings("unchecked")
-				final O o = (O) logFactory.getLog(id, pAnnotation.mName());
+				final O o = (O) logFactory.getLog(id, pLogInject.mName());
 				return o;
 			} else {
 				throw new IllegalStateException("Invalid type " + type.getName() + " for @LogInject (Must be either ILog, or IMLog.)");
@@ -269,6 +303,12 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 		};
 	}
 
+	/** Creates the default value for an annotated object, if the annotated element
+	 * requires a Long value.
+	 * @param pAnnotatable The annotated element.
+	 * @param pDefaultValueStr The default value, as a string, that must be converted.
+	 * @return The converted default value string.
+	 */
 	protected Long getDefaultLongValue(AnnotatedElement pAnnotatable, final String pDefaultValueStr) {
 		if (pDefaultValueStr == null) {
 			throw new IllegalStateException("@PropInject on " + pAnnotatable + " requires a defaultValue().");
@@ -282,6 +322,12 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 		return defaultLong;
 	}
 
+	/** Creates the default value for an annotated object, if the annotated element
+	 * requires an Integer value.
+	 * @param pAnnotatable The annotated element.
+	 * @param pDefaultValueStr The default value, as a string, that must be converted.
+	 * @return The converted default value string.
+	 */
 	protected Integer getDefaultIntValue(AnnotatedElement pAnnotatable, final String pDefaultValueStr) {
 		if (pDefaultValueStr == null) {
 			throw new IllegalStateException("@PropInject on " + pAnnotatable + " requires a defaultValue().");
@@ -295,6 +341,12 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 		return defaultInt;
 	}
 
+	/** Creates the default value for an annotated object, if the annotated element
+	 * requires a Boolean value.
+	 * @param pAnnotatable The annotated element.
+	 * @param pDefaultValueStr The default value, as a string, that must be converted.
+	 * @return The converted default value string.
+	 */
 	protected Boolean getDefaultBooleanValue(AnnotatedElement pAnnotatable, final String pDefaultValueStr) {
 		if (pDefaultValueStr == null) {
 			throw new IllegalStateException("@PropInject on " + pAnnotatable + " requires a defaultValue().");
@@ -309,6 +361,7 @@ public class DefaultOnTheFlyBinder implements OnTheFlyBinder {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public <O> void findBindings(IComponentFactory pCf, Class<?> pType,
 			BiConsumer<Key<O>, ScopedProvider<O>> pBindingSink) {
 		final Class<?> cl = (Class<?>) pType;

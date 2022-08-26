@@ -51,6 +51,7 @@ public interface OnTheFlyBinder {
 	 * into the given field. Null, if the field isn't
 	 * injectable.
 	 */
+	@SuppressWarnings("deprecation")
 	public <O> Provider<O> getProvider(IComponentFactory pCf, Field pField);
 	/**
 	 * Called to create a set of consumers, that are participating in the
@@ -62,6 +63,7 @@ public interface OnTheFlyBinder {
 	 * @param pConsumerSink A listener, that collects the created
 	 *   consumers.
 	 */
+	@SuppressWarnings("deprecation")
 	public <O> void findConsumers(IComponentFactory pCf, Class<?> pType, Consumer<Consumer<O>> pConsumerSink);
 	/**
 	 * Called to create a set of additional bindings.
@@ -72,5 +74,6 @@ public interface OnTheFlyBinder {
 	 * @param pBindingSink A listener, that collects the created
 	 *   bindings.
 	 */
+	@SuppressWarnings("deprecation")
 	public <O> void findBindings(IComponentFactory pCf, Class<?> pType, BiConsumer<Key<O>, ScopedProvider<O>> pBindingSink);
 }

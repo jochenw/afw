@@ -115,6 +115,11 @@ public class Cli<B> {
 		 */
 		public Cli<O> end() { return cli; }
 
+		/** Converts the string value, that has been supplied by the user
+		 * into an instance of the expected type.
+		 * @param pValue The string value, that has been supplied by the user.
+		 * @return The converted value.
+		 */
 		protected abstract T asValue(String pValue);
 
 		/** Sets the validator.
@@ -436,7 +441,6 @@ public class Cli<B> {
 		protected T asValue(String pValue) {
 			final Enum<?> en;
 			try {
-				@SuppressWarnings("unchecked")
 				final Enum<?> e = (Enum<?>) Enum.valueOf(type, pValue);
 				en = e;
 			} catch (IllegalArgumentException e) {
@@ -492,6 +496,11 @@ public class Cli<B> {
 		bean = pBean;
 	}
 
+	/** Creates an exception with the given error message, that may be thrown
+	 * to indicate a usage error.
+	 * @param pMsg The error message.
+	 * @return The created exception.
+	 */
 	protected RuntimeException error(String pMsg) {
 		if (errorHandler == null) {
 			return new UsageException(pMsg);
@@ -516,6 +525,11 @@ public class Cli<B> {
 		return errorHandler;
 	}
 
+	/** Registers a new option.
+	 * @param <O> The option type.
+	 * @param pOption The created option.
+	 * @return The same option.
+	 */
 	protected <O extends Option<?,B>> O option(O pOption) {
 		final Predicate<String> existingOptionTest = (s) -> {
 			for (Option<?,B> opt : options.values()) {
@@ -742,6 +756,9 @@ public class Cli<B> {
 		return bean;
 	}
 
+	/** Validates the option bean, after all options have been processed.
+	 * @param pBean Theoption bean, with the option values applied.
+	 */
 	protected void validate(B pBean) {
 		for (Option<?,B> opt : options.values()) {
 			if (opt.isRequired()  &&  !opt.isPresent()) {

@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 /** A component for executing commands as external processes.
+ * @deprecated Use {@link com.github.jochenw.afw.core.exec.Executor}.
  */
 public class Executor {
 	private static final @Nonnull ExecutorService DEFAULT_EXECUTOR_SERVICE = Executors.newFixedThreadPool(5);
@@ -109,6 +110,10 @@ public class Executor {
 				   (i) -> { listener.accept(i);});
 	}
 
+	
+	/** Creates a default {@link Listener listener}.
+	 * @return The created listener.
+	 */
 	protected @Nonnull Listener getDefaultListener() {
 		return new Listener() {
 			@Override
@@ -181,6 +186,13 @@ public class Executor {
 		}
 	}
 
+	/** Creates an action, that consumes the given {@link InputStream}.
+	 * @param pIn The input stream, that is being consumed.
+	 * @param pConsumer The consumer, that must be invoked to consume the input.
+	 *   May be null, in which case a default consumer is being created,
+	 *   that discards all input.
+	 * @return The created action.
+	 */
 	protected Callable<Object> startConsumer(@Nonnull InputStream pIn, Consumer<InputStream> pConsumer) {
 		return () -> {
 			if (pConsumer != null) {

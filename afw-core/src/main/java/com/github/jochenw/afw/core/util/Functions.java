@@ -82,7 +82,7 @@ public class Functions {
 	 * {@code ShortConsumer} is expected to operate via side-effects.
 	 *
 	 * <p>This is a <a href="package-summary.html">functional interface</a>
-	 * whose functional method is {@link #accept(byte)}.
+	 * whose functional method is {@link #accept(boolean)}.
 	 *
 	 * @see Consumer
 	 * @since 0.6

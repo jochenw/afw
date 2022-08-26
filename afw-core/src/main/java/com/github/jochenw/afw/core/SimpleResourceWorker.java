@@ -139,6 +139,11 @@ public class SimpleResourceWorker {
 		}
 	}
 
+	/** Called to close a resource.
+	 * @param pResource The resouce, that is being closed.
+	 * @param pCommit True, if a commit may be done. Otherwise, a rollback is assumed.
+	 * @throws Throwable Closing the resource has failed.
+	 */
 	protected void closeResource(Object pResource, boolean pCommit) throws Throwable {
 		final @Nonnull Object resource = Objects.requireNonNull(pResource, "Resource");
 		if (resource instanceof AutoCloseable) {
@@ -151,6 +156,9 @@ public class SimpleResourceWorker {
 	}
 
 
+	/** Creates a new resource tracker.
+	 * @return The created resource tracker.
+	 */
 	protected SimpleResourceTracker newTracker() {
 		return new SimpleResourceTracker();
 	}

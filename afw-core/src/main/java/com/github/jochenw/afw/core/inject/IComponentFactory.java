@@ -26,6 +26,7 @@ import javax.inject.Named;
 
 /**
  * Interface of a dependency injection controller.
+ * @deprecated Use {@code com.github.jochenw.afw.di.api.IComponentFactory}.
  */
 public interface IComponentFactory {
 	/**

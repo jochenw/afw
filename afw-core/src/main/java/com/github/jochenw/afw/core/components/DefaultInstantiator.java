@@ -12,6 +12,11 @@ import com.github.jochenw.afw.core.util.Reflection;
 /** Default implementation of {@link IInstantiator}.
  */
 public class DefaultInstantiator implements IInstantiator {
+	/** Creates a new instance of the given class, using the given {@link ClassLoader}.
+	 * @param pClassLoader The {@link ClassLoader}, which is being used.
+	 * @param pClassName Name of the class, that is being created.
+	 * @return The created instance.
+	 */
 	protected Object newInstance(ClassLoader pClassLoader, String pClassName) {
 		try {
 			@SuppressWarnings("unchecked")
@@ -41,10 +46,23 @@ public class DefaultInstantiator implements IInstantiator {
 		}
 	}
 
+	/** Converts the given string value into an instance of the given type.
+	 * @param pType The requested type.
+	 * @param pValue The string value, that is being converted.
+	 * @return The converted string value.
+	 */
 	protected Object asValue(Class<?> pType, String pValue) {
 		return Objects.convert(pValue, pType);
 	}
 
+	/** Sets the property named {@code pName} on the bean {@code pObject}
+	 * to the given {@code pValue}.
+	 * @param pObject The bean, that is being modified.
+	 * @param pName The property, that is being updated.
+	 * @param pValue The property value as a string. Internally,
+	 *   {@link #asValue(Class, String)} will be invoked to convert
+	 *   the string to a properly typed value.
+	 */
 	protected void setProperty(Object pObject, String pName, String pValue) {
 		final Method setter = Reflection.getPublicSetter(pObject.getClass(), pName);
 		if (setter != null) {

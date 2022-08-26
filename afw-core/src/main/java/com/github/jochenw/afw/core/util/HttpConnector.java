@@ -177,6 +177,12 @@ public class HttpConnector {
 		}
 	}
 
+	/** Creates an {@link AutoCloseable}, that provides a connection to the given
+	 * URL.
+	 * @param pUrl The URL, to which a connection shall be made.
+	 * @return The created {@link AutoCloseable}.
+	 * @throws IOException Creating the connection has failed.
+	 */
 	protected HttpConnection asHttpConnection(URL pUrl) throws IOException {
 		final HttpURLConnection urlConn;
 		if (proxy != null) {
@@ -198,6 +204,12 @@ public class HttpConnector {
 		};
 	}
 
+	/** Creates an {@link AutoCloseable}, that provides a connection to the given
+	 * https URL.
+	 * @param pUrl The URL, to which a connection shall be made.
+	 * @return The created {@link AutoCloseable}.
+	 * @throws IOException Creating the connection has failed.
+	 */
 	protected HttpConnection asHttpsConnection(URL pUrl) throws IOException {
 		final HttpsURLConnection urlConn;
 		if (proxy != null) {
@@ -220,6 +232,10 @@ public class HttpConnector {
 		};
 	}
 
+	/** Creates an {@link SSLSocketFactory SSL socket factory},
+	 * that can be used to create HTTPS connections.
+	 * @return The created {@link SSLSocketFactory SSL socket factory}.
+	 */
 	protected SSLSocketFactory getSSLSocketFactory() {
 		if (isTrustingAllCertificates()) {
 			try {

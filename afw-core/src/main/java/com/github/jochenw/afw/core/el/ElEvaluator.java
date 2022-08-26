@@ -16,7 +16,6 @@
 package com.github.jochenw.afw.core.el;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,10 +61,29 @@ public class ElEvaluator {
 			parameters = pParameters;
 		}
 
+		/**
+		 * Returns the evaluators model, that will be used to evaluate
+		 * expressions.
+		 * @return The evalauator's data model.
+		 */
+		public Object getModel() {
+			return model;
+		}
+
+		/** Evaluates the given EL expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(ElExpression pExpression) {
 			return evaluate(pExpression.getOrExpression());
 		}
 
+		/** Evaluates the given or expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(OrExpression pExpression) {
 			final List<AndExpression> expressions = pExpression.getAndExpressions();
 			Object left = evaluate(expressions.get(0));
@@ -91,6 +109,11 @@ public class ElEvaluator {
 			return left;
 		}
 
+		/** Evaluates the given and expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(AndExpression pExpression) {
 			final List<EqualityExpression> expressions = pExpression.getEqualityExpressions();
 			Object left = evaluate(expressions.get(0));
@@ -116,6 +139,11 @@ public class ElEvaluator {
 			return left;
 		}
 
+		/** Evaluates the given equality expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(EqualityExpression pExpression) {
 			final RelationalExpression leftExp = pExpression.getLeft();
 			final Object left = evaluate(leftExp);
@@ -147,6 +175,11 @@ public class ElEvaluator {
 			}
 		}
 		
+		/** Evaluates the given relational expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(RelationalExpression pExpression) {
 			final AddExpression leftExp = pExpression.getLeft();
 			final Object left = evaluate(leftExp);
@@ -197,6 +230,11 @@ public class ElEvaluator {
 			}
 		}
 
+		/** Evaluates the given add expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		@SuppressWarnings("unused")
 		protected Object evaluate(AddExpression pExpression) {
 			final List<?> objects = pExpression.getObjects();
@@ -242,6 +280,11 @@ public class ElEvaluator {
 			return left;
 		}
 
+		/** Evaluates the given multiply expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(MultiplyExpression pExpression) {
 			final UnaryExpression ueLeft = pExpression.getLeft();
 			final Object left = evaluate(ueLeft);
@@ -294,6 +337,11 @@ public class ElEvaluator {
 			}
 		}
 
+		/** Evaluates the given unary expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(UnaryExpression pExpression) {
 			final ValueExpression valueExp = pExpression.getValue();
 			final Object value = evaluate(valueExp);
@@ -343,6 +391,11 @@ public class ElEvaluator {
 			}
 		}
 		
+		/** Evaluates the given value expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(ValueExpression pExpression) {
 			final Boolean b = pExpression.getBooleanValue();
 			if (b == null) {
@@ -387,6 +440,11 @@ public class ElEvaluator {
 			}
 		}
 		
+		/** Evaluates the given variable reference expression, applying the evaluators
+		 * {@link #getModel()}.
+		 * @param pExpression The expression, that is being evaluated.
+		 * @return The evaluations result object.
+		 */
 		protected Object evaluate(VariableReferenceExpression pExpression) {
 			final String property = pExpression.getVar();
 			if (property.endsWith(".toString")) {
@@ -439,6 +497,12 @@ public class ElEvaluator {
 			}
 		}
 
+		/** Converts the given value to a canonical representation
+		 * of the same value. For example, integer values (bytes, shorts, 32 bit integers)
+		 * are being converted to 64 bit integers.
+		 * @param pValue The value, that is being converted.
+		 * @return The evaluations result object.
+		 */
 		protected Object canonify(Object pValue) {
 			if (pValue == null  ||  pValue instanceof Long  ||  pValue instanceof Double  ||  pValue instanceof String) {
 				return pValue;
@@ -461,7 +525,7 @@ public class ElEvaluator {
 
 	/**
 	 * Creates a new instance with the given property resolver.
-	 * @param pResolver The poperty resolver, which is being used
+	 * @param pResolver The property resolver, which is being used
 	 *   to evaluate properties in the model.
 	 */
 	public ElEvaluator(PropertyResolver pResolver) {

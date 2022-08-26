@@ -39,8 +39,9 @@ import com.github.jochenw.afw.core.util.Objects;
 
 
 /**
- * Abstract base class for builders of {@link IComponentFactory}.
- * @param <T> Type of the componentfactory, that is being built.
+ * Abstract base class for builders of {@code com.github.jochenw.afw.core.inject.IComponentFactory}.
+ * @param <T> Type of the component factory, that is being built.
+ * @deprecated Use {@code com.github.jochenw.afw.di.api.ComponentFactoryBuilder}.
  */
 public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<T>> {
 	/** Interface of a binding builder without scope.
@@ -225,6 +226,10 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return onTheFlyBinder;
 	}
 
+	/** Called to assert, that the builder is still mutable.
+	 * The builder ceases to be mutable, when {@link #build()}
+	 * is being invoked.
+	 */
 	protected void assertMutable() {
 		if (immutable) {
 			throw new IllegalStateException("This object is no longer mutable.");
@@ -335,18 +340,24 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 			key = pKey;
 		}
 
+		/** Called to assert, that the binding is still without scope.
+		 */
 		protected void assertNotScoped() {
 			if (scope != null) {
 				throw new IllegalStateException("The methods in(Scope), and asEagerSingleton(), are mutually exclusive, and may be used only once.");
 			}
 		}
 
+		/** Called to assert, that the binding is still without annotation, or annotation class.
+		 */
 		protected void assertNotAnnotated() {
 			if (annotation != null  ||  annotationClass != null) {
 				throw new IllegalStateException("The methods annotatedWith(Annotation), and annotatedWith(Class), and named(), are mutually exclusive, and may be used only once.");
 			}
 		}
 
+		/** Called to assert, that the binding is still without target.
+		 */
 		protected void assertNotTargeted() {
 			if (haveTarget) {
 				throw new IllegalStateException("The methods to(Class), to(Key), toInstance(), toProvider(*), and toConstructor(*), "
@@ -565,12 +576,19 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		}
 	}
 	
+	/** Returns this builder.
+	 * @return This builder.
+	 */
 	protected T self() {
 		@SuppressWarnings("unchecked")
 		final T t = (T) this;
 		return t;
 	}
 
+	/** Creates a new component factory instance, that is not yet initialied.
+	 * @return The created instance, which is not yet ready to use, because it
+	 *   requires initialization.
+	 */
 	protected IComponentFactory newInstance() {
 		final @Nonnull Class<? extends IComponentFactory> cfClass = getComponentFactoryClass();
 		try {
@@ -616,6 +634,14 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return instance;
 	}
 
+	/** Creates a list of bindings, that must be applied to the
+	 * component factory instance, in order to initialize it.
+	 * @param pCf The created component factory instance, which is not yet initialized.
+	 * @param pFinalizers The finalizers, which must be invoked, as soon as the component
+	 *   factory instance is ready for use.
+	 * @param pStaticInjectionClasses
+	 * @return The list of bindings.
+	 */
 	protected List<BindingBuilder<?>> createBindingBuilders(IComponentFactory pCf, List<Consumer<IComponentFactory>> pFinalizers, Set<Class<?>> pStaticInjectionClasses) {
 		final Map<Key<?>,BindingBuilder<?>> builders = new HashMap<>();
 		final Binder binder = new Binder() {
@@ -692,8 +718,19 @@ public abstract class ComponentFactoryBuilder<T extends ComponentFactoryBuilder<
 		return new ArrayList<>(builders.values());
 	}
 
+	/** Configures the component factory by applying the created list of bindings.
+	 * @param pComponentFactory The component factory instance, that is being initialized.
+	 * @param pBindings The list of bindings, that must be registered on the component
+	 * factory.
+	 * @param pStaticInjectionClasses The set of classes, that require static injection.
+	 */
 	protected abstract void createBindings(@Nonnull IComponentFactory pComponentFactory, @Nonnull List<BindingBuilder<?>> pBindings, @Nonnull Set<Class<?>> pStaticInjectionClasses);
 
+	/** Converts the given binding into a {@link Provider}.
+	 * @param <O> Type of the objects, that the provider creates.
+	 * @param pBb The binding, that is being converted.
+	 * @return The created provider.
+	 */
 	protected <O extends Object> Provider<O> asProvider(BindingBuilder<O> pBb) {
 		if (pBb.haveTarget) {
 			final O instance = pBb.targetInstance;

@@ -228,6 +228,8 @@ public class Args {
 		}
 	}
 
+	/** Default implementation of {@link Context}.
+	 */
 	protected static class ContextImpl implements Context {
 		private final @Nonnull Listener listener;
 		private final @Nonnull List<String> args;
@@ -235,6 +237,10 @@ public class Args {
 		private String name;
 		private final Set<String> singleOptionNames = new HashSet<>();
 
+		/**
+		 * @param pListener
+		 * @param pArgs
+		 */
 		public ContextImpl(@Nonnull Listener pListener, @Nonnull List<String> pArgs) {
 			args = Objects.requireNonNull(pArgs, "Args");
 			listener = Objects.requireNonNull(pListener, "Listener");

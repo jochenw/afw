@@ -65,6 +65,10 @@ public class CsvWriter implements AutoCloseable {
 		}
 	}
 
+	/** Writes a new row to the CSV file.
+	 * @param pRow The rows cell values.
+	 * @throws IOException Writing the row has failed, due to an I/O problem.
+	 */
 	protected void write(String[] pRow) throws IOException {
 		for (int i = 0;  i < pRow.length;  i++) {
 			if (i > 0) {
