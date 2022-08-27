@@ -2,6 +2,8 @@ package com.github.jochenw.afw.di.api;
 
 import java.lang.annotation.Annotation;
 
+import com.github.jochenw.afw.di.impl.BindingBuilder;
+
 
 
 /** Interface of a {@link BindingBuilder} without scope, and supplier, but with

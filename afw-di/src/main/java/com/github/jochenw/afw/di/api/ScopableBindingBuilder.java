@@ -1,7 +1,7 @@
 package com.github.jochenw.afw.di.api;
 
 
-/** Interface of a {@link BindingBuilder} without scope. In other words,
+/** Interface of a binding builder without scope. In other words,
  * a scope may be applied.
  */
 public interface ScopableBindingBuilder {

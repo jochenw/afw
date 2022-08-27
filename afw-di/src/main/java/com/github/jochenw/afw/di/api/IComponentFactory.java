@@ -68,7 +68,7 @@ public interface IComponentFactory {
 	 * @see #requireInstance(Key)
 	 * @see #getInstance(Class)
 	 * @see #getInstance(Class, String)
-	 * @see #getInstance(com.github.jochenw.afw.core.inject.Types.Type)
+	 * @see #getInstance(Types.Type)
 	 */
 	public @Nullable <O> O getInstance(Key<O> pKey);
 	/**
@@ -83,7 +83,7 @@ public interface IComponentFactory {
 	 * @see #getInstance(Key)
 	 * @see #getInstance(Class, String)
 	 * @see #getInstance(Type)
-	 * @see #getInstance(com.github.jochenw.afw.core.inject.Types.Type)
+	 * @see #getInstance(Types.Type)
 	 */
 	public default @Nullable <O> O getInstance(@Nonnull Class<O> pType) {
 		return getInstance(asKey(pType));
@@ -103,7 +103,7 @@ public interface IComponentFactory {
 	 * @see #getInstance(Key)
 	 * @see #getInstance(Class)
 	 * @see #getInstance(Type)
-	 * @see #getInstance(com.github.jochenw.afw.core.inject.Types.Type)
+	 * @see #getInstance(Types.Type)
 	 */
 	public default @Nullable <O> O getInstance(@Nonnull Class<O> pType, @Nonnull String pName) {
 		return getInstance(asKey(pType, pName));
@@ -121,7 +121,7 @@ public interface IComponentFactory {
 	 * @see #requireInstance(Class)
 	 * @see #requireInstance(Class, String)
 	 * @see #requireInstance(Type)
-	 * @see #requireInstance(com.github.jochenw.afw.core.inject.Types.Type)
+	 * @see #requireInstance(Types.Type)
 	 * @throws NoSuchElementException No such dependency has been registered.
 	 */
 	public default @Nonnull <O> O requireInstance(Key<O> pKey) throws NoSuchElementException {
@@ -144,7 +144,7 @@ public interface IComponentFactory {
 	 * @see #requireInstance(Key)
 	 * @see #requireInstance(Class, String)
 	 * @see #requireInstance(Type)
-	 * @see #requireInstance(com.github.jochenw.afw.core.inject.Types.Type)
+	 * @see #requireInstance(Types.Type)
 	 * @throws NoSuchElementException No such dependency has been registered.
 	 */
 	public default @Nonnull <O> O requireInstance(@Nonnull Class<O> pType) {
@@ -166,7 +166,7 @@ public interface IComponentFactory {
 	 * @see #requireInstance(Key)
 	 * @see #requireInstance(Class)
 	 * @see #requireInstance(Type)
-	 * @see #requireInstance(com.github.jochenw.afw.core.inject.Types.Type)
+	 * @see #requireInstance(Types.Type)
 	 * @throws NoSuchElementException No such dependency has been registered.
 	 */
 	public default @Nonnull <O> O requireInstance(@Nonnull Class<O> pType, @Nonnull String pName) {
@@ -228,6 +228,15 @@ public interface IComponentFactory {
 	 * Returns, whether the component factory has a binding for the given
 	 * key. This is the case, exactly, if {@link #getInstance(Key)} would
 	 * return non-null for the given key.
+	 * @param pKey The key, that's being tested to be present.
+	 * @return True, if there is a binding for the given key.
 	 */
 	public boolean hasKey(Key<?> pKey);
+
+	/** Creates a new component factory builder.
+	 * @return A new component factory builder
+	 */
+	public static ComponentFactoryBuilder builder() {
+		return new ComponentFactoryBuilder();
+	}
 }

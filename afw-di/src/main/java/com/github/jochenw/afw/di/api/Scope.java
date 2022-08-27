@@ -16,8 +16,8 @@
 package com.github.jochenw.afw.di.api;
 
 
-/** A bindings scope.
- * @see com.github.jochenw.afw.core.inject.Scopes
+/** A bindings scope. For possible values, see {@link Scopes}.
+ * @see Scopes
  */
 public class Scope {
 	Scope() {}

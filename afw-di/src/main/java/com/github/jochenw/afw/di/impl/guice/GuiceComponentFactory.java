@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Provider;
 
+import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.api.Key;
 import com.github.jochenw.afw.di.api.Scope;
@@ -24,6 +25,9 @@ import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.matcher.Matchers;
 
 
+/** Implementation of {@link IComponentFactory}, that uses Google Guice
+ * internally.
+ */
 public class GuiceComponentFactory extends AbstractComponentFactory {
 	private Injector injector;
 

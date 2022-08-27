@@ -9,11 +9,14 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
 
+/** Test suite for the {@link Exceptions} class.
+ */
 public class ExceptionsTest {
+	/** Test case for {@link Exceptions#show(Throwable)}.
+	 */
 	@Test
-	public void test() {
+	public void testShow() {
 		final RuntimeException rte = new RuntimeException();
 		try {
 			throw Exceptions.show(rte);

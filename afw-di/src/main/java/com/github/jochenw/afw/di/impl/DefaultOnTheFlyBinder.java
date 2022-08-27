@@ -6,12 +6,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
+import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.util.Exceptions;
 
+
+/** Default implementation of {@link IOnTheFlyBinder}.
+ * Supports {@code PostConstruct}, and {@code PreDestroy}.
+ */
 public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	@Override
 	protected boolean isInjectable(Field pField) {
@@ -61,7 +65,7 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	}
 
 	@Override
-	public Function<IComponentFactory, Object> getInstance(Type pType, Annotation[] pAnnotations) {
+	public Function<IComponentFactory, Object> getInstantiator(Type pType, Annotation[] pAnnotations) {
 		return null;
 	}
 

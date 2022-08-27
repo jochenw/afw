@@ -7,7 +7,7 @@ import javax.inject.Provider;
 
 
 
-/** A {@link BindingBuilder}, which may be linked to a particular supplier.
+/** A binding builder, which may be linked to a particular supplier.
  * The supplier is being used to acquire the object, which is being injected by
  * the binding.
  * @param <T> Type of the binding, and of the injected object.
@@ -52,7 +52,7 @@ public interface LinkableBindingBuilder<T> extends ScopableBindingBuilder {
 	ScopableBindingBuilder toProvider(Provider<? extends T> pProvider);
 	/** Requests, that the injected object is given by an invocation of the
 	 * given {@link Supplier}.
-	 * @param pProvider The provider, which is supplying the injected object.
+	 * @param pSupplier The provider, which is supplying the injected object.
 	 * @return A binding builder without scope, but with supplier.
 	 * @see #toProvider(Provider)
 	 */

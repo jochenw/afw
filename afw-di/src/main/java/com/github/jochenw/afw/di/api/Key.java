@@ -24,6 +24,8 @@ import javax.annotation.Nullable;
 
 import javax.inject.Named;
 
+import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
+
 
 /**
  * A {@link IComponentFactory} is basically a map: In the case of

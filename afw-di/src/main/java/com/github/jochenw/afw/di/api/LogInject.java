@@ -35,10 +35,10 @@ public @interface LogInject {
 	 * class, which declares the loggers field.
 	 */
 	String id() default "";
-	/** If an {@link com.github.jochenw.afw.core.log.IMLog} is being injected: Declares the method name.
+	/** If a method logger is being injected: Declares the method name.
 	 * Otherwise, this is being ignored.
-	 * @return The method name, if an {@link com.github.jochenw.afw.core.log.IMLog}
-	 *   is being injected. Otherwise, this is being ignored.
+	 * @return The method name, if a method logger is being injected.
+	 *   Otherwise, this is being ignored.
 	 */
 	String mName() default "";
 }

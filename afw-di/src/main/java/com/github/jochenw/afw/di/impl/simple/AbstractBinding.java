@@ -6,6 +6,8 @@ import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.util.Exceptions;
 
 
+/** Abstract default implementation of a binding.
+ */
 public abstract class AbstractBinding implements Binding {
 	private final Function<SimpleComponentFactory,Object> baseSupplier;
 

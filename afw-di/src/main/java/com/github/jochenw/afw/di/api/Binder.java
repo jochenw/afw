@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 
 import javax.inject.Named;
 
+import com.github.jochenw.afw.di.api.Types.Type;
+
 
 
 /** A {@link Binder} is an object, that can be used to create binding

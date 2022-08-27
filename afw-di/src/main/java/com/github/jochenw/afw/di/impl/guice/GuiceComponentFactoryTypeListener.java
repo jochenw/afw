@@ -10,10 +10,18 @@ import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
+/** Implementation of a Guice {@link TypeListener}, that implements use of the
+ * {@link IOnTheFlyBinder},
+ */
 public class GuiceComponentFactoryTypeListener implements TypeListener {
 	private final GuiceComponentFactory factory;
 	private final IOnTheFlyBinder onTheFlyBinder;
 
+	/** Creates a new instance,which implements using the given {@link IOnTheFlyBinder}
+	 * for the given {@link GuiceComponentFactory}.
+	 * @param pFactory The component factory, that is being customized by dynamic bindings.
+	 * @param pOnTheFlyBinder Thr on-the-fly binder, that provides the dynamic bindings.
+	 */
 	public GuiceComponentFactoryTypeListener(GuiceComponentFactory pFactory, IOnTheFlyBinder pOnTheFlyBinder) {
 		factory = Objects.requireNonNull(pFactory, "Factory");
 		onTheFlyBinder = Objects.requireNonNull(pOnTheFlyBinder, "Binder");

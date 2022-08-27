@@ -19,21 +19,47 @@ import com.github.jochenw.afw.di.impl.DefaultOnTheFlyBinder;
 import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
 import com.github.jochenw.afw.di.util.Exceptions;
 
+/** A builder for component factories. This is the officially recommended way to
+ * obtain a component factory. In other words. to obtain a component factory, you
+ * are supposed to do something like
+ * <pre>
+ *   IComponentFactory.builder().module(module).build();
+ * </pre>
+ */
 public class ComponentFactoryBuilder {
 	private @Nonnull List<Module> modules = new ArrayList<>();
 	private @Nonnull Supplier<AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
 	private @Nullable IComponentFactory instance;
 	private IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
 
+	/** Returns the modules, that have been registered for configuration of
+	 * the created component factory.
+	 * @return The modules, that have been registered for configuration of
+	 * the created component factory
+	 */
 	public List<Module> getModules() {
 		return modules;
 	}
 
+	/** Registers a new module for configuration of the created component
+	 * factory. The modules will be used in the order of registration.
+	 * @param pModule A new module for configuration of the created component
+	 * factory.
+	 * @return This builder.
+	 */
 	public ComponentFactoryBuilder module(@Nonnull Module pModule) {
 		modules.add(pModule);
 		return this;
 	}
 
+	/** Registers new modules for configuration of the created component
+	 * factory. The modules will be used in the order of registration. For the
+	 * modules in the given array, the order is determined by the arrays
+	 * natural order.
+	 * @param pModules A set of new modules for configuration of the created component
+	 * factory.
+	 * @return This builder.
+	 */
 	public ComponentFactoryBuilder modules(@Nullable Module... pModules) {
 		if (pModules != null) {
 			for (Module m : pModules) {
@@ -43,6 +69,14 @@ public class ComponentFactoryBuilder {
 		return this;
 	}
 
+	/** Registers new modules for configuration of the created component
+	 * factory. The modules will be used in the order of registration. For the
+	 * modules in the given set, the order is determined bythe iterables
+	 * natural order.
+	 * @param pModules A set of new modules for configuration of the created component
+	 * factory.
+	 * @return This builder.
+	 */
 	public ComponentFactoryBuilder modules(@Nullable Iterable<Module> pModules) {
 		if (pModules != null) {
 			for (Module m : pModules) {
@@ -52,6 +86,11 @@ public class ComponentFactoryBuilder {
 		return this;
 	}
 
+	/** Upon the first invocation, creates a new component factory, and configures
+	 * it by applying the registered modules. For all following invocations, returns
+	 * the same instance.
+	 * @return The created, anf configured component factory, ready to use.
+	 */
 	public @Nonnull IComponentFactory build() {
 		if (instance == null) {
 			final AbstractComponentFactory inst = supplier.get();
@@ -193,11 +232,22 @@ public class ComponentFactoryBuilder {
 		};
 	}
 
+	/**
+	 * Configures the created instances type.
+	 * @param pType Type of the created instance, a subclass of {@link AbstractComponentFactory}.
+	 * @return This builder.
+	 */
 	public ComponentFactoryBuilder type(Class<? extends AbstractComponentFactory> pType) {
 		supplier = newSupplier(pType);
 		return this;
 	}
 
+	/**
+	 * Configures the created instance.
+	 * @param pSupplier A supplier, that creates the instance of, that is being
+	 *   built.
+	 * @return This builder.
+	 */
 	public ComponentFactoryBuilder type(Supplier<AbstractComponentFactory> pSupplier) {
 		supplier = pSupplier;
 		return this;

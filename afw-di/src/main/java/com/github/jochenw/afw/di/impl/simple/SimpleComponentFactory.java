@@ -32,6 +32,10 @@ import com.github.jochenw.afw.di.util.Exceptions;
 import com.github.jochenw.afw.di.util.Reflection;
 
 
+/** Default implementation of an {@link IComponentFactory}:
+ * A simple, and fast, standalone implementation, without
+ * any need to bring Guava, or Spring, into the dependency hell.
+ */
 public class SimpleComponentFactory extends AbstractComponentFactory {
 	private final ConcurrentMap<Class<Object>, MetaData> metaDataByClass = new ConcurrentHashMap<>();
 	private Predicate<Class<?>> staticInjectionPredicate;
@@ -95,7 +99,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 			              @Nonnull List<BindingBuilder<Object>> pBuilders,
 			              @Nonnull Set<Class<?>> pStaticInjectionClasses) {
 		staticInjectionPredicate = (cl) -> pStaticInjectionClasses.contains(cl);
-		bindings = new BindingRegistry(this, pBuilders, staticInjectionPredicate);
+		bindings = new BindingRegistry(this, pBuilders);
 		try {
 			bindings.init(this);
 		} catch (Throwable t) {
@@ -109,7 +113,17 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return new MetaData(instantiator, injector);
 	}
 
+	/** Three arguments version of a {@link BiConsumer}.
+     * @param <O1> Type of the first argument.
+	 * @param <O2> Type of the second argument.
+	 * @param <O3> Type of the third argument.
+	 */
 	public interface TriConsumer<O1,O2,O3> {
+		/** Calls the consumer to provide an action, based on the three arugments.
+		 * @param pO1 The first argument.
+		 * @param pO2 The second argument.
+		 * @param pO3 The third argument.
+		 */
 		void accept(O1 pO1, O2 pO2, O3 pO3);
 	}
 
@@ -207,7 +221,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		Binding binding = bindings.find(pType, pAnnotations);
 		if (binding == null) {
 			if (onTheFlyBinder != null  &&  onTheFlyBinder.isInstantiable(pType, pAnnotations)) {
-				final Function<IComponentFactory,Object> instantiator = onTheFlyBinder.getInstance(pType, pAnnotations);
+				final Function<IComponentFactory,Object> instantiator = onTheFlyBinder.getInstantiator(pType, pAnnotations);
 				return new Binding() {
 					@Override
 					public Object apply(SimpleComponentFactory pScf) {

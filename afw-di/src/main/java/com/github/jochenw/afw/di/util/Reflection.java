@@ -6,7 +6,6 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
@@ -14,7 +13,20 @@ import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 
+/** Utility class for working with Java reflection.
+ */
 public class Reflection {
+	/** Returns a supplier, which creates an instance by invoking the given constructor.
+	 * The constructors parameters are obtained by invoking the given parameter function.
+	 * @param pConstructor The constructor, which is being invoked to create the instance.
+	 * @param pParameterSupplier The parameter supplier, which is being invoked to
+	 * obtain the constructor arguments. For example, if the constructor requires three
+	 *   arguments, then the parameter supplier will be invoked three times, with the
+	 *   arguments 0, 1, and 2, in that order.
+	 * @return The created supplier. Invoking this supplier will trigger invocations of
+	 *   the parameter supplier (if necessary), followed by an invocation of the
+	 *   constructor. The constructors result will be returned by the supplier.
+	 */
 	public static Supplier<Object> newInstantiator(Constructor<Object> pConstructor, IntFunction<Object> pParameterSupplier) {
 		try {
 			final Lookup privateLookup = getPrivateLookup(pConstructor.getDeclaringClass());
@@ -55,6 +67,14 @@ public class Reflection {
 		}
 	}
 
+	/** Returns a {@link BiConsumer}, which may be used to set the given fields value
+	 * on an instance.
+	 * @param pField The field, to which the injector will write the value.
+	 * @return The created {@link BiConsumer biconsumer}. Invoking this consumer
+	 *  will trigger a modification of {@code pField} on an instance. The {@link
+	 *  BiConsumer biconsumer's} arguments are the instance, that is being modified,
+	 *  and the new field value.
+	 */
 	public static BiConsumer<Object,Object> newInjector(Field pField) {
 		final boolean staticInjection = Modifier.isStatic(pField.getModifiers());
 		try {
@@ -90,6 +110,14 @@ public class Reflection {
 		}
 	}
 
+	/** Returns a {@link BiConsumer}, which may be used to invoke a setter method
+	 * on an instance.
+	 * @param pMethod The setter method, that will be invoked by the injector.
+	 * @return The created {@link BiConsumer biconsumer}. Invoking this consumer
+	 *  will trigger an invocation of {@code pMethod} on an instance. The {@link
+	 *  BiConsumer biconsumer's} arguments are the instance, that is being modified,
+	 *  and the setter methods argument.
+	 */
 	public static BiConsumer<Object,Object[]> newInjector(Method pMethod) {
 		final boolean staticInjection = Modifier.isStatic(pMethod.getModifiers());
 		try {

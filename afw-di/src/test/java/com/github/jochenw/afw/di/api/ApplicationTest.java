@@ -10,11 +10,25 @@ import javax.inject.Provider;
 
 import org.junit.Test;
 
+/** Test for the {@link Application} class.
+ */
 public class ApplicationTest {
+	/** Subclass of {@link Application}, which allows us to test, whether
+	 * {@link Application#of(Class, Module)}, or
+	 * {@link Application#of(Class, Supplier)}
+	 * can be used to create instances of a subclass.
+	 */
 	public static class MyApplication extends Application {
+		/** Creates a new instance with the given module supplier.
+		 * @param pModuleSupplier The module supplier, which will be
+		 *   used to create the {@link IComponentFactory}.
+		 */
 		public MyApplication(Supplier<Module> pModuleSupplier) {
 			super(pModuleSupplier);
 		}
+		/** Creates a new instance with the given component factory.
+		 * @param pComponentFactoryProvider The component factory provider.
+		 */
 		public MyApplication(Provider<IComponentFactory> pComponentFactoryProvider) {
 			super(pComponentFactoryProvider);
 		}

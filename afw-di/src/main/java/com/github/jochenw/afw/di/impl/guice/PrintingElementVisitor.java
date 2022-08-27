@@ -24,10 +24,20 @@ import com.google.inject.spi.StaticInjectionRequest;
 import com.google.inject.spi.TypeConverterBinding;
 import com.google.inject.spi.TypeListenerBinding;
 
+/** An implementation of {@link ElementVisitor}, that prints its
+ * invocation to an output stream, thereby visualizing the registration
+ * of bindings.
+ * 
+ * A debuggging tool for developers.
+ */
 @SuppressWarnings("rawtypes")
 public class PrintingElementVisitor implements ElementVisitor {
 	private final PrintStream out;
 
+	/** Creates a new instance, that writes debugging information to the
+	 * given output stream.
+	 * @param pOut The output stream.
+	 */
 	public PrintingElementVisitor(OutputStream pOut) {
 		if (pOut instanceof PrintStream) {
 			out = (PrintStream) pOut;
@@ -155,9 +165,13 @@ public class PrintingElementVisitor implements ElementVisitor {
 		return null;
 	}
 
-	public static void show(OutputStream pOut, com.google.inject.Module pModules) {
+	/** Called to visualize the given modules binding registrations.
+	 * @param pOut The output stream, to which registration events are being written.
+	 * @param pModule The module, that is being visualized.
+	 */
+	public static void show(OutputStream pOut, com.google.inject.Module pModule) {
 		final ElementVisitor<?> pev = new PrintingElementVisitor(pOut);
-		for (Element element : Elements.getElements(pModules)) {
+		for (Element element : Elements.getElements(pModule)) {
 			element.acceptVisitor(pev);
 		}
 	}

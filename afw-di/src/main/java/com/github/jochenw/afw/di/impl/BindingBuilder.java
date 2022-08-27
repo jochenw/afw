@@ -16,6 +16,9 @@ import com.github.jochenw.afw.di.api.Scope;
 import com.github.jochenw.afw.di.api.Scopes;
 
 
+/** A builder for component factory bindings.
+ * @param <T> Type of the object, that is being injected by the binding.
+ */
 public class BindingBuilder<T> implements LinkableBindingBuilder<T>, AnnotatableBindingBuilder<T> {
 	private final Key<T> key;
 	private Scope scope = Scopes.NO_SCOPE;
@@ -28,46 +31,99 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 	private Constructor<?> targetConstructor;
 	private Object targetInstance;
 
+	/** Creates a new instance with the given key.
+	 * @param pKey The bindings key, which provides the information, where, and when, the
+	 *   binding is applicable.
+	 */
 	public BindingBuilder(Key<T> pKey) {
 		key = Objects.requireNonNull(pKey, "Key");
 	}
 
+	/**
+	 * Returns the bindings scope.
+	 * @return The bindings scope.
+	 * @see #in(Scope)
+	 * @see #asEagerSingleton()
+	 */
 	public Scope getScope() {
 		return scope;
 	}
-	
+
+	/** If {@link #to(Class)} has been invoked: Returns the bindings
+	 * implementation class. Otherwise, returns null.
+	 * @return The bindings implementation class, if any, or null.
+	 * @see #to(Class)
+	 */
 	public Class<?> getTargetClass() {
 		return targetClass;
 	}
 
+	/** If {@link #to(Key)} has been invoked: Returns the bindings
+	 * implementation key. Otherwise, returns null.
+	 * @return The bindings implementation key, if any, or null.
+	 * @see #to(Key)
+	 */
 	public Key<?> getTargetKey() {
 		return targetKey;
 	}
 
+	/** If {@link #toSupplier(Supplier)} has been invoked: Returns the bindings
+	 * implementation supplier. Otherwise, returns null.
+	 * @return The bindings implementation supplier, if any, or null.
+	 * @see #toSupplier(Supplier)
+	 */
 	public Supplier<?> getTargetSupplier() {
 		return targetSupplier;
 	}
 
+	/** If {@link #toProvider(Provider)} has been invoked: Returns the bindings
+	 * implementation provider. Otherwise, returns null.
+	 * @return The bindings implementation supplier, if any, or null.
+	 * @see #toProvider(Provider)
+	 */
 	public Provider<?> getTargetProvider() {
 		return targetProvider;
 	}
 
+	/** If {@link #toConstructor(Constructor)} has been invoked: Returns the bindings
+	 * implementation constructor. Otherwise, returns null.
+	 * @return The bindings implementation constructor, if any, or null.
+	 * @see #toConstructor(Constructor)
+	 */
 	public Constructor<?> getTargetConstructor() {
 		return targetConstructor;
 	}
 
+	/** If {@link #toInstance(Object)} has been invoked: Returns the bindings
+	 * implementation instance. Otherwise, returns null.
+	 * @return The bindings implementation instance, if any, or null.
+	 * @see #toInstance(Object)
+	 */
 	public Object getTargetInstance() {
 		return targetInstance;
 	}
 
+	/** If {@link #annotatedWith(Class)} has been invoked: Returns the bindings
+	 * annotaion class. Otherwise, returns null.
+	 * @return The bindings annotation class, if any, or null.
+	 * @see #annotatedWith(Class)
+	 */
 	public Class<? extends Annotation> getAnnotationType() {
 		return annotationType;
 	}
 
+	/** If {@link #annotatedWith(Annotation)} has been invoked: Returns the bindings
+	 * annotation instance. Otherwise, returns null.
+	 * @return The bindings annotation instance, if any, or null.
+	 * @see #annotatedWith(Class)
+	 */
 	public Annotation getAnnotation() {
 		return annotation;
 	}
 
+	/** Returns the bindings key.
+	 * @return The bindings key.
+	 */
 	public Key<T> getKey() {
 		return key;
 	}

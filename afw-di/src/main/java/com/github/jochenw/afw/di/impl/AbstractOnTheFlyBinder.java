@@ -10,6 +10,8 @@ import java.util.function.Consumer;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 
+/** Abstract base class for implementing an {@link IOnTheFlyBinder}.
+ */
 public abstract class AbstractOnTheFlyBinder implements IOnTheFlyBinder {
 	private static class IsInjectableException extends RuntimeException {
 		private static final long serialVersionUID = 2820548098780229944L;

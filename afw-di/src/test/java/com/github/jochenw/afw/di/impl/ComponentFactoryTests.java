@@ -33,7 +33,13 @@ import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.Module;
 import com.github.jochenw.afw.di.api.Scopes;
 
+
+/** A helper class for testing implementations of {@link IComponentFactory}.
+ */
 public class ComponentFactoryTests {
+	/** A test class, which is being instantiated by the component factory,
+	 * with various fields properly filled.
+	 */
 	@SuppressWarnings("rawtypes")
 	public static class CreateMapsObject {
 		private @Inject @Named(value="hash") Map hashMap1;
@@ -46,6 +52,10 @@ public class ComponentFactoryTests {
 		private @Inject Map map2;
 	}
 
+	/** A test method, which tests proper instantiation, and injection of a
+	 * {@link CreateMapsObject}.
+	 * @param pType Type of the component factory, that is being tested.
+	 */
 	@SuppressWarnings("unchecked")
 	public static void testCreateMaps(Class<? extends AbstractComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
@@ -89,10 +99,17 @@ public class ComponentFactoryTests {
 		assertSame(cmo.map1, cmo.map2);
 	}
 
+	/** A test class, which is used to test proper injection of the component factory
+	 * itself in a child component factory.
+	 */
 	public static class TestParentObject {
 		private @Inject IComponentFactory componentFactory;
 	}
 
+	/** A test method, which tests proper instantiation, and injection of a
+	 * {@link TestParentObject}.
+	 * @param pType Type of the component factory, that is being tested.
+	 */
 	public static void testParent(Class<? extends AbstractComponentFactory> pType) {
 		final Module module = (b) -> {
 			b.bind(TestParentObject.class);
@@ -126,6 +143,9 @@ public class ComponentFactoryTests {
 		assertSame(cf, tpo2.componentFactory);
 	}
 
+	/** A test method, which runs the Java Inject TCK on the component factory.
+	 * @param pType Type of the component factory, that is being tested.
+	 */
 	public static void testTck(Class<? extends AbstractComponentFactory> pType) {
 		testTck(pType, true);
 	}

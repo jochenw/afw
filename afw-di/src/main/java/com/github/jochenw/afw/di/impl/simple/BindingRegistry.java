@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -21,13 +20,20 @@ import com.github.jochenw.afw.di.impl.BindingBuilder;
 import com.github.jochenw.afw.di.util.Exceptions;
 
 
+/** A binding registry is basically a map of types, as the keys, and a list of bindings,
+ * that provide values of these types.
+ */
 public class BindingRegistry implements IComponentFactoryAware {
 	private final ConcurrentMap<Type,BindingSet> bindings = new ConcurrentHashMap<>();
-	private final Predicate<Class<?>> staticInjectionPredicate;
 
-	public BindingRegistry(SimpleComponentFactory pFactory, List<BindingBuilder<Object>> pBindingBuilders, Predicate<Class<?>> pStaticInjectionPredicate) {
+	/** Creates a new instance, that manages bindings for the given
+	 * component factory.
+	 * @param pFactory The component factory, that holds this registry.
+	 * @param pBindingBuilders The binding builders, that have been configured on the
+	 *   component factory.
+	 */
+	public BindingRegistry(SimpleComponentFactory pFactory, List<BindingBuilder<Object>> pBindingBuilders) {
 		initBindings(pFactory, pBindingBuilders);
-		staticInjectionPredicate = pStaticInjectionPredicate;
 	}
 
 	protected void initBindings(IComponentFactory pFactory, List<BindingBuilder<Object>> pBindingBuilders) {
@@ -147,7 +153,12 @@ public class BindingRegistry implements IComponentFactoryAware {
 		}
 	}
 
-	public Binding find(Type pType, Annotation[] pAnnotations) {
+	/** Requests a binding for the given type, with the given annotations.
+	 * @param pType Type of the field, or method parameter, that is being injected.
+	 * @param pAnnotations Annotations of the field, or method parameter, that is being injected.
+	 * @return The requested binding, if any, or null.
+	 */
+	public @Nullable Binding find(Type pType, Annotation[] pAnnotations) {
 		final BindingSet bindingSet = bindings.get(pType);
 		if (bindingSet == null) {
 			return null;
@@ -156,6 +167,11 @@ public class BindingRegistry implements IComponentFactoryAware {
 		}
 	}
 
+	/** Requests a binding for the given keys type, with the given keys annotations.
+	 * @param pKey A key, that provides the type, and the annotations of the field, or method
+	 * parameter, that is being injected.
+	 * @return The requested binding, if any, or null.
+	 */
 	public Binding find(Key<Object> pKey) {
 		final Type type = pKey.getType();
 		final BindingSet bindingSet = bindings.get(type);
