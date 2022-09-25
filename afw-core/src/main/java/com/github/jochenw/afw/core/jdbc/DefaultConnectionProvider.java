@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import com.github.jochenw.afw.core.inject.IComponentFactory;
 import com.github.jochenw.afw.core.props.IPropertyFactory;
 import com.github.jochenw.afw.core.util.Objects;
+import com.github.jochenw.afw.di.api.IComponentFactory;
 
 /** Default implementation of {@link ConnectionProvider}: Uses the properties
  * "_prefix_.driver", "_prefix_.dialect", "_prefix_.url",

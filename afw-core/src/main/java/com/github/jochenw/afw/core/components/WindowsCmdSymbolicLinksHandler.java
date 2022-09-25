@@ -11,8 +11,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.annotation.Nonnull;
 
+import com.github.jochenw.afw.core.exec.Executor;
+import com.github.jochenw.afw.core.exec.ExecutorBuilder;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Executor;
 import com.github.jochenw.afw.core.util.Objects;
 
 
@@ -26,7 +27,16 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	 * files.
 	 */
 	public static final String CMD_EXE = "cmd.exe";
-	private final Executor executor = new Executor();
+
+	protected void run(Path pDir, String[] pCommand) {
+		final ExecutorBuilder eb = Executor.builder();
+		if (pDir != null) {
+			eb.directory(pDir);
+		}
+		eb.exec(CMD_EXE);
+		eb.arg("/c");
+		eb.args(pCommand);
+	}
 
 	@Override
 	protected void createSymbolicDirLink(@Nonnull Path pTarget, @Nonnull Path pLink) {
@@ -34,16 +44,16 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 		final @Nonnull Path link = Objects.requireNonNull(pLink, "Link");
 		final @Nonnull Path fileName = Objects.requireNonNull(link.getFileName(), "File name"); 
 		final Path dir = Objects.notNull(pLink.getParent(), () -> Paths.get("."));
-		final String[] command = { CMD_EXE, "/c", "mklink", "/j", "/d", fileName.toString(),
+		final String[] command = { "mklink", "/j", "/d", fileName.toString(),
 				                   target.toAbsolutePath().toString() };
-		executor.run(dir, command, null, null, null, null);
+		run(dir, command);
 	}
 
 	@Override
 	protected void createSymbolicFileLink(Path pTarget, Path pLink) {
-		final String[] command = { CMD_EXE, "/c", "mkdir", pLink.toString(),
+		final String[] command = { "mkdir", pLink.toString(),
                 pTarget.toString() };
-		executor.run(null, command, null, null);
+		run(null, command);
 	}
 
 	@Override

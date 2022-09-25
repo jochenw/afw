@@ -2,8 +2,6 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.*;
 
-import javax.naming.spi.ResolveResult;
-
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.data.Data;

@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -44,7 +43,6 @@ import org.xml.sax.SAXParseException;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.AbstractInitializer;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.IExtensionPoint;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.Initializer;
-import com.github.jochenw.afw.core.util.Streams;
 
 
 /** Test for the {@link PluginListParser}.

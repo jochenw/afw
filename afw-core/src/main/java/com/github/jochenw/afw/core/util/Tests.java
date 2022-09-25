@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -146,6 +148,17 @@ public class Tests {
 		assertEquals(pExpect.length, pGot.length);
 		for (int i = 0;  i < pExpect.length;  i++) {
 			assertEquals(pExpect[i], pGot[i]);
+		}
+	}
+
+	/**
+	 * Asserts, that the given objects are the same objects.
+	 * @param pExpect The expected object.
+	 * @param pGot The actual object.
+	 */
+	public static void assertSame(Object pExpect, Object pGot) {
+		if (pExpect != pGot) {
+			fail("Assertion failed, expected " + pExpect + ", got " + pGot);
 		}
 	}
 
@@ -372,5 +385,29 @@ public class Tests {
 		} catch (IOException e) {
 			throw Exceptions.show(e);
 		}
+	}
+
+	
+	/** Asserts, that executing the given {@link Runnable} will cause an
+	 * Exception of the given type with the given message.
+	 * @param <O> Type of the expected Exception
+	 * @param pType Type of the expected Exception
+	 * @param pMsg Message of the expected Exception
+	 * @param pRunnable The {@link Runnable}, that is being executed to trigger the exception. 
+	 */
+	public static <O extends Throwable> void assertThrowing(Class<O> pType, String pMsg, Runnable pRunnable) {
+		Throwable th;
+		try {
+			pRunnable.run();
+			throw new IllegalStateException("Expected Exception");
+		} catch (UncheckedIOException e) {
+			th = e.getCause();
+		} catch (UndeclaredThrowableException e) {
+			th = e.getCause();
+		} catch (Throwable e) {
+			th = e;
+		}
+		assertSame(pType, th.getClass());
+		assertEquals(pMsg, th.getMessage());
 	}
 }

@@ -20,6 +20,7 @@ import com.github.jochenw.afw.core.cli.Args.Listener;
 
 /** Test case for the {@link Args command line argument parser}.
  */
+@SuppressWarnings("deprecation")
 public class ArgsTest {
 	private Listener newListener(List<String> pArgs) {
 		return new Listener() {

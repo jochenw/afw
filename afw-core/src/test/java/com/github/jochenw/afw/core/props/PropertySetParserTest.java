@@ -77,6 +77,7 @@ public class PropertySetParserTest {
 		return list;
 	}
 
+	@SuppressWarnings("unused")
 	protected void test(String pContent, String pFileName, String... pValues) {
 		if (false) {
 			final BiConsumer<String, List<String>> validator = (fileName, list) -> {

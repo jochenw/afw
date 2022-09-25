@@ -14,28 +14,27 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.components.Application;
-import com.github.jochenw.afw.core.inject.ComponentFactoryBuilder;
-import com.github.jochenw.afw.core.inject.ComponentFactoryBuilder.Module;
-import com.github.jochenw.afw.core.inject.Scopes;
-import com.github.jochenw.afw.core.inject.guice.GuiceComponentFactoryBuilder;
+import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
 import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
+import com.github.jochenw.afw.core.props.IPropertyFactory;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.MutableBoolean;
 import com.github.jochenw.afw.core.util.Streams;
+import com.github.jochenw.afw.di.api.Application;
+import com.github.jochenw.afw.di.api.Module;
+import com.github.jochenw.afw.di.api.Scopes;
+
 
 /** Test suite for the {@link JdbcHelper}.
  */
 public class JdbcHelperTest {
 	private Application getApplication(Module pModule) {
-		return new Application((b) -> {
+		return Application.of((b) -> {
 			b.bind(JdbcHelper.class).in(Scopes.SINGLETON);
 			b.bind(Worker.class).in(Scopes.SINGLETON);
 			b.bind(ZoneId.class).toInstance(ZoneId.of("Europe/Berlin"));
@@ -45,22 +44,17 @@ public class JdbcHelperTest {
 			if (pModule != null) {
 				pModule.configure(b);
 			}
-		}, () -> new SimpleLogFactory(System.out), () -> {
-			final String uri = "com/github/jochenw/afw/core/jdbc/db-test.properties";
-			final URL url = Thread.currentThread().getContextClassLoader().getResource(uri);
-			if (url == null) {
-				throw new IllegalStateException("Unable to locate resource: " + uri);
-			}
-			final Properties props = Streams.load(url);
-			return new DefaultPropertyFactory(props);
-		}) {
-
-			@Override
-			protected ComponentFactoryBuilder<?> newComponentFactoryBuilder() {
-				return new GuiceComponentFactoryBuilder();
-			}
-			
-		};
+			b.bind(ILogFactory.class).toInstance(SimpleLogFactory.ofSystemOut());
+			b.bind(IPropertyFactory.class).toSupplier(() -> {
+				final String uri = "com/github/jochenw/afw/core/jdbc/db-test.properties";
+				final URL url = Thread.currentThread().getContextClassLoader().getResource(uri);
+				if (url == null) {
+					throw new IllegalStateException("Unable to locate resource: " + uri);
+				}
+				final Properties props = Streams.load(url);
+				return new DefaultPropertyFactory(props);
+			});
+		});
 	}
 
 	/** Test for {@link Worker.Context#getConnection()}.

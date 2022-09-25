@@ -211,4 +211,40 @@ public class SimpleLogFactory extends AbstractLogFactory {
 		slf.setLevel(Objects.notNull(pLogLevel, Level.INFO));
 		return slf;
 	}
+
+	/**
+	 * Creates a new instance, which is logging to the given {@link PrintStream}, using the given log level.
+	 * @param pOut The {@link PrintStream} to use. May be null, or empty, in
+	 *   which case {@link System#out} will be used for logging.
+	 * @param pLogLevel The log level to use. May be null, or empty, in
+	 *   which case {@link Level#INFO} will be used as the log level.
+	 * @return The created instance of {@link SimpleLogFactory}.
+	 */
+	public static ILogFactory of(@Nullable PrintStream pOut, @Nullable Level pLogLevel) {
+		final SimpleLogFactory slf = new SimpleLogFactory(Objects.notNull(pOut, System.out));
+		slf.setLevel(Objects.notNull(pLogLevel, Level.INFO));
+		return slf;
+	}
+
+	/**
+	 * Creates a new instance, which is logging to the given {@link PrintStream},
+	 * using the log level {@link Level#INFO}.
+	 * @param pOut The {@link PrintStream} to use. May be null, or empty, in
+	 *   which case {@link System#out} will be used for logging.
+	 * @return The created instance of {@link SimpleLogFactory}.
+	 */
+	public static ILogFactory of(@Nullable PrintStream pOut) {
+		return of (pOut, Level.INFO);
+	}
+
+	/**
+	 * Creates a new instance, which is logging to the given {@link System#out},
+	 * using the log level {@link Level#INFO}.
+	 * @param pOut The {@link PrintStream} to use. May be null, or empty, in
+	 *   which case {@link System#out} will be used for logging.
+	 * @return The created instance of {@link SimpleLogFactory}.
+	 */
+	public static ILogFactory ofSystemOut() {
+		return of (System.out, Level.INFO);
+	}
 }

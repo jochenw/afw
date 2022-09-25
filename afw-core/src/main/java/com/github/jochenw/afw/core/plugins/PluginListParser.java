@@ -107,6 +107,7 @@ public class PluginListParser {
 		 * @see #NS_100
 		 */
 		public static final String NS_101 = "http://namespaces.github.com/jochenw/afw/core/plugins/list/1.0.1";
+		@SuppressWarnings("unused")
 		private final ClassLoader classLoader;
 		private final Listener listener;
 
@@ -121,7 +122,10 @@ public class PluginListParser {
 		
 		private String id, className;
 		private List<String> dependsOnList;
-		private String propertyName, propertyValue;
+		@SuppressWarnings("unused")
+		private String propertyName;
+		private String propertyValue;
+		@SuppressWarnings("unused")
 		private StringBuilder propertyValueSb = new StringBuilder();
 		
 		@Override

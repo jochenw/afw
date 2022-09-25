@@ -12,6 +12,8 @@ import java.util.Properties;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.util.Tests;
+
 /**
  * Test suite for the {@link Data} class.
  */
@@ -402,5 +404,22 @@ public class DataTest {
 		// Create existingFile as an empty file.
 		try (OutputStream out = Files.newOutputStream(existingFile)) {
 		}
+		final Map<String,Object> map = new HashMap<String, Object>();
+		map.put("testDir", testDir);
+		map.put("testFile", existingFile);
+		map.put("noSuchFile", notExistingFile);
+		Data.MAP_ACCESSOR.requirePath(map, "testDir", "testDir", Data.DIR_EXISTS);
+		Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.FILE_EXISTS);
+		Data.MAP_ACCESSOR.requirePath(map, "noSuchFile", "noSuchFile", Data.NOT_EXISTS);
+		Tests.assertThrowing(NullPointerException.class, "Missing value for parameter noSuchParameter", () -> Data.MAP_ACCESSOR.requirePath(map, "noSuchParameter", "noSuchParameter"));
+		Tests.assertThrowing(IllegalStateException.class,
+	             "Invalid value for parameter testDir: Expected existing file, got " + testDir,
+	             () -> Data.MAP_ACCESSOR.requirePath(map, "testDir", "testDir", Data.FILE_EXISTS));
+		Tests.assertThrowing(IllegalStateException.class,
+	             "Invalid value for parameter testFile: Expected existing directory, got " + existingFile,
+	             () -> Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.DIR_EXISTS));
+		Tests.assertThrowing(IllegalStateException.class,
+	             "Invalid value for parameter testFile: Expected a non-existing item, got " + existingFile,
+	             () -> Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.NOT_EXISTS));
 	}
 }

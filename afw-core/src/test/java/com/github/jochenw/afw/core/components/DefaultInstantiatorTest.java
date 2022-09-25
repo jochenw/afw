@@ -320,22 +320,45 @@ public class DefaultInstantiatorTest {
 	}
 
 	/**
-	 * Test creating an instance of {@link ABean}. Properties are being injected using field access.
+	 * Test creating an instance of {@link ABean}. Properties are being specified as a map,
+	 * and injected using field access.
 	 */
 	@Test
-	public void testCreateUsingFieldAccess() {
+	public void testCreateUsingFieldAccessAndMap() {
 		final ABean aBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), ABean.class.getName(),
-				                                                  getBeanProperties());
+				                                                  getBeanPropertiesAsMap());
 		validate(aBean);
 	}
 
 	/**
-	 * Test creating an instance of {@link ABean}. Properties are being injected using method access (setters).
+	 * Test creating an instance of {@link ABean}. Properties are being specified as an array,
+	 * and injected using field access.
 	 */
 	@Test
-	public void testCreateUsingMethodAccess() {
+	public void testCreateUsingFieldAccessAndArray() {
+		final ABean aBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), ABean.class.getName(),
+				                                                  getBeanPropertiesAsArray());
+		validate(aBean);
+	}
+
+	/**
+	 * Test creating an instance of {@link ABean}. Properties are being specified as a map, and injected using method access (setters).
+	 */
+	@Test
+	public void testCreateUsingMethodAccessAndMap() {
 		final BBean bBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), BBean.class.getName(),
-				                                                  getBeanProperties());
+				                                                  getBeanPropertiesAsMap());
+		validate(bBean);
+		assertEquals(20, bBean.getNumberOfSetterInvocations());
+	}
+
+	/**
+	 * Test creating an instance of {@link ABean}. Properties are being specified as an array, and injected using method access (setters).
+	 */
+	@Test
+	public void testCreateUsingMethodAccessAndArray() {
+		final BBean bBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), BBean.class.getName(),
+				                                                  getBeanPropertiesAsArray());
 		validate(bBean);
 		assertEquals(20, bBean.getNumberOfSetterInvocations());
 	}
@@ -365,8 +388,8 @@ public class DefaultInstantiatorTest {
 	private final String BIGINT_EXAMPLE = String.valueOf(Long.MAX_VALUE) + String.valueOf(Long.MAX_VALUE);
 	private final String BIGDEC_EXAMPLE = BIGINT_EXAMPLE + ".0";
 
-	protected Map<String,String> getBeanProperties() {
-		final String[] propertyList = { "intProperty", "23",
+	protected String[] getBeanPropertiesAsArray() {
+		return new String[]{ "intProperty", "23",
 				"intObjProperty", "24", "longProperty", "25",
 				"longObjProperty", "26", "shortProperty", "27",
 				"shortObjProperty", "28", "byteProperty", "48",
@@ -381,9 +404,13 @@ public class DefaultInstantiatorTest {
 				"fileProperty", "./pom.xml",
 				"urlProperty", "http://127.0.0.1:8080/"
 				};
+	}
+
+	protected Map<String,String> getBeanPropertiesAsMap() {
 		final Map<String,String> map = new HashMap<>();
-		for (int i = 0;  i < propertyList.length;  i += 2) {
-			map.put(propertyList[i], propertyList[i+1]);
+		final String[] propertiesArray = getBeanPropertiesAsArray();
+		for (int i = 0;  i < propertiesArray.length;  i += 2) {
+			map.put(propertiesArray[i], propertiesArray[i+1]);
 		}
 		return map;
 	}

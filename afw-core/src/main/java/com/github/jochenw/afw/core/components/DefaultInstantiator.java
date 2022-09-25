@@ -107,5 +107,19 @@ public class DefaultInstantiator implements IInstantiator {
 		final O o = (O) object;
 		return o;
 	}
-	
+
+	@Override
+	public <O> O newInstance(ClassLoader pClassLoader, String pClassName, String... pBeanProperties) {
+		final Object object = newInstance(pClassLoader, pClassName);
+		if (pBeanProperties != null) {
+			for (int i = 0;  i < pBeanProperties.length;  i += 2) {
+				final String name = pBeanProperties[i];
+				final String value = pBeanProperties[i+1];
+				setProperty(object, name, value);
+			}
+		}
+		@SuppressWarnings("unchecked")
+		final O o = (O) object;
+		return o;
+	}
 }

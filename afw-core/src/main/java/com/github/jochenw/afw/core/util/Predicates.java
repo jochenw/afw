@@ -79,6 +79,7 @@ public class Predicates {
 	 * @return True, if any of the predicates in the list {@code pPredicates}
 	 *   returned true, when applied to the value {@code pValue}.
 	 */
+	@SafeVarargs
 	public static <O> boolean anyOf(O pValue, Predicate<O>... pPredicates) {
 		for (Predicate<O> predicate : pPredicates) {
 			if (predicate.test(pValue)) {
@@ -111,6 +112,7 @@ public class Predicates {
 	 * @return True, if all of the predicates in the list {@code pPredicates}
 	 *   returned true, when applied to the value {@code pValue}.
 	 */
+	@SafeVarargs
 	public static <O> boolean allOf(O pValue, Predicate<O>... pPredicates) {
 		for (Predicate<O> predicate : pPredicates) {
 			if (!predicate.test(pValue)) {

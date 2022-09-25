@@ -1,6 +1,5 @@
 package com.github.jochenw.afw.core.template;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.function.Consumer;

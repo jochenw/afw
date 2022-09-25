@@ -65,6 +65,7 @@ public class DocumentablePropertySetTest {
 				assertTrue(pset.isEmpty());
 			} else {
 				assertEquals(pValues.length, pset.size()*3);
+				@SuppressWarnings("unused")
 				final FailableConsumer<DocumentableProperty,?> consumer = new FailableConsumer<DocumentableProperty,RuntimeException>() {
 					private int offset = 0;
 
