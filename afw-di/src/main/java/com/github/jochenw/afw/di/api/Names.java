@@ -17,6 +17,10 @@ package com.github.jochenw.afw.di.api;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -26,51 +30,36 @@ import javax.inject.Named;
 /** This class supports working with instances of {@link Named}.
  */
 public class Names {
-	private static class NamedImpl implements javax.inject.Named, Serializable {
-		private static final long serialVersionUID = -3588508855233450088L;
-		private final @Nonnull String value;
-
-		NamedImpl(@Nonnull String pValue) {
-			value = pValue;
-		}
-
-		@Override
-		public Class<? extends Annotation> annotationType() {
-			return javax.inject.Named.class;
-		}
-
-		@Override
-		public @Nonnull String value() {
-			return value;
-		}
-
-		
-		
-		@Override
-		public int hashCode() {
-			return java.util.Objects.hash(value);
-		}
-
-		@Override
-		public boolean equals(Object pOther) {
-			if (pOther == null) {
-				return false;
-			}
-			if (pOther instanceof Named) {
-				final Named other = (Named) pOther;
-				return value.equals(other.value());
-			} else {
-				return false;
-			}
-		}
-	}
 
 	/** Creates an instance of {@link Named} with the given value.
 	 * @param pValue The created annotations value.
 	 * @return A newly created instance of {@link Named} with the given value.
 	 */
 	public static javax.inject.Named named(@Nonnull String pValue) {
-		return new NamedImpl(pValue);
+		final Class<?>[] interfaces = (Class<?>[]) Array.newInstance(Class.class, 1);
+		interfaces[0] = Named.class;
+		return (Named) Proxy.newProxyInstance(Names.class.getClassLoader(), interfaces, new InvocationHandler() {
+			@Override
+			public Object invoke(Object pProxy, Method pMethod, Object[] pArgs) throws Throwable {
+				if ("equals".equals(pMethod.getName())) {
+					final Object pOther = pArgs[0];
+					if (pOther == null) {
+						return false;
+					}
+					if (pOther instanceof Named) {
+						final Named other = (Named) pOther;
+						return pValue.equals(other.value());
+					} else {
+						return false;
+					}
+				}  else if ("value".equals(pMethod.getName())) {
+					return pValue;
+				} else if ("hashCode".equals(pMethod.getName())) {
+					return Integer.valueOf(Objects.hash(pValue));
+				}
+				throw new IllegalStateException("Not implemented: " + pMethod);
+			}
+		});
 	}
 
 	/** Creates a camel cased method property name. Example: prefix=get,

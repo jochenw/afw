@@ -26,6 +26,16 @@ public class MutableBoolean implements Serializable, Comparable<MutableBoolean> 
 	private static final long serialVersionUID = 3402519841525500747L;
 	private boolean value;
 
+	/** Creates a new instance with the given initial value.
+	 * @param pValue The given initial value.
+	 * @return The created instance.
+	 */
+	public static MutableBoolean of(boolean pValue) {
+	    final MutableBoolean mb = new MutableBoolean();
+	    mb.setValue(pValue);
+	    return mb;
+	}
+
 	/** Returns the current boolean value.
 	 * @return The current boolean value.
 	 */
@@ -45,23 +55,18 @@ public class MutableBoolean implements Serializable, Comparable<MutableBoolean> 
 		return Boolean.compare(value, pOtherMutableBoolean.getValue());
 	}
 
-    @Override
-	public boolean equals(Object pObj) {
-    	// This Boolean is mutable, so we can't simply compare the values.
-		return super.equals(pObj);
-	}
-
-	@Override
-	public int hashCode() {
-    	// This Boolean is mutable, so we can't simply use the values hash code.
-		return super.hashCode();
-	}
-
 	/**
      * Shortcut for {@link #setValue(boolean) setValue(true)}.
      */
 	public void set() {
 		setValue(true);
+	}
+
+	/**
+     * Shortcut for {@link #setValue(boolean) setValue(false)}.
+     */
+	public void unset() {
+		setValue(false);
 	}
 
     /**
