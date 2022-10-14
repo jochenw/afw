@@ -171,4 +171,25 @@ public class ComponentFactoryTests {
 		final IComponentFactory cf = new ComponentFactoryBuilder().type(pType).module(module).build();
 		Tck.testsFor(cf.requireInstance(Car.class), pStaticInjection, true);
 	}
+
+	/** A method for testing, whether a module can override a previous modules bindings.
+	 * @param pType Type of the component factory, that is being tested.
+	 */
+	public static void testModuleOverrides(Class<? extends AbstractComponentFactory> pType) {
+		final Object overwrittenInstance = new Object();
+		final Object overwritingInstance = new Object();
+		final Module overwrittenModule = (b) -> {
+			b.bind(Object.class).toInstance(overwrittenInstance);
+		};
+		final Module overwritingModule = (b) -> {
+			b.bind(Object.class).toInstance(overwritingInstance);
+		};
+		final IComponentFactory cf1 = new ComponentFactoryBuilder().type(pType)
+				.module(overwrittenModule).build();
+		final IComponentFactory cf2 = new ComponentFactoryBuilder().type(pType)
+				.module(overwrittenModule)
+				.module(overwritingModule).build();
+		assertSame(overwrittenInstance, cf1.requireInstance(Object.class));
+		assertSame(overwritingInstance, cf2.requireInstance(Object.class));
+	}
 }

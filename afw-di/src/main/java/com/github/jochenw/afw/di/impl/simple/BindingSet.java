@@ -89,6 +89,14 @@ public class BindingSet {
 	 * @param pBinding The registered binding.
 	 */
 	public synchronized void register(Key<Object> pKey, Binding pBinding) {
+		for (int i = 0;  i < bindings.size();  i++) {
+			final KeyAndBinding kab = bindings.get(i);
+			if (pKey.equals(kab.key)) {
+				// There is a new binding with the same key. Replace the existing one.
+				bindings.set(i, new KeyAndBinding(pKey, pBinding));
+				return;
+			}
+		}
 		bindings.add(new KeyAndBinding(pKey, pBinding));
 	}
 
