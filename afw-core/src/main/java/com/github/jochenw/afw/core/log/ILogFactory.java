@@ -15,8 +15,8 @@
  */
 package com.github.jochenw.afw.core.log;
 
-import com.github.jochenw.afw.core.ILifecycleController;
 import com.github.jochenw.afw.core.ResourceLocator;
+import com.github.jochenw.afw.di.api.ILifecycleController;
 
 
 /** Interface of a logger factory.

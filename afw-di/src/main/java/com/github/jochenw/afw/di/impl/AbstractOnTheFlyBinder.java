@@ -67,7 +67,7 @@ public abstract class AbstractOnTheFlyBinder implements IOnTheFlyBinder {
 				if (isInjectable(method)) {
 					final BiConsumer<IComponentFactory, Object> injector = getInjector(method);
 					if (injector == null) {
-						throw new NullPointerException("isInjectable(Method) is true, bug getInjector(Method) returned null for " + method);
+						throw new NullPointerException("isInjectable(Method) is true, but getInjector(Method) returned null for " + method);
 					}
 					injectors.add(injector);
 				}

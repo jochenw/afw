@@ -252,4 +252,20 @@ public class ComponentFactoryBuilder {
 		supplier = pSupplier;
 		return this;
 	}
+
+	/** Configures the {@link IOnTheFlyBinder}, that is being used.
+	 * @param pBinder The {@link IOnTheFlyBinder}, that is being used.
+	 * @return This builder.
+	 */
+	public ComponentFactoryBuilder onTheFlyBinder(IOnTheFlyBinder pBinder) {
+		onTheFlyBinder = Objects.requireNonNull(pBinder);
+		return this;
+	}
+
+	/** Returns the {@link IOnTheFlyBinder}, that is being used.
+	 * @return The {@link IOnTheFlyBinder}, that is being used
+	 */
+	public IOnTheFlyBinder onTheFlyBinder() {
+		return onTheFlyBinder;
+	}
 }

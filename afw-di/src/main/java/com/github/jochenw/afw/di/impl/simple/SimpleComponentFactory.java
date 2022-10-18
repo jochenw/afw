@@ -98,6 +98,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	public void configure(IOnTheFlyBinder pOnTheFlyBinder,
 			              @Nonnull List<BindingBuilder<Object>> pBuilders,
 			              @Nonnull Set<Class<?>> pStaticInjectionClasses) {
+		onTheFlyBinder = pOnTheFlyBinder;
 		staticInjectionPredicate = (cl) -> pStaticInjectionClasses.contains(cl);
 		bindings = new BindingRegistry(this, pBuilders);
 		try {
@@ -143,10 +144,10 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 						newMethodInjector(list::add, method);
 					}
 				}
-				if (onTheFlyBinder != null  &&  onTheFlyBinder.isInjectable(clazz)) {
-					final BiConsumer<IComponentFactory,Object> injector = onTheFlyBinder.getInjector(clazz);
-					list.add((scf,o) -> injector.accept(scf, o));
-				}
+			}
+			if (onTheFlyBinder != null  &&  onTheFlyBinder.isInjectable(clazz)) {
+				final BiConsumer<IComponentFactory,Object> injector = onTheFlyBinder.getInjector(clazz);
+				list.add((scf,o) -> injector.accept(scf, o));
 			}
 			clazz = clazz.getSuperclass();
 		}

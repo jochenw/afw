@@ -44,4 +44,8 @@ public @interface PropInject {
 	 * @return The properties default value.
 	 */
 	String defaultValue() default NO_DEFAULT;
+	/** Returns, whether the injected property value may be null. By default, a null value is not permitted.
+	 * @return True, if this property value may be null.
+	 */
+	boolean nullable() default false;
 }

@@ -2,6 +2,7 @@ package com.github.jochenw.afw.di.impl.simple;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateMapsObject;
@@ -42,5 +43,12 @@ public class SimpleComponentFactoryTest {
 	@Test
 	public void testModuleOverrides() {
 		ComponentFactoryTests.testModuleOverrides(COMPONENT_FACTORY_TYPE);
+	}
+
+	/** Test, whether the {@link IOnTheFlyBinder} works, as expected.
+	 */
+	@Test
+	public void testOnTheFlyBinder() {
+		ComponentFactoryTests.testOnTheFlyBinder(COMPONENT_FACTORY_TYPE);
 	}
 }

@@ -1,16 +1,23 @@
 package com.github.jochenw.afw.di.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Member;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,7 +37,11 @@ import org.atinject.tck.auto.accessories.SpareTire;
 import com.github.jochenw.afw.di.api.Binder;
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.ILifecycleController;
+import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
+import com.github.jochenw.afw.di.api.LogInject;
 import com.github.jochenw.afw.di.api.Module;
+import com.github.jochenw.afw.di.api.PropInject;
 import com.github.jochenw.afw.di.api.Scopes;
 
 
@@ -191,5 +202,91 @@ public class ComponentFactoryTests {
 				.module(overwritingModule).build();
 		assertSame(overwrittenInstance, cf1.requireInstance(Object.class));
 		assertSame(overwritingInstance, cf2.requireInstance(Object.class));
+	}
+
+	public static class DynmicallyBindableComponent {
+		private boolean started;
+		private boolean stopped;
+		private @PropInject(id="myProperty") String myProperty;
+		private @PropInject String otherProperty;
+		private @LogInject(id="myLogger") Logger myLogger;
+		private @LogInject() Logger otherLogger;
+
+		@PostConstruct
+		public void start() {
+			started = true;
+		}
+
+		@PreDestroy
+		public void shutdown() {
+			stopped = true;
+		}
+
+		public boolean isStopped() {
+			return stopped;
+		}
+
+		public boolean isStarted() {
+			return started;
+		}
+
+		public String getMyProperty() { return myProperty; }
+		public String getOtherProperty() { return otherProperty; }
+		public Logger getMyLogger() { return myLogger; }
+		public Logger getOtherLogger() { return otherLogger; }
+	}
+
+	/** A method for testing, whether the {@link IOnTheFlyBinder} works,
+	 * as expected.
+	 * @param pComponentFactoryType Type of the component factory, that is being tested.
+	 */
+	public static void testOnTheFlyBinder(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		// Check the state of a DynamicallyBindableComponent, that isn't properly initialized.
+		final DynmicallyBindableComponent dbc0 = new DynmicallyBindableComponent();
+		assertFalse(dbc0.isStarted());
+		assertFalse(dbc0.isStopped());
+		assertNull(dbc0.getMyProperty());
+		assertNull(dbc0.getOtherProperty());
+		assertNull(dbc0.getMyProperty());
+		assertNull(dbc0.getMyLogger());
+		assertNull(dbc0.getOtherLogger());
+		final Module module = (b) -> {
+			b.bind(DynmicallyBindableComponent.class).in(Scopes.SINGLETON);
+			b.bind(ILifecycleController.class).to(DefaultLifecycleController.class).in(Scopes.SINGLETON);
+			b.addFinalizer((cf) -> {
+				cf.requireInstance(ILifecycleController.class).start();
+			});
+		};
+		final IComponentFactory cf1 = new ComponentFactoryBuilder().type(pComponentFactoryType)
+				.onTheFlyBinder(new DefaultOnTheFlyBinder(){
+					@Override
+					protected Object getLogger(IComponentFactory pFactory, Class<?> pType, String pId) {
+						return Logger.getLogger(pId);
+					}
+
+					@Override
+					protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId) {
+						assertSame(String.class, pType);
+						switch(pId) {
+						  case "myProperty": return "myPropertyValue";
+						  case "com.github.jochenw.afw.di.impl.ComponentFactoryTests.DynmicallyBindableComponent.otherProperty":
+							  return "otherPropertyValue";
+						  default: throw new IllegalStateException("Invalid property key: " + pId);
+						}
+					}
+				})
+				.module(module).build();
+		// Retrieve another DynamicallyBindableComponent, that is properly initialized.
+		final DynmicallyBindableComponent dbc1 = cf1.requireInstance(DynmicallyBindableComponent.class);
+		assertTrue(dbc1.isStarted());
+		assertFalse(dbc1.isStopped());
+		assertEquals("myPropertyValue", dbc1.getMyProperty());
+		assertEquals("otherPropertyValue", dbc1.getOtherProperty());
+		assertEquals("myLogger", dbc1.getMyLogger().getName());
+		assertEquals("com.github.jochenw.afw.di.impl.ComponentFactoryTests.DynmicallyBindableComponent", dbc1.getOtherLogger().getName());
+		cf1.requireInstance(ILifecycleController.class).shutdown();
+		assertTrue(dbc1.isStopped());
+		assertFalse(dbc0.isStarted());
+		assertFalse(dbc0.isStopped());
 	}
 }

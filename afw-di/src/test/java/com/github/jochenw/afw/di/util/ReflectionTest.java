@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.junit.Test;
@@ -119,6 +120,7 @@ public class ReflectionTest {
 	private static class MethodsClass {
 		private static String staticStringField;
 		private Object objectField1, objectField2;
+		private boolean invoked;
 
 		/** Returns the {@code staticStringField}.
 		 * @return The {@code staticStringField}
@@ -157,6 +159,18 @@ public class ReflectionTest {
 		public Object getObjectField2() {
 			return objectField2;
 		}
+		/** Returns the value of the "invoked" property.
+		 * @return The value of the "invoked" property.
+		 */
+		public boolean isInvoked() {
+			return invoked;
+		}
+		/** Sets the "invoked" property to true.
+		 */
+		@SuppressWarnings("unused")
+		public void setInvoked() {
+			invoked = true;
+		}
 	}
 
 	/** Test for invocation of methods.
@@ -179,5 +193,24 @@ public class ReflectionTest {
 		assertNull(MethodsClass.staticStringField);
 		staticStringFieldInjector.accept(mc1, new Object[]{"42"});
 		assertSame("42", MethodsClass.staticStringField);
+	}
+
+	/** Test for {@link Reflection#newInvoker(Method)}
+	 * @throws Exception The test failed.
+	 */
+	@Test
+	public void testNewInvoker() throws Exception {
+		final MethodsClass mc1 = new MethodsClass();
+		final MethodsClass mc2 = new MethodsClass();
+		final Method setInvokedMethod = MethodsClass.class.getDeclaredMethod("setInvoked");
+		final Consumer<MethodsClass> invoker = Reflection.newInvoker(setInvokedMethod);
+		assertFalse(mc1.isInvoked());
+		assertFalse(mc2.isInvoked());
+		invoker.accept(mc1);
+		assertTrue(mc1.isInvoked());
+		assertFalse(mc2.isInvoked());
+		invoker.accept(mc2);
+		assertTrue(mc1.isInvoked());
+		assertTrue(mc2.isInvoked());
 	}
 }

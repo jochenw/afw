@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
@@ -159,6 +160,45 @@ public class Reflection {
 			return (Lookup) method.invoke(null, pType, MethodHandles.lookup());
 		} catch (Throwable t) {
 			return null;
+		}
+	}
+
+	/** Creates a consumer, which invokes the given no-args method on an instance.
+	 * @param <O> Type of the instance, on which a method is being invoked.
+	 * @param pMethod The method, that is being invoked. This method must not take
+	 *   any arguments.
+	 * @return A consumer, which invokes the given no-args method on an instance.
+	 */
+	public static <O> Consumer<O> newInvoker(Method pMethod) {
+		final Lookup privateLookup = getPrivateLookup(pMethod.getDeclaringClass());
+		final Class<?>[] parameterTypes = pMethod.getParameterTypes();
+		if (parameterTypes != null  &&  parameterTypes.length > 0) {
+			throw new IllegalArgumentException("Unable to create an invoker for method "
+					+ pMethod + ", because it takes parameters.");
+		}
+		if (privateLookup == null) {
+			// Java 8: Use Reflection
+			return (inst) -> {
+				try {
+					pMethod.invoke(inst);
+				} catch (Exception e) {
+					throw Exceptions.show(e);
+				}
+			};
+		} else {
+			MethodHandle mh;
+			try {
+				mh = privateLookup.unreflect(pMethod);
+			} catch (Exception e) {
+				throw Exceptions.show(e);
+			}
+			return (inst) -> {
+				try {
+					mh.invoke(inst);
+				} catch (Throwable e) {
+					throw Exceptions.show(e);
+				}
+			};
 		}
 	}
 }

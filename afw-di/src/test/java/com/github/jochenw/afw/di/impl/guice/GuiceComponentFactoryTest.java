@@ -34,4 +34,12 @@ public class GuiceComponentFactoryTest {
 	public void testTck() {
 		ComponentFactoryTests.testTck(COMPONENT_FACTORY_TYPE);
 	}
+
+	/** A test method, which checks, whether a module can overwrite a previous
+	 * modules bindings.
+	 */
+	@Test
+	public void testModuleOverrides() {
+		ComponentFactoryTests.testModuleOverrides(COMPONENT_FACTORY_TYPE);
+	}
 }

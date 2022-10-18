@@ -24,7 +24,8 @@ import javax.annotation.PreDestroy;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.ILifecycleController.TerminableListener;
+import com.github.jochenw.afw.di.api.ILifecycleController.TerminableListener;
+import com.github.jochenw.afw.di.impl.DefaultLifecycleController;
 
 /** Test for the {@link DefaultLifecycleController}.
  */

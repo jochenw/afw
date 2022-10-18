@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jochenw.afw.core.impl;
+package com.github.jochenw.afw.di.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.jochenw.afw.core.ILifecycleController;
-import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.di.api.ILifecycleController;
+import com.github.jochenw.afw.di.util.Exceptions;
 
 
 
