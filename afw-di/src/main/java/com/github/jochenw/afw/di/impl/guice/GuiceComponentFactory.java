@@ -3,7 +3,9 @@ package com.github.jochenw.afw.di.impl.guice;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -61,6 +63,12 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 	public void configure(IOnTheFlyBinder pOnTheFlyBinder,
 			              List<BindingBuilder<Object>> pBuilders,
 			              Set<Class<?>> pStaticInjectionClasses) {
+		// Eliminate duplicate bindings.
+		final Map<Key<Object>,BindingBuilder<Object>> bindingsByKey = new HashMap<>();
+		for (BindingBuilder<Object> bb : pBuilders) {
+			final Key<Object> key = bb.getKey();
+			bindingsByKey.put(key, bb);
+		}
 		com.google.inject.Module module = new com.google.inject.Module() {
 			@Override
 			public void configure(Binder pBinder) {
@@ -70,8 +78,12 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 				for (Class<?> cl : pStaticInjectionClasses) {
 					pBinder.requestStaticInjection(cl);
 				}
-				for (BindingBuilder<Object> bb : pBuilders) {
-					final Key<Object> key = bb.getKey();
+				for (BindingBuilder<Object> bib : pBuilders) {
+					final Key<Object> key = bib.getKey();
+					final BindingBuilder<Object> bb = bindingsByKey.remove(key);
+					if (bb == null) {
+						continue;
+					}
 					final com.google.inject.Key<Object> gkey = asGuiceKey(key, bb.getAnnotation(), bb.getAnnotationType());
 					final LinkedBindingBuilder<Object> lbb = pBinder.bind(gkey);
 					final ScopedBindingBuilder sbb;

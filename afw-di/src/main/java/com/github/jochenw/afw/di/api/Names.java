@@ -56,6 +56,8 @@ public class Names {
 					return pValue;
 				} else if ("hashCode".equals(pMethod.getName())) {
 					return Integer.valueOf(Objects.hash(pValue));
+				} else if ("annotationType".equals(pMethod.getName())) {
+					return Named.class;
 				}
 				throw new IllegalStateException("Not implemented: " + pMethod);
 			}

@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Provider;
 
+import com.github.jochenw.afw.di.impl.DefaultLifecycleController;
 import com.github.jochenw.afw.di.util.Exceptions;
 
 /** Base class for deriving application singleton objects, that main control
@@ -47,7 +48,11 @@ public class Application {
 				if (mInner != null) {
 					mInner.configure(b);
 				}
+				b.bind(ILifecycleController.class).to(DefaultLifecycleController.class).in(Scopes.SINGLETON);
 				b.bind(Application.class).toInstance(Application.this);
+				b.addFinalizer((cf) -> {
+					cf.requireInstance(ILifecycleController.class).start();
+				});
 			};
 			return new ComponentFactoryBuilder().module(mOuter).build();
 		} else {

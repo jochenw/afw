@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import org.junit.Test;
@@ -100,4 +101,31 @@ public class ApplicationTest {
 		validate(appl, true);
 	}
 
+	public static class Startable {
+		private boolean started, stopped;
+
+		@PostConstruct
+		public void start() { started = true; }
+		public boolean isStarted() { return started; }
+		@PostConstruct
+		public void stop() { stopped = true; }
+		public boolean isStopped() { return stopped; }
+	}
+
+	/** Test, whether the {@link ILifecycleController} is properly
+	 * initialized.
+	 */
+	public void testLifecycle() {
+		final Application app = Application.of((b) -> {
+			b.bind(Startable.class).in(Scopes.SINGLETON);
+		});
+		final ILifecycleController lc = app.getComponentFactory().requireInstance(ILifecycleController.class);
+		assertNotNull(lc);
+		final Startable startable = app.getComponentFactory().requireInstance(Startable.class);
+		assertTrue(startable.isStarted());
+		assertFalse(startable.isStopped());
+		lc.shutdown();
+		assertTrue(startable.isStarted());
+		assertTrue(startable.isStopped());
+	}
 }
