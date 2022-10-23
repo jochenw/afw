@@ -136,14 +136,24 @@ public class Reflection {
 					}
 				};
 			} else {
+				final MethodHandle mh = privateLookup.unreflect(pMethod);
 				return (pojo,value) -> {
-					try {
-						final MethodHandle mh = privateLookup.unreflect(pMethod);
-						if (staticInjection) {
-							mh.invoke(value);
+					final Object[] args;
+					if (staticInjection) {
+						args = value;
+					} else {
+						if (value == null  ||  value.length == 0) {
+							args = new Object[] {pojo};
 						} else {
-							mh.invoke(pojo, value);
+							args = new Object[value.length+1];
+							args[0] = pojo;
+							for(int i = 0;  i < value.length;  i++) {
+								args[i+1] = value[i];
+							}
 						}
+					}
+					try {
+						mh.invokeWithArguments(args);
 					} catch (Throwable t) {
 						throw Exceptions.show(t);
 					}

@@ -125,6 +125,9 @@ public class Key<O extends Object> {
 			if (otherAnno != null)
 				return false;
 		} else {
+			if (otherAnno == null) {
+				return false;
+			}
 			return anno.equals(otherAnno)  ||  otherAnno.equals(anno);
 		}
 		final Class<? extends Annotation> annoClass = getAnnotationClass();

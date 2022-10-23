@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Provider;
@@ -64,9 +65,10 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 			              List<BindingBuilder<Object>> pBuilders,
 			              Set<Class<?>> pStaticInjectionClasses) {
 		// Eliminate duplicate bindings.
+		final Function<Map<?,?>,String> mapper = (m) -> m.toString();
 		final Map<Key<Object>,BindingBuilder<Object>> bindingsByKey = new HashMap<>();
 		for (BindingBuilder<Object> bb : pBuilders) {
-			final Key<Object> key = bb.getKey();
+			final Key<Object> key = bb.getAnnotatedKey();
 			bindingsByKey.put(key, bb);
 		}
 		com.google.inject.Module module = new com.google.inject.Module() {
@@ -79,7 +81,7 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 					pBinder.requestStaticInjection(cl);
 				}
 				for (BindingBuilder<Object> bib : pBuilders) {
-					final Key<Object> key = bib.getKey();
+					final Key<Object> key = bib.getAnnotatedKey();
 					final BindingBuilder<Object> bb = bindingsByKey.remove(key);
 					if (bb == null) {
 						continue;

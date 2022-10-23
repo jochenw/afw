@@ -21,6 +21,7 @@ import com.github.jochenw.afw.di.api.Scopes;
  */
 public class BindingBuilder<T> implements LinkableBindingBuilder<T>, AnnotatableBindingBuilder<T> {
 	private final Key<T> key;
+	private Key<T> annotatedKey;
 	private Scope scope = Scopes.NO_SCOPE;
 	private Class<? extends Annotation> annotationType;
 	private Annotation annotation;
@@ -37,6 +38,7 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 	 */
 	public BindingBuilder(Key<T> pKey) {
 		key = Objects.requireNonNull(pKey, "Key");
+		annotatedKey = key;
 	}
 
 	/**
@@ -121,8 +123,9 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 		return annotation;
 	}
 
-	/** Returns the bindings key.
-	 * @return The bindings key.
+	/** Returns the bindings key, excluding optional annotations.
+	 * @return The bindings key, excluding optional annotations.
+	 * @see #getAnnotatedKey()
 	 */
 	public Key<T> getKey() {
 		return key;
@@ -141,12 +144,14 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 	@Override
 	public LinkableBindingBuilder<T> annotatedWith(Class<? extends Annotation> pAnnotationType) {
 		annotationType = Objects.requireNonNull(pAnnotationType, "AnnotationType");
+		annotatedKey = new Key<T>(key.getType(), pAnnotationType);
 		return this;
 	}
 
 	@Override
 	public LinkableBindingBuilder<T> annotatedWith(Annotation pAnnotation) {
 		annotation = Objects.requireNonNull(pAnnotation, "Annotation");
+		annotatedKey = new Key<T>(key.getType(), pAnnotation);
 		return this;
 	}
 
@@ -200,5 +205,13 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 		final Constructor<S> constructor = Objects.requireNonNull(pConstructor, "Constructor");
 		targetConstructor = constructor;
 		return this;
+	}
+
+	/** Returns the bindings key, including optional annotations.
+	 * @return The bindings key, including optional annotations.
+	 * @see #getKey()
+	 */
+	public Key<T> getAnnotatedKey() {
+		return annotatedKey;
 	}
 }
