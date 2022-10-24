@@ -36,6 +36,7 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 		eb.exec(CMD_EXE);
 		eb.arg("/c");
 		eb.args(pCommand);
+		eb.build().run();
 	}
 
 	@Override
@@ -59,7 +60,7 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	@Override
 	protected Path checkSymbolicLink(Path pPath) {
 		try {
-			if (Files.exists(pPath, LinkOption.NOFOLLOW_LINKS)) {
+			if (Files.exists(pPath)) {
 				final BasicFileAttributes bfa = Files.readAttributes(pPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 				if (!bfa.isSymbolicLink()  &&  bfa.isOther()) {
 					return pPath.toRealPath();
