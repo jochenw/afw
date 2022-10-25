@@ -17,6 +17,7 @@ public class DefaultInstantiator implements IInstantiator {
 	 * @param pClassName Name of the class, that is being created.
 	 * @return The created instance.
 	 */
+	@SuppressWarnings("deprecation")
 	protected Object newInstance(ClassLoader pClassLoader, String pClassName) {
 		try {
 			@SuppressWarnings("unchecked")
@@ -26,7 +27,7 @@ public class DefaultInstantiator implements IInstantiator {
 			Throwable th9 = null;
 			try {
 				// Are we running Java 8, or lower? If so, this should work.
-				return cl.newInstance();
+				return cl.getDeclaredConstructor().newInstance();
 			} catch (Throwable t) {
 				th8 = t;
 			}
@@ -63,6 +64,7 @@ public class DefaultInstantiator implements IInstantiator {
 	 *   {@link #asValue(Class, String)} will be invoked to convert
 	 *   the string to a properly typed value.
 	 */
+	@SuppressWarnings("deprecation")
 	protected void setProperty(Object pObject, String pName, String pValue) {
 		final Method setter = Reflection.getPublicSetter(pObject.getClass(), pName);
 		if (setter != null) {
