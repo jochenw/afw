@@ -49,7 +49,8 @@ public class Reflection {
      * @param pField The field name being searched for.
      * @param pValue The fields new value.
      */
-    public static void setValue(Object pInstance, String pField, Object pValue) {
+    @SuppressWarnings("deprecation")
+	public static void setValue(Object pInstance, String pField, Object pValue) {
     	if (pField == null  ||  pField.length() == 0) {
     		throw new NullPointerException("The field name must not be null, or empty.");
     	}
