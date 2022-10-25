@@ -15,8 +15,6 @@
  */
 package com.github.jochenw.afw.di.api;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -30,7 +28,6 @@ import javax.inject.Named;
 /** This class supports working with instances of {@link Named}.
  */
 public class Names {
-
 	/** Creates an instance of {@link Named} with the given value.
 	 * @param pValue The created annotations value.
 	 * @return A newly created instance of {@link Named} with the given value.
