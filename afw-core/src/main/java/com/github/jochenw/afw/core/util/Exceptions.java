@@ -166,6 +166,7 @@ public class Exceptions {
      * @param pTh The throwable, that is being checked.
      * @param pType The type of the cause.
      * @return The cause, if it meets the requested criteria, otherwise null.
+     * @param <E> The type of the cause.
      */
 	public static @Nullable <E extends Throwable> E getCause(@Nonnull Throwable pTh, @Nonnull Class<E> pType) {
 		final Throwable cause = pTh.getCause();

@@ -41,6 +41,7 @@ public interface IListable<O> {
 	/** Creates a new {@link IListable}. The elements in the {@link IListable} will be the
 	 * elements in the list.
 	 * @param pList The list, that supplies the elements.
+	 * @param <T> Type of the elements in the list.
 	 * @return The created {@link IListable}.
 	 * @throws NullPointerException The parameter {@code pList} is null.
 	 */
@@ -81,6 +82,7 @@ public interface IListable<O> {
 	/** Creates a new {@link IListable}. The elements in the {@link IListable} are given
 	 * as method arguments.
 	 * @param pValues The elements.
+	 * @param <T> Type of the elements.
 	 * @return The created {@link IListable}.
 	 * @throws NullPointerException The parameter {@code pList} is null.
 	 */
@@ -121,6 +123,7 @@ public interface IListable<O> {
 	/** Creates a new {@link IListable}. The elements in the {@link IListable} are given
 	 * as an array parameter. Arbitrary arrays are supported, including primitive values.
 	 * @param pArray The element array.
+	 * @param <T> Type of the elements in the array.
 	 * @return The created {@link IListable}.
 	 * @throws NullPointerException The parameter {@code pArray} is null.
 	 * @throws IllegalArgumentException The parameter {@code pArray} is no array.

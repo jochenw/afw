@@ -52,7 +52,6 @@ import java.nio.charset.CodingErrorAction;
  * Instances of {@link WriterOutputStream} are not thread safe.
  * </p>
  *
- * @see org.apache.commons.io.input.ReaderInputStream
  * @since 2.0
  */
 public class WriterOutputStream extends OutputStream {

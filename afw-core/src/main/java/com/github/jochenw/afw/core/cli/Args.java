@@ -238,14 +238,16 @@ public class Args {
 		private final Set<String> singleOptionNames = new HashSet<>();
 
 		/**
-		 * @param pListener
-		 * @param pArgs
+		 * @param pListener The listener, which is being notified for arguments.
+		 * @param pArgs The array of arguments, that is being parsed.
 		 */
 		public ContextImpl(@Nonnull Listener pListener, @Nonnull List<String> pArgs) {
 			args = Objects.requireNonNull(pArgs, "Args");
 			listener = Objects.requireNonNull(pListener, "Listener");
 		}
 
+		/** Returns the current options name.
+		 */
 		@Override
 		public String getName() {
 			return name;

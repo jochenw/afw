@@ -240,8 +240,6 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	/**
 	 * Creates a new instance, which is logging to the given {@link System#out},
 	 * using the log level {@link Level#INFO}.
-	 * @param pOut The {@link PrintStream} to use. May be null, or empty, in
-	 *   which case {@link System#out} will be used for logging.
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
 	public static ILogFactory ofSystemOut() {

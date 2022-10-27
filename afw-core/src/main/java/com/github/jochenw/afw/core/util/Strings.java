@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
@@ -41,23 +42,6 @@ import javax.annotation.Nullable;
  * this class ought to be useful always.
  */
 public class Strings {
-	/** Returns the given value, if it is non-null, or the empty string ("").
-	 * @param pValue The value to check for null.
-	 * @return A non-null string: Either the given value, if that is non-null,
-	 *   or the empty string ("").
-	 */
-	public static @Nonnull String notNull(@Nullable String pValue) {
-		return notNull(pValue, "");
-	}
-	/** Returns the given value, if it is non-null, or the default value.
-	 * @param pValue The value to check for null.
-	 * @param pDefault The non-null default value.
-	 * @return A non-null string: Either the given value, if that is non-null,
-	 *   or the default value.
-	 */
-	public static @Nonnull String notNull(@Nullable String pValue, @Nonnull String pDefault) {
-		return Objects.notNull(pValue, pDefault);
-	}
 	/** Returns the given value, if it is non-null, and non-empty, or
 	 * the default value.
 	 * @param pValue The value to check for null, or empty.
@@ -66,8 +50,23 @@ public class Strings {
 	 * if that is non-null, and non-empty, or the default value.
 	 */
 	public static String notEmpty(String pValue, String pDefault) {
-		if (pValue == null  ||  pValue.length() == 0) {
+		if (isEmpty(pValue)) {
 			return pDefault;
+		} else {
+			return pValue;
+		}
+	}
+
+	/** Returns the given value, if it is non-null, and non-empty, or
+	 * the default value.
+	 * @param pValue The value to check for null, or empty.
+	 * @param pDefault The non-null, and non-empty default value.
+	 * @return A non-null, and non-empty string: Either the given value,
+	 * if that is non-null, and non-empty, or the default value.
+	 */
+	public static String notEmpty(String pValue, Supplier<String> pDefault) {
+		if (isEmpty(pValue)) {
+			return pDefault.get();
 		} else {
 			return pValue;
 		}

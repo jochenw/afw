@@ -29,7 +29,7 @@ import com.github.jochenw.afw.core.util.Functions.FailableFunction;
  *       public static void main(String[] pArgs) {
  *          final OptionsBean bean = new Cli()
  *              .stringOption("--inputFile", "-if").default("inputFile.xml")
- *                 .handler((c,s) -> { \* Process the value *\ }).end()
+ *                 .handler((c,s) -&gt;{ \* Process the value *\ }).end()
  *              .build(new OptionsBean());
  *          run(bean);
  *       }
@@ -59,9 +59,10 @@ public class Cli<B> {
 			super(pMessage);
 		}
 	}
+
 	/**
 	 * Interface of the handler context, that is being passed to
-	 * {@link Option#handler(FailableBiConsumer)}.
+	 * {@link Option#handler(FailableBiConsumer)}
 	 * @param <O> Type of the options bean.
 	 */
 	public interface Context<O> {
@@ -579,7 +580,7 @@ public class Cli<B> {
 	 * @param pPrimaryName The options primary name.
 	 * @param pSecondaryNames The options secondary names.
 	 * @return The created option builder.
-	 * <T> Type of the Enum parameter.
+	 * @param <T> Type of the Enum parameter.
 	 */
 	public <T extends Enum<T>> EnumOption<B,T> enumOption(Class<T> pType, String pPrimaryName,
 			String... pSecondaryNames) {

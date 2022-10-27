@@ -15,10 +15,10 @@ import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Objects;
 
 
-/** A replacement for {@link Properties}, that supports comments on properties, as a kind of
+/** A replacement for {@link java.util.Properties}, that supports comments on properties, as a kind of
  * documentation.
  */
-public class DocumentablePropertySet {
+public class OrderedPropertySet {
 	/** A {@link DocumentableProperty} is basically a standard property, that can have a comment as
 	 * documentation.
 	 */
@@ -136,10 +136,9 @@ public class DocumentablePropertySet {
 	 * @param pCharset The character set of the property file. Defaults to
 	 *    {@link StandardCharsets#UTF_8}.
 	 * @return The property set, that has has been parsed from the document.
-	 * @throws IOException Parsing the property set has failed.
 	 * @throws NullPointerException The parameter {@code pReadable} is null.
 	 */
-	public static DocumentablePropertySet of(IReadable pReadable, Charset pCharset) {
+	public static OrderedPropertySet of(IReadable pReadable, Charset pCharset) {
 		try {
 			return new PropertySetParser().read(pReadable, pCharset);
 		} catch (Throwable e) {

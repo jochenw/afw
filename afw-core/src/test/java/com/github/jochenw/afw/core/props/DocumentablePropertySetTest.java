@@ -9,11 +9,11 @@ import java.util.function.BiConsumer;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.io.IReadable;
-import com.github.jochenw.afw.core.props.DocumentablePropertySet.DocumentableProperty;
+import com.github.jochenw.afw.core.props.OrderedPropertySet.DocumentableProperty;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 
-/** Test suite for the {@link DocumentablePropertySet}.
+/** Test suite for the {@link OrderedPropertySet}.
  */
 public class DocumentablePropertySetTest {
 	/**
@@ -51,16 +51,16 @@ public class DocumentablePropertySetTest {
 			 " This is a comment." + System.lineSeparator() + " The comments second line.");
 	}
 
-	protected DocumentablePropertySet parseTestFile(String pContent, String pFileName) {
+	protected OrderedPropertySet parseTestFile(String pContent, String pFileName) {
 		final IReadable readable = IReadable.of(pFileName, () -> {
 			final byte[] bytes = pContent.getBytes(StandardCharsets.UTF_8);
 			return new ByteArrayInputStream(bytes);
 		});
-		return DocumentablePropertySet.of(readable, StandardCharsets.UTF_8);
+		return OrderedPropertySet.of(readable, StandardCharsets.UTF_8);
 	}
 
 	protected void test(String pContent, String pFileName, String... pValues) {
-		final BiConsumer<String, DocumentablePropertySet> validator = (fileName, pset) -> {
+		final BiConsumer<String, OrderedPropertySet> validator = (fileName, pset) -> {
 			if (pValues == null) {
 				assertTrue(pset.isEmpty());
 			} else {
@@ -84,11 +84,11 @@ public class DocumentablePropertySetTest {
 			}
 		};
 		{
-			final DocumentablePropertySet dps = parseTestFile(pContent, pFileName + "_CRLF");
+			final OrderedPropertySet dps = parseTestFile(pContent, pFileName + "_CRLF");
 			validator.accept(pFileName + "_CRLF", dps);
 		}
 		{
-			final DocumentablePropertySet dps = parseTestFile(pContent.replace("\r\n", "\n"), pFileName + "_LF");
+			final OrderedPropertySet dps = parseTestFile(pContent.replace("\r\n", "\n"), pFileName + "_LF");
 			validator.accept(pFileName + "_LF", dps);
 		}
 	}

@@ -24,8 +24,8 @@ public class BindingSet {
 		private final Binding binding;
 
 		/** Creates a new instance, with the given key, and binding.
-		 * @param pKey
-		 * @param pBinding
+		 * @param pKey The bindings key.
+		 * @param pBinding The binding itself.
 		 */
 		public KeyAndBinding(Key<Object> pKey, Binding pBinding) {
 			this.key = pKey;

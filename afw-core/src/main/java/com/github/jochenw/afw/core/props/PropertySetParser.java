@@ -14,7 +14,7 @@ import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 import com.github.jochenw.afw.core.util.Functions.FailableTriConsumer;
 import com.github.jochenw.afw.core.util.Objects;
 
-/** A parser class for reading a {@link DocumentablePropertySet} from a stored property file.
+/** A parser class for reading a {@link OrderedPropertySet} from a stored property file.
  */
 public class PropertySetParser {
 	private @Nonnull String commentLineSeparator = System.lineSeparator();
@@ -165,8 +165,8 @@ public class PropertySetParser {
 	 * @throws IOException Parsing the property set has failed.
 	 * @throws NullPointerException The parameter {@code pReadable} is null.
 	 */
-	public @Nonnull DocumentablePropertySet read(@Nonnull IReadable pReadable, @Nullable Charset pCharset) throws IOException {
-		final DocumentablePropertySet dps = new DocumentablePropertySet();
+	public @Nonnull OrderedPropertySet read(@Nonnull IReadable pReadable, @Nullable Charset pCharset) throws IOException {
+		final OrderedPropertySet dps = new OrderedPropertySet();
 		parse(dps::put, pReadable, pCharset);
 		return dps;
 	}

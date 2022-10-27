@@ -292,6 +292,7 @@ public class StringsTest {
 
     /** Test case for {@link Strings#list(String...)}.
      */
+    @Test
     public void testList() {
     	final ArrayList<String> values = Strings.list("a", "c", "b");
     	assertEquals(3, values.size());
@@ -302,6 +303,7 @@ public class StringsTest {
 
     /** Test case for {@link Strings#list(String...)}.
      */
+    @Test
     public void testArray() {
     	final String[] values = Strings.array("a", "c", "b");
     	assertEquals(3, values.length);
@@ -312,8 +314,31 @@ public class StringsTest {
 
     /** Test case for {@link Strings#join(String,Class)}.
      */
+    @Test
     public void testJoinEnums() {
     	final String joinedNames = Strings.join("|", Level.class);
     	assertEquals("TRACE|DEBUG|INFO|WARN|ERROR|FATAL", joinedNames);
+    }
+
+    /** Test case for {@link Strings#notEmpty(String,String)}.
+     */
+    @Test
+    public void testNotEmptyStringString() {
+    	final String DEFAULT = "default";
+    	assertSame(DEFAULT, Strings.notEmpty(null, DEFAULT));
+    	assertSame(DEFAULT, Strings.notEmpty("", DEFAULT));
+    	assertEquals("0", Strings.notEmpty("0", DEFAULT));
+    	assertEquals("false", Strings.notEmpty("false", DEFAULT));
+    }
+
+    /** Test case for {@link Strings#notEmpty(String,Supplier)}.
+     */
+    @Test
+    public void testNotEmptyStringSupplier() {
+    	final String DEFAULT = "default";
+    	assertSame(DEFAULT, Strings.notEmpty(null, () -> DEFAULT));
+    	assertSame(DEFAULT, Strings.notEmpty("", () -> DEFAULT));
+    	assertEquals("0", Strings.notEmpty("0", () -> DEFAULT));
+    	assertEquals("false", Strings.notEmpty("false", () -> DEFAULT));
     }
 }

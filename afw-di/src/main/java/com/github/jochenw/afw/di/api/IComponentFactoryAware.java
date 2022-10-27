@@ -11,8 +11,9 @@ public interface IComponentFactoryAware {
 	 *   the object is ready to use. However, the object remains
 	 *   hidden from application code, until this method has
 	 *   been invoked successfully.
-	 * @param pFactory
-	 * @throws Exception
+	 * @param pFactory The factory, that created this object. The factory may be
+	 *   queried for required components.
+	 * @throws Exception Initializing this object has failed.
 	 */
 	void init(IComponentFactory pFactory) throws Exception;
 }

@@ -11,10 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.logging.log4j.util.TriFunction;
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.util.Functions.TriConsumer;
 
 /**
  * @author jwi

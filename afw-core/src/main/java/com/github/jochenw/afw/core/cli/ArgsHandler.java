@@ -145,10 +145,12 @@ public abstract class ArgsHandler<O extends Object> {
                     throw error(null);
                 }, "help", "h", "?");
 	}
-        /** Called to perform the actual task, as configured by the given option
-         * bean.
-         * @param pOptions
-         * @throws Exception 
-         */
+
+	/** Called to perform the actual task, as configured by the given option
+	 * bean.
+	 * @param pOptions The options bean, that has been created by parsing
+	 *   the command line arguments.
+	 * @throws Exception Calling this method has failed.
+	 */
 	protected abstract void run(O pOptions) throws Exception;
 }

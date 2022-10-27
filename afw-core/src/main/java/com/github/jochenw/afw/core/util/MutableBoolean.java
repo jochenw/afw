@@ -97,7 +97,7 @@ public class MutableBoolean implements Serializable, Comparable<MutableBoolean> 
 
 	/**
 	 * Asserts the mutable booleans current state by invoking the given {@link FailableRunnable},
-	 * if the mutable boolean isn't as given by the parameter {@link pExpect}.
+	 * if the mutable boolean isn't as given by the parameter {@code pExpect}.
 	 * @param pExpect The expected state of the mutable boolean.
 	 * @param pRunnable The runnable to invoke, if the mutable boolean is set.
 	 */

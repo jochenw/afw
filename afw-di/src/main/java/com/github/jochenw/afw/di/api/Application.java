@@ -86,6 +86,7 @@ public class Application {
 	 * @param pType Type of the created instance, a subclass of {@link Application}.
 	 * @param pComponentFactoryProvider Provider of the component factory,
 	 *   that the created application should use.
+	 * @param <App> Type of the created instance, a subclass of {@link Application}.
 	 * @return The created instance.
 	 */
 	public static <App extends Application> App of(Class<App> pType, Provider<IComponentFactory> pComponentFactoryProvider) {

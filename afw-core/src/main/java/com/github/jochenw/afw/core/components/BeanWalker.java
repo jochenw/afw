@@ -60,8 +60,8 @@ public class BeanWalker {
 		 * @return True, if this field is considered atomic, in which
 		 *   case {@link #visitAtomicProperty(Context, Field, Supplier, Consumer)}
 		 *   will be invoked for this field. False, if this field isn't considered
-		 *   atomic, in which case {@link #isComplex(Context, String, Class)} will be
-		 *   invoked.
+		 *   atomic, in which case {@link #isComplex(Context, String, Class)}
+		 *   will be invoked.
 		 */
 		boolean isAtomic(C pContext, String pFieldName, Class<?> pType);
 		/**

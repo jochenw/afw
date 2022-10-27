@@ -239,10 +239,10 @@ public class Data {
 		}
 	}
 
-	/** {@link Accessor} object for instances of {@link Map Map<String,Object>}.
+	/** {@link Data.Accessor} object for instances of {@link Map Map&lt;String,Object&gt;}.
 	 */
 	public static final Accessor<Map<String,Object>> MAP_ACCESSOR = new Accessor<Map<String,Object>>((map,key) -> map.get(key));
-	/** {@link Accessor} object for instances of {@link Properties}.
+	/** {@link Data.Accessor} object for instances of {@link Properties}.
 	 */
 	public static final Accessor<Properties> PROPS_ACCESSOR = new Accessor<Properties>((props,key) -> props.get(key));
 

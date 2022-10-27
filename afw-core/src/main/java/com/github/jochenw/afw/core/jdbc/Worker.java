@@ -66,9 +66,9 @@ public class Worker {
 		}
 
 		/** Called to execute an SQL query, and process the results.
-		 * @param pSql 
-		 * @param pConsumer
-		 * @param pParams
+		 * @param pSql The SQL query, that is being executed.
+		 * @param pConsumer The consumer, that is being called to process the result.
+		 * @param pParams The query parameters, if any.
 		 */
 		public void executeQuery(String pSql, FailableConsumer<JdbcHelper.Row,?> pConsumer, Object... pParams) {
 			try {
@@ -166,6 +166,7 @@ public class Worker {
 	 * invoking the given {@code pCallable}, and returning the result.
 	 * @param pCallable The action, which is being executed.
 	 * @return The result object, that has been returned by the action.
+	 * @param <O> Type of the result object, that is returned by the database.
 	 */
 	public <O> O call(FailableFunction<Context,O,?> pCallable) {
 		try (Context ctx = new Context()) {
