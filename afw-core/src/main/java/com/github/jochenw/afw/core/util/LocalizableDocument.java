@@ -32,6 +32,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.LocatorImpl;
 
 import com.github.jochenw.afw.core.util.DomHelper.LocalizableException;
@@ -69,7 +70,7 @@ public class LocalizableDocument {
 
 	/** A SAX parser, that is being used to create a {@link LocalizableDocument}.
 	 */
-	public static class Handler implements ContentHandler {
+	public static class Handler implements ContentHandler, LexicalHandler {
 		private final Document nodeFactory;
 		private Node currentNode;
 		private Locator locator;
@@ -158,6 +159,42 @@ public class LocalizableDocument {
 		@Override
 		public void skippedEntity(String name) throws SAXException {
 			currentNode.appendChild(setUserData(nodeFactory.createEntityReference(name)));
+		}
+
+		@Override
+		public void startDTD(String name, String publicId, String systemId) throws SAXException {
+			// Ignore DTD
+		}
+
+		@Override
+		public void endDTD() throws SAXException {
+			// Ignore DTD
+		}
+
+		@Override
+		public void startEntity(String name) throws SAXException {
+			// Ignore the fact, that we are now in an included entity.
+		}
+
+		@Override
+		public void endEntity(String name) throws SAXException {
+			// Ignore the fact, that we are no longer in an included entity.
+		}
+
+		@Override
+		public void startCDATA() throws SAXException {
+			// We don't distinguish between CDATA, and plain text.
+		}
+
+		@Override
+		public void endCDATA() throws SAXException {
+			// We don't distinguish between CDATA, and plain text.
+		}
+
+		@Override
+		public void comment(char[] ch, int start, int length) throws SAXException {
+			final Text text = setUserData((Text) nodeFactory.createComment(new String(ch, start, length)));
+			currentNode.appendChild(text);
 		}
 	}
 

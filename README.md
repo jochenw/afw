@@ -1,5 +1,6 @@
 # afw
-An Application Framework
+
+The *A*pplication *F*rame*w*ork
 
 ## License
 
