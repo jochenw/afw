@@ -265,7 +265,8 @@ public class ComponentFactoryTests {
 					}
 
 					@Override
-					protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId) {
+					protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId,
+							                     String pDefaultValue, boolean pNullable) {
 						assertSame(String.class, pType);
 						switch(pId) {
 						  case "myProperty": return "myPropertyValue";

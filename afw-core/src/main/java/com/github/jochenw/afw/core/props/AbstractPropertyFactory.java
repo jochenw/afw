@@ -15,6 +15,8 @@
  */
 package com.github.jochenw.afw.core.props;
 
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -119,4 +121,39 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
     public synchronized void addListener(ChangeListener pListener) {
         listeners.add(pListener);
     }
+
+	@Override
+	public IURLProperty getUrlProperty(String pKey, URL pDefaultValue) {
+		return getUrlProperty(pKey, pDefaultValue, null);
+	}
+
+	@Override
+	public IURLProperty getUrlProperty(String pKey, URL pDefaultValue,
+			                           IProperty.ChangeListener<URL> pListener) {
+		final UrlProperty up = new UrlProperty(pKey, pDefaultValue);
+		if (pListener != null) {
+			up.addListener(pListener);
+		}
+		return up;
+	}
+
+	@Override
+	public IPathProperty getPathProperty(String pKey) {
+		return getPathProperty(pKey, null, null);
+	}
+
+	@Override
+	public IPathProperty getPathProperty(String pKey, Path pDefaultValue) {
+		return getPathProperty(pKey, pDefaultValue, null);
+	}
+
+	@Override
+	public IPathProperty getPathProperty(String pKey, Path pDefaultValue,
+			                             IProperty.ChangeListener<Path> pListener) {
+		final PathProperty pp = new PathProperty(pKey, pDefaultValue);
+		if (pListener != null) {
+			pp.addListener(pListener);
+		}
+		return pp;
+	}
 }

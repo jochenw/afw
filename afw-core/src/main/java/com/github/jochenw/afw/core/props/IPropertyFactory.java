@@ -15,6 +15,8 @@
  */
 package com.github.jochenw.afw.core.props;
 
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.Map;
 
 
@@ -133,6 +135,63 @@ public interface IPropertyFactory {
      *   and the given default value.
      */
     IBooleanProperty getBooleanProperty(String pKey, IProperty.ChangeListener<Boolean> pListener);
+    /** Returns an URL property object with the given key, no default value,
+     * and no change listener.
+     * @param pKey The property objects key.
+     * @return An URL property object with the given key, no default value,
+     * and no change listener.
+     */
+    IURLProperty getUrlProperty(String pKey);
+    /** Returns an URL property object with the given key, the given default value,
+     * and no change listener.
+     * @param pKey The property objects key.
+     * @param pDefaultValue The property objects default value. May be null, in which case
+     *   the returned property object has no default value.
+     * @return An URL property object with the given key, no default value,
+     *   and no change listener.
+     */
+    IURLProperty getUrlProperty(String pKey, URL pDefaultValue);
+    /** Returns an URL property object with the given key, the given default value,
+     * and the given change listener.
+     * @param pKey The property objects key.
+     * @param pDefaultValue The property objects default value. May be null, in which case
+     *   the returned property object has no default value.
+     * @param pListener A change listener, which is being attached to the property object.
+     *   May be null, in which case the property object doesn't have a change
+     *   listener.
+     * @return An URL property object with the given key, no default value,
+     *   and no change listener.
+     */
+    IURLProperty getUrlProperty(String pKey, URL pDefaultValue, IProperty.ChangeListener<URL> pListener);
+    /** Returns a path property object with the given key, no default value,
+     * and no change listener.
+     * @param pKey The property objects key.
+     * @return A path property object with the given key, no default value,
+     * and no change listener.
+     */
+    IPathProperty getPathProperty(String pKey);
+    /** Returns a path property object with the given key, the given default value,
+     * and no change listener.
+     * @param pKey The property objects key.
+     * @param pDefaultValue The property objects default value. May be null, in which case
+     *   the returned property object has no default value.
+     * @return A path property object with the given key, no default value,
+     *   and no change listener.
+     */
+    IPathProperty getPathProperty(String pKey, Path pDefaultValue);
+    /** Returns a path property object with the given key, the given default value,
+     * and the given change listener.
+     * @param pKey The property objects key.
+     * @param pDefaultValue The property objects default value. May be null, in which case
+     *   the returned property object has no default value.
+     * @param pListener A change listener, which is being attached to the property object.
+     *   May be null, in which case the property object doesn't have a change
+     *   listener.
+     * @return A path property object with the given key, no default value,
+     *   and no change listener.
+     */
+    IPathProperty getPathProperty(String pKey, Path pDefaultValue, IProperty.ChangeListener<Path> pListener);
+    
     /** Returns the property value with the given key, or null.
      * @return The property value with the given key, or null.
      * @param pKey Key of the property, that's being looked up.

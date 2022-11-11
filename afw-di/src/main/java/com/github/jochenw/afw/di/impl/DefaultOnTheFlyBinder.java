@@ -73,7 +73,8 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 		return null;
 	}
 
-	protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId) {
+	protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId, String pDefaultValue,
+			                     boolean pNullable) {
 		return null;
 	}
 
@@ -101,7 +102,7 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 			id = pPropInject.id();
 		}
 		final Class<?> type = getInjectableValueType(pMember);
-		final Object property = getProperty(pComponentFactory, type, id);
+		final Object property = getProperty(pComponentFactory, type, id, pPropInject.defaultValue(), pPropInject.nullable());
 		if (property == null) {
 			if (!pPropInject.nullable()) {
 				throw new IllegalStateException("No property value is available with id " + id

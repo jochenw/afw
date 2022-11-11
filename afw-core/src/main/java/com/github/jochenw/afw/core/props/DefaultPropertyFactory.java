@@ -268,4 +268,10 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
 		}
 		return new DefaultPropertyFactory(props);
 	}
+
+	@Override
+	public IURLProperty getUrlProperty(String pKey) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
