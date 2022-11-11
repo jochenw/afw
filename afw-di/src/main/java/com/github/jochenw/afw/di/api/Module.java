@@ -19,27 +19,39 @@ public interface Module {
 	/**
 	 * Creates a module, that extends the current module by calling
 	 * the given module.
+	 * @param pModule The module, that is extending the current
+	 *   module. May be null, in which case the current module
+	 *   itself is being returned.
+	 * @return A new module, which works by internally calling the
+	 *   current module, and then the given (in that order).
 	 */
 	public default Module extend(@Nullable Module pModule) {
+		if (pModule == null) {
+			return this;
+		}
 		return (b) -> {
 			configure(b);
-			if (pModule != null) {
-				pModule.configure(b);
-			}
+			pModule.configure(b);
 		};
 	}
 
 	/**
 	 * Creates a module, that extends the current module by calling
 	 * the given modules.
+	 * @param pModules The modules, that are extending the current
+	 *   module. May be null, in which case the current module
+	 *   itself is being returned.
+	 * @return A new module, which works by internally calling the
+	 *   current module, and then the given (in that order).
 	 */
 	public default Module extend(@Nullable Module... pModules) {
+		if (pModules == null) {
+			return this;
+		}
 		return (b) -> {
 			configure(b);
-			if (pModules != null) {
-				for (Module m : pModules) {
-					m.configure(b);
-				}
+			for (Module m : pModules) {
+				m.configure(b);
 			}
 		};
 	}
@@ -47,14 +59,20 @@ public interface Module {
 	/**
 	 * Creates a module, that extends the current module by calling
 	 * the given modules.
+	 * @param pModules The modules, that are extending the current
+	 *   module. May be null, in which case the current module
+	 *   itself is being returned.
+	 * @return A new module, which works by internally calling the
+	 *   current module, and then the given (in that order).
 	 */
 	public default Module extend(@Nullable Iterable<Module> pModules) {
+		if (pModules == null) {
+			return this;
+		}
 		return (b) -> {
 			configure(b);
-			if (pModules != null) {
-				for (Module m : pModules) {
-					m.configure(b);
-				}
+			for (Module m : pModules) {
+				m.configure(b);
 			}
 		};
 	}

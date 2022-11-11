@@ -9,10 +9,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Member;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -289,5 +291,33 @@ public class ComponentFactoryTests {
 		assertTrue(dbc1.isStopped());
 		assertFalse(dbc0.isStarted());
 		assertFalse(dbc0.isStopped());
+	}
+
+	/** Test for {@link Module#extend(Module)}.
+	 * @param pComponentFactoryType Type of the component factory, that is being tested.
+	 */
+	public static void testModuleExtension(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		final Map<String,Object> hashMap = new HashMap<>();
+		final Module module0 = (b) -> {
+			b.bind(Map.class).toInstance(hashMap);
+		};
+		final Module module1 = (b) -> {
+			b.bind(Map.class, "hash").toInstance(hashMap);
+		};
+		assertSame(module0, module0.extend((Module) null));
+		assertSame(module0, module0.extend((Module[]) null));
+		assertSame(module0, module0.extend((Iterable<Module>) null));
+		final IComponentFactory cf0 = IComponentFactory.builder().module(module0)
+				.type(pComponentFactoryType).build();
+		final Consumer<Module> validator = (m) -> {
+			final IComponentFactory cf = IComponentFactory.builder().type(pComponentFactoryType).module(m).build();
+			assertSame(hashMap, cf0.requireInstance(Map.class));
+			assertSame(hashMap, cf.requireInstance(Map.class));
+			assertNull(cf0.getInstance(Map.class, "hash"));
+			assertSame(hashMap, cf.requireInstance(Map.class, "hash"));
+		};
+		validator.accept(module0.extend(module1));
+		validator.accept(module0.extend(new Module[] {module1}));
+		validator.accept(module0.extend(Arrays.asList(module1)));
 	}
 }
