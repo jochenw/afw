@@ -19,6 +19,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -324,8 +325,12 @@ public class StreamsTest {
     public void testLoadUrl() throws Exception {
     	final Properties props = newTestProperties();
     	final Path path = createTestProperties(props, false);
-    	final Properties got = Streams.load(path.toUri().toURL());
-    	assertSameProperties(props, got);
+    	final Properties got1 = Streams.load(path.toUri().toURL());
+    	assertSameProperties(props, got1);
+    	final Properties got2 = Streams.load(path.toUri().toURL(), false);
+    	assertSameProperties(props, got2);
+    	final Path path2 = path.getParent().resolve("thisFileDoesntExist");
+    	assertNull(Streams.load(path2.toUri().toURL(), true));
     	final Path xmlPath = createTestProperties(props, true);
     	final Properties xmlGot = Streams.load(xmlPath.toUri().toURL());
     	assertSameProperties(props, xmlGot);
@@ -336,8 +341,15 @@ public class StreamsTest {
     public void testLoadPath() {
     	final Properties props = newTestProperties();
     	final Path path = createTestProperties(props, false);
-    	final Properties got = Streams.load(path);
-    	assertSameProperties(props, got);
+    	final Properties got1 = Streams.load(path);
+    	assertSameProperties(props, got1);
+    	final Properties got2 = Streams.load(path, false);
+    	assertSameProperties(props, got2);
+    	final Properties got3 = Streams.load(false, new Object[] {path});
+    	assertSameProperties(props, got3);
+    	final Path path2 = path.getParent().resolve("thisFileDoesntExist");
+    	assertNull(Streams.load(path2, true));
+    	assertNull(Streams.load(true, new Object[] {path2}));
     	final Path xmlPath = createTestProperties(props, true);
     	final Properties xmlGot = Streams.load(xmlPath);
     	assertSameProperties(props, xmlGot);
@@ -347,9 +359,16 @@ public class StreamsTest {
      */
     public void testLoadFile() {
     	final Properties props = newTestProperties();
-    	final Path path = createTestProperties(props, false);
-    	final Properties got = Streams.load(path.toFile());
-    	assertSameProperties(props, got);
+    	final File file = createTestProperties(props, false).toFile();
+    	final Properties got1 = Streams.load(file);
+    	assertSameProperties(props, got1);
+    	final Properties got2 = Streams.load(file, false);
+    	assertSameProperties(props, got2);
+    	final Properties got3 = Streams.load(false, new Object[] {file});
+    	assertSameProperties(props, got3);
+    	final File file2 = new File(file.getParentFile(), "thisFileDoesntExist");
+    	assertNull(Streams.load(file2, true));
+    	assertNull(Streams.load(false, new Object[] {file2}));
     	final Path xmlPath = createTestProperties(props, true);
     	final Properties xmlGot = Streams.load(xmlPath.toFile());
     	assertSameProperties(props, xmlGot);

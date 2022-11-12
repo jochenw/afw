@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
 import java.io.FilterReader;
@@ -39,6 +40,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -567,7 +569,7 @@ public class Streams {
      * @return The contents of the given file, as a {@link java.util.Properties}
      *   object.
      */
-    public static @Nonnull java.util.Properties load(File pFile) {
+    public static @Nonnull Properties load(File pFile) {
     	return Streams.apply(pFile, (in) -> { return load(in, pFile.getName()); });
     }
 
@@ -577,8 +579,120 @@ public class Streams {
      * @return The contents of the given URL, as a {@link java.util.Properties}
      *   object.
      */
-    public static @Nonnull java.util.Properties load(URL pUrl) {
+    public static @Nonnull Properties load(URL pUrl) {
     	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
+    }
+
+    /** Returns a property set, which is obtained by reading the given
+     * resource, which may be a String, {@link Path}, {@link File}, {@link URL},
+     * or an {@link IReadable}.
+     * @param pResource The resource, from which to read the property set. This may
+     *   be a String, {@link Path}, {@link File}, {@link URL},
+     *   or an {@link IReadable}.
+     * @param pNullPermitted Indicates, whether the resource may be absent, or
+     *   otherwise invalid, in which case a null value will be returned.
+     * @return The property set, which has been read from the given resource,
+     *   or null, if the resource is absent, or oherwise invalid, and the
+     *   parameter {@code pNullPermitted} is true.
+     */
+    public static @Nullable Properties load(@Nonnull Object pResource, boolean pNullPermitted) {
+    	final Object res = Objects.requireNonNull(pResource, "Resource");
+    	if (res instanceof Path) {
+    		final Path p = (Path) res;
+    		if (Files.isRegularFile(p)) {
+    			return load(p);
+    		} else if (!pNullPermitted) {
+    			throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + p);
+    		}
+    	} else if (res instanceof File) {
+    		final File f = (File) res;
+    		if (f.isFile()) {
+    			return load(f);
+    		} else if (!pNullPermitted) {
+    			throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + f);
+    		}
+    	} else if (res instanceof String) {
+    		final Path p = Paths.get((String) res);
+    		if (Files.isRegularFile(p)) {
+    			return load(p);
+    		} else if (!pNullPermitted) {
+    			throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + p);
+    		}
+    	} else if (res instanceof IReadable) {
+    		final IReadable r = (IReadable) res;
+    		try {
+    			return load((IReadable) r);
+    		} catch (UncheckedIOException e) {
+    			if (e.getCause() instanceof FileNotFoundException) {
+    				if (!pNullPermitted) {
+    	    			throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + r.getName());
+    				}
+    			} else {
+    				throw e;
+    			}
+    		}
+    	} else if (res instanceof URL) {
+    		final URL u = (URL) res;
+    		try (InputStream in = u.openStream()) {
+    			return load(in);
+    		} catch (FileNotFoundException e) {
+    			if (!pNullPermitted) {
+    				throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + u);
+    			}
+    		} catch (IOException e) {
+    			throw Exceptions.show(e);
+    		}
+    	}
+    	return null;
+    }
+
+    /** Builds a new property set by loading properties from the given resources.
+     * @param pResources A set of property specifications. Any property specification
+     *   is made up from two objects: The first object is a String, {@link Path},
+     *   {@link File}, {@link URL}, or an {@link IReadable}, which indicates from
+     *   where to load the property resource. The second parameter is a Boolean
+     *   object, which indicates, whether that property resource may be absent.
+     *   If that is the case, then the property resource is simply ignored.
+     * @return The created property set.
+     */
+    public static @Nonnull Properties load(@Nonnull Object... pResources) {
+    	final Object[] resources = Objects.requireNonNull(pResources, "Resources");
+    	final Properties properties = new Properties();
+    	int i = 0;
+    	while (i < resources.length) {
+    		final Object res = Objects.requireNonNull(resources[i++], "Resource");
+    		final boolean permittedToNotExist;
+    		if (i < resources.length) {
+    			final Object object = Objects.requireNonNull(resources[i++], "Permission to not exist");
+    			permittedToNotExist = ((Boolean) object).booleanValue();
+    		} else {
+    			permittedToNotExist = false;
+    		}
+    		final Properties props = load(res, permittedToNotExist);
+    		if (props != null) {
+    			properties.putAll(props);
+    		}
+    	}
+    	return properties;
+    }
+
+    /** Builds a new property set by loading properties from the given resources.
+     * @param pNullPermitted Indicates, whether the resources may be absent, or
+     *   otherwise invalid.
+     * @param pResources A set of resources, from which these properties are being
+     *   read.
+     * @return The created property set.
+     */
+    public static final @Nonnull Properties load(boolean pNullPermitted, @Nonnull Object... pResources) {
+    	final Object[] resources = Objects.requireNonNull(pResources);
+    	final Properties properties = new Properties();
+    	for (Object res : resources) {
+    		final Properties props = load(res, pNullPermitted);
+    		if (props != null) {
+    			properties.putAll(props);
+    		}
+    	}
+    	return properties;
     }
 
     /** Converts the given {@link Reader} into an {@link InputStream}, using the
