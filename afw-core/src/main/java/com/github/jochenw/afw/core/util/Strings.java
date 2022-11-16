@@ -745,5 +745,32 @@ public class Strings {
 		}
 		return sb.toString();
 	}
+
+	/** Converts the given {@code pString} into a stream of tokens,
+	 * which are separated by the given {@code pDelimiter}. This is mainly
+	 * equivalent to the {@link StringTokenizer}, except that the latter
+	 * interprets the delimiter as a set of characters, rater than a
+	 * separator string.
+	 * @param pString The string, that is being tokenized.
+	 * @param pDelimiter The separator string, that is supposed to
+	 *   separate the various tokens.
+	 * @return The tokens, that were found.
+	 */
+	public static @Nonnull List<String> tokenize(@Nonnull String pString, @Nonnull String pDelimiter) {
+		String string = Objects.requireNonNull(pString, "String");
+		final String delim = Objects.requireNonNull(pDelimiter, "Delimiter");
+		List<String> tokens = new ArrayList<>();
+		while (string.length() > 0) {
+			final int offset = string.indexOf(delim);
+			if (offset == -1) {
+				tokens.add(string);
+				break;
+			} else {
+				tokens.add(string.substring(0, offset));
+				string = string.substring(offset + delim.length());
+			}
+		}
+		return tokens;
+	}
 }
 
