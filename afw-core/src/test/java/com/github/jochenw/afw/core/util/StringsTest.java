@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.junit.Assert;
 import org.junit.Test;

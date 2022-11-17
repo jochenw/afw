@@ -47,12 +47,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.io.IReadable;
+import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 
@@ -502,7 +504,8 @@ public class StreamsTest {
     	}
     }
 
-    /** Test case for {@link Streams#closeListeningStream(InputStream,BooleanSupplier).
+    /** Test case for {@link Streams#closeListeningStream(InputStream,BooleanSupplier)}.
+     * @throws Exception The test failed.
      */
     public void testCloseListeningStream() throws Exception {
     	final byte[] bytes = "01234567890abcdefghijklmnopqrstuvwxyz".getBytes(StandardCharsets.UTF_8);
@@ -534,7 +537,8 @@ public class StreamsTest {
     	}
     }
 
-    /** Test case for {@link Streams#closeListeningReader(Reader,BooleanSupplier).
+    /** Test case for {@link Streams#closeListeningReader(Reader,BooleanSupplier)}.
+     * @throws Exception The test failed.
      */
     public void testCloseListeningReader() throws Exception {
     	final String bytes = "01234567890abcdefghijklmnopqrstuvwxyz";

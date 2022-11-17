@@ -77,6 +77,7 @@ public class CircularBufferReaderTest {
 
 	/**
 	 * Create a large, but random input buffer.
+	 * @return The created input buffer.
 	 */
 	private char[] newInputBuffer() {
 		final char[] buffer = new char[16*512+rnd.nextInt(512)];

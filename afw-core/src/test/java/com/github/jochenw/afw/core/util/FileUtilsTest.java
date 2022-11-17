@@ -10,7 +10,7 @@ import org.junit.Test;
 /** Test for {@link FileUtils}.
  */
 public class FileUtilsTest {
-	/** Test case for {@link FileUtils#resolve(String)} on Linux.
+	/** Test case for {@link FileUtils#resolve(Path, String)} on Linux.
 	 */
 	@Test
 	public void testRelativizeOnLinux() {
@@ -31,7 +31,7 @@ public class FileUtilsTest {
 		}
 	}
 
-	/** Test case for {@link FileUtils#resolve(String)} on Windows.
+	/** Test case for {@link FileUtils#resolve(Path, String)} on Windows.
 	 */
 	@Test
 	public void testRelativizeOnWindows() {

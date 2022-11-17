@@ -33,7 +33,7 @@ public class IReadableTest {
 		validateNonRepeatable(r1, "pom.xml", Files.size(p));
 	}
 
-	/** Test case for {@link IReadable#of(String)}.
+	/** Test case for {@link IReadable#of(String, String)}.
 	 * @throws Exception The test failed.
 	 */
 	@Test

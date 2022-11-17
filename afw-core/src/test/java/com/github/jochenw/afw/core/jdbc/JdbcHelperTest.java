@@ -97,7 +97,7 @@ public class JdbcHelperTest {
 		assertEquals(expectedLocalTime, actualLocalTime);
 	}
 	
-	/** Test for {@link Worker.Context#executeUpdate()}.
+	/** Test for {@link Worker.Context#executeUpdate(String, Object...)}.
 	 */
 	@Test
 	public void testCreateTable() {

@@ -20,7 +20,7 @@ import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Functions.FailableTriConsumer;
 
 
-/** Test suite for the {@link PropertyParser}.
+/** Test suite for the {@link PropertySetParser}.
  */
 public class PropertySetParserTest {
 	/**

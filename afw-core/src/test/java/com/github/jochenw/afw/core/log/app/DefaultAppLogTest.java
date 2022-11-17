@@ -137,6 +137,7 @@ public class DefaultAppLogTest {
 
 	/** Test method for {@link IAppLog#of(Level, Path)}, and
 	 * {@link IAppLog#of(Level, String)}.
+	 * @throws Exception The test failed.
 	 */
 	@Test
 	public void testCreate() throws Exception {

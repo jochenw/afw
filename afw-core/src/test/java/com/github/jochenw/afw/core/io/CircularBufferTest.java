@@ -68,7 +68,7 @@ public class CircularBufferTest {
 	 * @throws Exception The test failed.
 	 */
 	@Test
-	public void testCircularCharBuffer() {
+	public void testCircularCharBuffer() throws Exception {
 		final CircularCharBuffer ccb = new CircularCharBuffer(20);
 		assertEquals(20, ccb.getSpace());
 		assertEquals(0, ccb.getCurrentNumberOfChars());

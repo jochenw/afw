@@ -248,7 +248,7 @@ public class FunctionsTest {
         assertNotNull(instance);
     }
 
-    /** Test case for {@link Functions#accept(FailableConsumer)}.
+    /** Test case for {@link Functions#accept(FailableConsumer, Object)}.
      */
     @Test
     public void testAcceptConsumer() {
@@ -299,7 +299,7 @@ public class FunctionsTest {
         Functions.accept(Testable::test, testable);
     }
 
-    /** Test case for {@link Functions#accept(FailableBiConsumer)}.
+    /** Test case for {@link Functions#accept(FailableBiConsumer, Object, Object)}.
      */
     @Test
     public void testAcceptBiConsumer() {
@@ -348,7 +348,7 @@ public class FunctionsTest {
         consumer.accept(testable, null);
     }
 
-    /** Test case for {@link Functions#apply(FailableFunction)}.
+    /** Test case for {@link Functions#apply(FailableFunction, Object)}.
      */
     @Test
     public void testApplyFunction() {
@@ -404,7 +404,7 @@ public class FunctionsTest {
         assertEquals(0, function.apply(null).intValue());
     }
 
-    /** Test case for {@link Functions#apply(FailableBiFunction)}.
+    /** Test case for {@link Functions#apply(FailableBiFunction, Object, Object)}.
      */
     @Test
     public void testApplyBiFunction() {

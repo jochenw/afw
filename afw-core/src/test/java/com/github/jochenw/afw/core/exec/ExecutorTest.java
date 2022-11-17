@@ -12,8 +12,10 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.Systems;
 
+/** Test suite for the {@link Executor}.
+ */
 public class ExecutorTest {
-	/** Test case for {@link Executor#run(java.nio.file.Path, String[], String[], Consumer, Consumer, java.util.function.IntConsumer)}
+	/** Test case for {@link Executor#run()}
 	 * on Windows.
 	 */
 	@Test
@@ -22,6 +24,11 @@ public class ExecutorTest {
 		runTest("Okay\r\n", "", "cmd", "/c", "echo", "Okay");
 	}
 
+	/** Called for actually running an e test.
+	 * @param pExpectedStdOut The tests expected standard output.
+	 * @param pExpectedStdErr The tests expected error output.
+	 * @param pCmd The command, that is being executed.
+	 */
 	protected void runTest(String pExpectedStdOut, String pExpectedStdErr, String... pCmd) {
 		final List<String> cmdLine = new ArrayList<>(Arrays.asList(pCmd));
 		final String cmd = cmdLine.remove(0);
@@ -38,7 +45,7 @@ public class ExecutorTest {
 		Assert.assertEquals(pExpectedStdErr, baes.toString());
 	}
 
-	/** Test case for {@link Executor#run(java.nio.file.Path, String[], String[], Consumer, Consumer, java.util.function.IntConsumer)}
+	/** Test case for {@link Executor#run()}
 	 * on Non-Windows.
 	 */
 	@Test

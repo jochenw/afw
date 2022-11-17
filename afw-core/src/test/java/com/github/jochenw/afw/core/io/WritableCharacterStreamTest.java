@@ -12,7 +12,7 @@ import java.util.Random;
 import org.junit.Test;
 
 
-/** Test for the {@link WritableCharStream}.
+/** Test for the {@link WritableCharacterStream}.
  */
 public class WritableCharacterStreamTest {
 	private static final Random RND = new Random(1568496373721l); // System.currentTimeMillis() when this test was written.

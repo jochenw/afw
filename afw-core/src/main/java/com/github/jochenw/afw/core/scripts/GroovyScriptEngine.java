@@ -24,7 +24,7 @@ import groovy.lang.GroovyShell;
  * scripts.
  */
 public class GroovyScriptEngine implements IScriptEngine {
-	/** Implementation of {@link Script} for Groovy
+	/** Implementation of {@link IScriptEngine.Script} for Groovy
 	 * scripts.
 	 */
 	public static class GroovyScript implements Script {

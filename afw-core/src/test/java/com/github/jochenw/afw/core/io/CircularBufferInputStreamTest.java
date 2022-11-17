@@ -166,6 +166,7 @@ public class CircularBufferInputStreamTest {
 
 	/**
 	 * Create a large, but random input buffer.
+	 * @return The created input buffer.
 	 */
 	private byte[] newInputBuffer() {
 		final byte[] buffer = new byte[16*512+rnd.nextInt(512)];

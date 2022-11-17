@@ -393,7 +393,8 @@ public class DataTest {
 		}
 	}
 
-	/** Test case for {@link Accessor#requirePath(Object, String, String, PathCriterion[])}.
+	/** Test case for {@link Data.Accessor#requirePath(Object, String, String, Data.Accessor.PathCriterion[])}.
+	 * @throws Exception The test failed.
 	 */
 	@Test
 	public void testRequireStringObjectStringStringPathCriteria() throws Exception {

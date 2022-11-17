@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package com.github.jochenw.afw.core.util;
+ */
+package com.github.jochenw.afw.core.util;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -33,6 +34,7 @@ public class ParentLastClassLoader extends ClassLoader {
 	 * @param pUrls URL's of jar files, from which classes are being loaded.
 	 */
 	public ParentLastClassLoader(ClassLoader pParent, URL... pUrls) {
+		super(null);
 		final ClassLoader parent = Objects.notNull(pParent, Thread.currentThread().getContextClassLoader());
 		urls = Objects.requireNonNull(pUrls, "Urls");
 		delegateWithParent = new URLClassLoader(urls, parent);
