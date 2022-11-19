@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
 import com.github.jochenw.afw.core.util.Holder;
 import com.github.jochenw.afw.core.util.MutableBoolean;
 

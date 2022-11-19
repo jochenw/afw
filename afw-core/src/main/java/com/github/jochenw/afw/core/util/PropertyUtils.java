@@ -21,8 +21,9 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 
 
 /** A class for reading, and writing property files, including comments.

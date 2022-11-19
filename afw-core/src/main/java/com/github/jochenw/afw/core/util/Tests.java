@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import com.github.jochenw.afw.core.function.Functions;
+
 
 /** Utility class for unit tests.
  */
@@ -395,7 +397,7 @@ public class Tests {
 	 * @param pMsg Message of the expected Exception
 	 * @param pRunnable The {@link Runnable}, that is being executed to trigger the exception. 
 	 */
-	public static <O extends Throwable> void assertThrowing(Class<O> pType, String pMsg, Runnable pRunnable) {
+	public static <O extends Throwable> void assertThrows(Class<O> pType, String pMsg, Runnable pRunnable) {
 		Throwable th;
 		try {
 			pRunnable.run();

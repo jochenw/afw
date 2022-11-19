@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.function;
 
 import java.util.function.Predicate;
 

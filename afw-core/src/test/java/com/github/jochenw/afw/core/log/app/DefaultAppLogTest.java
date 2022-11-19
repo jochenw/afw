@@ -15,8 +15,8 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.log.app.IAppLog.Level;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 /**
  * @author jwi

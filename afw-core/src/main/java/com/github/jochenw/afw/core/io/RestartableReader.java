@@ -6,8 +6,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.io.ObservableReader.Listener;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Streams;
 
 

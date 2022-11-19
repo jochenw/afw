@@ -15,9 +15,9 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Reflection;
 
 

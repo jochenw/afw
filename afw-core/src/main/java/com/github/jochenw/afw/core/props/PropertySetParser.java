@@ -9,9 +9,9 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
+import com.github.jochenw.afw.core.function.Functions.FailableTriConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
-import com.github.jochenw.afw.core.util.Functions.FailableTriConsumer;
 import com.github.jochenw.afw.core.util.Objects;
 
 /** A parser class for reading a {@link OrderedPropertySet} from a stored property file.

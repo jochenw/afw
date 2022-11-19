@@ -29,12 +29,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
 
 
 /**

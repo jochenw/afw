@@ -25,13 +25,13 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.github.jochenw.afw.core.function.Functions.BooleanConsumer;
+import com.github.jochenw.afw.core.function.Functions.ByteConsumer;
+import com.github.jochenw.afw.core.function.Functions.DoubleConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FloatConsumer;
+import com.github.jochenw.afw.core.function.Functions.ShortConsumer;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions.BooleanConsumer;
-import com.github.jochenw.afw.core.util.Functions.ByteConsumer;
-import com.github.jochenw.afw.core.util.Functions.DoubleConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FloatConsumer;
-import com.github.jochenw.afw.core.util.Functions.ShortConsumer;
 
 /** A helper object for working with JDBC connections.
  */

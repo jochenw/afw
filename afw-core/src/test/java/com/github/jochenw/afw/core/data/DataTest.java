@@ -412,14 +412,14 @@ public class DataTest {
 		Data.MAP_ACCESSOR.requirePath(map, "testDir", "testDir", Data.DIR_EXISTS);
 		Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.FILE_EXISTS);
 		Data.MAP_ACCESSOR.requirePath(map, "noSuchFile", "noSuchFile", Data.NOT_EXISTS);
-		Tests.assertThrowing(NullPointerException.class, "Missing value for parameter noSuchParameter", () -> Data.MAP_ACCESSOR.requirePath(map, "noSuchParameter", "noSuchParameter"));
-		Tests.assertThrowing(IllegalStateException.class,
+		Tests.assertThrows(NullPointerException.class, "Missing value for parameter noSuchParameter", () -> Data.MAP_ACCESSOR.requirePath(map, "noSuchParameter", "noSuchParameter"));
+		Tests.assertThrows(IllegalStateException.class,
 	             "Invalid value for parameter testDir: Expected existing file, got " + testDir,
 	             () -> Data.MAP_ACCESSOR.requirePath(map, "testDir", "testDir", Data.FILE_EXISTS));
-		Tests.assertThrowing(IllegalStateException.class,
+		Tests.assertThrows(IllegalStateException.class,
 	             "Invalid value for parameter testFile: Expected existing directory, got " + existingFile,
 	             () -> Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.DIR_EXISTS));
-		Tests.assertThrowing(IllegalStateException.class,
+		Tests.assertThrows(IllegalStateException.class,
 	             "Invalid value for parameter testFile: Expected a non-existing item, got " + existingFile,
 	             () -> Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.NOT_EXISTS));
 	}

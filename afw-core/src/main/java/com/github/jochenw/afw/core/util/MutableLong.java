@@ -74,17 +74,23 @@ public class MutableLong extends Number implements Comparable<MutableLong> {
 	}
 
     /**
-     * Increments the primitive number by one.
+     * Increments the primitive number by one, and returns the result.
+     * This is basically a pre-increment.
+     * @return The incremented (new) value.
      */
-    public void inc() {
+    public long inc() {
     	setValue(getValue()+1);
+    	return getValue();
     }
 
     /**
-     * Decrements the primitive number by one.
+     * Decrements the primitive number by one, and returns the old value.
+     * This is basically a post-decrement.
+     * @return The previous (non-decremented) value.
      */
-    public void dec() {
-    	setValue(getValue()-1);
+    public long dec() {
+    	long value = getValue();
+    	setValue(value-1);
+    	return value;
     }
-
 }

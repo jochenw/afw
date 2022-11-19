@@ -13,8 +13,8 @@ import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nonnull;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 /** Default implementation of {@link IAppLog}, writing to an {@link OutputStream}.
  */

@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.function;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -16,17 +16,19 @@ import static org.junit.Assert.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableBiFunction;
-import com.github.jochenw.afw.core.util.Functions.FailableBiIntPredicate;
-import com.github.jochenw.afw.core.util.Functions.FailableBiLongPredicate;
-import com.github.jochenw.afw.core.util.Functions.FailableBiPredicate;
-import com.github.jochenw.afw.core.util.Functions.FailableCallable;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
-import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
-import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableBiFunction;
+import com.github.jochenw.afw.core.function.Functions.FailableBiIntPredicate;
+import com.github.jochenw.afw.core.function.Functions.FailableBiLongPredicate;
+import com.github.jochenw.afw.core.function.Functions.FailableBiPredicate;
+import com.github.jochenw.afw.core.function.Functions.FailableCallable;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
+import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
+import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.util.Exceptions;
 
 
 /** Test for {@link Functions}.

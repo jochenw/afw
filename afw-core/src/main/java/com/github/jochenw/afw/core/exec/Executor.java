@@ -23,8 +23,8 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.MutableInteger;
 import com.github.jochenw.afw.core.util.Objects;
 

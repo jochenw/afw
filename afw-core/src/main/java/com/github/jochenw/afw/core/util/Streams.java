@@ -48,12 +48,12 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.io.ReaderInputStream;
 import com.github.jochenw.afw.core.io.WriterOutputStream;
-import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
 
 /**

@@ -1,7 +1,7 @@
 package com.github.jochenw.afw.core.scripts;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Scripts;
 
 

@@ -13,11 +13,11 @@ import java.nio.file.Path;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.FileUtils;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Streams;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
 
 /**
  * Interface of an object, that handles the external processes output (stdout, or stderr).

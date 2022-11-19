@@ -17,8 +17,8 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.util.Streams;
 import com.github.jochenw.afw.core.util.Strings;

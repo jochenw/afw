@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.function;
 
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
@@ -25,6 +25,8 @@ import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import com.github.jochenw.afw.core.util.Exceptions;
 
 
 /** Utility class, which mimicks the java.util.function package, except that unchecked exceptions are

@@ -6,7 +6,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.jochenw.afw.core.util.Functions.FailableBiIntConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableBiIntConsumer;
 
 /** Interface of an object, that may be used for iterations over lists of elements,
  * like lists, or arrays.

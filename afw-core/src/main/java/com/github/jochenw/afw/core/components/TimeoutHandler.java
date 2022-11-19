@@ -14,8 +14,8 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 

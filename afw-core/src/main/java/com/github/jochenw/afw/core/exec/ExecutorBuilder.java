@@ -15,9 +15,9 @@
  */
 package com.github.jochenw.afw.core.exec;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.FileUtils;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Streams;
 

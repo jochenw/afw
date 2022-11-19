@@ -9,9 +9,9 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
 
 /** A helper object for implementing JDBC based applications.

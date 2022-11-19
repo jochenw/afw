@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.function;
 
 import static org.junit.Assert.*;
 
@@ -13,6 +13,9 @@ import java.util.function.Predicate;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Predicates;
+import com.github.jochenw.afw.core.function.TriFunction;
+
 
 /**
  * @author jwi
@@ -20,7 +23,7 @@ import org.junit.Test;
  */
 public class PredicatesTest {
 	/**
-	 * Test method for {@link com.github.jochenw.afw.core.util.Predicates#always(boolean)}.
+	 * Test method for {@link com.github.jochenw.afw.core.function.Predicates#always(boolean)}.
 	 */
 	@Test
 	public void testAlways() {
@@ -31,7 +34,7 @@ public class PredicatesTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.jochenw.afw.core.util.Predicates#alwaysTrue()}.
+	 * Test method for {@link com.github.jochenw.afw.core.function.Predicates#alwaysTrue()}.
 	 */
 	@Test
 	public void testAlwaysTrue() {
@@ -40,7 +43,7 @@ public class PredicatesTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.jochenw.afw.core.util.Predicates#alwaysFalse()}.
+	 * Test method for {@link com.github.jochenw.afw.core.function.Predicates#alwaysFalse()}.
 	 */
 	@Test
 	public void testAlwaysFalse() {
@@ -70,7 +73,7 @@ public class PredicatesTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.jochenw.afw.core.util.Predicates#anyOf(Object,Predicate[])}.
+	 * Test method for {@link com.github.jochenw.afw.core.function.Predicates#anyOf(Object,Predicate[])}.
 	 */
 	@Test
 	public void testAnyOfVarArgs() {
@@ -103,7 +106,7 @@ public class PredicatesTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.jochenw.afw.core.util.Predicates#anyOf(Iterable,Object)}.
+	 * Test method for {@link com.github.jochenw.afw.core.function.Predicates#anyOf(Iterable,Object)}.
 	 */
 	@Test
 	public void testAnyOf() {
@@ -127,7 +130,7 @@ public class PredicatesTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.jochenw.afw.core.util.Predicates#allOf(Iterable,Object)}.
+	 * Test method for {@link com.github.jochenw.afw.core.function.Predicates#allOf(Iterable,Object)}.
 	 */
 	@Test
 	public void testAllOf() {
@@ -148,7 +151,7 @@ public class PredicatesTest {
 	}
 
 	/**
-	 * Test method for {@link com.github.jochenw.afw.core.util.Predicates#allOf(Iterable,Object)}.
+	 * Test method for {@link com.github.jochenw.afw.core.function.Predicates#allOf(Iterable,Object)}.
 	 */
 	@Test
 	public void testAllOfVarArgs() {

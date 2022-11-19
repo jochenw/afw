@@ -14,12 +14,11 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions;
 import com.github.jochenw.afw.core.util.Objects;
-
-import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
 
 
 /** Abstract base class for deriving Cli applications.

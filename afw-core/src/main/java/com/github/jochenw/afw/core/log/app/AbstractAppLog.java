@@ -7,8 +7,8 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-import com.github.jochenw.afw.core.util.Functions.FailableCallable;
-import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
+import com.github.jochenw.afw.core.function.Functions.FailableCallable;
+import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
 import com.github.jochenw.afw.core.util.Locks;
 import com.github.jochenw.afw.core.util.Locks.Lockable;
 

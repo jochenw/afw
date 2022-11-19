@@ -5,8 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.io.ObservableInputStream.Listener;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Streams;
 
 

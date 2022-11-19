@@ -17,7 +17,8 @@ package com.github.jochenw.afw.core.util;
 
 import java.io.Serializable;
 
-import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
 
 /**
  * Utility class, providing the ability to store a mutable boolean value.

@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 
 
 /** Utility class for working with objects. (Working with objects is

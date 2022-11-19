@@ -1,34 +1,36 @@
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.function;
 
 import java.util.Objects;
 import java.util.function.Function;
 
 /**
  * Represents a function that accepts two arguments and produces a result.
- * This is the two-arity specialization of {@link Function}.
+ * This is the four-arity specialization of {@link Function}.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #apply(Object, Object, Object)}.
+ * whose functional method is {@link #apply(Object, Object, Object, Object)}.
  *
  * @param <I1> the type of the first argument to the function
  * @param <I2> the type of the second argument to the function
  * @param <I3> the type of the third argument to the function
+ * @param <I4> the type of the third argument to the function
  * @param <O> the type of the result of the function
  *
  * @see Function
  * @since 1.8
  */
 @FunctionalInterface
-public interface TriFunction<I1,I2,I3,O> {
+public interface QuadFunction<I1,I2,I3,I4,O> {
     /**
      * Applies this function to the given arguments.
      *
      * @param pI1 the first function argument
      * @param pI2 the second function argument
      * @param pI3 the third function argument
+     * @param pI4 the fourth function argument
      * @return the function result
      */
-    O apply(I1 pI1, I2 pI2, I3 pI3);
+    O apply(I1 pI1, I2 pI2, I3 pI3, I4 pI4);
 
     /**
      * Returns a composed function that first applies this function to
@@ -43,8 +45,8 @@ public interface TriFunction<I1,I2,I3,O> {
      * applies the {@code after} function
      * @throws NullPointerException if after is null
      */
-    default <V> TriFunction<I1, I2, I3, V> andThen(Function<? super O, ? extends V> pAfter) {
+    default <V> QuadFunction<I1, I2, I3, I4, V> andThen(Function<? super O, ? extends V> pAfter) {
         Objects.requireNonNull(pAfter);
-        return (I1 i1, I2 i2, I3 i3) -> pAfter.apply(apply(i1, i2, i3));
+        return (I1 i1, I2 i2, I3 i3, I4 i4) -> pAfter.apply(apply(i1, i2, i3, i4));
     }
 }

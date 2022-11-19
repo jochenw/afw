@@ -3,10 +3,10 @@ package com.github.jochenw.afw.core.util;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.StampedLock;
 
-import com.github.jochenw.afw.core.util.Functions.FailableCallable;
-import com.github.jochenw.afw.core.util.Functions.FailableLongSupplier;
-import com.github.jochenw.afw.core.util.Functions.FailableRunnable;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.function.Functions.FailableCallable;
+import com.github.jochenw.afw.core.function.Functions.FailableLongSupplier;
+import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 
 
 /**

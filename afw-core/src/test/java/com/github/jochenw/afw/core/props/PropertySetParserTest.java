@@ -15,9 +15,9 @@ import java.util.function.Consumer;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Functions.FailableTriConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions.FailableTriConsumer;
 
 
 /** Test suite for the {@link PropertySetParser}.

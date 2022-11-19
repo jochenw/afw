@@ -53,9 +53,9 @@ import java.util.function.Consumer;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
-import com.github.jochenw.afw.core.util.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 
 /** Test case for the {@link Streams} class.
@@ -257,7 +257,7 @@ public class StreamsTest {
     }
 
     /**
-     * Test for {@link Streams#accept(java.net.URL, com.github.jochenw.afw.core.util.Functions.FailableConsumer)}.
+     * Test for {@link Streams#accept(java.net.URL, com.github.jochenw.afw.core.function.Functions.FailableConsumer)}.
      * @throws Exception The test failed.
      */
     public void testAcceptUrlConsumer() throws Exception {

@@ -8,9 +8,9 @@ import java.util.function.BiConsumer;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.props.OrderedPropertySet.DocumentableProperty;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 
 
 /** Test suite for the {@link OrderedPropertySet}.

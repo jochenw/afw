@@ -3,9 +3,9 @@ package com.github.jochenw.afw.core.scripts;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
-import com.github.jochenw.afw.core.util.Functions;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.MutableBoolean;
 
 

@@ -7,9 +7,9 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
-import com.github.jochenw.afw.core.util.Functions.FailablePredicate;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
+import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
 
 /**
  * This class provides utility functions, and classes for working with the

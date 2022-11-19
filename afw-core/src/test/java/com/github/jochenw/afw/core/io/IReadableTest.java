@@ -13,8 +13,8 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable.NoLongerReadableException;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Holder;
 import com.github.jochenw.afw.core.util.Streams;
 

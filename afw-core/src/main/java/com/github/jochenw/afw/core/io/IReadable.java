@@ -19,10 +19,10 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Exceptions;
-import com.github.jochenw.afw.core.util.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.util.Functions.FailableFunction;
-import com.github.jochenw.afw.core.util.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Holder;
 import com.github.jochenw.afw.core.util.Streams;
 
