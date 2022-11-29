@@ -207,6 +207,7 @@ public class LocalizableDocument {
 	 */
 	public LocalizableDocument(Document pDocument) {
 		document = pDocument;
+		domHelper.setDefaultNamespaceUri(pDocument.getDocumentElement().getNamespaceURI());
 		domHelper.setLocationProvider((node) -> getLocator(node));
 		domHelper.setErrorHandler((loc,msg) -> new LocalizableException(loc,msg));
 	}

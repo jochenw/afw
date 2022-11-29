@@ -174,9 +174,6 @@ public class DomHelperTest {
 
 		/** Test, whether there is a child element t:p by using the stream API.
 		 */
-		final Iterator<Element> bodyIterator2 = dh.getChildren(bodyElement).iterator();
-		assertTrue(bodyIterator2.hasNext());
-		
 		assertNotNull(dh.getChildren(bodyElement, "p").iterator().next());
 		assertTrue(dh.getChildrenNS(bodyElement, "foo", "p").stream().anyMatch((e) -> e != null));
 		assertTrue(dh.getChildren(bodyElement, "p").stream().anyMatch((e) -> {
