@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import java.io.StringReader;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
@@ -15,6 +16,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 
+import com.github.jochenw.afw.core.function.IStreamableIterable;
 import com.github.jochenw.afw.core.util.DomHelper.LocalizableException;
 
 /**
@@ -143,7 +145,7 @@ public class DomHelperTest {
 		} catch (NoSuchElementException e) {
 			assertNull(e.getMessage());
 		}
-		final Iterable<Element> bodyIterable = dh.getChildren(bodyElement);
+		final IStreamableIterable<Element> bodyIterable = dh.getChildren(bodyElement);
 		assertNotNull(bodyIterable);
 		final Iterator<Element> bodyIterator = bodyIterable.iterator();
 		assertNotNull(bodyIterator);
@@ -169,6 +171,21 @@ public class DomHelperTest {
 		assertEquals("p", p3.getTagName());
 		assertEquals("Paragraph 3", p3.getTextContent());
 		assertFalse(bodyIterator.hasNext());
+
+		/** Test, whether there is a child element t:p by using the stream API.
+		 */
+		final Iterator<Element> bodyIterator2 = dh.getChildren(bodyElement).iterator();
+		assertTrue(bodyIterator2.hasNext());
+		
+		assertNotNull(dh.getChildren(bodyElement, "p").iterator().next());
+		assertTrue(dh.getChildrenNS(bodyElement, "foo", "p").stream().anyMatch((e) -> e != null));
+		assertTrue(dh.getChildren(bodyElement, "p").stream().anyMatch((e) -> {
+			return "Paragraph 1".equals(e.getTextContent());
+		}));
+		assertTrue(dh.getChildren(bodyElement, "p").stream().anyMatch((e) -> {
+			return "Paragraph 1".equals(e.getTextContent());
+		}));
+		assertFalse(dh.getChildren(bodyElement, "p").stream().anyMatch((e) -> "Para 1".equals(e.getTextContent())));
 	}
 
 	/**

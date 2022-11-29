@@ -5,11 +5,15 @@ package com.github.jochenw.afw.core.util;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,6 +25,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.LocatorImpl;
 
+import com.github.jochenw.afw.core.function.IStreamableIterable;
 import com.google.common.base.Supplier;
 
 /** A helper object for parsing DOM documents.
@@ -133,7 +138,7 @@ public class DomHelper {
 	/** Implementation class for the various getChildren methods.
 	 * @param <N> The actual node type.
 	 */
-	public static class NodeChildrenIterable<N extends Node> implements Iterable<N> {
+	public static class NodeChildrenIterable<N extends Node> implements IStreamableIterable<N> {
 		private Node parent;
 		private final Predicate<Node> predicate;
 		/**
@@ -148,37 +153,17 @@ public class DomHelper {
 		}
 		@Override
 		public Iterator<N> iterator() {
-			return new Iterator<N>() {
-				private N currentChild;
-				private Node nextChild = parent.getFirstChild();
-
-				@Override
-				public boolean hasNext() {
-					if (currentChild == null) {
-						while (nextChild != null) {
-							final Node chld = nextChild;
-							nextChild = nextChild.getNextSibling();
-							if (predicate.test(chld)) {
-								@SuppressWarnings("unchecked")
-								final N n = (N) chld;
-								currentChild = n;
-								break;
-							}
-						}
-					}
-					return currentChild != null;
+			final List<N> list = new ArrayList<>();
+			Node node = parent.getFirstChild();
+			while (node != null) {
+				if (predicate.test(node)) {
+					@SuppressWarnings("unchecked")
+					final N nd = (N) node;
+					list.add(nd);
 				}
-
-				@Override
-				public N next() {
-					if (currentChild == null) {
-						throw new NoSuchElementException();
-					}
-					final N n = currentChild;
-					currentChild = null;
-					return n;
-				}
-			};
+				node = node.getNextSibling();
+			}
+			return list.iterator();
 		}
 	}
 
@@ -261,7 +246,7 @@ public class DomHelper {
 	 * @param pNode The parent node, which is being queried for child elements.
 	 * @return The parent nodes child elements.
 	 */
-	public @Nonnull Iterable<Element> getChildren(@Nonnull Node pNode) {
+	public @Nonnull IStreamableIterable<Element> getChildren(@Nonnull Node pNode) {
 		return new NodeChildrenIterable<Element>(pNode, (n) -> n.getNodeType() == Node.ELEMENT_NODE);
 	}
 
@@ -272,7 +257,7 @@ public class DomHelper {
 	 * @return The parent nodes child elements with the given local name,
 	 *   and the default namespace.
 	 */
-	public @Nonnull Iterable<Element> getChildren(@Nonnull Node pNode, @Nonnull String pLocalName) {
+	public @Nonnull IStreamableIterable<Element> getChildren(@Nonnull Node pNode, @Nonnull String pLocalName) {
 		return getChildrenNS(pNode, getDefaultNamespaceUri(), pLocalName);
 	}
 
@@ -285,7 +270,7 @@ public class DomHelper {
 	 * @return The parent nodes child elements with the given local name,
 	 *   and the given namespace URI.
 	 */
-	public @Nonnull Iterable<Element> getChildrenNS(@Nonnull Node pNode, @Nullable String pNamespaceUri,
+	public @Nonnull IStreamableIterable<Element> getChildrenNS(@Nonnull Node pNode, @Nullable String pNamespaceUri,
 			                                        @Nonnull String pLocalName) {
 		return new NodeChildrenIterable<Element>(pNode, (n) -> isElementNS(n, pNamespaceUri, pLocalName));
 	}
@@ -333,11 +318,13 @@ public class DomHelper {
 	 * {@link LocalizableException}.
 	 * @param pNode The node, which is being tested.
 	 * @throws LocalizableException The assertion failed.
+	 * @return The input {@code pNode}, casted to an {@link Element}.
 	 */
-	public void assertElement(@Nonnull Node pNode) throws LocalizableException {
+	public Element assertElement(@Nonnull Node pNode) throws LocalizableException {
 		if (pNode.getNodeType() != Node.ELEMENT_NODE) {
 			throw error(pNode, "Expected element, got " + pNode.getClass().getName());
 		}
+		return (Element) pNode;
 	}
 
 	/**
@@ -346,9 +333,10 @@ public class DomHelper {
 	 * @param pNode The node, which is being tested.
 	 * @param pLocalName The expected local name.
 	 * @throws LocalizableException The assertion failed.
+	 * @return The input {@code pNode}, casted to an {@link Element}.
 	 */
-	public void assertElement(@Nonnull Node pNode, @Nonnull String pLocalName) throws LocalizableException {
-		assertElementNS(pNode, getDefaultNamespaceUri(), pLocalName);
+	public Element assertElement(@Nonnull Node pNode, @Nonnull String pLocalName) throws LocalizableException {
+		return assertElementNS(pNode, getDefaultNamespaceUri(), pLocalName);
 	}
 
 	/**
@@ -359,8 +347,9 @@ public class DomHelper {
 	 * @param pNamespaceURI The expected namespace URI.
 	 * @param pLocalName The expected local name.
 	 * @throws LocalizableException The assertion failed.
+	 * @return The input {@code pNode}, casted to an {@link Element}.
 	 */
-	public void assertElementNS(@Nonnull Node pNode, @Nonnull String pNamespaceURI, String pLocalName)
+	public Element assertElementNS(@Nonnull Node pNode, @Nonnull String pNamespaceURI, String pLocalName)
 	    throws LocalizableException {
 		if (pNode.getNodeType() == Node.ELEMENT_NODE) {
 			if (!isElementNS(pNode, pNamespaceURI, pLocalName)) {
@@ -370,6 +359,7 @@ public class DomHelper {
 		} else {
 			throw error(pNode, "Expected element, got " + pNode.getClass().getName());
 		}
+		return (Element) pNode;
 	}
 
 	/** Returns the first child element of the given node, which has the

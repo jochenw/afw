@@ -20,7 +20,7 @@
   <artifactId>afw</artifactId>
   <version>0.6.2-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>AFW (DI)</name>
+  <name>AFW</name>
   <description>Application framework, Dependency Injection</description>
   <dependencies>
   	<dependency>
@@ -67,6 +67,32 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+		<id>Sources</id>
+		<activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+		<build>
+			<plugins>
+			    <plugin>
+			        <groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-source-plugin</artifactId>
+			        <version>3.2.1</version>
+			        <executions>
+				        <execution>
+					        <phase>package</phase>
+					        <goals>
+						        <goal>jar-no-fork</goal>
+					        </goals>
+					        <configuration>
+      						    <attach>true</attach>
+					        </configuration>
+				        </execution>
+			        </executions>
+		        </plugin>
+			</plugins>
+		</build>
+	</profile>
   </profiles>
   <build>
     <defaultGoal>clean install</defaultGoal>
