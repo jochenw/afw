@@ -69,14 +69,14 @@ public class Streams {
 
     /**
      * Returns the contents of the given {@link InputStream}, as a byte
-     * array. The {@link InputStream} isn't closed.
+     * array. The {@link InputStream} is being closed.
      * @param pIn The {@link InputStream} to read from. Will be closed.
      * @return The contents, which have been read from {@code pIn}.
      */
     public static byte[] read(InputStream pIn) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (InputStream in = pIn) {
-            copy(pIn, baos);
+            copy(in, baos);
         } catch (IOException e) {
             throw Exceptions.newUncheckedIOException(e);
         }
@@ -204,7 +204,7 @@ public class Streams {
 
     /**
      * Returns the contents of the given {@link Reader}, as a string.
-     * The {@link Reader} is closed.
+     * The {@link Reader} is being closed.
      * @param pIn The {@link Reader} to read from. This
      * {@link Reader} is <em>not</em> closed, after invoking this method.
      * @return The contents, which have been read from {@code pIn}.
@@ -213,7 +213,7 @@ public class Streams {
     public static String read(Reader pIn) {
         final StringWriter sw = new StringWriter();
         try (Reader in = pIn) {
-            copy(pIn, sw);
+            copy(in, sw);
         } catch (IOException e) {
             throw Exceptions.newUncheckedIOException(e);
         }
@@ -429,7 +429,7 @@ public class Streams {
     public static void accept(@Nonnull URL pUrl, @Nonnull FailableConsumer<InputStream,IOException> pConsumer) {
     	try (InputStream in = pUrl.openStream();
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
-    		pConsumer.accept(in);
+    		pConsumer.accept(bin);
     	} catch (IOException e) {
     		throw new UncheckedIOException(e);
     	}
@@ -488,7 +488,7 @@ public class Streams {
     public static <O> O apply(@Nonnull URL pUrl, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
     	try (InputStream in = pUrl.openStream();
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
-    		return pFunction.apply(in);
+    		return pFunction.apply(bin);
     	} catch (IOException e) {
     		throw new UncheckedIOException(e);
     	}
@@ -511,7 +511,7 @@ public class Streams {
     public static <O> O apply(@Nonnull Path pPath, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
     	try (InputStream in = Files.newInputStream(pPath);
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
-    		return pFunction.apply(in);
+    		return pFunction.apply(bin);
     	} catch (IOException e) {
     		throw new UncheckedIOException(e);
     	}
@@ -592,7 +592,7 @@ public class Streams {
      * @param pNullPermitted Indicates, whether the resource may be absent, or
      *   otherwise invalid, in which case a null value will be returned.
      * @return The property set, which has been read from the given resource,
-     *   or null, if the resource is absent, or oherwise invalid, and the
+     *   or null, if the resource is absent, or otherwise invalid, and the
      *   parameter {@code pNullPermitted} is true.
      */
     public static @Nullable Properties load(@Nonnull Object pResource, boolean pNullPermitted) {
@@ -634,7 +634,7 @@ public class Streams {
     	} else if (res instanceof URL) {
     		final URL u = (URL) res;
     		try (InputStream in = u.openStream()) {
-    			return load(in);
+    			return load(in, u.toExternalForm());
     		} catch (FileNotFoundException e) {
     			if (!pNullPermitted) {
     				throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + u);
@@ -681,7 +681,7 @@ public class Streams {
      *   otherwise invalid.
      * @param pResources A set of resources, from which these properties are being
      *   read.
-     * @return The created property set.
+     * @return The created property set, possibly empty.
      */
     public static final @Nonnull Properties load(boolean pNullPermitted, @Nonnull Object... pResources) {
     	final Object[] resources = Objects.requireNonNull(pResources);
@@ -761,19 +761,19 @@ public class Streams {
      *   The consumers arguments are the line number (beginning with 1), and the text line.
      */
     public static void read(IReadable pReadable, Charset pCharset, FailableBiConsumer<Integer,String,?> pConsumer) {
-    	pReadable.read((r) -> {
+    	pReadable.read((BufferedReader r) -> {
     		final BufferedReader br;
     		if (r instanceof BufferedReader) {
     			br = (BufferedReader) r;
     		} else {
     			br = new BufferedReader(r);
     		}
-    		for (int i = 1;  ;  i++) {
+    		for (int i = 0;  ;  i++) {
     			final String line = br.readLine();
     			if (line == null) {
     				break;
     			} else {
-    				pConsumer.accept(Integer.valueOf(i), line);
+    				pConsumer.accept(i, line);
     			}
     		}
     	}, Objects.notNull(pCharset, StandardCharsets.UTF_8));

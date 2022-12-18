@@ -260,11 +260,11 @@ public class StreamsTest {
      * Test for {@link Streams#accept(java.net.URL, com.github.jochenw.afw.core.function.Functions.FailableConsumer)}.
      * @throws Exception The test failed.
      */
+    @Test
     public void testAcceptUrlConsumer() throws Exception {
     	final byte[] content = "MagicByteStream".getBytes(StandardCharsets.UTF_16);
        	final MutableBoolean opened = new MutableBoolean();
        	final MutableBoolean closed = new MutableBoolean();
-       	final MutableBoolean connectedFlag = new MutableBoolean();
         final URLStreamHandler ush = new URLStreamHandler() {
 			@Override
 			protected URLConnection openConnection(URL pUrl) throws IOException {
@@ -276,7 +276,7 @@ public class StreamsTest {
 				return new URLConnection(pUrl) {					
 					@Override
 					public void connect() throws IOException {
-						connectedFlag.set();
+						throw new NotImplementedException();
 					}
 
 					@Override
@@ -301,12 +301,12 @@ public class StreamsTest {
     	});
     	assertTrue(opened.isSet());
     	assertTrue(closed.isSet());
-    	assertTrue(connectedFlag.isSet());
     	Tests.assertEquals(content, contentHolder.get());
     }
 
     /** Test for {@link Streams#accept(Path, FailableConsumer)}.
      */
+    @Test
     public void testAcceptPathConsumer() {
     	final Path path = Paths.get("pom.xml");
     	assertTrue(Files.isRegularFile(path));
@@ -315,6 +315,7 @@ public class StreamsTest {
 
     /** Test for {@link Streams#accept(File, FailableConsumer)}.
      */
+    @Test
     public void testAcceptFileConsumer() {
     	final File file = new File("pom.xml");
     	assertTrue(file.isFile());
@@ -324,6 +325,7 @@ public class StreamsTest {
     /** Test for {@link Streams#load(URL)}.
      * @throws Exception The test failed.
      */
+    @Test
     public void testLoadUrl() throws Exception {
     	final Properties props = newTestProperties();
     	final Path path = createTestProperties(props, false);
@@ -340,6 +342,7 @@ public class StreamsTest {
 
     /** Test for {@link Streams#load(Path)}.
      */
+    @Test
     public void testLoadPath() {
     	final Properties props = newTestProperties();
     	final Path path = createTestProperties(props, false);
@@ -351,7 +354,9 @@ public class StreamsTest {
     	assertSameProperties(props, got3);
     	final Path path2 = path.getParent().resolve("thisFileDoesntExist");
     	assertNull(Streams.load(path2, true));
-    	assertNull(Streams.load(true, new Object[] {path2}));
+    	final Properties got4 = Streams.load(true, new Object[] {path2}); 
+    	assertNotNull(got4);
+    	assertTrue(got4.isEmpty());
     	final Path xmlPath = createTestProperties(props, true);
     	final Properties xmlGot = Streams.load(xmlPath);
     	assertSameProperties(props, xmlGot);
@@ -359,6 +364,7 @@ public class StreamsTest {
 
     /** Test for {@link Streams#load(File)}.
      */
+    @Test
     public void testLoadFile() {
     	final Properties props = newTestProperties();
     	final File file = createTestProperties(props, false).toFile();
@@ -370,7 +376,9 @@ public class StreamsTest {
     	assertSameProperties(props, got3);
     	final File file2 = new File(file.getParentFile(), "thisFileDoesntExist");
     	assertNull(Streams.load(file2, true));
-    	assertNull(Streams.load(false, new Object[] {file2}));
+    	final Properties got4 = Streams.load(true, new Object[] {file2});
+		assertNotNull(got4);
+		assertTrue(got4.isEmpty());
     	final Path xmlPath = createTestProperties(props, true);
     	final Properties xmlGot = Streams.load(xmlPath.toFile());
     	assertSameProperties(props, xmlGot);
@@ -420,6 +428,7 @@ public class StreamsTest {
     /** Test case for {@link Streams#of(byte[])}.
      * @throws Exception The test failed.
      */
+    @Test
     public void testOfByteArray() throws Exception {
     	String string = "763209kfegLIZRD$";
 		final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
@@ -436,6 +445,7 @@ public class StreamsTest {
 
     /** Test case for {@link Streams#of(String)}.
      */
+    @Test
     public void testOfString() {
     	String string = "763209kfegLIZRD$";
     	final StringWriter sw = new StringWriter();
@@ -452,6 +462,7 @@ public class StreamsTest {
     /** Test case for {@link Streams#of(String, Charset)}.
      * @throws Exception The test failed.
      */
+    @Test
     public void testOfStringCharset() throws Exception {
     	String string = "763209kfegLIZRD$";
     	final ByteArrayOutputStream baos0 = new ByteArrayOutputStream();
@@ -470,15 +481,16 @@ public class StreamsTest {
 
     /** Test case for {@link Streams#read(IReadable, Charset, FailableBiConsumer)}.
      */
+    @Test
     public void testReadIReadableCharsetBiConsumer() {
     	final Consumer<List<Object>> validator = (list) -> {
     		assertEquals(8, list.size());
     		while (!list.isEmpty()) {
     			final Integer lineNumber = (Integer) list.remove(0);
-    			final String text = (String) list.remove(1);
+    			final String text = (String) list.remove(0);
     			assertNotNull(lineNumber);
     			assertNotNull(text);
-    			assertEquals("This is line " + lineNumber, text);
+    			assertEquals("This is line " + lineNumber + ".", text);
     		}
     	};
     	for (final String sep : Arrays.asList(System.lineSeparator(), "\n", "\r\n")) {
@@ -507,6 +519,7 @@ public class StreamsTest {
     /** Test case for {@link Streams#closeListeningStream(InputStream,BooleanSupplier)}.
      * @throws Exception The test failed.
      */
+    @Test
     public void testCloseListeningStream() throws Exception {
     	final byte[] bytes = "01234567890abcdefghijklmnopqrstuvwxyz".getBytes(StandardCharsets.UTF_8);
     	{
@@ -517,7 +530,7 @@ public class StreamsTest {
     		final byte[] output = Streams.read(in);
     		assertArrayEquals(bytes, output);
     		assertFalse(cis.isClosed());
-    		assertFalse(hookInvoked.isSet());
+    		assertTrue(hookInvoked.isSet());
     		in.close();
     		assertFalse(cis.isClosed());
     		assertTrue(hookInvoked.isSet());
@@ -529,8 +542,8 @@ public class StreamsTest {
     		final InputStream in = Streams.closeListeningStream(cis, () -> { hookInvoked.set(); return false; });
     		final byte[] output = Streams.read(in);
     		assertArrayEquals(bytes, output);
-    		assertFalse(cis.isClosed());
-    		assertFalse(hookInvoked.isSet());
+    		assertTrue(cis.isClosed());
+    		assertTrue(hookInvoked.isSet());
     		in.close();
     		assertTrue(cis.isClosed());
     		assertTrue(hookInvoked.isSet());
@@ -540,6 +553,7 @@ public class StreamsTest {
     /** Test case for {@link Streams#closeListeningReader(Reader,BooleanSupplier)}.
      * @throws Exception The test failed.
      */
+    @Test
     public void testCloseListeningReader() throws Exception {
     	final String bytes = "01234567890abcdefghijklmnopqrstuvwxyz";
     	{
@@ -548,9 +562,10 @@ public class StreamsTest {
     		final MutableBoolean hookInvoked = new MutableBoolean();
     		final Reader in = Streams.closeListeningReader(cr, () -> { hookInvoked.set(); return true; });
     		final String output = Streams.read(in);
+    		in.close();
     		assertEquals(bytes, output);
     		assertFalse(cr.isClosed());
-    		assertFalse(hookInvoked.isSet());
+    		assertTrue(hookInvoked.isSet());
     		in.close();
     		assertFalse(cr.isClosed());
     		assertTrue(hookInvoked.isSet());
@@ -562,8 +577,8 @@ public class StreamsTest {
     		final Reader in = Streams.closeListeningReader(cr, () -> { hookInvoked.set(); return false; });
     		final String output = Streams.read(in);
     		assertEquals(bytes, output);
-    		assertFalse(cr.isClosed());
-    		assertFalse(hookInvoked.isSet());
+    		assertTrue(cr.isClosed());
+    		assertTrue(hookInvoked.isSet());
     		in.close();
     		assertTrue(cr.isClosed());
     		assertTrue(hookInvoked.isSet());
