@@ -584,4 +584,23 @@ public class StreamsTest {
     		assertTrue(hookInvoked.isSet());
     	}
     }
+
+    /** Test for {@link Streams#uncloseableReader(Reader)}.
+     */
+    @Test
+    public void testUncloseableReader() throws IOException {
+    	final MutableBoolean closed = new MutableBoolean();
+    	final StringReader sr = new StringReader("abcdefghijklmnopqrstuvwxyz") {
+			@Override
+			public void close() {
+				closed.set();
+				super.close();
+			}
+    	};
+    	assertFalse(closed.isSet());
+    	final Reader r = Streams.uncloseableReader(sr);
+    	r.close();
+    	r.close();
+    	assertFalse(closed.isSet());
+    }
 }
