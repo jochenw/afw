@@ -26,7 +26,7 @@ public interface IComponentFactory {
 	 * dependencies.
 	 */
 	public default <O> Key<O> asKey(@Nonnull Type pType) {
-		return new Key<O>(pType);
+		return Key.of(pType);
 	}
 	/**
 	 * Creates a key, which represents the given {@link Type type},
@@ -44,10 +44,9 @@ public interface IComponentFactory {
 	 */
 	public default <O> Key<O> asKey(@Nonnull Type pType, @Nonnull String pName) {
 		if (pName == null  ||  pName.length() == 0) {
-			return new Key<O>(pType);
+			return Key.of(pType);
 		} else {
-			final Named named = Names.named(pName);
-			return new Key<O>(pType, named);
+			return Key.of(pType, pName);
 		}
 	}
 	/**
@@ -191,7 +190,7 @@ public interface IComponentFactory {
 	 *   such binding has been registered.
 	 */
 	public default <O> O getInstance(@Nonnull Type pType) {
-		final Key<O> key = new Key<O>(pType);
+		final Key<O> key = Key.of(pType);
 		return getInstance(key);
 	}
 	/** Returns an instance of the given type.
@@ -201,7 +200,7 @@ public interface IComponentFactory {
 	 * @throws NoSuchElementException No such binding has been registered.
 	 */
 	public default <O> O requireInstance(@Nonnull Type pType) {
-		final Key<O> key = new Key<O>(pType);
+		final Key<O> key = Key.of(pType);
 		return requireInstance(key);
 	}
 	/** Returns an instance of the given type.
@@ -211,7 +210,7 @@ public interface IComponentFactory {
 	 *   such binding has been registered.
 	 */
 	public default <O> O getInstance(@Nonnull Types.Type<O> pType) {
-		final Key<O> key = new Key<O>(pType.getRawType());
+		final Key<O> key = Key.of(pType.getRawType());
 		return getInstance(key);
 	}
 	/** Returns an instance of the given type.
@@ -221,7 +220,7 @@ public interface IComponentFactory {
 	 * @throws NoSuchElementException No such binding has been registered.
 	 */
 	public default <O> O requireInstance(@Nonnull Types.Type<O> pType) {
-		final Key<O> key = new Key<O>(pType.getRawType());
+		final Key<O> key = Key.of(pType.getRawType());
 		return requireInstance(key);
 	}
 	/**

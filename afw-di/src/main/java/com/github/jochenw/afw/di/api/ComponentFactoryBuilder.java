@@ -170,8 +170,7 @@ public class ComponentFactoryBuilder {
 			@Override
 			public <T> AnnotatableBindingBuilder<T> bind(Type<T> pType) {
 				final java.lang.reflect.Type reflectType = pType.getRawType();
-				@SuppressWarnings("unchecked")
-				final Key<Object> key = (Key<Object>) new Key<T>(reflectType);
+				final Key<Object> key = Key.of(reflectType);
 				return register(key);
 			}
 
@@ -183,8 +182,7 @@ public class ComponentFactoryBuilder {
 			@Override
 			public <T> AnnotatableBindingBuilder<T> bind(Class<T> pType) {
 				final java.lang.reflect.Type reflectType = pType;
-				@SuppressWarnings("unchecked")
-				final Key<Object> key = (Key<Object>) new Key<T>(reflectType);
+				final Key<Object> key = Key.of(reflectType);
 				return register(key);
 			}
 

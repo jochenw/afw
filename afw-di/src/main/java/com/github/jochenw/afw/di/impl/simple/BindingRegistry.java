@@ -47,12 +47,12 @@ public class BindingRegistry implements IComponentFactoryAware {
 			final Key<Object> k;
 			if (bb.getAnnotation() == null) {
 				if (bb.getAnnotationType() == null) {
-					k = new Key<Object>(type);
+					k = Key.of(type);
 				} else {
-					k = new Key<Object>(type, bb.getAnnotationType());
+					k = Key.of(type, bb.getAnnotationType());
 				}
 			} else {
-				k = new Key<Object>(type, bb.getAnnotation());
+				k = Key.of(type, bb.getAnnotation());
 			}
 			bindingSet.register(k, binding);
 		}

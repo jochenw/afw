@@ -42,7 +42,7 @@ public class Key<O extends Object> {
 	 * and no annotation class.
 	 * @param pType The type, to which the keys binding is applicable.
 	 */
-	public Key(@Nonnull Type pType) {
+	private Key(@Nonnull Type pType) {
 		type = pType;
 		annotation = null;
 		annotationClass = null;
@@ -54,7 +54,7 @@ public class Key<O extends Object> {
 	 * @param pAnnotation The annotation, which must be present to make
 	 * the keys binding applicable.
 	 */
-	public Key(@Nonnull Type pType, @Nonnull Annotation pAnnotation) {
+	private Key(@Nonnull Type pType, @Nonnull Annotation pAnnotation) {
 		type = pType;
 		annotation = pAnnotation;
 		annotationClass = null;
@@ -66,7 +66,7 @@ public class Key<O extends Object> {
 	 * @param pAnnotationClass The annotation class, which must be
 	 *   present to make the keys binding applicable.
 	 */
-	public Key(@Nonnull Type pType, @Nonnull Class<? extends Annotation> pAnnotationClass) {
+	private Key(@Nonnull Type pType, @Nonnull Class<? extends Annotation> pAnnotationClass) {
 		type = pType;
 		annotation = null;
 		annotationClass = pAnnotationClass;
@@ -170,7 +170,7 @@ public class Key<O extends Object> {
 		final Class<? extends Annotation> annoClass = getAnnotationClass();
 		if (annoClass != null) {
 			sb.append(", annotationClass=");
-			sb.append(annoClass);
+			sb.append(annoClass.getName());
 		}
 		return sb.toString();
 	}
@@ -178,5 +178,46 @@ public class Key<O extends Object> {
 	@Override
 	public String toString() {
 		return getDescription();
+	}
+
+	/** Creates a new instance with the given type, no annotation,
+	 * and no annotation class.
+	 * @param pType The type, to which the keys binding is applicable.
+	 * @return The created instance.
+	 */
+	public static <O> Key<O> of(Type pType) {
+		return new Key<O>(pType);
+	}
+
+	/** Creates a new instance with the given type, the given annotation,
+	 * and no annotation class.
+	 * @param pType The type, to which the keys binding is applicable.
+	 * @param pAnnotation The annotation, which must be present to make
+	 * the keys binding applicable.
+	 * @return The created instance.
+	 */
+	public static <O> Key<O> of(Type pType, Annotation pAnnotation) {
+		return new Key<O>(pType, pAnnotation);
+	}
+
+	/** Creates a new instance with the given type, a {@link Named}
+	 * annotation with the value {@code pName}, and no annotation class.
+	 * @param pType The type, to which the keys binding is applicable.
+	 * @param pName Value of the bindings {@link Named} annotation.
+	 * @return The created instance.
+	 */
+	public static <O> Key<O> of(Type pType, String pName) {
+		return new Key<O>(pType, Names.named(pName));
+	}
+
+	/** Creates a new instance with the given type, no annotation,
+	 * and the given annotation class.
+	 * @param pType The type, to which the keys binding is applicable.
+	 * @param pAnnotationClass The annotation class, which must be
+	 *   present to make the keys binding applicable.
+	 * @return The created instance.
+	 */
+	public static <O> Key<O> of(Type pType, Class<? extends Annotation> pAnnotationClass) {
+		return new Key<O>(pType, pAnnotationClass);
 	}
 }

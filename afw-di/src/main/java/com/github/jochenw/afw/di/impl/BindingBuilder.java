@@ -144,14 +144,14 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 	@Override
 	public LinkableBindingBuilder<T> annotatedWith(Class<? extends Annotation> pAnnotationType) {
 		annotationType = Objects.requireNonNull(pAnnotationType, "AnnotationType");
-		annotatedKey = new Key<T>(key.getType(), pAnnotationType);
+		annotatedKey = Key.of(key.getType(), pAnnotationType);
 		return this;
 	}
 
 	@Override
 	public LinkableBindingBuilder<T> annotatedWith(Annotation pAnnotation) {
 		annotation = Objects.requireNonNull(pAnnotation, "Annotation");
-		annotatedKey = new Key<T>(key.getType(), pAnnotation);
+		annotatedKey = Key.of(key.getType(), pAnnotation);
 		return this;
 	}
 
