@@ -34,6 +34,21 @@ public class ApplicationTest {
 			super(pComponentFactoryProvider);
 		}
 	}
+	/** Subclass of {@link Application} without a valid constructor.
+	 * This allows us to test, whether {@link Application#of(Class, Module)}
+	 * provides an appropriate error message. 
+	 */
+	public static class InvalidApplicationClass extends Application {
+		protected InvalidApplicationClass(Supplier<Module> pModuleSupplier) {
+			super(pModuleSupplier);
+			throw new IllegalStateException("Not implemented");
+		}
+
+		protected InvalidApplicationClass(Provider<IComponentFactory> pComponentFctoryProvider) {
+			super(pComponentFctoryProvider);
+			throw new IllegalStateException("Not implemented");
+		}
+	}
 
 	/** Test creating an application with a module supplier.
 	 */
@@ -74,6 +89,24 @@ public class ApplicationTest {
 		};
 		final Application appl = Application.of(provider);
 		validate(appl, true);
+		try {
+			Application.of(InvalidApplicationClass.class, provider);
+			fail("Expected Exception");
+		} catch (IllegalStateException e) {
+			assertEquals("Not implemented", e.getMessage());
+		}
+	}
+
+	/** Test creating an application with a component factory.
+	 */
+	@Test
+	public void testCreateWithComponentFactory() {
+		final Module module = (b) -> {
+			b.bind(Map.class).toClass(HashMap.class);
+		};
+		final IComponentFactory cf = new ComponentFactoryBuilder().module(module).build();
+		final Application appl = Application.of(cf);
+		validate(appl, true);
 	}
 
 	/** Test creating a subclass with a module supplier.
@@ -85,6 +118,12 @@ public class ApplicationTest {
 		};
 		final MyApplication appl = Application.of(MyApplication.class, module);
 		validate(appl, false);
+		try {
+			Application.of(InvalidApplicationClass.class, module);
+			fail("Expected Exception");
+		} catch (IllegalStateException e) {
+			assertEquals("Not implemented", e.getMessage());
+		}
 	}
 
 	/** Test creating a subclass with a component factory provider.
