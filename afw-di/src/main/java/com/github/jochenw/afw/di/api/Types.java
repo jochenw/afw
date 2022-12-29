@@ -53,9 +53,7 @@ public class Types {
 		 */
 		public Type() {
 			final java.lang.reflect.Type t = getClass().getGenericSuperclass();
-			if (t instanceof Class) {
-				rawType = t;
-			} else if (t instanceof ParameterizedType) {
+			if (t instanceof ParameterizedType) {
 				final ParameterizedType ptype = (ParameterizedType) t;
 				final java.lang.reflect.Type[] typeArgs = ptype.getActualTypeArguments();
 				if (typeArgs != null  &&  typeArgs.length > 0) {
