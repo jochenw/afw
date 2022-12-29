@@ -29,6 +29,12 @@ public class TypesTest {
 		final java.lang.reflect.Type[] parameterTypes = pt.getActualTypeArguments();
 		assertEquals(1, parameterTypes.length);
 		assertEquals(String.class, parameterTypes[0]);
+		try {
+			new Types.Type<>(String.class);
+			fail("Expected Exception");
+		} catch (IllegalStateException e) {
+			assertEquals("Unsupported type: " + String.class, e.getMessage());
+		}
 	}
 
 }

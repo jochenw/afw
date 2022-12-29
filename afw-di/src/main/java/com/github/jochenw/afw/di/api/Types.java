@@ -52,17 +52,21 @@ public class Types {
 		 * Creates a new instance.
 		 */
 		public Type() {
-			final java.lang.reflect.Type t = getClass().getGenericSuperclass();
-			if (t instanceof ParameterizedType) {
-				final ParameterizedType ptype = (ParameterizedType) t;
+			this(null);
+		}
+
+		/**
+		 * Creates a new instance with the given raw type.
+		 * @param pRawType The raw type.
+		 */
+		public Type(java.lang.reflect.Type pRawType) {
+			final java.lang.reflect.Type rt = pRawType == null ? getClass().getGenericSuperclass() : pRawType;
+			if (rt instanceof ParameterizedType) {
+				final ParameterizedType ptype = (ParameterizedType) rt;
 				final java.lang.reflect.Type[] typeArgs = ptype.getActualTypeArguments();
-				if (typeArgs != null  &&  typeArgs.length > 0) {
-					rawType = typeArgs[0];
-				} else {
-					throw new IllegalStateException("Unsupported type: " + t);
-				}
+				rawType = typeArgs[0];
 			} else {
-				throw new IllegalStateException("Unsupported type: " + t);
+				throw new IllegalStateException("Unsupported type: " + rt);
 			}
 		}
 
