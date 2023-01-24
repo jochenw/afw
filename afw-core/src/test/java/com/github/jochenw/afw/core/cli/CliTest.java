@@ -3,6 +3,7 @@ package com.github.jochenw.afw.core.cli;
 import static org.junit.Assert.*;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.Test;
 
@@ -141,5 +142,19 @@ public class CliTest {
 			assertNull(options.helperFile);
 			assertTrue(options.verbose);
 	}
-	
+
+	/** Test case for the error handler.
+	 */
+	@Test
+	public void testErrorHandler() {
+		final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
+				.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
+				.stringOption("outputFile", "of").required().handler((c,s) -> c.getBean().outputFile = Paths.get(s)).end()
+				.errorHandler((s) -> new IllegalStateException(s));
+		try {
+			cli.parse(new String[]{ "-if=pom.xml", "-of=/var/lib/of.log", "-h"});
+		} catch (IllegalStateException e) {
+			assertNull(e.getMessage());
+		}
+	}
 }

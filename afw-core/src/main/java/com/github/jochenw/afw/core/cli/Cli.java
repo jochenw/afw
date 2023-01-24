@@ -669,7 +669,11 @@ public class Cli<B> {
 				}
 			}
 			if (option == null) {
-				throw error("Option " + optName + " is not recognized.");
+				if ("help".equals(opt)  ||  "h".equals(opt)  ||  "?".equals(opt)) {
+					throw error(null);
+				} else {
+					throw error("Option " + optName + " is not recognized.");
+				}
 			}
 			final @Nonnull Option<?,B> optn = Objects.requireNonNull(option);
 			if (optionValues.containsKey(optn.getPrimaryName())) {
