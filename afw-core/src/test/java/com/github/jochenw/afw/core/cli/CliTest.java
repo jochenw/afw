@@ -7,7 +7,9 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.MutableBoolean;
 
 
@@ -156,5 +158,29 @@ public class CliTest {
 		} catch (IllegalStateException e) {
 			assertNull(e.getMessage());
 		}
+	}
+
+    /** Test case for linux paths as arguments.
+     */
+	@Test
+	public void testLinuxPaths() {
+		final FailableBiConsumer<Context<OptionsBean>, String, ?> ofHandler = (c,s) -> {
+			c.getBean().outputFile = Paths.get(s);
+		};
+		final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
+				.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
+				.stringOption("outputFile", "of").required().handler(ofHandler).end()
+				.errorHandler((s) -> new IllegalStateException(s));
+		final String[] args1 = new String[] {"-if=pom.xml", "-of=/var/lib/of.log"};
+		final OptionsBean ob1 = cli.parse(args1);
+		assertNotNull(ob1);
+		assertEquals("pom.xml", ob1.inputFile.toString());
+		assertEquals("/var/lib/of.log", ob1.outputFile.toString());
+		final String[] args2 = new String[] {"-if", "pom.xml", "-of", "/var/lib/of.log"};
+		final OptionsBean ob2 = cli.parse(args2);
+		assertNotNull(ob2);
+		assertEquals("pom.xml", ob2.inputFile.toString());
+		assertEquals("/var/lib/of.log", ob2.outputFile.toString());
+		
 	}
 }
