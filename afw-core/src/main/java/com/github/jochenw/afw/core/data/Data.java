@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -238,6 +239,200 @@ public class Data {
 			return getBoolean(pData, pKey, "Map key " + pKey);
 		}
 	}
+	/**
+	 * @param <O> Type of the data store object.
+	 */
+	public static class Accessable {
+		private final Function<String,Object> function;
+
+		/** Creates a new instance with the given access function.
+		 * @param pFunction The access function, that reads a value for
+		 *   a parameter from an instance of {@code O}.
+		 */
+		protected Accessable(Function<String,Object> pFunction) {
+			function = pFunction;
+		}
+
+		/** Extracts a value from the given data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The value, which has been retrieved.
+		 */
+		public @Nullable Object getValue(@Nonnull String pKey) {
+			final String key = Objects.requireNonNull(pKey, "Key");
+			return function.apply(key);
+		}
+		/** Extracts a string from the given data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @return The string, which has been retrieved.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is not a string.
+		 */
+		public @Nullable String getString(@Nonnull String pKey, @Nonnull String pDescription) {
+			Object value = getValue(pKey);
+			if (value == null) {
+				return null;
+			} else {
+				if (value instanceof String) {
+					return (String) value;
+				} else {
+					final String description = Objects.notNull(pDescription, pKey);
+					throw new IllegalArgumentException("Invalid value for parameter " + description
+							                        + ": Expected string, got " + value.getClass().getName());
+				}
+			}
+		}
+		/** Extracts a string from the given data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The string, which has been retrieved.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is not a string.
+		 */
+		public @Nullable String getString(@Nonnull String pKey) {
+			return getString(pKey, pKey);
+		}
+		/** Extracts a non-empty string from the given data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @return The string, which has been retrieved.
+		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is empty, or not a string.
+		 */
+		public @Nonnull String requireString(@Nonnull String pKey,
+				                             @Nonnull String pDescription) {
+			Object value = getValue(pKey);
+			if (value == null) {
+				throw new NullPointerException("Missing value for parameter " + pDescription);
+			} else {
+				if (value instanceof String) {
+					final String s = (String) value;
+					if (s.length() == 0) {
+						throw new IllegalArgumentException("Empty value for parameter " + pDescription);
+					}
+					return s;
+				} else {
+					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+							                        + ": Expected string, got " + value.getClass().getName());
+				}
+			}
+		}
+		/** Extracts a non-empty string from the given data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The string, which has been retrieved.
+		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is empty, or not a string.
+		 */
+		public @Nonnull String requireString(@Nonnull String pKey) {
+			return requireString(pKey, pKey);
+		}
+
+		/** Extracts a path from the given data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @return The string, which has been retrieved.
+		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is empty, or not a string.
+		 */
+		public @Nonnull Path requirePath(@Nonnull String pKey,
+				                         @Nonnull String pDescription) {
+			Object value = getValue(pKey);
+			if (value == null) {
+				throw new NullPointerException("Missing value for parameter " + pDescription);
+			} else {
+				if (value instanceof String) {
+					final String s = (String) value;
+					if (s.length() == 0) {
+						throw new IllegalArgumentException("Empty value for parameter " + pDescription);
+					}
+					return Paths.get(s);
+				} else if (value instanceof Path) {
+					return (Path) value;
+				} else if (value instanceof File) {
+					return ((File) value).toPath();
+				} else {
+					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+							                        + ": Expected path, got " + value.getClass().getName());
+				}
+			}
+		}
+
+		/** Extracts a path from the given data store, ensuring that the path
+		 * meets the given criteria.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @param pCriteria The criteria, that the path must meet.
+		 * @return The string, which has been retrieved.
+		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is empty, or not a string.
+		 * @throws IllegalStateException The value, which has been extracted from the data store,
+		 *   doesn't meet the given criteria.
+		 * @see Data#FILE_EXISTS
+		 * @see Data#DIR_EXISTS
+		 * @see Data#NOT_EXISTS
+		 */
+		public @Nonnull Path requirePath(@Nonnull String pKey,
+				                         @Nonnull String pDescription, PathCriterion... pCriteria) {
+			final Path path = requirePath(pKey, pDescription);
+			if (pCriteria != null) {
+				for (PathCriterion pc : pCriteria) {
+					final String error = pc.test(path, pDescription);
+					if (error != null) {
+						throw new IllegalStateException(error);
+					}
+				}
+			}
+			return path;
+		}
+
+		/** Extracts a path value from the given map.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The path, which has been retrieved.
+		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is empty, or not a string.
+		 */
+		public @Nonnull Path requirePath(@Nonnull String pKey) {
+			return requirePath(pKey, pKey);
+		}
+
+		/** Extracts a boolean value from the given map.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @return The string, which has been retrieved.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is not a string.
+		 */
+		public @Nullable Boolean getBoolean(@Nonnull String pKey, @Nonnull String pDescription) {
+			final Object value = getValue(pKey);
+			if (value == null) {
+				return null;
+			} else {
+				if (value instanceof Boolean) {
+					return (Boolean) value;
+				} else if (value instanceof String) {
+					return Boolean.valueOf((String) value);
+				} else {
+					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+							+ ": Expected string, or boolean, got " + value.getClass().getName());
+				}
+			}
+		}
+
+		/** Extracts a boolean value from the given map.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The string, which has been retrieved.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is not a string.
+		 */
+		public @Nullable Boolean getBoolean(@Nonnull String pKey) {
+			return getBoolean(pKey, "Map key " + pKey);
+		}
+	}
+
 
 	/** {@link Data.Accessor} object for instances of {@link Map Map&lt;String,Object&gt;}.
 	 */

@@ -423,4 +423,40 @@ public class DataTest {
 	             "Invalid value for parameter testFile: Expected a non-existing item, got " + existingFile,
 	             () -> Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.NOT_EXISTS));
 	}
+
+	/** Test case for {@link Data.Accessable#getValue(String)}.
+	 */
+	@Test
+	public void testAccessableGetValueString() {
+		final Map<String,Object> map = getMap();
+		final Data.Accessable acc = new Data.Accessable(map::get);
+		assertNull(acc.getValue("unknown"));
+		assertEquals("bar", acc.getValue("foo"));
+		assertEquals("", acc.getValue("empty"));
+		assertEquals(42, ((Integer) acc.getValue("answer")).intValue());
+		assertTrue(((Boolean) acc.getValue("test")).booleanValue());
+		assertEquals("true", acc.getValue("b"));
+	}
+
+	/** Test case for {@link Data.Accessable#getString(String)}.
+	 */
+	@Test
+	public void testAccessableGetStringString() {
+		final Map<String,Object> map = getMap();
+		final Data.Accessable acc = new Data.Accessable(map::get);
+		assertNull(acc.getString("unknown"));
+		assertEquals("bar", acc.getString("foo"));
+		assertEquals("", acc.getString("empty"));
+		assertEquals("true", acc.getString("b"));
+	}
+
+	/** Test case for {@link Data.Accessable#requireString(String)}.
+	 */
+	@Test
+	public void testAccessableRequireStringString() {
+		final Map<String,Object> map = getMap();
+		final Data.Accessable acc = new Data.Accessable(map::get);
+		assertEquals("bar", acc.requireString("foo"));
+		assertEquals("true", acc.requireString("b"));
+	}
 }
