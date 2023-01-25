@@ -18,7 +18,7 @@ public class IScriptEngineTest {
 	 */
 	@Test
 	public void test() {
-		final URL url = getClass().getResource("simple-script.groovy");
+		final URL url = getClass().getResource("simple-script.grv");
 		assertNotNull(url);
 		final Script script = Scripts.compile(url, StandardCharsets.UTF_8);
 		script.run(null);

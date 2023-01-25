@@ -94,7 +94,8 @@ public class GroovyScriptEngine implements IScriptEngine {
 	private final GroovyShell gsh = new GroovyShell();
 	@Override
 	public boolean isScriptable(@Nonnull IReadable pReadable) {
-		return pReadable.isReadable()  &&  pReadable.getName().endsWith(".groovy");
+		String name = pReadable.getName();
+		return pReadable.isReadable()  &&  (name.endsWith(".groovy") || name.endsWith(".grv"));
 	}
 
 	@Override
