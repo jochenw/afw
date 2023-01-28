@@ -240,16 +240,19 @@ public class Data {
 		}
 	}
 	/**
-	 * @param <O> Type of the data store object.
+	 * Same as {@link Data.Accessor}, except that the data store
+	 * is embedded, and not supplied as a parameter. In other
+	 * words, the {@link Data.Accessible} is more convenient to
+	 * use.
 	 */
-	public static class Accessable {
+	public static class Accessible {
 		private final Function<String,Object> function;
 
 		/** Creates a new instance with the given access function.
 		 * @param pFunction The access function, that reads a value for
 		 *   a parameter from an instance of {@code O}.
 		 */
-		protected Accessable(Function<String,Object> pFunction) {
+		protected Accessible(Function<String,Object> pFunction) {
 			function = pFunction;
 		}
 
@@ -317,7 +320,7 @@ public class Data {
 				}
 			}
 		}
-		/** Extracts a non-empty string from the given data store.
+		/** Extracts a non-empty string from the data store.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The string, which has been retrieved.
 		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
@@ -429,7 +432,40 @@ public class Data {
 		 *   is not a string.
 		 */
 		public @Nullable Boolean getBoolean(@Nonnull String pKey) {
-			return getBoolean(pKey, "Map key " + pKey);
+			return getBoolean(pKey, pKey);
+		}
+
+		/** Creates a new {@link Accessible}, which accesses the given map.
+		 * This is equivalent to {@code new Data.Accessable((k) -> pMap.get(k)}.
+		 * @param pMap The map, that is being accessed.
+		 * @return The created {@link Accessible}
+		 * @throws NullPointerException The parameter {@code pMap} is null.
+		 */
+		public static Accessible of(Map<String,Object> pMap) {
+			final Map<String,Object> map = Objects.requireNonNull(pMap, "Map");
+			return new Accessible(map::get);
+		}
+
+		/** Creates a new {@link Accessible}, which accesses the given property set.
+		 * This is equivalent to {@code new Data.Accessable((k) -> pProperties.get(k)}.
+		 * @param pProperties The property set, that is being accessed.
+		 * @return The created {@link Accessible}
+		 * @throws NullPointerException The parameter {@code pProperties} is null.
+		 */
+		public static Accessible of(Properties pProperties) {
+			final Properties props = Objects.requireNonNull(pProperties, "Properties");
+			return new Accessible(props::get);
+		}
+
+		/** Creates a new {@link Accessible}, which uses the given accessor function.
+		 * This is equivalent to {@code new Data.Accessable(pAccessor)}.
+		 * @param pAccessor The accessor function, that is being used.
+		 * @return The created {@link Accessible}
+		 * @throws NullPointerException The parameter {@code pAccessor} is null.
+		 */
+		public static Accessible of(Function<String,Object> pAccessor) {
+			final Function<String,Object> acc = Objects.requireNonNull(pAccessor, "Accessor");
+			return new Accessible(acc);
 		}
 	}
 
@@ -629,7 +665,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public @Nullable Boolean getBoolean(@Nonnull Map<String,Object> pMap, @Nonnull String pKey, @Nonnull String pDescription) {
+	public static @Nullable Boolean getBoolean(@Nonnull Map<String,Object> pMap, @Nonnull String pKey, @Nonnull String pDescription) {
 		return MAP_ACCESSOR.getBoolean(pMap, pKey, pDescription);
 	}
 

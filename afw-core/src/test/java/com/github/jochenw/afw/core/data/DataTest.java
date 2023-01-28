@@ -2,6 +2,7 @@ package com.github.jochenw.afw.core.data;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +13,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
 import com.github.jochenw.afw.core.util.Tests;
 
 /**
@@ -424,12 +426,12 @@ public class DataTest {
 	             () -> Data.MAP_ACCESSOR.requirePath(map, "testFile", "testFile", Data.NOT_EXISTS));
 	}
 
-	/** Test case for {@link Data.Accessable#getValue(String)}.
+	/** Test case for {@link Data.Accessible#getValue(String)}.
 	 */
 	@Test
 	public void testAccessableGetValueString() {
 		final Map<String,Object> map = getMap();
-		final Data.Accessable acc = new Data.Accessable(map::get);
+		final Data.Accessible acc = new Data.Accessible(map::get);
 		assertNull(acc.getValue("unknown"));
 		assertEquals("bar", acc.getValue("foo"));
 		assertEquals("", acc.getValue("empty"));
@@ -438,25 +440,327 @@ public class DataTest {
 		assertEquals("true", acc.getValue("b"));
 	}
 
-	/** Test case for {@link Data.Accessable#getString(String)}.
+	/** Test case for {@link Data.Accessible#getString(String)}.
 	 */
 	@Test
 	public void testAccessableGetStringString() {
 		final Map<String,Object> map = getMap();
-		final Data.Accessable acc = new Data.Accessable(map::get);
+		final Data.Accessible acc = new Data.Accessible(map::get);
 		assertNull(acc.getString("unknown"));
 		assertEquals("bar", acc.getString("foo"));
 		assertEquals("", acc.getString("empty"));
 		assertEquals("true", acc.getString("b"));
+		try {
+			acc.getString("answer");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter answer: Expected string, got java.lang.Integer", e.getMessage());
+		}
 	}
 
-	/** Test case for {@link Data.Accessable#requireString(String)}.
+	/** Test case for {@link Data.Accessible#requireString(String)}.
 	 */
 	@Test
 	public void testAccessableRequireStringString() {
 		final Map<String,Object> map = getMap();
-		final Data.Accessable acc = new Data.Accessable(map::get);
+		final Data.Accessible acc = new Data.Accessible(map::get);
 		assertEquals("bar", acc.requireString("foo"));
 		assertEquals("true", acc.requireString("b"));
+		try {
+			acc.requireString("unknown");
+			fail("Expected Exception");
+		} catch (NullPointerException e) {
+			assertEquals("Missing value for parameter unknown", e.getMessage());
+		}
+		try {
+			acc.requireString("empty");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Empty value for parameter empty", e.getMessage());
+		}
+		try {
+			acc.requireString("answer");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter answer: Expected string, got java.lang.Integer", e.getMessage());
+		}
+	}
+
+	/** Test case for {@link Data.Accessible#getStringString()}
+	 */
+	@Test
+	public void testAccessableGetStringStringString() {
+		final Map<String,Object> map = getMap();
+		final Data.Accessible acc = new Data.Accessible(map::get);
+		assertNull(acc.getString("unknown", "unknown"));
+		assertEquals("bar", acc.getString("foo", "foo"));
+		assertEquals("", acc.getString("empty", "empty"));
+		assertEquals("true", acc.getString("b", "b"));
+		try {
+			acc.getString("answer", "answ");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter answ: Expected string, got java.lang.Integer", e.getMessage());
+		}
+	}
+
+	/** Test case for {@link Data.Accessible#requireString(String)}.
+	 */
+	@Test
+	public void testAccessableRequireStringStringString() {
+		final Map<String,Object> map = getMap();
+		final Data.Accessible acc = new Data.Accessible(map::get);
+		assertEquals("bar", acc.requireString("foo", "foo"));
+		assertEquals("true", acc.requireString("b", "b"));
+		try {
+			acc.requireString("unknown", "unknwn");
+			fail("Expected Exception");
+		} catch (NullPointerException e) {
+			assertEquals("Missing value for parameter unknwn", e.getMessage());
+		}
+		try {
+			acc.requireString("empty", "empt");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Empty value for parameter empt", e.getMessage());
+		}
+		try {
+			acc.requireString("answer", "answ");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter answ: Expected string, got java.lang.Integer", e.getMessage());
+		}
+	}
+
+	/**
+	 * Test case for {@link Data.Accessible#requirePath(String)}.
+	 */
+	@Test
+	public void testAccessableRequirePathString() {
+		final Properties props = getProperties();
+		final Data.Accessible acc = new Data.Accessible(props::get);
+		assertEquals("bar", acc.requirePath("foo").toString());
+		try {
+			acc.requirePath("bar");
+			fail("Expected Exception");
+		} catch (NullPointerException e) {
+			assertEquals("Missing value for parameter bar", e.getMessage());
+		}
+		try {
+			acc.requirePath("empty");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Empty value for parameter empty", e.getMessage());
+		}
+		try {
+			acc.requirePath("test");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter test: Expected path, got java.lang.Boolean", e.getMessage());
+		}
+
+		final Map<String,Object> map = Data.asMap("path", Paths.get("."), "file", new File("./tmp"));
+		final Data.Accessible acc2 = new Data.Accessible(map::get);
+		assertEquals(Paths.get("."), acc2.requirePath("path"));
+		assertEquals(Paths.get("./tmp"), acc2.requirePath("file"));
+	}
+
+	/**
+	 * Test case for {@link Data.Accessible#requirePath(String, String)}.
+	 */
+	@Test
+	public void testAccessableRequirePathStringString() {
+		final Properties props = getProperties();
+		final Data.Accessible acc = new Data.Accessible(props::get);
+		assertEquals("bar", acc.requirePath("foo", "foo").toString());
+		try {
+			acc.requirePath("bar", "br");
+			fail("Expected Exception");
+		} catch (NullPointerException e) {
+			assertEquals("Missing value for parameter br", e.getMessage());
+		}
+		try {
+			acc.requirePath("empty", "empt");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Empty value for parameter empt", e.getMessage());
+		}
+		try {
+			acc.requirePath("test", "tst");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter tst: Expected path, got java.lang.Boolean", e.getMessage());
+		}
+		try {
+			acc.requirePath("empty", "empt");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Empty value for parameter empt", e.getMessage());
+		}
+		try {
+			acc.requirePath("answer", "answ");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter answ: Expected path, got java.lang.Integer", e.getMessage());
+		}
+
+		final Map<String,Object> map = Data.asMap("path", Paths.get("."), "file", new File("./tmp"));
+		final Data.Accessible acc2 = new Data.Accessible(map::get);
+		assertEquals(Paths.get("."), acc2.requirePath("path", "path"));
+		assertEquals(Paths.get("./tmp"), acc2.requirePath("file", "file"));
+	}
+
+	/** Test case for {@link Data.Accessible#requirePath(String, String, PathCriterion[])}
+	 */
+	@Test
+	public void testAccessableRequirePathStringStringPathCriteria() {
+		final Map<String,Object> map = Data.asMap("pom", "pom.xml",
+				                                  "unknown", "noSuchFile.xml",
+				                                  "empty", "",
+				                                  "src", "src",
+				                                  "path", Paths.get("."),
+				                                  "file", new File("./target"));
+		final Data.Accessible acc = Data.Accessible.of(map::get);
+		assertEquals(Paths.get("pom.xml"), acc.requirePath("pom", "pom", (PathCriterion[]) null));
+		assertEquals(Paths.get("pom.xml"), acc.requirePath("pom", "pom", Data.FILE_EXISTS));
+		assertEquals(Paths.get("src"), acc.requirePath("src", "src", (PathCriterion[]) null));
+		assertEquals(Paths.get("src"), acc.requirePath("src", "src", (PathCriterion[]) null));
+		assertEquals(Paths.get("src"), acc.requirePath("src", "src", Data.DIR_EXISTS));
+		try {
+			acc.requirePath("pom", "pom", Data.DIR_EXISTS);
+			fail("Expected Exception");
+		} catch (IllegalStateException e) {
+			assertEquals("Invalid value for parameter pom: Expected existing directory, got pom.xml", e.getMessage());
+		}
+		try {
+			acc.requirePath("empty", "empt", (PathCriterion[]) null);
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Empty value for parameter empt", e.getMessage());
+		}
+		try {
+			acc.requirePath("null", "nul", (PathCriterion[]) null);
+			fail("Expected Exception");
+		} catch (NullPointerException e) {
+			assertEquals("Missing value for parameter nul", e.getMessage());
+		}
+	}
+
+    /** Test case for {@link Data.Accessible#getBoolean(String, String)}.
+     */
+	@Test
+	public void testAccessableGetBooleanStringString() {
+		final Data.Accessible acc = Data.Accessible.of(Data.asMap("true", "true",
+				                                                   "TRUE", Boolean.TRUE,
+				                                                   "false", "false",
+				                                                   "FALSE", Boolean.FALSE,
+				                                                   "answer", Integer.valueOf(42)));
+		assertTrue(acc.getBoolean("true", "true").booleanValue());
+		assertTrue(acc.getBoolean("TRUE", "TRUE").booleanValue());
+		assertFalse(acc.getBoolean("false", "false").booleanValue());
+		assertFalse(acc.getBoolean("FALSE", "FALSE").booleanValue());
+		assertNull(acc.getBoolean("noSuchKey", "noSuchKey"));
+		try {
+			acc.getBoolean("answer", "answ");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter answ: Expected string, or boolean, got java.lang.Integer", e.getMessage());
+		}
+	}
+
+
+	/** Test case for {@link Data#getBoolean(Map<String,Object>,String,String)}.
+     */
+	@Test
+	public void testAccessableGetBooleanString() {
+		final Map<String,Object> map = Data.asMap("true", "true",
+				                                  "TRUE", Boolean.TRUE,
+				                                  "false", "false",
+				                                  "FALSE", Boolean.FALSE,
+				                                  "answer", Integer.valueOf(42));
+		assertTrue(Data.getBoolean(map, "true", "true").booleanValue());
+		assertTrue(Data.getBoolean(map, "TRUE", "TRUE").booleanValue());
+		assertFalse(Data.getBoolean(map, "false", "false").booleanValue());
+		assertFalse(Data.getBoolean(map, "FALSE", "FALSE").booleanValue());
+		assertNull(Data.getBoolean(map, "noSuchKey", "noSuchKey"));
+		try {
+			Data.getBoolean(map, "answer", "answ");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Invalid value for parameter answ: Expected string, or boolean, got java.lang.Integer", e.getMessage());
+		}
+	}
+
+	/** Test case for {@link Data.Accessible#of(Properties)}
+	 */
+	@Test
+	public void testAccessibleOfProperties() {
+		/** 		map.put("foo", "bar");
+		map.put("empty", "");
+		map.put("answer", Integer.valueOf(42));
+		map.put("test", Boolean.TRUE);
+		map.put("b", "true"); */
+		final Data.Accessible acc = Data.Accessible.of(getProperties());
+		assertEquals("bar", acc.getString("foo"));
+		assertEquals("", acc.getString("empty"));
+		assertTrue(acc.getBoolean("test").booleanValue());
+	}
+
+	/** Test case for {@link Data.Accessible#of(Map<String,Object>)}
+	 */
+	@Test
+	public void testAccessibleOfMap() {
+		final Data.Accessible acc = Data.Accessible.of(getMap());
+		assertEquals("bar", acc.getString("foo"));
+		assertEquals("", acc.getString("empty"));
+		assertTrue(acc.getBoolean("test").booleanValue());
+	}
+
+	/** Test case for {@link Data#requirePath(Map<String,Object>,String)}
+	 */
+	@Test
+	public void testRequirePathMapString() {
+		final Map<String,Object> map = Data.asMap(
+				"pom", "pom.xml",
+                "unknown", "noSuchFile.xml",
+                "empty", "",
+                "src", "src",
+                "path", Paths.get("."),
+                "file", new File("./target"));
+		assertEquals(Paths.get("pom.xml"), Data.requirePath(map, "pom"));
+		assertEquals(Paths.get("src"), Data.requirePath(map, "src"));
+		assertEquals(Paths.get("./target"), Data.requirePath(map, "file"));
+		assertEquals(Paths.get("."), Data.requirePath(map, "path"));
+	}
+
+	/** Test case for {@link Data.Accessor#requirePath(Map<String,Object>,String)}
+	 */
+	@Test
+	public void testAccessorRequirePathMapString() {
+		final Map<String,Object> map = Data.asMap(
+				"pom", "pom.xml",
+                "unknown", "noSuchFile.xml",
+                "empty", "",
+                "src", "src",
+                "path", Paths.get("."),
+                "file", new File("./target"));
+		assertEquals(Paths.get("pom.xml"), Data.MAP_ACCESSOR.requirePath(map, "pom"));
+		assertEquals(Paths.get("src"), Data.MAP_ACCESSOR.requirePath(map, "src"));
+		assertEquals(Paths.get("./target"), Data.MAP_ACCESSOR.requirePath(map, "file"));
+		assertEquals(Paths.get("."), Data.MAP_ACCESSOR.requirePath(map, "path"));
+	}
+
+	/** Test case for {@link Data.Accessor#requireString(Object,String) {
+	 */
+	@Test
+	public void testAccessorRequireStringObjectString() {
+		final Map<String,Object> map = getMap();
+		assertEquals("bar", Data.MAP_ACCESSOR.requireString(map, "foo", "foo"));
+		try {
+			Data.MAP_ACCESSOR.requireString(map, "empty", "empt");
+			fail("Expected Exception");
+		} catch (IllegalArgumentException e) {
+			assertEquals("Empty value for parameter empt", e.getMessage());
+		}
 	}
 }
