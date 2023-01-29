@@ -20,6 +20,8 @@ import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Objects;
 
+import groovyjarjarantlr4.v4.runtime.atn.SemanticContext.OR;
+
 
 /** Abstract base class for deriving Cli applications.
  * Suggested usage:
@@ -629,7 +631,8 @@ public class Cli<B> {
 	 * @return The successfully configured bean.
 	 */
 	public B parse(String[] pArgs) {
-		final List<String> args = new ArrayList<String>(Arrays.asList(Objects.requireNonNull(pArgs, "Args")));
+		final String[] argsArray = Objects.requireNonNull(pArgs, "Args");
+		final List<String> args = new ArrayList(Arrays.asList(argsArray));
 		final Map<String,String> optionValues = new HashMap<>();
 		while (!args.isEmpty()) {
 			final String arg = args.remove(0);
@@ -641,7 +644,8 @@ public class Cli<B> {
 			} else {
 				throw new UsageException("Invalid argument: Excepted option reference, got " + arg);
 			}
-			final String optName, optValue;
+			final String optName;
+			String optValue;
 			final int offset = opt.indexOf('=');
 			if (offset == -1) {
 				optName = opt;
@@ -650,64 +654,73 @@ public class Cli<B> {
 				optName = opt.substring(0, offset);
 				optValue = opt.substring(offset+1);
 			}
-			Option<?,B> option = null;
-			for (Option<?,B> o : options.values()) {
-				if (optName.equals(o.getPrimaryName())) {
-					option = o;
-					break;
-				}
-				if (o.getSecondaryNames() != null) {
-					for (String s : o.getSecondaryNames()) {
-						if (s.equals(optName)) {
-							option = o;
-							break;
-						}
-					}
-				}
-				if (option != null) {
-					break;
-				}
-			}
-			if (option == null) {
+			final Option<?,B> o = findOption(optName);
+			if (o == null) {
 				if ("help".equals(opt)  ||  "h".equals(opt)  ||  "?".equals(opt)) {
 					throw error(null);
 				} else {
 					throw error("Option " + optName + " is not recognized.");
 				}
 			}
-			final @Nonnull Option<?,B> optn = Objects.requireNonNull(option);
-			if (optionValues.containsKey(optn.getPrimaryName())) {
-				throw error("Option " + option.getPrimaryName() + " may be repeated only once.");
-			}
-			String value = optValue;
-			if (value == null) {
+			final String value;
+			if (optValue == null) {
 				if (args.isEmpty()) {
-					if (option instanceof BooleanOption) {
+					if (o instanceof BooleanOption) {
 						value = "true";
+					} else {
+						throw error("Option " + optName + " requires an argument.");
 					}
 				} else {
-					final String v = args.get(0);
-					if (v.startsWith("--")  ||  v.startsWith("-")  ||  v.startsWith("/")) {
-						if (option instanceof BooleanOption) {
-							value = "true";
-						}
-					} else {
-						value = args.remove(0);
-					}
+					value = args.remove(0);
 				}
+			} else {
+				value = optValue;
 			}
-			option.setPresent(true);
-			optionValues.put(option.getPrimaryName(), value);
+			o.setPresent(true);
+			optionValues.put(o.getPrimaryName(), value);
 		}
 		options.entrySet().forEach((en) -> {
 			final String optionName = en.getKey();
-			final Option<?,B> option = en.getValue();
-			final String defaultValue = option.getDefaultValue();
+			final Option<?,B> opt = en.getValue();
+			final String defaultValue = opt.getDefaultValue();
 			if (defaultValue != null  &&  !optionValues.containsKey(optionName)) {
 				optionValues.put(optionName, defaultValue);
 			}
 		});
-		for (Map.Entry<String,String> en : optionValues.entrySet()) {
+		notifyHandlers(optionValues);
+		validate(bean);
+		return bean;
+	}
+
+	/** Called to find an option with the given primary, or secondary
+	 * name.
+	 * @param pOptName The options name.
+	 * @return The requested option, if available, {@link OR} nullr
+	 */
+	protected Option<?,B> findOption(String pOptName) {
+		for (Option<?,B> o : options.values()) {
+			if (pOptName.equals(o.getPrimaryName())) {
+				return o;
+			}
+			if (o.getSecondaryNames() != null) {
+				for (String s : o.getSecondaryNames()) {
+					if (s.equals(pOptName)) {
+						return o;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/** Called to apply the configured options by invoking the 
+	 * option handlers.
+	 * @param pOptionValues A map with the primary option names as keys,
+	 * and the option values, after applying default values.
+	 */
+	protected void notifyHandlers(Map<String,String> pOptionValues) {
+		for (Map.Entry<String,String> en : pOptionValues.entrySet()) {
 			final String optionName = en.getKey();
 			final String optionValue = en.getValue();
 			@SuppressWarnings("unchecked")
@@ -756,12 +769,10 @@ public class Cli<B> {
 				}
 			}
 		}
-		validate(bean);
-		return bean;
 	}
 
 	/** Validates the option bean, after all options have been processed.
-	 * @param pBean Theoption bean, with the option values applied.
+	 * @param pBean The option bean, with the option values applied.
 	 */
 	protected void validate(B pBean) {
 		for (Option<?,B> opt : options.values()) {

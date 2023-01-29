@@ -4,6 +4,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
+/** Implementation of {@link IURLProperty}.
+ */
 public class UrlProperty extends AbstractProperty<URL> implements IURLProperty {
 	UrlProperty(String pKey, URL pDefaultValue) {
 		super(pKey, pDefaultValue);

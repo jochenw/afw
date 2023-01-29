@@ -27,6 +27,9 @@ public class SimpleLog extends AbstractLog {
         super(pFactory, pId);
     }
 
+    /** Returns the factory, that created this logger.
+     * @return The factory, that created this logger
+     */
     protected SimpleLogFactory getFactory() {
         return (SimpleLogFactory) super.logFactory;
     }

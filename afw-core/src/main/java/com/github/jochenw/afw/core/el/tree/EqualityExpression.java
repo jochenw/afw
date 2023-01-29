@@ -36,7 +36,12 @@ public class EqualityExpression implements Serializable {
          */
         NE
     }
+    /** The left hand side, and the right hand side of the expression.
+     * (The terms, that are being compared.)
+     */
     private final RelationalExpression left, right;
+    /** The operand.
+     */
     private final Op op;
 
     /**

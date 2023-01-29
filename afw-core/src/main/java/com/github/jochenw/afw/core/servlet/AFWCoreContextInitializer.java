@@ -45,6 +45,11 @@ public abstract class AFWCoreContextInitializer<Data extends Object> implements 
 		shutdown(data);
 	}
 
+	/** Converts the current web applications context path into the
+	 * application instance name.
+	 * @param pContextName The web applications context path.
+	 * @return The applications instance name, as derived from the context path.
+	 */
 	protected String getInstanceName(String pContextName) {
 		if (Strings.isEmpty(pContextName)) {
 			return "ROOT";
@@ -70,7 +75,10 @@ public abstract class AFWCoreContextInitializer<Data extends Object> implements 
 		}
 		return data;
 	}
-	
+
+	/** Called to destroy the given data object.
+	 * @param pData The data object, that is being destroyed.
+	 */
 	protected void shutdown(Data pData) {}
 
 	/** Called to create the new data object, which is being stored as a servlet context attribute.

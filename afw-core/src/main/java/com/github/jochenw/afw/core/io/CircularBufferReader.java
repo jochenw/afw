@@ -16,6 +16,7 @@
 package com.github.jochenw.afw.core.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.Objects;
 
@@ -24,9 +25,17 @@ import java.util.Objects;
  * data, that allows peeking into the buffer.
  */
 public class CircularBufferReader extends Reader {
+	/** The actual {@link Reader}, from which to read characters.
+	 */
 	protected final Reader in;
+	/** The buffer, which is used to enable peeking.
+	 */
 	protected final CircularCharBuffer buffer;
+	/** The buffers size.
+	 */
 	protected final int bufferSize;
+	/** Whether the {@link #in actual InputStream has already reported EOF.
+	 */
 	private boolean eofSeen;
 
 	/**
@@ -58,6 +67,9 @@ public class CircularBufferReader extends Reader {
 		this(pIn, 8192);
 	}
 
+	/** Called to fill the buffer by reading from the actual {@link Reader}.
+	 * @throws IOException Filling the buffer has failed.
+	 */
 	protected void fillBuffer() throws IOException {
 		if (eofSeen) {
 			return;
@@ -76,7 +88,15 @@ public class CircularBufferReader extends Reader {
 		}
 	}
 
-	protected boolean haveBytes(int pNumber) throws IOException {
+	/** Returns, whether the buffer currently contains the given number of
+	 * characters. If that is not the case, an attempt will be made to fill
+	 * the buffer.
+	 * @param pNumber The requested number of bytes.
+	 * @return True, if the requested number of bytes is available in the buffer.
+	 *   Otherwise false.
+	 * @throws IOException Filling the buffer has failed.
+	 */
+	protected boolean haveChars(int pNumber) throws IOException {
 		if (buffer.getCurrentNumberOfChars() < pNumber) {
 			fillBuffer();
 		}
@@ -85,7 +105,7 @@ public class CircularBufferReader extends Reader {
 
 	@Override
 	public int read() throws IOException {
-		if (!haveBytes(1)) {
+		if (!haveChars(1)) {
 			return -1;
 		}
 		return buffer.next();
@@ -105,7 +125,7 @@ public class CircularBufferReader extends Reader {
 		if (pLength < 0) {
 			throw new IllegalArgumentException("Length must not be negative");
 		}
-		if (!haveBytes(pLength)) {
+		if (!haveChars(pLength)) {
 			return -1;
 		}
 		final int result = Math.min(pLength, buffer.getCurrentNumberOfChars());

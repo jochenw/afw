@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  * to operate via side-effects.
  *
  * <p>This is a <a href="package-summary.html">functional interface</a>
- * whose functional method is {@link #accept(Object, Object, Object)}.
+ * whose functional method is {@link #accept(int, Object)}.
  *
  * @param <I> the type of the first argument to the operation
  *

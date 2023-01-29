@@ -25,6 +25,8 @@ import java.util.List;
  */
 public class OrExpression implements Serializable {
 	private static final long serialVersionUID = 8986714670332919378L;
+	/** The expression terms.
+	 */
 	private final List<AndExpression> items;
 
     /**

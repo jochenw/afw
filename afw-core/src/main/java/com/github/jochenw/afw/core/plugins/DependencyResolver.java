@@ -100,7 +100,11 @@ public class DependencyResolver {
 	 */
 	public static class DuplicateNodeIdException extends RuntimeException {
 		private static final long serialVersionUID = -7512617047451839575L;
+		/** The duplicate node id.
+		 */
 		private final String id;
+		/** The nodes, that are sharing the same id.
+		 */
 		private final Node<?> node0, node1;
 
 		/**
@@ -142,7 +146,11 @@ public class DependencyResolver {
 	 */
 	public static class UnknownNodeIdException extends RuntimeException {
 		private static final long serialVersionUID = -5541605129065404997L;
+		/** The unknown node's id
+		 */
 		private final String id;
+		/** The node with the invalid reference.
+		 */
 		private final Node<?> node;
 
 		/** Creates a new instance.
@@ -174,6 +182,8 @@ public class DependencyResolver {
 	 */
 	public static class CircularDependencyException extends RuntimeException {
 		private static final long serialVersionUID = 1154298234609885033L;
+		/** The id's, that make up the circle.
+		 */
 		private final List<String> ids;
 
 		/**

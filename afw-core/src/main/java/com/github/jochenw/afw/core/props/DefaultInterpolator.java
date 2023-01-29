@@ -164,6 +164,10 @@ public class DefaultInterpolator implements Interpolator {
 		}
 	}
 
+	/** Returns the configured value for the variable {@code pKey}.
+	 * @param pKey The requested variable name.
+	 * @return The requested variables value, possibly null.
+	 */
 	protected String getPropertyValue(String pKey) {
 		return propertyProvider.apply(pKey);
 	}

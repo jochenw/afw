@@ -23,7 +23,11 @@ import java.io.Serializable;
  */
 public class ElExpression implements Serializable {
 	private static final long serialVersionUID = 8384812496202649423L;
+	/** The single {@link OrExpression}.
+	 */
 	private final OrExpression orExpression;
+	/** The number of placeholders.
+	 */
 	private final int numPlaceholders;
 
 	/**

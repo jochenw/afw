@@ -73,5 +73,10 @@ public abstract class AbstractProperty<O> implements IProperty<O>, IPropertyFact
         }
     }
 
+    /** Called internally to convert the properties string value into the actual type.
+     * @param pStrValue The string value, that is being converted.
+     * @return The converted value, if conversion has been done successfully.
+     *   Otherwise the default value.
+     */
     protected abstract O convert(String pStrValue);
 }

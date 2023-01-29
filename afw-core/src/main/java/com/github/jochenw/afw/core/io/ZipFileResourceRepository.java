@@ -93,6 +93,10 @@ public class ZipFileResourceRepository implements IResourceRepository {
 		}
 	}
 
+	/** Creates a string representation of the given resource name.
+	 * @param pName The current resources name.
+	 * @return The created string representation.
+	 */
 	protected String asUri(String pName) {
 		final String uri = pName.replace('\\', '/');
 		if (uri.startsWith("./")) {
@@ -104,6 +108,10 @@ public class ZipFileResourceRepository implements IResourceRepository {
 		}
 	}
 
+	/** Creates a string representation of the given resource within the zip file.
+	 * @param pName The current resources name.
+ 	 * @return The created string representation.
+	 */
 	protected String asNamespace(String pName) {
 		final String name = asUri(pName);
 		final int offset = name.lastIndexOf('/');

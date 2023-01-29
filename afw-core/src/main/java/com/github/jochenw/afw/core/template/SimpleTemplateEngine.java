@@ -182,6 +182,10 @@ public class SimpleTemplateEngine implements ITemplateEngine<Map<String,Object>>
 		return compile(lines);
 	}
 
+	/** Called to compile the given template lines.
+	 * @param pLines The template lines, that are being compiled.
+	 * @return The created template.
+	 */
 	protected Template<Map<String,Object>> compile(List<String> pLines) {
 		final String[] array = pLines.toArray(new String[pLines.size()]);
 		return new SimpleTemplateCompiler<Map<String,Object>>(propertyResolver, elReader, elEvalutor, uri).compile(array);

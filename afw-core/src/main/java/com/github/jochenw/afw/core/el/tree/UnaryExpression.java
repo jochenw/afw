@@ -37,8 +37,12 @@ public class UnaryExpression implements Serializable {
 		 */
 		EMPTY
 	}
-	
+
+	/** The expressions value.
+	 */
     private final ValueExpression value;
+    /** The expressions operator.
+     */
     private final Op op;
 
     /**

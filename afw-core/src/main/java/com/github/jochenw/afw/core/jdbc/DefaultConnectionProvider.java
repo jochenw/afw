@@ -69,6 +69,12 @@ public class DefaultConnectionProvider implements ConnectionProvider {
 		return getProperty("dialect");
 	}
 
+	/** Returns a configured, non-empty property value.
+	 * @param pProperty The requested properties key.
+	 * @return The configured property value.
+	 * @throws NullPointerException No property value has been configured.
+	 * @throws IllegalArgumentException The configured property value is empty.
+	 */
 	protected String getProperty(String pProperty) {
 		final String prop = getPrefix() + "." + pProperty;
 		final String value = propertyFactory.getPropertyValue(prop);

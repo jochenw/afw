@@ -24,12 +24,26 @@ import java.io.Serializable;
  */
 public class ValueExpression implements Serializable {
 	private static final long serialVersionUID = 7032680077947015321L;
+	/** The value expression, or null.
+	 */
 	private final ElExpression elExpression;
+	/** The boolean value, or null.
+	 */
 	private final Boolean booleanValue;
+	/** The long value, or null.
+	 */
 	private final Long longValue;
+	/** The double value, or null.
+	 */
 	private final Double doubleValue;
+	/** The string value, or null.
+	 */
 	private final String stringValue;
+	/** The variable reference, or null.
+	 */
 	private final VariableReferenceExpression variableReference;
+	/** The placeholder index, or null.
+	 */
 	private final Integer placeholderIndex;
 
 	/**

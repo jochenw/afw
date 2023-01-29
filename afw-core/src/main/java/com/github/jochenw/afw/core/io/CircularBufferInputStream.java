@@ -24,9 +24,17 @@ import java.util.Objects;
  * data, that allows peeking into the buffer.
  */
 public class CircularBufferInputStream extends InputStream {
+	/** The actual {@link InputStream}, which is being buffered by this {@link InputStream}.
+	 */
 	protected final InputStream in;
+	/** The buffer, which is used to enable peeking.
+	 */
 	protected final CircularByteBuffer buffer;
+	/** The buffers size.
+	 */
 	protected final int bufferSize;
+	/** Whether the {@link #in actual InputStream has already reported EOF.
+	 */
 	private boolean eofSeen;
 
 	/**
@@ -58,6 +66,9 @@ public class CircularBufferInputStream extends InputStream {
 		this(pIn, 8192);
 	}
 
+	/** Called to fill the buffer by reading from the actual {@link InputStream}.
+	 * @throws IOException Filling the buffer failed.
+	 */
 	protected void fillBuffer() throws IOException {
 		if (eofSeen) {
 			return;
@@ -76,6 +87,13 @@ public class CircularBufferInputStream extends InputStream {
 		}
 	}
 
+	/** Returns, whether the buffer currently contains the given number of bytes.
+	 * If that is not the case, an attempt will be made to fill the buffer.
+	 * @param pNumber The requested number of bytes.
+	 * @return True, if the requested number of bytes is available in the buffer.
+	 *   Otherwise false.
+	 * @throws IOException Filling the buffer has failed.
+	 */
 	protected boolean haveBytes(int pNumber) throws IOException {
 		if (buffer.getCurrentNumberOfBytes() < pNumber) {
 			fillBuffer();

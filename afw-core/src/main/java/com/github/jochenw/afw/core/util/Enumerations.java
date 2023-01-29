@@ -32,6 +32,7 @@ public class Enumerations {
 	 *   false, after executing this method.
 	 *   If that is a problem, use {@link #asIterator(Enumeration)},
 	 *   or {@link #asIterable(Enumeration)}.
+	 * @param <O> The enumerations element type.
 	 * @return A list with the same elements.
 	 */
 	public static <O> List<O> asList(Enumeration<O> pEnum) {
@@ -48,6 +49,7 @@ public class Enumerations {
 	 *   <em>Note:</em> The enumeration is <em>not</em> consumed
 	 *   by this method. However, using the iterator will affect
 	 *   the state of the enumeration.
+	 * @param <O> The enumerations element type.
 	 * @return An iterator over the same elements.
 	 */
 	public static <O> Iterator<O> asIterator(Enumeration<O> pEnum) {
@@ -72,6 +74,7 @@ public class Enumerations {
 	 *   by this method. However, using the iterable, or the
 	 *   iterator, that it creates, will affect the state of
 	 *   the enumeration.
+	 * @param <O> The enumerations element type.
 	 * @return An iterable over the same elements.
 	 */
 	public static <O> Iterable<O> asIterable(Enumeration<O> pEnum) {

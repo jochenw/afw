@@ -46,7 +46,11 @@ public class RelationalExpression implements Serializable {
     }
     
 
+    /** The left hand term, and the right hand term.
+     */
     private final AddExpression left, right;
+    /** The comparison operator.
+     */
     private final Op op;
 
     /**

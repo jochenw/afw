@@ -61,16 +61,32 @@ public class Sax {
 			}
 		}
 
+		/**
+		 * Indicates, that a text element begins.
+		 * @param pConsumer A consumer, that will be invoked with the elements content,
+		 *     when the text element ends.
+		 */
 		protected void startTextElement(FailableConsumer<String,SAXException> pConsumer) {
 			startTextElement(level, pConsumer);
 		}
 
+		/**
+		 * Indicates, that a text element begins.
+		 * @param pLevel The text elements end level.
+		 * @param pConsumer A consumer, that will be invoked with the elements content,
+		 *     when the given element level is reached.
+		 */
 		protected void startTextElement(int pLevel, FailableConsumer<String,SAXException> pConsumer) {
 			sb = new StringBuilder();
 			textElementConsumer = pConsumer;
 			textElementLevel = pLevel;
 		}
-		
+
+		/** Increments the current element level by 1.
+		 * @return The new (incremented) element level.
+		 * @throws SAXException An attempt was made, to increment the element level
+		 * within a text element.
+		 */
 		protected int incLevel() throws SAXException {
 			if (sb != null) {
 				throw error("Unexpected element within text.");
@@ -78,6 +94,12 @@ public class Sax {
 			return ++level;
 		}
 
+		/** Decrements the current element level by 1.
+		 * Invokes the text element consumer, if the requested element level is reached.
+		 * @return The element level, before decrement. (The
+		 *   previous element level.)
+		 * @throws SAXException The text element consumer reported an error.
+		 */
 		protected int decLevel() throws SAXException {
 			final int l = level--;
 			if (sb != null  &&  l == textElementLevel) {
@@ -89,6 +111,9 @@ public class Sax {
 			return l;
 		}
 
+		/** Returns the current element level.
+		 * @return The current element level.
+		 */
 		protected int getLevel() {
 			return level;
 		}
@@ -98,18 +123,32 @@ public class Sax {
 			locator = pLocator;
 		}
 
+		/** Called to report an error with the given message, and the current location.
+		 * @param pMsg The error message.
+		 * @return The created exception, ready for throwing.
+		 * @see #error(String, Locator)
+		 */
 		protected SAXParseException error(String pMsg) {
 			return error(pMsg, getDocumentLocator());
 		}
 
+		/** Called to report an error with the given message, and the given location.
+		 * @param pMsg The error message.
+		 * @param pLocator The errors location.
+		 * @return The created exception, ready for throwing.
+		 * @see #error(String)
+		 */
 		protected SAXParseException error(String pMsg, Locator pLocator) {
 			return new SAXParseException(pMsg, pLocator);
 		}
 
-		protected SAXParseException error(String pMsg, Exception pCause) {
-			return new SAXParseException(pMsg, getDocumentLocator(), pCause);
-		}
-
+		/** Called to report an error with the given message, the given
+		 * cause, and the current location.
+		 * @param pMsg The error message.
+		 * @param pCause The errors cause.
+		 * @return The created exception, ready for throwing.
+		 * @see #error(String, Locator)
+		 */
 		protected SAXParseException error(String pMsg, Throwable pCause) {
 			final SAXParseException spe = new SAXParseException(pMsg, getDocumentLocator());
 			spe.initCause(pCause);
@@ -156,6 +195,12 @@ public class Sax {
 			}
 		}
 
+		/** Creates a string representation of the given qualified name.
+		 * @param pUri The qualified name's namespace URI.
+		 * @param pLocalName The qualified name's local part.
+		 * @return The created string representation. Either just the local part
+		 * (if the namespace URI is trivial), or "{uri}localPart".
+		 */
 		protected String asQName(String pUri, String pLocalName) {
 			if (pUri == null  ||  pUri.length() == 0) {
 				return pLocalName;

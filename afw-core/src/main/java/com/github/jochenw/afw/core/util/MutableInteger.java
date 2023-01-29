@@ -19,8 +19,9 @@ package com.github.jochenw.afw.core.util;
  */
 public class MutableInteger extends Number implements Comparable<MutableInteger> {
 	private static final long serialVersionUID = 5486916587259114022L;
+	/** The current value.
+	 */
 	private int value;
-
 
 	/**
 	 * Returns the primitive number.

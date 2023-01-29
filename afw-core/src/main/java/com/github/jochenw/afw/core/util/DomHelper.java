@@ -35,7 +35,11 @@ public class DomHelper {
 	 */
 	public static class LocalizableException extends RuntimeException {
 		private static final long serialVersionUID = 618692900801230917L;
+		/** The errors system id, and public id.
+		 */
 		private final String systemId, publicId;
+		/** The errors line number, and column number.
+		 */
 		private final int lineNumber, columnNumber;
 
 		/** Creates a new instance with the given error location, the given message, and no cause.

@@ -40,6 +40,8 @@ public class AddExpression implements Serializable {
         MINUS
     }
 
+    /** The expressions atoms.
+     */
     private final List<Serializable> objects;
 
     /**

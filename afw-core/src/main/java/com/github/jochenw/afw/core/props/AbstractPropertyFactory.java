@@ -27,10 +27,15 @@ import java.util.Map;
 public abstract class AbstractPropertyFactory implements IPropertyFactory {
     private final List<IPropertyFactory.ChangeListener> listeners = new ArrayList<>();
 
-    protected synchronized void notifyListeners(Map<String,String> oldProperties) {
+    /** Called to notify the listeners, that an updated property set is available.
+     * @param pOldProperties The old property set. A property is changed, if its
+     *    value in this property set differs from the value in the current
+     *    (updated) property set.
+     */
+    protected synchronized void notifyListeners(Map<String,String> pOldProperties) {
         final Map<String,String> newProperties = getPropertyMap();
         listeners.stream().forEach((listener) -> {
-            listener.valueChanged(this, oldProperties, newProperties);
+            listener.valueChanged(this, pOldProperties, newProperties);
         });
     }
     @Override

@@ -38,11 +38,15 @@ import java.util.Map;
  * up to four hexadecimal character).
  */
 public class AnnotationScanner {
-	/** Implementation of an anntotation, that has been detected by the scanner.
+	/** Implementation of an annotation, that has been detected by the scanner.
 	 */
 	public static class Annotation implements Serializable {
 		private static final long serialVersionUID = 2761700259919020204L;
+		/** The annotations name.
+		 */
 		private final String name;
+		/** The annotations attributes.
+		 */
 		private final Map<String,String> attributes;
 
 		/** Creates a new instance, with the given name, and the given attributes.

@@ -19,6 +19,8 @@ package com.github.jochenw.afw.core.util;
  */
 public class MutableLong extends Number implements Comparable<MutableLong> {
 	private static final long serialVersionUID = 3459405672114578607L;
+	/** The current value.
+	 */
 	private long value;
 
 	/**

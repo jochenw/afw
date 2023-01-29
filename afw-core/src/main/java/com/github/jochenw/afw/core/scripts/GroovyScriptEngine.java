@@ -40,6 +40,11 @@ public class GroovyScriptEngine implements IScriptEngine {
 			gScript = pScript;
 		}
 
+		/** Converts the given map of parameters into a parameter map.
+		 * (Nothing much to do here, mostly null handling.
+		 * @param pParameters The map of parameters.
+		 * @return The created parameter map.
+		 */
 		protected @Nonnull Map<String,Object> asParameters(Map<String,Object> pParameters) {
 			if (pParameters == null) {
 				return Collections.emptyMap();
@@ -56,6 +61,9 @@ public class GroovyScriptEngine implements IScriptEngine {
 			return o;
 		}
 
+		/** Called for actual execution of the Groovy acript.
+		 * @return The script evaluations result.
+		 */
 		protected Object run() {
 			try {
 				return gScript.run();

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jochenw.afw.core.csv;
-
 /**
  * This package provides utility classes for working with CSV files.
- * To read a CSV file, create a {@link CsvRow Consumer<CsvRow>}, and
+ * To read a CSV file, create a {@link java.util.function.Consumer Consumer&lt;CsvReader.CsvRow&gt;}, and
  * use the {@link CsvReader}.
  * On the other hand, to write a CSV file, use the {@link CsvWriter}.
  */
+package com.github.jochenw.afw.core.csv;
+

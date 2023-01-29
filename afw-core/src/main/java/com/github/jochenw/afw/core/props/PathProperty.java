@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
+/** Implementation of {@link IPathProperty}.
+ */
 public class PathProperty extends AbstractProperty<Path> implements IPathProperty {
 	PathProperty(String pKey, Path pDefaultValue) {
 		super(pKey, pDefaultValue);

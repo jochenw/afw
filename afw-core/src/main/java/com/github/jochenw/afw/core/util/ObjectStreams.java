@@ -98,6 +98,8 @@ public class ObjectStreams {
 			});
 		}
 
+		/** Marks the stream as terminated.
+		 */
 		protected void makeTerminated() {
 			if (terminated) {
 				throw new IllegalStateException("This stream is already terminated.");

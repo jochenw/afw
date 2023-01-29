@@ -28,6 +28,10 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	 */
 	public static final String CMD_EXE = "cmd.exe";
 
+	/** Executes a {@link #CMD_EXE "cmd /c"} invocation with the given arguments.
+	 * @param pCommand The command line, that is being executed.
+	 * @param pDir The directory, where to execute the command.
+	 */
 	protected void run(Path pDir, String[] pCommand) {
 		final ExecutorBuilder eb = Executor.builder();
 		if (pDir != null) {

@@ -50,12 +50,21 @@ public class ReaderInputStream extends InputStream {
 		charset = Objects.requireNonNull(pCharset, "Charset");
 	}
 
+	/** Asserts, that the stream hasn't been closed, so far.
+	 * @throws The stream has already been closed.
+	 */
 	protected void assertNotClosed() throws IOException {
 		if (closedReported) {
 			throw new IOException("This stream is already closed.");
 		}
 	}
 
+	/** Called to ensure, that the internal buffer contains at least
+	 * the given number of bytes.
+	 * @param pLength The requested number of bytes.
+	 * @return The available number of bytes.
+	 * @throws IOException Filling the buffer has failed.
+	 */
 	protected int fillBuffer(int pLength) throws IOException {
 		int num = 0;
 		for (ByteBuffer bb : buffers) {

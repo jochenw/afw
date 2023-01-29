@@ -43,6 +43,9 @@ public class Log4j2LogFactory extends AbstractLogFactory {
         return new Log4j2Log(this, pId);
     }
 
+	/** Returns the configuration URL.
+	 * @return The config file's URL.
+	 */
 	protected URL getUrl() {
 		return getResourceLocator().getResource("log4j2.xml");
 	}
@@ -57,6 +60,11 @@ public class Log4j2LogFactory extends AbstractLogFactory {
 		}
 	}
 
+	/** Called to perform configuration by reading a file from
+	 * the given input stream.
+	 * @param pIn The file to read.
+	 * @param pUri The file's URI, for use in error messages.
+	 */
 	protected void configure(InputStream pIn, String pUri) {
 		try {
 			final ConfigurationSource csource = new ConfigurationSource(pIn);

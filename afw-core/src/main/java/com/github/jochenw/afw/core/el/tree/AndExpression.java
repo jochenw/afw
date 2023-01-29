@@ -25,6 +25,8 @@ import java.util.List;
  */
 public class AndExpression implements Serializable {
 	private static final long serialVersionUID = 4979351601788101217L;
+    /** The expressions atoms.
+     */
 	private final List<EqualityExpression> items;
 
     /**

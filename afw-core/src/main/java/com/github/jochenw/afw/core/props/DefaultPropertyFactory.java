@@ -113,6 +113,10 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
         myProperties = props;
     }
 
+    /** Loads a property set from the given URL.
+     * @param pUrl The URL, which is being read.
+     * @return The requested property set, and the time/date of its last modification.
+     */
     protected DatedProperties loadProperties(URL pUrl) {
     	if (pUrl == null) {
     		return null;

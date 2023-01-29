@@ -29,6 +29,9 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 	public abstract static class Block<T> {
 		private final List<Consumer<Context<T>>> list = new ArrayList<>();
 		private final int lineNumber;
+		/** Creates a new block, that begins at the given line.
+		 * @param pLineNumber The blocks start line.
+		 */
 		protected Block(int pLineNumber) {
 			lineNumber = pLineNumber;
 		}
@@ -348,6 +351,11 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 		return result;
 	}
 
+	/** Called to evaluate an EL expression, applying the given model.
+	 * @param pExpression The EL expression, that is being evaluated.
+	 * @param pModel The model, that is being applied.
+	 * @return The evaluated result.
+	 */
 	protected boolean evaluate (ElExpression pExpression, M pModel) {
 		final Object o = elEvalutor.evaluate(pExpression, pModel);
 		if (o == null) {
@@ -364,6 +372,10 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 					                        + o.getClass().getName());
 		}
 	}
+
+	/** Called to compile the given template line.
+	 * @param pLine The line, that is being compiled.
+	 */
 	protected void compile(String pLine) {
 		String value = pLine;
 		for(;;) {

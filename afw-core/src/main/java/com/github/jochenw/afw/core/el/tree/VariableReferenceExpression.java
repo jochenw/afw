@@ -22,6 +22,8 @@ import java.io.Serializable;
  */
 public class VariableReferenceExpression implements Serializable {
 	private static final long serialVersionUID = 6604745293504046349L;
+	/** The referenced variable.
+	 */
 	private final String var;
 
 	/**

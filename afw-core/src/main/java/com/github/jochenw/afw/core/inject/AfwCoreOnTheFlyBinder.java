@@ -20,8 +20,12 @@ import com.github.jochenw.afw.core.util.Strings;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.impl.DefaultOnTheFlyBinder;
 
+/** Default implementation of {@link DefaultOnTheFlyBinder} for
+ * {@code AFW Core}, extending the latter with support for
+ * instances of {@link com.github.jochenw.afw.core.log.ILog},
+ * and {@link com.github.jochenw.afw.core.props.IProperty}.
+ */
 public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
-
 	@Override
 	protected Object getLogger(IComponentFactory pFactory, Class<?> pType, String pId) {
 		if (pType == ILog.class) {
@@ -155,6 +159,12 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 		}
 	}
 
+	/** Converts the given string value into the actual integer value.
+	 * @param pValue The actual property value, possibly null, or empty.
+	 * @param pDefaultValue The default property value, which is being applied,
+	 *   if the actual property value is null, or empty.
+	 * @return The converted property value.
+	 */
 	protected Integer asInt(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			try {
@@ -173,6 +183,12 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 		return null;
 	}
 
+	/** Converts the given string value into the actual long value.
+	 * @param pValue The actual property value, possibly null, or empty.
+	 * @param pDefaultValue The default property value, which is being applied,
+	 *   if the actual property value is null, or empty.
+	 * @return The converted property value.
+	 */
 	protected Long asLong(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			try {
@@ -191,6 +207,12 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 		return null;
 	}
 
+	/** Converts the given string value into the actual short value.
+	 * @param pValue The actual property value, possibly null, or empty.
+	 * @param pDefaultValue The default property value, which is being applied,
+	 *   if the actual property value is null, or empty.
+	 * @return The converted property value.
+	 */
 	protected Short asShort(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			try {
@@ -209,6 +231,12 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 		return null;
 	}
 
+	/** Converts the given string value into the actual URL value.
+	 * @param pValue The actual property value, possibly null, or empty.
+	 * @param pDefaultValue The default property value, which is being applied,
+	 *   if the actual property value is null, or empty.
+	 * @return The converted property value.
+	 */
 	protected URL asUrl(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			try {
@@ -227,6 +255,12 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 		return null;
 	}
 
+	/** Converts the given string value into the actual path value.
+	 * @param pValue The actual property value, possibly null, or empty.
+	 * @param pDefaultValue The default property value, which is being applied,
+	 *   if the actual property value is null, or empty.
+	 * @return The converted property value.
+	 */
 	protected Path asPath(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			return Paths.get(pValue);
@@ -237,6 +271,12 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 		return null;
 	}
 
+	/** Converts the given string value into the actual file value.
+	 * @param pValue The actual property value, possibly null, or empty.
+	 * @param pDefaultValue The default property value, which is being applied,
+	 *   if the actual property value is null, or empty.
+	 * @return The converted property value.
+	 */
 	protected File asFile(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			return new File(pValue);
@@ -247,6 +287,12 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 		return null;
 	}
 
+	/** Converts the given string value into the actual boolean value.
+	 * @param pValue The actual property value, possibly null, or empty.
+	 * @param pDefaultValue The default property value, which is being applied,
+	 *   if the actual property value is null, or empty.
+	 * @return The converted property value.
+	 */
 	protected Boolean asBoolean(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			return Boolean.valueOf(pValue);

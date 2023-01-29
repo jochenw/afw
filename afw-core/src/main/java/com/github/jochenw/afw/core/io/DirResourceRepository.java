@@ -201,6 +201,11 @@ public class DirResourceRepository implements IResourceRepository {
 		return pResource instanceof ImmutablePathResource  ||  pResource instanceof MutablePathResource;
 	}
 
+	/** Called to log a message by invoking the configured
+	 * {@link #logger}. If the configured logger is null:
+	 * Does nothing.
+	 * @param pMsg The log message, which is being reported.
+	 */
 	protected void log(String pMsg) {
 		if (logger != null) {
 			logger.accept(pMsg);

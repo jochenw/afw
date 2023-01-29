@@ -41,7 +41,11 @@ public class MultiplyExpression implements Serializable {
         MODULUS
     }
 
+    /** The left hand term, and the right hand term.
+     */
     private final UnaryExpression left, right;
+    /** The operator.
+     */
     private final Op op;
 
     /** Creates a new instance with the given left hand side, the given operator, and

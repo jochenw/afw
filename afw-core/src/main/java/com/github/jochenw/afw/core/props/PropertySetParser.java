@@ -133,13 +133,27 @@ public class PropertySetParser {
 		pReadable.apply(function, charset);
 	}
 
+	/** Returns, whether the given line is being continued. (Ends with
+	 * a backslash character.)
+	 * @param pLine The line, which is being checked.
+	 * @return True, if the line contains a comment.
+	 */
 	protected boolean isLineContinued(String pLine) {
 		return pLine.endsWith("\\");
 	}
+	/** Returns, whether the given line contains a comment. (Begins with
+	 * a '#', or '!' character.)
+	 * @param pLine The line, which is being checked.
+	 * @return True, if the line contains a comment.
+	 */
 	protected boolean isCommentLine(String pLine) {
 		return pLine.startsWith("!")  ||  pLine.startsWith("#");  
 	}
 
+	/** Removes leading whitespace from the given value.
+	 * @param pValue The value, possibly with leading whitespace characters.
+	 * @return The value, without leading whitespace characters.
+	 */
 	protected String removeLeadingWhitespace(String pValue) {
 		int lastWhitespaceOffset = -1;
 		for (int i = 0;  i < pValue.length();  i++) {
@@ -171,6 +185,11 @@ public class PropertySetParser {
 		return dps;
 	}
 
+	/** Decodes a line from the property file, applying escape character, etc.
+	 * @param pLine The line, which is being decoded.
+	 * @param pErrorHandler The handler, which is being invoked in case of errors.
+	 * @return The decoded line.
+	 */
 	protected String decode(CharSequence pLine, Function<String,RuntimeException> pErrorHandler) {
 		final StringBuilder sb = new StringBuilder();
 		for (int i = 0;  i < pLine.length();  i++) {
