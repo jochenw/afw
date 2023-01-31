@@ -40,6 +40,9 @@ public class Application {
 		return componentFactory;
 	}
 
+	protected IOnTheFlyBinder getOnTheFlyBinder() {
+		return null;
+	}
 	protected IComponentFactory newComponentFactory() {
 		if (componentFactoryProvider == null) {
 			final Module mInner = Objects.requireNonNull(moduleSupplier.get(),
@@ -54,7 +57,12 @@ public class Application {
 					cf.requireInstance(ILifecycleController.class).start();
 				});
 			};
-			return new ComponentFactoryBuilder().module(mOuter).build();
+			final ComponentFactoryBuilder componentFactoryBuilder = new ComponentFactoryBuilder();
+			IOnTheFlyBinder iotfb = getOnTheFlyBinder();
+			if (iotfb != null) {
+				componentFactoryBuilder.onTheFlyBinder(iotfb);
+			}
+			return componentFactoryBuilder.module(mOuter).build();
 		} else {
 			return componentFactoryProvider.get();
 		}

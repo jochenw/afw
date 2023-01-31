@@ -175,12 +175,12 @@ public class CliTest {
 		final OptionsBean ob1 = cli.parse(args1);
 		assertNotNull(ob1);
 		assertEquals("pom.xml", ob1.inputFile.toString());
-		assertEquals("/var/lib/of.log", ob1.outputFile.toString());
+		assertEquals("/var/lib/of.log", ob1.outputFile.toString().replace('\\', '/'));
 		final String[] args2 = new String[] {"-if", "pom.xml", "-of", "/var/lib/of.log"};
 		final OptionsBean ob2 = cli.parse(args2);
 		assertNotNull(ob2);
 		assertEquals("pom.xml", ob2.inputFile.toString());
-		assertEquals("/var/lib/of.log", ob2.outputFile.toString());
+		assertEquals("/var/lib/of.log", ob2.outputFile.toString().replace('\\', '/'));
 		
 	}
 }
