@@ -66,6 +66,8 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 
 	protected boolean isAnnotationInjectable(Method pMethod, Annotation pAnnotation, Annotation[] pAnnotations) {
 		return pAnnotation instanceof PostConstruct  ||  pAnnotation instanceof PreDestroy
+				||  pAnnotation instanceof jakarta.annotation.PostConstruct
+				||  pAnnotation instanceof jakarta.annotation.PreDestroy
 				||  pAnnotation instanceof LogInject  ||  pAnnotation instanceof PropInject;
 	}
 
@@ -182,9 +184,13 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 				invoker.accept(inst);
 			};
 		} else {
-			final PostConstruct postConstruct = pMethod.getAnnotation(PostConstruct.class);
-			final PreDestroy preDestroy = pMethod.getAnnotation(PreDestroy.class);
-			if (postConstruct == null  &&  preDestroy == null) {
+			final boolean postConstructPresent =
+					pMethod.getAnnotation(PostConstruct.class) != null
+					||  pMethod.getAnnotation(jakarta.annotation.PostConstruct.class) != null;
+			final boolean preDestroyPresent =
+					pMethod.getAnnotation(PreDestroy.class) != null
+					||  pMethod.getAnnotation(jakarta.annotation.PreDestroy.class) != null;
+			if (!postConstructPresent  &&  !preDestroyPresent) {
 				throw new IllegalStateException("Invalid method: " + pMethod
 						+ ", it isn't annotated with @PostConstruct, or @PreDestroy.");
 			} else {
@@ -195,19 +201,19 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 								+ " but takes parameters.");
 					}
 				}
-				final Consumer<Object> starter = postConstruct == null ? null : Reflection.newInvoker(pMethod);
-				final Consumer<Object> stopper = preDestroy == null ? null : Reflection.newInvoker(pMethod);
+				final Consumer<Object> starter = postConstructPresent ? Reflection.newInvoker(pMethod) : null;
+				final Consumer<Object> stopper = preDestroyPresent ? Reflection.newInvoker(pMethod) : null;
 				return (cf,inst) -> {
 					final ILifecycleController lc = cf.getInstance(ILifecycleController.class);
 					if (lc == null) {
-						if (postConstruct == null) {
+						if (postConstructPresent) {
 							throw new IllegalStateException("The method " + pMethod
-									+ " is annotated with @PreDestroy, but no component of type "
+									+ " is annotated with @PostConstruct, but no component of type "
 									+ ILifecycleController.class.getName()
 									+ " has been configured in the IComponentFactory.");
 						} else {
 							throw new IllegalStateException("The method " + pMethod
-									+ " is annotated with @PostConstruct, but no component of type "
+									+ " is annotated with @PreDestroy, but no component of type "
 									+ ILifecycleController.class.getName()
 									+ " has been configured in the IComponentFactory.");
 						}
