@@ -174,6 +174,10 @@ public class Rest {
 		 * {@link #getBody() body producer}, the {@code pCallable result producer},
 		 * the {@link #getConsumer() response consumer},
 		 * and the {@link #getErrorConsumer() error response consumer}, as necessary.
+		 * <em>Note:</em> 
+		 * @param <O> Type of the result object, that is being produced by the
+		 *   {@code pCallable result producer}, and returned by this method.
+		 * @param pCallable The result producer.
 		 */
 		public <O> O call(FailableFunction<InputStream,O,?> pCallable) {
 			return Rest.this.call(this, pCallable);
