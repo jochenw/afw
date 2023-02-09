@@ -6,8 +6,6 @@ import java.lang.reflect.Constructor;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import javax.inject.Provider;
-
 import com.github.jochenw.afw.di.impl.DefaultLifecycleController;
 import com.github.jochenw.afw.di.util.Exceptions;
 
@@ -16,8 +14,11 @@ import com.github.jochenw.afw.di.util.Exceptions;
  * <em>Note:</em> This class is supposed to be thread safe.
  */
 public class Application {
+	/** Interface of an object, that provides the applications component factory.
+	 */
+	public interface ComponentFactorySupplier extends Supplier<IComponentFactory> {}
 	private final Supplier<Module> moduleSupplier;
-	private final Provider<IComponentFactory> componentFactoryProvider;
+	private final Supplier<IComponentFactory> componentFactoryProvider;
 	private IComponentFactory componentFactory;
 
 	protected Application(Supplier<Module> pModuleSupplier) {
@@ -25,8 +26,8 @@ public class Application {
 		componentFactoryProvider = null;
 	}
 
-	protected Application(Provider<IComponentFactory> pComponentFctoryProvider) {
-		componentFactoryProvider = Objects.requireNonNull(pComponentFctoryProvider, "Provider");
+	protected Application(ComponentFactorySupplier pComponentFactoryProvider) {
+		componentFactoryProvider = Objects.requireNonNull(pComponentFactoryProvider, "Provider");
 		moduleSupplier = null;
 	}
 
@@ -74,7 +75,7 @@ public class Application {
 	 * @return The created instance.
 	 */
 	public static Application of(IComponentFactory pComponentFactory) {
-		final Provider<IComponentFactory> provider = () -> pComponentFactory;
+		final ComponentFactorySupplier provider = () -> pComponentFactory;
 		return of(provider);
 	}
 
@@ -84,8 +85,8 @@ public class Application {
 	 *   that the created application should use.
 	 * @return The created instance.
 	 */
-	public static Application of(Provider<IComponentFactory> pComponentFactoryProvider) {
-		final Provider<IComponentFactory> provider = Objects.requireNonNull(pComponentFactoryProvider, "Provider");
+	public static Application of(ComponentFactorySupplier pComponentFactoryProvider) {
+		final ComponentFactorySupplier provider = Objects.requireNonNull(pComponentFactoryProvider, "Provider");
 		return new Application(provider);
 	}
 
@@ -97,11 +98,11 @@ public class Application {
 	 * @param <App> Type of the created instance, a subclass of {@link Application}.
 	 * @return The created instance.
 	 */
-	public static <App extends Application> App of(Class<App> pType, Provider<IComponentFactory> pComponentFactoryProvider) {
-		final Provider<IComponentFactory> provider = Objects.requireNonNull(pComponentFactoryProvider, "Provider");
+	public static <App extends Application> App of(Class<App> pType, ComponentFactorySupplier pComponentFactoryProvider) {
+		final ComponentFactorySupplier provider = Objects.requireNonNull(pComponentFactoryProvider, "Provider");
 		final MethodHandles.Lookup lookup = MethodHandles.lookup();
 		try {
-			final Constructor<App> constructor = (Constructor<App>) pType.getDeclaredConstructor(Provider.class);
+			final Constructor<App> constructor = (Constructor<App>) pType.getDeclaredConstructor(ComponentFactorySupplier.class);
 			final MethodHandle mh = lookup.unreflectConstructor(constructor);
 			return (App) mh.invoke(provider);
 		} catch (Throwable t) {

@@ -22,8 +22,6 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import javax.inject.Named;
-
 import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
 
 
@@ -158,13 +156,13 @@ public class Key<O extends Object> {
 		}
 		final Annotation anno = getAnnotation();
 		if (anno != null) {
-			if (anno instanceof Named) {
-				final Named named = (Named) anno;
-				sb.append(", name=");
-				sb.append(named.value());
-			} else {
+			final String namedValue = Annotations.getNamedValue(anno);
+			if (namedValue == null) {
 				sb.append(", annotation=");
 				sb.append(anno);
+			} else {
+				sb.append(", name=");
+				sb.append(namedValue);
 			}
 		}
 		final Class<? extends Annotation> annoClass = getAnnotationClass();
@@ -198,16 +196,6 @@ public class Key<O extends Object> {
 	 */
 	public static <O> Key<O> of(Type pType, Annotation pAnnotation) {
 		return new Key<O>(pType, pAnnotation);
-	}
-
-	/** Creates a new instance with the given type, a {@link Named}
-	 * annotation with the value {@code pName}, and no annotation class.
-	 * @param pType The type, to which the keys binding is applicable.
-	 * @param pName Value of the bindings {@link Named} annotation.
-	 * @return The created instance.
-	 */
-	public static <O> Key<O> of(Type pType, String pName) {
-		return new Key<O>(pType, Names.named(pName));
 	}
 
 	/** Creates a new instance with the given type, no annotation,

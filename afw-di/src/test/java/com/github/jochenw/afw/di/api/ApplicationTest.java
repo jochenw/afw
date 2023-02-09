@@ -11,6 +11,8 @@ import javax.inject.Provider;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.di.api.Application.ComponentFactorySupplier;
+
 /** Test for the {@link Application} class.
  */
 public class ApplicationTest {
@@ -30,7 +32,7 @@ public class ApplicationTest {
 		/** Creates a new instance with the given component factory.
 		 * @param pComponentFactoryProvider The component factory provider.
 		 */
-		public MyApplication(Provider<IComponentFactory> pComponentFactoryProvider) {
+		public MyApplication(ComponentFactorySupplier pComponentFactoryProvider) {
 			super(pComponentFactoryProvider);
 		}
 	}
@@ -44,7 +46,7 @@ public class ApplicationTest {
 			throw new IllegalStateException("Not implemented");
 		}
 
-		protected InvalidApplicationClass(Provider<IComponentFactory> pComponentFctoryProvider) {
+		protected InvalidApplicationClass(ComponentFactorySupplier pComponentFctoryProvider) {
 			super(pComponentFctoryProvider);
 			throw new IllegalStateException("Not implemented");
 		}
@@ -84,7 +86,7 @@ public class ApplicationTest {
 		final Module module = (b) -> {
 			b.bind(Map.class).toClass(HashMap.class);
 		};
-		final Provider<IComponentFactory> provider = () -> {
+		final ComponentFactorySupplier provider = () -> {
 			return new ComponentFactoryBuilder().module(module).build();
 		};
 		final Application appl = Application.of(provider);
@@ -133,7 +135,7 @@ public class ApplicationTest {
 		final Module module = (b) -> {
 			b.bind(Map.class).toClass(HashMap.class);
 		};
-		final Provider<IComponentFactory> provider = () -> {
+		final ComponentFactorySupplier provider = () -> {
 			return new ComponentFactoryBuilder().module(module).build();
 		};
 		final MyApplication appl = Application.of(MyApplication.class, provider);

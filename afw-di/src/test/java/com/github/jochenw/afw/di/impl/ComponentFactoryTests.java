@@ -54,7 +54,7 @@ public class ComponentFactoryTests {
 	 * with various fields properly filled.
 	 */
 	@SuppressWarnings("rawtypes")
-	public static class CreateMapsObject {
+	public static class CreateJavaxMapsObject {
 		private @Inject @Named(value="hash") Map hashMap1;
 		private @Inject @Named(value="hash") Map hashMap2;
 		private @Inject @Named(value="linked") Map linkedMap1;
@@ -66,21 +66,22 @@ public class ComponentFactoryTests {
 	}
 
 	/** A test method, which tests proper instantiation, and injection of a
-	 * {@link CreateMapsObject}.
+	 * {@link CreateJavaxMapsObject}.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
 	@SuppressWarnings("unchecked")
-	public static void testCreateMaps(Class<? extends AbstractComponentFactory> pType) {
+	public static void testCreateJavaxMaps(Class<? extends AbstractComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
 		final Module module = (b) -> {
 			b.bind(Map.class, "hash").toInstance(hashMap);
 			b.bind(Map.class, "linked").to(LinkedHashMap.class);
 			b.bind(Map.class).to(HashMap.class).in(Scopes.SINGLETON);
 			b.bind(Map.class, "empty").toSupplier(() -> new Hashtable<>());
-			b.bind(CreateMapsObject.class).in(Scopes.SINGLETON);
+			b.bind(CreateJavaxMapsObject.class).in(Scopes.SINGLETON);
 			b.bind(SpareTire.class).in(Scopes.SINGLETON);
 		};
-		final IComponentFactory cf = new ComponentFactoryBuilder().module(module).type(pType).build();
+		final IComponentFactory cf = IComponentFactory.builder().javax()
+				.module(module).type(pType).build();
 		final Map<String,Object> hashMapCf1 = cf.getInstance(Map.class, "hash");
 		assertNotNull(hashMapCf1);
 		assertSame(hashMap, hashMapCf1);
@@ -98,7 +99,70 @@ public class ComponentFactoryTests {
 		assertNotNull(emptyMapCf1);
 		final Map<String,Object> emptyMapCf2 = cf.getInstance(Map.class, "empty");
 		assertNotSame(emptyMapCf1, emptyMapCf2);
-		final CreateMapsObject cmo = cf.getInstance(CreateMapsObject.class);
+		final CreateJavaxMapsObject cmo = cf.getInstance(CreateJavaxMapsObject.class);
+		assertSame(hashMap, cmo.hashMap1);
+		assertSame(hashMap, cmo.hashMap2);
+		assertNotNull(cmo.linkedMap1);
+		assertTrue(cmo.linkedMap1 instanceof LinkedHashMap);
+		assertNotNull(cmo.emptyMap1);
+		assertFalse(cmo.emptyMap1 instanceof HashMap);
+		assertFalse(cmo.emptyMap2 instanceof LinkedHashMap);
+		assertNotSame(cmo.emptyMap1, cmo.emptyMap2);
+		assertNotNull(cmo.map1);
+		assertTrue(cmo.map1 instanceof HashMap);
+		assertSame(cmo.map1, cmo.map2);
+	}
+
+	/** A test class, which is being instantiated by the component factory,
+	 * with various fields properly filled.
+	 */
+	@SuppressWarnings("rawtypes")
+	public static class CreateJakartaMapsObject {
+		private @jakarta.inject.Inject @Named(value="hash") Map hashMap1;
+		private @jakarta.inject.Inject @Named(value="hash") Map hashMap2;
+		private @jakarta.inject.Inject @Named(value="linked") Map linkedMap1;
+		private @jakarta.inject.Inject @Named(value="linked") Map linkedMap2;
+		private @jakarta.inject.Inject @Named(value="empty") Map emptyMap1;
+		private @jakarta.inject.Inject @Named(value="empty") Map emptyMap2;
+		private @jakarta.inject.Inject Map map1;
+		private @jakarta.inject.Inject Map map2;
+	}
+
+	/** A test method, which tests proper instantiation, and injection of a
+	 * {@link CreateJavaxMapsObject}.
+	 * @param pType Type of the component factory, that is being tested.
+	 */
+	@SuppressWarnings("unchecked")
+	public static void testCreateJakartaMaps(Class<? extends AbstractComponentFactory> pType) {
+		final Map<String,Object> hashMap = new HashMap<>();
+		final Module module = (b) -> {
+			b.bind(Map.class, "hash").toInstance(hashMap);
+			b.bind(Map.class, "linked").to(LinkedHashMap.class);
+			b.bind(Map.class).to(HashMap.class).in(Scopes.SINGLETON);
+			b.bind(Map.class, "empty").toSupplier(() -> new Hashtable<>());
+			b.bind(CreateJakartaMapsObject.class).in(Scopes.SINGLETON);
+			b.bind(SpareTire.class).in(Scopes.SINGLETON);
+		};
+		final IComponentFactory cf = IComponentFactory.builder().javax()
+				.module(module).type(pType).build();
+		final Map<String,Object> hashMapCf1 = cf.getInstance(Map.class, "hash");
+		assertNotNull(hashMapCf1);
+		assertSame(hashMap, hashMapCf1);
+		final Map<String,Object> hashMapCf2 = cf.getInstance(Map.class, "hash");
+		assertSame(hashMap, hashMapCf2);
+		final Map<String,Object> linkedMapCf1 = cf.getInstance(Map.class, "linked");
+		assertNotNull(linkedMapCf1);
+		final Map<String,Object> linkedMapCf2 = cf.getInstance(Map.class, "linked");
+		assertNotSame(linkedMapCf1, linkedMapCf2);
+		final Map<String,Object> mapCf1 = cf.getInstance(Map.class);
+		assertNotNull(mapCf1);
+		final Map<String,Object> mapCf2 = cf.getInstance(Map.class);
+		assertSame(mapCf1, mapCf2);
+		final Map<String,Object> emptyMapCf1 = cf.getInstance(Map.class, "empty");
+		assertNotNull(emptyMapCf1);
+		final Map<String,Object> emptyMapCf2 = cf.getInstance(Map.class, "empty");
+		assertNotSame(emptyMapCf1, emptyMapCf2);
+		final CreateJakartaMapsObject cmo = cf.getInstance(CreateJakartaMapsObject.class);
 		assertSame(hashMap, cmo.hashMap1);
 		assertSame(hashMap, cmo.hashMap2);
 		assertNotNull(cmo.linkedMap1);

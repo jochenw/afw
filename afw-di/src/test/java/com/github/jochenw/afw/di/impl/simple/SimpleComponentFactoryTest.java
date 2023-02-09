@@ -6,7 +6,8 @@ import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.api.Module;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests;
-import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateMapsObject;
+import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateJakartaMapsObject;
+import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateJavaxMapsObject;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests.TestParentObject;
 
 
@@ -16,11 +17,19 @@ public class SimpleComponentFactoryTest {
 	private static final Class<? extends AbstractComponentFactory> COMPONENT_FACTORY_TYPE = SimpleComponentFactory.class;
 
 	/** A test method, which tests proper instantiation, and injection of a
-	 * {@link CreateMapsObject}.
+	 * {@link CreateJavaxMapsObject}.
 	 */
 	@Test
-	public void testCreateMaps() {
-		ComponentFactoryTests.testCreateMaps(COMPONENT_FACTORY_TYPE);
+	public void testCreateJavaxMaps() {
+		ComponentFactoryTests.testCreateJavaxMaps(COMPONENT_FACTORY_TYPE);
+	}
+
+	/** A test method, which tests proper instantiation, and injection of a
+	 * {@link CreateJakartaMapsObject}.
+	 */
+	@Test
+	public void testCreateJakartaMaps() {
+		ComponentFactoryTests.testCreateJakartaMaps(COMPONENT_FACTORY_TYPE);
 	}
 
 	/** A test method, which tests proper instantiation, and injection of a

@@ -9,7 +9,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
-import javax.inject.Provider;
 
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
@@ -94,32 +93,26 @@ public class BindingRegistry implements IComponentFactoryAware {
 					final Key<Object> key = (Key<Object>) pBindingBuilder.getTargetKey();
 					if (key == null) {
 						@SuppressWarnings("unchecked")
-						final Provider<Object> provider = (Provider<Object>) pBindingBuilder.getTargetProvider();
-						if (provider == null) {
-							@SuppressWarnings("unchecked")
-							final Supplier<Object> supplier = (Supplier<Object>) pBindingBuilder.getTargetSupplier();
-							if (supplier == null) {
-								final Type type = pBindingBuilder.getKey().getType();
-								Class<?> cl = null;
-								if (type instanceof Class) {
+						final Supplier<Object> supplier = (Supplier<Object>) pBindingBuilder.getTargetSupplier();
+						if (supplier == null) {
+							final Type type = pBindingBuilder.getKey().getType();
+							Class<?> cl = null;
+							if (type instanceof Class) {
+								cl = (Class<?>) type;
+								if (cl.isAnnotation()  ||  cl.isEnum()  ||  cl.isArray()  ||  cl.isPrimitive()) {
 									cl = (Class<?>) type;
-									if (cl.isAnnotation()  ||  cl.isEnum()  ||  cl.isArray()  ||  cl.isPrimitive()) {
-										cl = (Class<?>) type;
-									}
 								}
-								if (cl == null) {
-									throw new IllegalStateException("Unable to create self-binding for the requested type " + type
-											+ " for binding key=" + pBindingBuilder.getKey()
-											+ ", please invoke either of the to* methods on the binding builder.");
-								} else {
-									final Class<?> clazz = cl;
-									baseSupplier = (scf) -> scf.newInstance(clazz);
-								}
+							}
+							if (cl == null) {
+								throw new IllegalStateException("Unable to create self-binding for the requested type " + type
+										+ " for binding key=" + pBindingBuilder.getKey()
+										+ ", please invoke either of the to* methods on the binding builder.");
 							} else {
-								baseSupplier = asInitializable(supplier, supplier);
+								final Class<?> clazz = cl;
+								baseSupplier = (scf) -> scf.newInstance(clazz);
 							}
 						} else {
-							baseSupplier = asInitializable(provider, () -> provider.get());
+							baseSupplier = asInitializable(supplier, supplier);
 						}
 					} else {
 						final Binding binding = getBinding(key);

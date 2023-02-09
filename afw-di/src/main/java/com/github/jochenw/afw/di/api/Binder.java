@@ -2,8 +2,6 @@ package com.github.jochenw.afw.di.api;
 
 import java.util.function.Consumer;
 
-import javax.inject.Named;
-
 import com.github.jochenw.afw.di.api.Types.Type;
 
 
@@ -30,7 +28,7 @@ public interface Binder {
 	 * with the given {@link Type type}, and the given name.
 	 * @param <T> The created binding builders type.
 	 * @param pType The type, in which the created binding will be applicable.
-	 * @param pName The expected value of the {@link Named} annotation.
+	 * @param pName The expected value of the {@code Named} annotation.
 	 * @return The created binding builder.
 	 */
     <T> LinkableBindingBuilder<T> bind(Types.Type<T> pType, String pName);
@@ -45,7 +43,7 @@ public interface Binder {
 	 * with the given {@link Class type}, and the given name.
 	 * @param <T> The created binding builders type.
 	 * @param pType The type, in which the created binding will be applicable.
-	 * @param pName The expected value of the {@link Named} annotation.
+	 * @param pName The expected value of the {@code Named} annotation.
 	 * @return The created binding builder.
 	 */
     <T> LinkableBindingBuilder<T> bind(Class<T> pType, String pName);

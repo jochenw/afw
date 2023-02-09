@@ -5,12 +5,9 @@ import java.lang.reflect.Constructor;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import javax.inject.Provider;
-
 import com.github.jochenw.afw.di.api.AnnotatableBindingBuilder;
 import com.github.jochenw.afw.di.api.Key;
 import com.github.jochenw.afw.di.api.LinkableBindingBuilder;
-import com.github.jochenw.afw.di.api.Names;
 import com.github.jochenw.afw.di.api.ScopableBindingBuilder;
 import com.github.jochenw.afw.di.api.Scope;
 import com.github.jochenw.afw.di.api.Scopes;
@@ -19,7 +16,7 @@ import com.github.jochenw.afw.di.api.Scopes;
 /** A builder for component factory bindings.
  * @param <T> Type of the object, that is being injected by the binding.
  */
-public class BindingBuilder<T> implements LinkableBindingBuilder<T>, AnnotatableBindingBuilder<T> {
+public abstract class BindingBuilder<T> implements LinkableBindingBuilder<T>, AnnotatableBindingBuilder<T> {
 	private final Key<T> key;
 	private Key<T> annotatedKey;
 	private Scope scope = Scopes.NO_SCOPE;
@@ -28,7 +25,6 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 	private Class<?> targetClass;
 	private Key<?> targetKey;
 	private Supplier<?> targetSupplier;
-	private Provider<?> targetProvider;
 	private Constructor<?> targetConstructor;
 	private Object targetInstance;
 
@@ -76,15 +72,6 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 	 */
 	public Supplier<?> getTargetSupplier() {
 		return targetSupplier;
-	}
-
-	/** If {@link #toProvider(Provider)} has been invoked: Returns the bindings
-	 * implementation provider. Otherwise, returns null.
-	 * @return The bindings implementation supplier, if any, or null.
-	 * @see #toProvider(Provider)
-	 */
-	public Provider<?> getTargetProvider() {
-		return targetProvider;
 	}
 
 	/** If {@link #toConstructor(Constructor)} has been invoked: Returns the bindings
@@ -156,11 +143,6 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 	}
 
 	@Override
-	public LinkableBindingBuilder<T> named(String pName) {
-		return annotatedWith(Names.named(pName));
-	}
-
-	@Override
 	public ScopableBindingBuilder to(Class<? extends T> pImplementation) {
 		return toClass(pImplementation);
 	}
@@ -184,13 +166,6 @@ public class BindingBuilder<T> implements LinkableBindingBuilder<T>, Annotatable
 		final T t = Objects.requireNonNull(pInstance, "Instance");
 		targetInstance = t;
 		scope = Scopes.SINGLETON;
-	}
-
-	@Override
-	public ScopableBindingBuilder toProvider(Provider<? extends T> pProvider) {
-		final Provider<? extends T> provider = Objects.requireNonNull(pProvider, "Provider");
-		targetProvider = provider;
-		return this;
 	}
 
 	@Override

@@ -2,9 +2,8 @@ package com.github.jochenw.afw.di.api;
 
 import static org.junit.Assert.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-
-import javax.inject.Named;
 
 import org.junit.Test;
 
@@ -12,14 +11,20 @@ import org.junit.Test;
 /** Test for the {@link Names} class.
  */
 public class NamesTest {
-	/** Test case for {@link Names#named(String)}.
+	/** Test case for {@code Names#named(String)}.
 	 * @throws Exception The test failed.
 	 */
 	@Test
 	public void testNamed() throws Exception {
-		final Named named = Names.named("My Name");
+		testNamed(Annotations.getProvider("javax.inject"));
+		testNamed(Annotations.getProvider("jakarta.inject"));
+		testNamed(Annotations.getProvider("com.google.inject"));
+	}
+
+	private void testNamed(IAnnotationProvider pProvider) throws NoSuchMethodException {
+		final Annotation named = pProvider.newNamed("My Name");
 		assertNotNull(named);
-		assertEquals("My Name", named.value());
+		assertEquals("My Name", pProvider.getNamedValue(named));
 		assertFalse(named.equals(null));
 		final Method toStringMethod = Object.class.getDeclaredMethod("toString");
 		try {
@@ -28,6 +33,7 @@ public class NamesTest {
 		} catch (IllegalStateException e) {
 			assertEquals("Not implemented: " + toStringMethod, e.getMessage());
 		}
+
 	}
 
 	/** Test case for {@link Names#upperCased(String, String)}.

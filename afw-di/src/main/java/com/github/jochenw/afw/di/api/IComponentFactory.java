@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Named;
 
 
 
@@ -14,6 +13,12 @@ import javax.inject.Named;
  * Interface of a dependency injection controller.
  */
 public interface IComponentFactory {
+	/** Returns the annotation provider, which determines the annotation framework,
+	 * that is being used.
+	 * @return The annotation provider, that is being used by this component factory.
+	 */
+	IAnnotationProvider getAnnotations();
+
 	/**
 	 * Creates a key, which represents the given {@link Type type}.
 	 * The key can be used for registration, or retrieval of
@@ -46,7 +51,7 @@ public interface IComponentFactory {
 		if (pName == null  ||  pName.length() == 0) {
 			return Key.of(pType);
 		} else {
-			return Key.of(pType, pName);
+			return Key.of(pType, getAnnotations().newNamed(pName));
 		}
 	}
 	/**

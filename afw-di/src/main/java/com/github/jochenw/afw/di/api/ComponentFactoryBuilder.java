@@ -30,8 +30,78 @@ public class ComponentFactoryBuilder {
 	private @Nonnull List<Module> modules = new ArrayList<>();
 	private @Nonnull Supplier<AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
 	private @Nullable IComponentFactory instance;
+	private @Nonnull IAnnotationProvider annotationProvider = Annotations.getDefaultProvider();
 	private IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
 
+	/** Returns the {@link IAnnotationProvider}, which is being used by
+	 * this builder, and the component factory, that it creates.
+	 * @return This builders {@link IAnnotationProvider}.
+	 */
+	public IAnnotationProvider getAnnotations() {
+		return annotationProvider;
+	}
+
+	/** Sets the {@link IAnnotationProvider}, which is being used by
+	 * this builder, and the component factory, that it creates.
+	 * @param pAnnotations This builders {@link IAnnotationProvider}.
+	 * @return This builder.
+	 */
+	public ComponentFactoryBuilder annotations(IAnnotationProvider pAnnotations) {
+		annotationProvider = Objects.requireNonNull(pAnnotations, "Annotations");
+		return this;
+	}
+
+	/** Sets the {@link IAnnotationProvider}, which is being used by
+	 * this builder, and the component factory, that it creates, to
+	 * the JavaxAnnotationProvider.
+	 * @return This builder.
+	 * @see #jakarta()
+	 * @see #guice()
+	 */
+	public ComponentFactoryBuilder javax() {
+		final IAnnotationProvider annotations = Annotations.getProvider("javax.inject");
+		if (annotations == null) {
+			throw new IllegalStateException("Annotation provider javax.inject"
+					+ " is not available. Perhaps you meant jakarta.inject,"
+					+ " or com.google.inject, or you need to fix your class path.");
+		}
+		return annotations(annotations);
+	}
+
+	/** Sets the {@link IAnnotationProvider}, which is being used by
+	 * this builder, and the component factory, that it creates, to
+	 * the JakartaAnnotationProvider.
+	 * @return This builder.
+	 * @see #javax()
+	 * @see #guice()
+	 */
+	public ComponentFactoryBuilder jakarta() {
+		final IAnnotationProvider annotations = Annotations.getProvider("jakarta.inject");
+		if (annotations == null) {
+			throw new IllegalStateException("Annotation provider jakarta.inject"
+					+ " is not available. Perhaps you meant javax.inject,"
+					+ " or com.google.inject, or you need to fix your class path.");
+		}
+		return annotations(annotations);
+	}
+	
+	/** Sets the {@link IAnnotationProvider}, which is being used by
+	 * this builder, and the component factory, that it creates, to
+	 * the GoogleAnnotationProvider.
+	 * @return This builder.
+	 * @see #javax()
+	 * @see #jakarta()
+	 */
+	public ComponentFactoryBuilder guice() {
+		final IAnnotationProvider annotations = Annotations.getProvider("com.google.inject");
+		if (annotations == null) {
+			throw new IllegalStateException("Annotation provider com.google.inject"
+					+ " is not available. Perhaps you meant javax.inject,"
+					+ " or jakarta.inject, or you need to fix your class path.");
+		}
+		return annotations(annotations);
+	}
+	
 	/** Returns the modules, that have been registered for configuration of
 	 * the created component factory.
 	 * @return The modules, that have been registered for configuration of
@@ -124,7 +194,12 @@ public class ComponentFactoryBuilder {
 			}
 
 			protected <T> BindingBuilder<T> register(final Key<Object> key) {
-				final BindingBuilder<Object> bb = new BindingBuilder<Object>(key);
+				final BindingBuilder<Object> bb = new BindingBuilder<Object>(key) {
+					@Override
+					public LinkableBindingBuilder<Object> named(String pValue) {
+						return annotatedWith(getAnnotations().newNamed(pValue));
+					}
+				};
 				finished();
 				currentBb = bb;
 				builders.add(bb);
@@ -140,7 +215,6 @@ public class ComponentFactoryBuilder {
 						&&  currentBb.getTargetConstructor() == null
 						&&  currentBb.getTargetInstance() == null
 						&&  currentBb.getTargetKey() == null
-						&&  currentBb.getTargetProvider() == null
 						&&  currentBb.getTargetSupplier() == null) {
 						final java.lang.reflect.Type type = currentBb.getKey().getType();
 						final boolean selfBindingPossible;
@@ -212,7 +286,7 @@ public class ComponentFactoryBuilder {
 		final IComponentFactory icf = pComponentFactory;
 		binder.bind(IComponentFactory.class).toInstance(icf);
 		binder.finished();
-		pComponentFactory.configure(onTheFlyBinder, builders, staticInjectionClasses);
+		pComponentFactory.configure(getAnnotations(), onTheFlyBinder, builders, staticInjectionClasses);
 		for (Consumer<IComponentFactory> finalizer : finalizers) {
 			finalizer.accept(pComponentFactory);
 		}

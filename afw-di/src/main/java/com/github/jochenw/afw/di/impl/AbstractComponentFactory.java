@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
+import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.api.Key;
@@ -14,7 +15,17 @@ import com.github.jochenw.afw.di.api.Key;
  * created instance is derived from this class.
  */
 public abstract class AbstractComponentFactory implements IComponentFactory {
+	private IAnnotationProvider annotationProvider;
 	private Key<IComponentFactory> key;
+
+	@Override
+	public IAnnotationProvider getAnnotations() {
+		return annotationProvider;
+	}
+
+	protected void setAnnotationProvider(IAnnotationProvider pAnnotationProvider) {
+		annotationProvider = pAnnotationProvider;
+	}
 
 	/** Called by the {@link ComponentFactoryBuilder} to configure the
 	 * component factory, after it has been created.
@@ -23,7 +34,8 @@ public abstract class AbstractComponentFactory implements IComponentFactory {
 	 * @param pStaticInjectionClasses The set of classes, that need static
 	 *   injection.
 	 */
-	public abstract void configure(IOnTheFlyBinder pOnTheFlyBinder,
+	public abstract void configure(IAnnotationProvider pAnnotationProvider,
+			                       IOnTheFlyBinder pOnTheFlyBinder,
 			                       List<BindingBuilder<Object>> pBuilders,
 			                       Set<Class<?>> pStaticInjectionClasses);
 

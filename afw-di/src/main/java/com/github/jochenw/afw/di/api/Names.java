@@ -15,52 +15,12 @@
  */
 package com.github.jochenw.afw.di.api;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.inject.Named;
 
-
-/** This class supports working with instances of {@link Named}.
+/** This class supports working with instances of {@code Named}.
  */
 public class Names {
-	/** Creates an instance of {@link Named} with the given value.
-	 * @param pValue The created annotations value.
-	 * @return A newly created instance of {@link Named} with the given value.
-	 */
-	public static javax.inject.Named named(@Nonnull String pValue) {
-		final Class<?>[] interfaces = (Class<?>[]) Array.newInstance(Class.class, 1);
-		interfaces[0] = Named.class;
-		return (Named) Proxy.newProxyInstance(Names.class.getClassLoader(), interfaces, new InvocationHandler() {
-			@Override
-			public Object invoke(Object pProxy, Method pMethod, Object[] pArgs) throws Throwable {
-				if ("equals".equals(pMethod.getName())) {
-					final Object pOther = pArgs[0];
-					if (pOther == null) {
-						return false;
-					}
-					if (pOther instanceof Named) {
-						final Named other = (Named) pOther;
-						return pValue.equals(other.value());
-					} else {
-						return false;
-					}
-				}  else if ("value".equals(pMethod.getName())) {
-					return pValue;
-				} else if ("hashCode".equals(pMethod.getName())) {
-					return Integer.valueOf(Objects.hash(pValue));
-				} else if ("annotationType".equals(pMethod.getName())) {
-					return Named.class;
-				}
-				throw new IllegalStateException("Not implemented: " + pMethod);
-			}
-		});
-	}
-
 	/** Creates a camel cased method property name. Example: prefix=get,
 	 * suffix=foo yields getFoo.
 	 * @param pPrefix The method names prefix, for example "get", or "is".

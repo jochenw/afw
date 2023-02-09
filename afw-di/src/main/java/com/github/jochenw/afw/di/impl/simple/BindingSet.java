@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.inject.Inject;
-
+import com.github.jochenw.afw.di.api.Annotations;
 import com.github.jochenw.afw.di.api.Key;
 
 
@@ -133,7 +132,7 @@ public class BindingSet {
 					}
 				} else {
 					for (Annotation annotation : pAnnotations) {
-						if (!(annotation instanceof Inject)) {
+						if (!Annotations.isInjectAnnotation(annotation)) {
 							if (annotation.getClass() == annotationClass) {
 								classAnnotatedBinding = kab.getBinding();
 							}

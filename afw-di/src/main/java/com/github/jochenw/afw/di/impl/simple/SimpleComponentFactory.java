@@ -14,15 +14,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Provider;
 
+import com.github.jochenw.afw.di.api.Annotations;
+import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.api.Key;
@@ -30,6 +31,8 @@ import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.BindingBuilder;
 import com.github.jochenw.afw.di.util.Exceptions;
 import com.github.jochenw.afw.di.util.Reflection;
+
+import jakarta.inject.Provider;
 
 
 /** Default implementation of an {@link IComponentFactory}:
@@ -95,9 +98,11 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public void configure(IOnTheFlyBinder pOnTheFlyBinder,
+	public void configure(@Nonnull IAnnotationProvider pAnnotationProvider,
+			              @Nonnull IOnTheFlyBinder pOnTheFlyBinder,
 			              @Nonnull List<BindingBuilder<Object>> pBuilders,
 			              @Nonnull Set<Class<?>> pStaticInjectionClasses) {
+		setAnnotationProvider(pAnnotationProvider);
 		onTheFlyBinder = pOnTheFlyBinder;
 		staticInjectionPredicate = (cl) -> pStaticInjectionClasses.contains(cl);
 		bindings = new BindingRegistry(this, pBuilders);
@@ -139,7 +144,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				newFieldInjector(list::add, clazz, staticInjection, field);
 			}
 			for (Method method : clazz.getDeclaredMethods()) {
-				if (method.isAnnotationPresent(Inject.class)) {
+				if (Annotations.isInjectPresent(method)) {
 					if (!Modifier.isStatic(method.getModifiers())  ||  staticInjection) {
 						newMethodInjector(list::add, method);
 					}
@@ -182,7 +187,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 
 	protected void newFieldInjector(final Consumer<BiConsumer<SimpleComponentFactory, Object>> pSink, Class<Object> pClazz,
 			boolean pStaticInjection, final Field pField) {
-		if (pField.isAnnotationPresent(Inject.class)) {
+		if (Annotations.isInjectPresent(pField)) {
 			if (Modifier.isStatic(pField.getModifiers())  &&  !pStaticInjection) {
 				throw new IllegalStateException("The field " + pField.getName()
 					+ " is static. No static injection has been requested for class "
@@ -234,18 +239,39 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		if (binding == null) {
 			if (pType instanceof ParameterizedType) {
 				final ParameterizedType pt = (ParameterizedType) pType;
-				if (pt.getRawType() == Provider.class  ||  pt.getRawType() == Supplier.class) {
-					final Type[] typeArguments = pt.getActualTypeArguments();
-					if (typeArguments.length == 1) {
-						final Type typeArgument = typeArguments[0];
-						final Binding typeArgumentBinding = findBinding(typeArgument, pAnnotations);
-						if (typeArgumentBinding == null) {
-							return null;
-						} else {
-							return new ProviderBinding(typeArgumentBinding);
+				final Type rawType = pt.getRawType();
+				final BiFunction<Class<?>,Function<Binding,Binding>,Binding> providerCreator = (cl,func) -> {
+					if (rawType == cl) {
+						final Type[] typeArguments = pt.getActualTypeArguments();
+						if (typeArguments.length == 1) {
+							final Type typeArgument = typeArguments[0];
+							final Binding typeArgumentBinding = findBinding(typeArgument, pAnnotations);
+							if (typeArgumentBinding != null) {
+								return func.apply(typeArgumentBinding);
+							}
 						}
 					}
+					return null;
+				};
+				for (IAnnotationProvider ap : Annotations.getProviders()) {
+					final Binding bnd = providerCreator.apply(ap.getProviderClass(), (b) -> ap.getProvider(b));
+					if (bnd != null) {
+						return bnd;
+					}
 				}
+				return providerCreator.apply(Supplier.class, (b) -> {
+					return new Binding() {
+						@Override
+						public Object apply(SimpleComponentFactory pCf) {
+							return new Supplier<Object>() {
+								@Override
+								public Object get() {
+									return b.apply(pCf);
+								}
+							};
+						}
+					};
+				});
 			}
 		}
 		return binding;
@@ -256,7 +282,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		for (Constructor<?> cons : pType.getDeclaredConstructors()) {
 			@SuppressWarnings("unchecked")
 			final Constructor<Object> constructor = (Constructor<Object>) cons;
-			if (constructor.isAnnotationPresent(Inject.class)) {
+			if (Annotations.isInjectPresent(constructor)) {
 				if (result != null) {
 					throw new IllegalStateException("Multiple constructors annotated with @Inject in class " + pType.getName());
 				}

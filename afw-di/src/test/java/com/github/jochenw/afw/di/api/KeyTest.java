@@ -20,6 +20,7 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.di.impl.JavaxAnnotationProvider;
 import com.github.jochenw.afw.di.util.Exceptions;
 
 public class KeyTest {
@@ -51,7 +52,13 @@ public class KeyTest {
 	 */
 	@Test
 	public void testOfTypeAnnotation() {
-		final Annotation annotation = Names.named("hash");
+		testOfTypeAnnotation(Annotations.getProvider("javax.inject"));
+		testOfTypeAnnotation(Annotations.getProvider("jakarta.inject"));
+		testOfTypeAnnotation(Annotations.getProvider("com.google.inject"));
+	}
+
+	private void testOfTypeAnnotation(final IAnnotationProvider ap) {
+		final Annotation annotation = ap.newNamed("hash");
 		final Key<Map<String,Object>> key = Key.of(Map.class, annotation);
 		assertNotNull(key);
 		assertSame(Map.class, key.getType());
@@ -84,17 +91,23 @@ public class KeyTest {
 	private @LogInject(id="logger.b") Logger bLogger;
 	private @LogInject(id="logger.a") Logger cLogger;
 
-	/** Test for {@link Key#of(Type, String)}.
+	/** Test for {@code Key#of(Type, String)}.
 	 */
 	@Test
 	public void testOfTypeString() {
-		final Key<Map<String,Object>> key = Key.of(Map.class, "hash");
+		testOfTypeString(Annotations.getProvider("javax.inject"));
+		testOfTypeString(Annotations.getProvider("jakarta.inject"));
+		testOfTypeString(Annotations.getProvider("com.google.inject"));
+	}
+
+	private void testOfTypeString(IAnnotationProvider pAnnotationProvider) {
+		final Key<Map<String,Object>> key = Key.of(Map.class, pAnnotationProvider.newNamed("hash"));
 		assertNotNull(key);
 		assertSame(Map.class, key.getType());
-		assertEquals(Names.named("hash"), key.getAnnotation());
+		assertTrue(pAnnotationProvider.newNamed("hash").equals(key.getAnnotation()));
 		assertNull(key.getAnnotationClass());
 		assertEquals(Objects.hash(Map.class, key.getAnnotation(), null), key.hashCode());
-		assertEquals(Key.of(Map.class, "hash"), key);
+		assertEquals(Key.of(Map.class, pAnnotationProvider.newNamed("hash")), key);
 		assertEquals("class=" + Map.class.getName() + ", name=hash", key.getDescription());
 	}
 
@@ -114,12 +127,18 @@ public class KeyTest {
 
 	/** Test for {@link Key#equals(Object)}.
 	 */
-	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void testEquals() {
+		testEquals(Annotations.getProvider("javax.inject"));
+		testEquals(Annotations.getProvider("jakarta.inject"));
+		testEquals(Annotations.getProvider("com.google.inject"));
+	}
+
+	@SuppressWarnings("unlikely-arg-type")
+	private void testEquals(IAnnotationProvider pAp) {
 		final Key<Map<String,Object>> key = Key.of(Map.class);
-		final Key<Map<String,Object>> hashKey = Key.of(Map.class, "hash");
-		final Key<Map<String,Object>> linkedKey = Key.of(Map.class, "linked");
+		final Key<Map<String,Object>> hashKey = Key.of(Map.class, pAp.newNamed("hash"));
+		final Key<Map<String,Object>> linkedKey = Key.of(Map.class, pAp.newNamed("linked"));
 		final Key<Map<String,Object>> namedKey = Key.of(Map.class, Named.class);
 		final Key<Map<String,Object>> loggingKey = Key.of(Map.class, LogInject.class);
 		assertFalse(key.equals(null));
@@ -136,6 +155,7 @@ public class KeyTest {
 		assertEquals(Key.of(Map.class, Named.class), namedKey);
 		assertEquals(Key.of(Map.class), key);
 		assertNotSame(Key.of(Map.class), key);
-		assertEquals(Key.of(Map.class, "hash"), hashKey);
+		assertEquals(Key.of(Map.class, pAp.newNamed("hash")), hashKey);
 	}
+	
 }

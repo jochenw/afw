@@ -3,7 +3,6 @@ package com.github.jochenw.afw.di.api;
 import java.lang.reflect.Constructor;
 import java.util.function.Supplier;
 
-import javax.inject.Provider;
 
 
 
@@ -44,17 +43,9 @@ public interface LinkableBindingBuilder<T> extends ScopableBindingBuilder {
 	 */
 	void toInstance(T pInstance);
 	/** Requests, that the injected object is given by an invocation of the
-	 * given {@link Provider}.
-	 * @param pProvider The provider, which is supplying the injected object.
-	 * @return A binding builder without scope, but with supplier.
-	 * @see #toSupplier(Supplier)
-	 */
-	ScopableBindingBuilder toProvider(Provider<? extends T> pProvider);
-	/** Requests, that the injected object is given by an invocation of the
 	 * given {@link Supplier}.
 	 * @param pSupplier The provider, which is supplying the injected object.
 	 * @return A binding builder without scope, but with supplier.
-	 * @see #toProvider(Provider)
 	 */
 	ScopableBindingBuilder toSupplier(Supplier<? extends T> pSupplier);
 	/** Requests, that the injected object is being created by invoking the

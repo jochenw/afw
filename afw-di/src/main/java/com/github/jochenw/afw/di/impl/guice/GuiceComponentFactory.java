@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Provider;
 
+import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.api.Key;
@@ -60,9 +61,11 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public void configure(IOnTheFlyBinder pOnTheFlyBinder,
+	public void configure(IAnnotationProvider pAnnotationProvider,
+			              IOnTheFlyBinder pOnTheFlyBinder,
 			              List<BindingBuilder<Object>> pBuilders,
 			              Set<Class<?>> pStaticInjectionClasses) {
+		setAnnotationProvider(pAnnotationProvider);
 		// Eliminate duplicate bindings.
 		final Map<Key<Object>,BindingBuilder<Object>> bindingsByKey = new HashMap<>();
 		for (BindingBuilder<Object> bb : pBuilders) {
@@ -99,39 +102,33 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 								final Key<Object> targetKey = (Key<Object>) bb.getTargetKey();
 								if (targetKey == null) {
 									@SuppressWarnings("unchecked")
-									final Provider<Object> targetProvider = (Provider<Object>) bb.getTargetProvider();
-									if (targetProvider == null) {
-										@SuppressWarnings("unchecked")
-										final Supplier<Object> targetSupplier = (Supplier<Object>) bb.getTargetSupplier();
-										if (targetSupplier == null) {
-											final Type type = key.getType();
-											if (type instanceof Class) {
-												final Class<?> cl = (Class<?>) type;
-												if (cl.isAnnotation()) {
-													throw new IllegalStateException("No target was specified on the BindingBuilder"
-															+ " for key " + key + ", and self-binding is not possible for an annotation class.");
-												} else if (cl.isArray()) {
-													throw new IllegalStateException("No target was specified on the BindingBuilder"
-															+ " for key " + key + ", and self-binding is not possible for an array class.");
-												} else if (cl.isEnum()) {
-													throw new IllegalStateException("No target was specified on the BindingBuilder"
-															+ " for key " + key + ", and self-binding is not possible for an enum class.");
-												} else if (cl.isInterface()) {
-													throw new IllegalStateException("No target was specified on the BindingBuilder"
-															+ " for key " + key + ", and self-binding is not possible for an interface class.");
-												} else {
-													// Self-Binding, do nothing.
-													sbb = (ScopedBindingBuilder) lbb;
-												}
-											} else {
+									final Supplier<Object> targetSupplier = (Supplier<Object>) bb.getTargetSupplier();
+									if (targetSupplier == null) {
+										final Type type = key.getType();
+										if (type instanceof Class) {
+											final Class<?> cl = (Class<?>) type;
+											if (cl.isAnnotation()) {
 												throw new IllegalStateException("No target was specified on the BindingBuilder"
-														+ " for key " + key + ", and self-binding is not possible for a generic type.");
+														+ " for key " + key + ", and self-binding is not possible for an annotation class.");
+											} else if (cl.isArray()) {
+												throw new IllegalStateException("No target was specified on the BindingBuilder"
+														+ " for key " + key + ", and self-binding is not possible for an array class.");
+											} else if (cl.isEnum()) {
+												throw new IllegalStateException("No target was specified on the BindingBuilder"
+														+ " for key " + key + ", and self-binding is not possible for an enum class.");
+											} else if (cl.isInterface()) {
+												throw new IllegalStateException("No target was specified on the BindingBuilder"
+														+ " for key " + key + ", and self-binding is not possible for an interface class.");
+											} else {
+												// Self-Binding, do nothing.
+												sbb = (ScopedBindingBuilder) lbb;
 											}
 										} else {
-											sbb = lbb.toProvider(() -> targetSupplier.get());
+											throw new IllegalStateException("No target was specified on the BindingBuilder"
+													+ " for key " + key + ", and self-binding is not possible for a generic type.");
 										}
 									} else {
-										sbb = lbb.toProvider(targetProvider);
+										sbb = lbb.toProvider(() -> targetSupplier.get());
 									}
 								} else {
 									sbb = lbb.to(asGuiceKey(targetKey));

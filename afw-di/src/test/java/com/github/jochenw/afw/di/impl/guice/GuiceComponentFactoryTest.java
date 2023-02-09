@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests;
-import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateMapsObject;
+import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateJavaxMapsObject;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests.TestParentObject;
 
 /** Test for the {@link GuiceComponentFactory}.
@@ -13,11 +13,11 @@ public class GuiceComponentFactoryTest {
 	private static final Class<? extends AbstractComponentFactory> COMPONENT_FACTORY_TYPE = GuiceComponentFactory.class;
 
 	/** A test method, which tests proper instantiation, and injection of a
-	 * {@link CreateMapsObject}.
+	 * {@link CreateJavaxMapsObject}.
 	 */
 	@Test
 	public void testCreateMaps() {
-		ComponentFactoryTests.testCreateMaps(COMPONENT_FACTORY_TYPE);
+		ComponentFactoryTests.testCreateJavaxMaps(COMPONENT_FACTORY_TYPE);
 	}
 
 	/** A test method, which tests proper instantiation, and injection of a
