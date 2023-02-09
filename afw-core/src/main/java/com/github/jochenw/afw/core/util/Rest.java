@@ -289,11 +289,11 @@ public class Rest {
 		}
 		public Builder basicAuth(@NotNull String pUserName, @NotNull String pPassword) {
 			final String userName = Objects.requireNonNull(pUserName, "User name");
-			final String password = Objects.requireNonNull(pUserName, "Password");
+			final String password = Objects.requireNonNull(pPassword, "Password");
 			final byte[] authBytes = (userName + ":" + password).getBytes(StandardCharsets.UTF_8);
 			final String authHeader = "Basic " +
-					Base64.getMimeEncoder(-1, null).encodeToString(authBytes);
-			return header("Authorize", authHeader);
+					Base64.getMimeEncoder(-1, new byte[] {'\n'}).encodeToString(authBytes);
+			return header("Authorization", authHeader);
 		}
 		public Builder parameter(@NotNull String pName, String pValue) {
 			final @NotNull String name = Objects.requireNonNull(pName, "Name");
@@ -405,7 +405,15 @@ public class Rest {
 				}
 			}
 			if (spec != null) {
-				url = new URL(url, spec);
+				String u = url.toExternalForm();
+				if (u.endsWith("/")) {
+					u = u.substring(0, u.length()-1);
+				}
+				if (spec.startsWith("/")) {
+					url = new URL(u + spec);
+				} else {
+					url = new URL(u + "/" + spec);
+				}
 			}
 			if (pRequest.getParameters() != null  &&  !pRequest.getParameters().isEmpty()) {
 				final StringBuilder sb = new StringBuilder(url.toExternalForm());
@@ -453,6 +461,7 @@ public class Rest {
 							pRequest.getErrorConsumer().accept(err);
 						}
 					}
+				} else {
 					throw new IllegalStateException("Unexepected HTTP Response: " + status + "," + msg);
 				}
 				if (pReader != null) {

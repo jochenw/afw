@@ -1,8 +1,17 @@
 package com.github.jochenw.afw.core.io;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+import javax.annotation.Nonnull;
+
+import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
@@ -39,7 +48,65 @@ public class ObservableInputStream extends InputStream {
 		 * @throws IOException The listener failed.
 		 */
 		void closing() throws IOException;
-		
+
+
+		public static @Nonnull Listener of(@Nonnull Path pPath) {
+    		return of(() -> Files.newOutputStream(pPath));
+    	}
+    	public static @Nonnull Listener of(@Nonnull File pFile) {
+    		return of(() -> new FileOutputStream(pFile));
+    	}
+    	public static @Nonnull Listener of(@Nonnull FailableSupplier<OutputStream,?> pOut) {
+    		return new Listener() {
+    			private BufferedOutputStream bOut;
+
+				protected OutputStream getOut() throws IOException {
+					if (bOut == null) {
+						final OutputStream out;
+						try {
+							out = pOut.get();
+						} catch (Throwable t) {
+							throw Exceptions.show(t);
+						}
+						if (out == null) {
+							throw new NullPointerException("Supplier returned a null OutputStream");
+						}
+						if (out instanceof BufferedOutputStream) {
+							bOut = (BufferedOutputStream) out;
+						} else {
+							bOut = new BufferedOutputStream(out);
+						}
+					}
+					return bOut;
+				}
+
+				@Override
+				public void reading(byte[] pBuffer, int pOffset, int pLen) throws IOException {
+					getOut().write(pBuffer, pOffset, pLen);
+				}
+
+				@Override
+				public void reading(int pByte) throws IOException {
+					getOut().write(pByte);
+				}
+
+				@Override
+				public void closing() throws IOException {
+					if (bOut != null) {
+						bOut.close();
+						bOut = null;
+					}
+				}
+
+				@Override
+				public void endOfFile() throws IOException {
+					// Make sure, that the buffer is open, so that
+					// Listener.of(Path), and Listener.of(File) will always produce a (possibly empty) file.
+					getOut();
+				}
+    		};
+    	}
+
 	}
 
 	private final InputStream in;

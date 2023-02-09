@@ -52,6 +52,8 @@ import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.io.IReadable;
+import com.github.jochenw.afw.core.io.ObservableInputStream;
+import com.github.jochenw.afw.core.io.ObservableInputStream.Listener;
 import com.github.jochenw.afw.core.io.ReaderInputStream;
 import com.github.jochenw.afw.core.io.WriterOutputStream;
 
@@ -777,5 +779,22 @@ public class Streams {
     			}
     		}
     	}, Objects.notNull(pCharset, StandardCharsets.UTF_8));
+    }
+
+    @FunctionalInterface
+    public interface InputStreamObserver {
+    	default void open() throws IOException {}
+    	void data(byte[] pBuffer, int pOffset, int pLen) throws IOException;
+    	default void eof() throws IOException {}
+    	default void close() throws IOException {}
+   
+    }
+
+    /** Creates an {@link InputStream}, which returns the contents of the given
+     * {@link InputStream} {@code pIn}, but allows creating a copy of the data
+     * by sending it to the given delegates.
+     */
+    public static InputStream multiplex(InputStream pIn, Listener pObservers) {
+    	return new ObservableInputStream(pIn, pObservers);
     }
 }

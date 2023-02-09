@@ -56,6 +56,7 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
+import com.github.jochenw.afw.core.io.ObservableInputStream.Listener;
 
 
 /** Test case for the {@link Streams} class.
@@ -602,5 +603,72 @@ public class StreamsTest {
     	r.close();
     	r.close();
     	assertFalse(closed.isSet());
+    }
+
+    /** Test for {@link Streams#multiplex(InptStream, Object...)}.
+     */
+    @Test
+    public void testMultiplex() throws Exception {
+    	final MutableBoolean baosClosed = new MutableBoolean();
+    	final ByteArrayOutputStream baos = new ByteArrayOutputStream() {
+			@Override
+			public void close() throws IOException {
+				baosClosed.set();
+				super.close();
+			}
+    	};
+    	assertFalse(baosClosed.isSet());
+    	final String input = "abcdefghijklmnopqrstuvwxyz";
+
+    	// Step 1: Test using read()
+    	{
+    		final byte[] buffer = new byte[7];
+    		final CloseableInputStream cis = CloseableInputStream.newInstance(input);
+    		try (InputStream in = Streams.multiplex(cis, Listener.of(() -> baos))) {
+    			for (;;) {
+    				final int res = in.read();
+    				if (res == -1) {
+    					break;
+    				}
+    			}
+    		}
+    		assertTrue(baosClosed.isSet());
+    		assertEquals(input, baos.toString("UTF-8"));
+    	}
+    	
+    	// Step 2: Test using read(byte[], int, int)
+    	{
+    		final byte[] buffer = new byte[7];
+    		baos.reset();
+    		baosClosed.setValue(false);
+    		final CloseableInputStream cis = CloseableInputStream.newInstance(input);
+    		try (InputStream in = Streams.multiplex(cis, Listener.of(() -> baos))) {
+    			for (;;) {
+    				final int res = in.read(buffer, 0, buffer.length);
+    				if (res == -1) {
+    					break;
+    				}
+    			}
+    		}
+    		assertTrue(baosClosed.isSet());
+    		assertEquals(input, baos.toString("UTF-8"));
+    	}
+
+    	// Step 3: Test using read()
+    	{
+    		baos.reset();
+    		baosClosed.setValue(false);
+    		final CloseableInputStream cis = CloseableInputStream.newInstance(input);
+    		try (InputStream in = Streams.multiplex(cis, Listener.of(() -> baos))) {
+    			for (;;) {
+    				final int res = in.read();
+    				if (res == -1) {
+    					break;
+    				}
+    			}
+    		}
+    		assertTrue(baosClosed.isSet());
+    		assertEquals(input, baos.toString("UTF-8"));
+    	}
     }
 }
