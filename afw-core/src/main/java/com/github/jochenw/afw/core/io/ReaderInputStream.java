@@ -51,7 +51,7 @@ public class ReaderInputStream extends InputStream {
 	}
 
 	/** Asserts, that the stream hasn't been closed, so far.
-	 * @throws The stream has already been closed.
+	 * @throws IOException The stream has already been closed.
 	 */
 	protected void assertNotClosed() throws IOException {
 		if (closedReported) {

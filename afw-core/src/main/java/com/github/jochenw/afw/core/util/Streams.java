@@ -793,8 +793,19 @@ public class Streams {
     /** Creates an {@link InputStream}, which returns the contents of the given
      * {@link InputStream} {@code pIn}, but allows creating a copy of the data
      * by sending it to the given delegates.
+     * @param pIn The input stream, which supplies the contents.
+     * @param pObservers The observers, which are to be participating in the
+     *   incoming data.
+     * return The created input stream. By reading this, you will obtain data, that
+     *   is actually read from {@code pIn}, but ths observers will be notified
+     *   about the same data.
      */
-    public static InputStream multiplex(InputStream pIn, Listener pObservers) {
-    	return new ObservableInputStream(pIn, pObservers);
+    public static InputStream multiplex(InputStream pIn, Listener... pObservers) {
+    	if (pObservers == null  ||  pObservers.length == 0) {
+    		return pIn;
+    	} else if (pObservers.length == 1) {
+        	return new ObservableInputStream(pIn, pObservers[0]);
+    	}
+        return new ObservableInputStream(pIn, Listener.of(pObservers));
     }
 }

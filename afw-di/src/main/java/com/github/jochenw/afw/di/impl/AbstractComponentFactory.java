@@ -28,7 +28,10 @@ public abstract class AbstractComponentFactory implements IComponentFactory {
 	}
 
 	/** Called by the {@link ComponentFactoryBuilder} to configure the
-	 * component factory, after it has been created.
+	 * component factory, after it has been created. A successfull
+	 * invocation of this method indicates, that the component
+	 * factory is now ready to use.
+	 * @param pAnnotationProvider The annotation provider, that is being used.
 	 * @param pOnTheFlyBinder Sets the on-the-fly binder, if any.
 	 * @param pBuilders The list of binding builders
 	 * @param pStaticInjectionClasses The set of classes, that need static

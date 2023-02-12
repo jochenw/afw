@@ -123,6 +123,7 @@ public class Application {
 
 	/** Creates a new instance of the given type, with a component factory,
 	 * that's created using the given module.
+	 * @param <App> Type of the created instance, a subclass of {@link Application}.
 	 * @param pType Type of the created instance, a subclass of {@link Application}.
 	 * @param pModule A module, that will be used to create the aplications
 	 *   component factory.
@@ -136,6 +137,7 @@ public class Application {
 
 	/** Creates a new instance of the given type, with a component factory,
 	 * that's created using a module, thats returned by the given supplier.
+	 * @param <App> Type of the created instance, a subclass of {@link Application}.
 	 * @param pType Type of the created instance, a subclass of {@link Application}.
 	 * @param pSupplier A supplier for the module, that will be used to create the aplications
 	 *   component factory.

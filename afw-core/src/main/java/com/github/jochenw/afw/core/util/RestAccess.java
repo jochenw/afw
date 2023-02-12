@@ -58,14 +58,12 @@ import groovyjarjarantlr4.v4.runtime.misc.NotNull;
  * 
  * If your request is supposed to create a result, replace {@link Builder#send()}
  * with {@link Builder#call(FailableFunction)}.
- *       
- * </pre>
  */
-public class Rest {
+public class RestAccess {
 	private @Inject HttpConnector httpConnector;
 
 	/** This class is a container for the REST requests configuration.
-	 * To create an instance, use a {@link Rest#builder(URL)}.
+	 * To create an instance, use a {@link RestAccess#builder(URL)}.
 	 */
 	public class Request {
 		private final @NotNull URL url;
@@ -75,7 +73,7 @@ public class Rest {
 		private final FailableConsumer<InputStream,?> consumer, errorConsumer;
 
 		/** Creates a new instance. You are not supposed to use this constructor
-		 * directly. Instead, use {@link Rest#builder(URL)}.
+		 * directly. Instead, use {@link RestAccess#builder(URL)}.
 		 * @param pUrl The REST API's URL.
 		 * @param pMethod The HTTP method, which is being used.
 		 * @param pResource The REST resource.
@@ -110,8 +108,8 @@ public class Rest {
 		/** Returns the HTTP request method, like POST, PUT, DELETE, or GET.
 		 * May be null, in which case GET is used as the default.
 		 * @return The HTTP request method, or null.
-		 * @see Rest.Builder#post(FailableConsumer)
-		 * @see Rest.Builder#put(FailableConsumer)
+		 * @see RestAccess.Builder#post(FailableConsumer)
+		 * @see RestAccess.Builder#put(FailableConsumer)
 		 */
 		public String getMethod() { return method; }
 		/** Returns the REST resource URI, which will be appended to the {@link #getUrl() REST API URL}.
@@ -130,29 +128,29 @@ public class Rest {
 		/** Returns the map of HTTP request parameters.
 		 * <em>Note:</em> As of this writing, multiple values per parameter are unsupported.
 		 * @return The map of HTTP request parameters.
-		 * @see Rest.Builder#parameter(String, String)
+		 * @see RestAccess.Builder#parameter(String, String)
 		 * @see #getHeaders()
 		 */
 		public Map<String, String> getParameters() { return parameters; }
 		/** Returns the map of HTTP request parameters.
 		 * <em>Note:</em> As of this writing, multiple values per header are unsupported.
 		 * @return The map of HTTP request parameters.
-		 * @see Rest.Builder#header(String, String)
+		 * @see RestAccess.Builder#header(String, String)
 		 * @see #getParameters()
 		 */
 		public Map<String, String> getHeaders() { return headers; }
 		/** Returns a producer for the request body.
 		 * <em>Note:</em> Keep in mind, that the {@link #getMethod() HTTP request method}
 		 * must be "POST", or "PUT", if you have a request body. The best way to ensure this
-		 * is to use the methods {@link Rest.Builder#post(FailableConsumer)}, or
-		 * {@link Rest.Builder#put(FailableConsumer)}, rather than
-		 * {@link Rest.Builder#body(FailableConsumer)}.
+		 * is to use the methods {@link RestAccess.Builder#post(FailableConsumer)}, or
+		 * {@link RestAccess.Builder#put(FailableConsumer)}, rather than
+		 * {@link RestAccess.Builder#body(FailableConsumer)}.
 		 * @return The producer for the request body, or null.
 		 */
 		public FailableConsumer<OutputStream, ?> getBody() { return body; }
 		/** Returns a consumer for the response body.
 		 * <em>Note:</em> If your consumer is supposed to produce a result,
-		 * consider using a {@link Rest#call(Request, FailableFunction) result
+		 * consider using a {@link RestAccess#call(Request, FailableFunction) result
 		 * function} instead.
 		 * @return The consumer for the response body, or null.
 		 */
@@ -161,16 +159,16 @@ public class Rest {
 		 * @return The consumer for the error response body, or null.
 		 */
 		public FailableConsumer<InputStream, ?> getErrorConsumer() { return errorConsumer; }
-		/** Performs the request by invoking {@link Rest#send(Request)}. Invokes the
+		/** Performs the request by invoking {@link RestAccess#send(Request)}. Invokes the
 		 * {@link #getBody() body producer}, {@link #getConsumer() response consumer},
 		 * and the {@link #getErrorConsumer() error response consumer}, as necessary.
 		 * If your response is supposed to produce a result, consider using
 		 * {@link #call(FailableFunction)} instead.
 		 */
 		public void send() {
-			Rest.this.send(this);
+			RestAccess.this.send(this);
 		}
-		/** Performs the request by invoking {@link Rest#send(Request)}. Invokes the
+		/** Performs the request by invoking {@link RestAccess#send(Request)}. Invokes the
 		 * {@link #getBody() body producer}, the {@code pCallable result producer},
 		 * the {@link #getConsumer() response consumer},
 		 * and the {@link #getErrorConsumer() error response consumer}, as necessary.
@@ -178,9 +176,11 @@ public class Rest {
 		 * @param <O> Type of the result object, that is being produced by the
 		 *   {@code pCallable result producer}, and returned by this method.
 		 * @param pCallable The result producer.
+		 * @return The result object, which has been created by invoking
+		 *   the {@code pCallable}.
 		 */
 		public <O> O call(FailableFunction<InputStream,O,?> pCallable) {
-			return Rest.this.call(this, pCallable);
+			return RestAccess.this.call(this, pCallable);
 		}
 	}
    
@@ -339,11 +339,11 @@ public class Rest {
 					           getBody(), getConsumer(), getErrorConsumer());
 		}
 		public void send() {
-			Rest.this.send(build());
+			RestAccess.this.send(build());
 		}
 
 		public <O> O call(FailableFunction<InputStream, O, ?> pCallable) {
-			return Rest.this.call(build(), pCallable);
+			return RestAccess.this.call(build(), pCallable);
 		}
 	}
 

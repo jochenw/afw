@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import javax.annotation.Nonnull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.io.ObservableInputStream.Listener;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
@@ -50,12 +51,72 @@ public class ObservableInputStream extends InputStream {
 		void closing() throws IOException;
 
 
+		/** Creates a new {@code Listener} instance, which internally delegates
+		 * events to all of the given listeners.
+		 * @param pListeners The listeners, which are being notified
+		 *   by the created instance.
+		 * @return The created listener proxy.
+		 */
+		public static @Nonnull Listener of(Listener... pListeners) {
+			return new Listener() {
+				@Override
+				public void endOfFile() throws IOException {
+					if (pListeners != null) {
+						for (Listener observer : pListeners) {
+							observer.endOfFile();
+						}
+					}
+				}
+
+				@Override
+				public void reading(int pByte) throws IOException {
+					if (pListeners != null) {
+						for (Listener observer : pListeners) {
+							observer.reading(pByte);
+						}
+					}
+				}
+
+				@Override
+				public void reading(byte[] pBuffer, int pOffset, int pLen) throws IOException {
+					if (pListeners != null) {
+						for (Listener observer : pListeners) {
+							observer.reading(pBuffer, pOffset, pLen);
+						}
+					}
+				}
+
+				@Override
+				public void closing() throws IOException {
+					if (pListeners != null) {
+						for (Listener observer : pListeners) {
+							observer.closing();
+						}
+					}
+				}
+	    	};
+		}
+		/** Creates a new {@code Listener} instance, which copies the incoming data
+		 * to the given file.
+		 * @param pPath The file, to which incoming data is being copied.
+		 * @return The created {@code Listener} instance.
+		 */
 		public static @Nonnull Listener of(@Nonnull Path pPath) {
     		return of(() -> Files.newOutputStream(pPath));
     	}
+		/** Creates a new {@code Listener} instance, which copies the incoming data
+		 * to the given file.
+		 * @param pFile The file, to which incoming data is being copied.
+		 * @return The created {@code Listener} instance.
+		 */
     	public static @Nonnull Listener of(@Nonnull File pFile) {
     		return of(() -> new FileOutputStream(pFile));
     	}
+		/** Creates a new {@code Listener} instance, which copies the incoming data
+		 * to the given output stream.
+		 * @param pOut The output stream, to which incoming data is being copied.
+		 * @return The created {@code Listener} instance.
+		 */
     	public static @Nonnull Listener of(@Nonnull FailableSupplier<OutputStream,?> pOut) {
     		return new Listener() {
     			private BufferedOutputStream bOut;
@@ -116,7 +177,8 @@ public class ObservableInputStream extends InputStream {
 	 * Creates a new instance, which reads from the given {@link InputStream}, and
 	 * notifies the given listener, while doing so.
 	 * @param pIn The input stream, which is actually being read.
-	 * @param pListener The listener, which is being notified about data events.
+	 * @param pListener The listener, which are being notified about data events.
+	 *   For multiple listeners, see {@link Listener#of(Listener...)}.
 	 */
 	public ObservableInputStream(InputStream pIn, Listener pListener) {
 		in = pIn;

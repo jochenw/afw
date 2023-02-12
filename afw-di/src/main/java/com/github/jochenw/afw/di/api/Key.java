@@ -180,6 +180,7 @@ public class Key<O extends Object> {
 
 	/** Creates a new instance with the given type, no annotation,
 	 * and no annotation class.
+	 * @param <O> The type, to which the keys binding is applicable.
 	 * @param pType The type, to which the keys binding is applicable.
 	 * @return The created instance.
 	 */
@@ -189,6 +190,7 @@ public class Key<O extends Object> {
 
 	/** Creates a new instance with the given type, the given annotation,
 	 * and no annotation class.
+	 * @param <O> The type, to which the keys binding is applicable.
 	 * @param pType The type, to which the keys binding is applicable.
 	 * @param pAnnotation The annotation, which must be present to make
 	 * the keys binding applicable.
@@ -200,6 +202,7 @@ public class Key<O extends Object> {
 
 	/** Creates a new instance with the given type, no annotation,
 	 * and the given annotation class.
+	 * @param <O> The type, to which the keys binding is applicable.
 	 * @param pType The type, to which the keys binding is applicable.
 	 * @param pAnnotationClass The annotation class, which must be
 	 *   present to make the keys binding applicable.
