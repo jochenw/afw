@@ -20,6 +20,9 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -42,7 +45,9 @@ public class Executor {
 
     private final String[] cmdLine;
     private final Path directory;
-    private FailableConsumer<InputStream,?> stdOutHandler, stdErrHandler;
+    private final FailableConsumer<InputStream,?> stdOutHandler, stdErrHandler;
+    private final FailableConsumer<String[],?> cmdLineConsumer;
+    private final Map<String,String> environment;
 
     /**
      * Creates a new instance with the given configuration.
@@ -54,20 +59,39 @@ public class Executor {
      * @throws NullPointerException Either of the parameters is null.
      */
     public Executor(String[] pCmdLine, Path pDirectory, FailableConsumer<InputStream,?> pStdOutHandler,
-    		        FailableConsumer<InputStream,?> pStdErrHandler) {
+    		        FailableConsumer<InputStream,?> pStdErrHandler,
+    		        FailableConsumer<String[],?> pCmdLineConsumer,
+    		        Map<String,String> pEnvironment) {
         cmdLine = Objects.requireAllNonNull(pCmdLine, "CmdLineArg");
         directory = pDirectory;
         stdOutHandler = Objects.requireNonNull(pStdOutHandler, "StdOutHandler");
         stdErrHandler = Objects.requireNonNull(pStdErrHandler, "StdErrHandler");
+        cmdLineConsumer = pCmdLineConsumer;
+        environment = pEnvironment;
     }
 
     /** Performs the actual launch, waits for completion, and returns the result code.
      * @return The external processes exit code.
      */
     public int run() {
+    	if (cmdLineConsumer != null) {
+    		try {
+    			cmdLineConsumer.accept(cmdLine);
+    		} catch (Throwable t) {
+    			throw Exceptions.show(t);
+    		}
+    	}
+    	final String[] env;
+    	if (environment == null  ||  environment.isEmpty()) {
+    		env = null;
+    	} else {
+    		final List<String> list = new ArrayList<>();
+    		environment.forEach((k,v) -> list.add(k + "=" + v));
+    		env = list.toArray(new String[list.size()]);
+    	}
     	Process process;
 		try {
-			process = Runtime.getRuntime().exec(cmdLine, null, directory == null ? null : directory.toFile());
+			process = Runtime.getRuntime().exec(cmdLine, env, directory == null ? null : directory.toFile());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

@@ -35,17 +35,26 @@ public class Annotations {
 	private static IAnnotationProvider[] initAnnotationProviders() {
 		final List<IAnnotationProvider> list = new ArrayList<>();
 		try {
-			list.add(new JavaxAnnotationProvider());
+			final IAnnotationProvider ap = new JavaxAnnotationProvider();
+			if (ap.getInjectClass() != null) {
+				list.add(ap);
+			}
 		} catch (Throwable t) {
 			// Ignore this,
 		}
 		try {
-			list.add(new JakartaAnnotationProvider());
+			final IAnnotationProvider ap = new JakartaAnnotationProvider();
+			if (ap.getInjectClass() != null) {
+				list.add(ap);
+			}
 		} catch (Throwable t) {
 			// Ignore this,
 		}
 		try {
-			list.add(new GoogleAnnotationProvider());
+			final IAnnotationProvider ap = new GoogleAnnotationProvider();
+			if (ap.getInjectClass() != null) {
+				list.add(ap);
+			}
 		} catch (Throwable t) {
 			// Ignore this,
 		}

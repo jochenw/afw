@@ -34,15 +34,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  */
 public class ExecutorBuilder {
 	private final List<String> cmdLine = new ArrayList<>();
+	private final Map<String,String> environment = new HashMap<>();
     private ProcessOutputHandler stdOutHandler, stdErrHandler;
     private Path directory;
+    private FailableConsumer<String[],?> cmdLineListener;
 
     /** Sets the executable, that is being executed.
      * As a side-effect, clears the argument list.
@@ -148,6 +152,11 @@ i     */
         return arg(Objects.requireNonNull(pArg, "Argument").getPath());
     }
 
+    /** Sets a listener, which is being notified about the actually
+     * executed command line. The typical use case is for logging,
+     * and other diagnostic purposes.
+     * @param pCmdLine The command line, which is about to be executed.
+     */
     /** Sets the directory, where the external process will be launched.
      * In other words: From the external processes perspective, this will
      * be the current directory.
@@ -195,6 +204,24 @@ i     */
     	return directory(Paths.get(dir));
     }
 
+    /** Sets a listener, which is being notified, before the actual execution
+     * starts. The use case is for logging, and other diagnostic purposes.
+     * @param The command line, which is being executed.
+     * @return This builder.
+     */
+    public ExecutorBuilder cmdLineListener(FailableConsumer<String[],?> pCmdLineConsumer) {
+    	cmdLineListener = pCmdLineConsumer;
+    	return this;
+    }
+
+    /** Sets a listener, which is being notified, before the actual execution
+     * starts. The use case is for logging, and other diagnostic purposes.
+     * @return The command line listener, if present, or null.
+     */
+    FailableConsumer<String[],?> getCmdLineListener() {
+    	return cmdLineListener;
+    }
+ 
     /** Returns the directory, where the external process will be launched.
      * In other words: From the external processes perspective, this will
      * be the current directory.
@@ -206,6 +233,16 @@ i     */
     	} else {
     		return directory;
     	}
+    }
+
+    /** Specifies an environment variable, that the executed process should have.
+     * @param pVar Name of the environment variable.
+     * @param pValue Value of the environment variable.
+     * @return This builder.
+     */
+    public ExecutorBuilder envVar(String pVar, String pValue) {
+    	environment.put(pVar, pValue);
+    	return this;
     }
 
     /**
@@ -517,7 +554,8 @@ i     */
     	final FailableConsumer<InputStream,?> errHandler = Objects.notNull(stdErrHandler, () -> {
     		return (in) -> Streams.readAndDiscard(in);
     	});
-    	return new Executor(cmdLine.toArray(new String[cmdLine.size()]), directory, outHandler, errHandler);
+    	return new Executor(cmdLine.toArray(new String[cmdLine.size()]), directory, outHandler, errHandler,
+    			            cmdLineListener, environment);
     }
 
     /** Returns the command line, that is being executed.

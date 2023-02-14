@@ -295,6 +295,9 @@ public class RestAccess {
 					Base64.getMimeEncoder(-1, new byte[] {'\n'}).encodeToString(authBytes);
 			return header("Authorization", authHeader);
 		}
+		public Builder contentType(@NotNull String pContentType) {
+			return header("content-type", pContentType);
+		}
 		public Builder parameter(@NotNull String pName, String pValue) {
 			final @NotNull String name = Objects.requireNonNull(pName, "Name");
 			assertMutable();

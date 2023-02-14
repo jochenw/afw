@@ -16,12 +16,14 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
 import java.io.FilterReader;
@@ -41,6 +43,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -807,5 +811,111 @@ public class Streams {
         	return new ObservableInputStream(pIn, pObservers[0]);
     	}
         return new ObservableInputStream(pIn, Listener.of(pObservers));
+    }
+
+    /** Creates an {@link OutputStream}, which acts as a proxy for the given
+     * outpot stream {@code pOut}, but also copies the contents to the
+     * given destinations.
+     * @param pOut The output stream, to which data should be actually
+     *   written
+     * @param pDestinations The destinations, to which data should be
+     *   copied. Every destination may be
+     *   <ul>
+     *     <li>Another {@link OutputStream}</li>
+     *     <li>A {@link Path}, or {@link File}, to which data is being
+     *     copied. The parent directory will be created, if necessary.</li>
+     *   </ul>
+     * @return The created output stream. By writing this, you are actually writing
+     *   to {@code pOut}
+     */
+    public static OutputStream multiplex(OutputStream pOut, Object... pDestinations) {
+    	final List<OutputStream> destinationList = new ArrayList<>();
+    	destinationList.add(uncloseableStream(Objects.requireNonNull(pOut, "OutputStream pOut")));
+    	final Object[] destinations = Objects.requireNonNull(pDestinations, "Destinations");
+    	try {
+    		for (int i = 0;  i < destinations.length;  i++) {
+    			final Object o = destinations[i];
+    			if (o == null) {
+    				throw new NullPointerException("Null destination fount at index: " + i);
+    			}
+    			if (o instanceof OutputStream) {
+    				destinationList.add((OutputStream) o);
+    			} else if (o instanceof Path) {
+    				final Path p = (Path) o;
+    				final Path dir = p.getParent();
+    				try {
+    					if (dir != null) {
+    						Files.createDirectories(dir);
+    					}
+    					final OutputStream o2 = Files.newOutputStream(p);
+    					destinationList.add(new BufferedOutputStream(o2));
+    				} catch (IOException e) {
+    					throw new UncheckedIOException(e);
+    				}
+    			} else if (o instanceof File) {
+    				final File f = (File) o;
+    				final File dir = f.getParentFile();
+    				if (dir != null) {
+    					dir.mkdirs();
+    				}
+    				try {
+    					final OutputStream o2 = new FileOutputStream(f);
+    					destinationList.add(new BufferedOutputStream(o2));
+    				} catch (IOException e) {
+    					throw new UncheckedIOException(e);
+    				}
+    			} else {
+    				throw new IllegalArgumentException("Invalid destination type: Expected OutputStream|Path|File, got " + o.getClass().getName());
+    			}
+    		}
+    	} catch (Throwable t) {
+    		for (OutputStream out : destinationList) {
+    			try {
+    				out.close();
+    			} catch (Throwable t2) {
+    				// Ignore this, throw the original cause.
+    			}
+    		}
+    		throw Exceptions.show(t);
+    	}
+		return new OutputStream() {
+			@Override
+			public void write(int pByte) throws IOException {
+				for (OutputStream out : destinationList) {
+					out.write(pByte);
+				}
+			}
+
+			@Override
+			public void write(byte[] pBuffer) throws IOException {
+				for (OutputStream out : destinationList) {
+					out.write(pBuffer);
+				}
+			}
+
+			@Override
+			public void write(byte[] pBuffer, int pOff, int pLen) throws IOException {
+				for (OutputStream out : destinationList) {
+					out.write(pBuffer, pOff, pLen);
+				}
+			}
+
+			@Override
+			public void flush() throws IOException {
+				for (OutputStream out : destinationList) {
+					out.flush();
+				}
+			}
+
+			@Override
+			public void close() throws IOException {
+				for (OutputStream out : destinationList) {
+					out.close();
+				}
+				// At this point, the original pOut is still open, because we replaced it
+				// with an uncloseable version.
+				pOut.close();
+			}
+		};
     }
 }
