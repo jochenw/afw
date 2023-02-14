@@ -206,7 +206,8 @@ i     */
 
     /** Sets a listener, which is being notified, before the actual execution
      * starts. The use case is for logging, and other diagnostic purposes.
-     * @param The command line, which is being executed.
+     * @param pCmdLineConsumer The listener, which is being notified about
+     *   the command line before execution.
      * @return This builder.
      */
     public ExecutorBuilder cmdLineListener(FailableConsumer<String[],?> pCmdLineConsumer) {

@@ -56,6 +56,9 @@ public class Executor {
      *   null, in which case the directory is inherited from the current process.
      * @param pStdOutHandler The handler for the external processes stdout stream.
      * @param pStdErrHandler The handler for the external processes stderr stream.
+     * @param pCmdLineConsumer A listener, which is being notified with the command
+     *   line, that is being executed.
+     * @param pEnvironment A map with additional environment variables.
      * @throws NullPointerException Either of the parameters is null.
      */
     public Executor(String[] pCmdLine, Path pDirectory, FailableConsumer<InputStream,?> pStdOutHandler,
