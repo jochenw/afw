@@ -18,7 +18,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.jochenw.afw</groupId>
   <artifactId>afw</artifactId>
-  <version>0.7.2-SNAPSHOT</version>
+  <version>0.7.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>AFW</name>
   <description>Application framework, Dependency Injection</description>
