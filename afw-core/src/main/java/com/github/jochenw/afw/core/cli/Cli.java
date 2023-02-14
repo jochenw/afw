@@ -63,7 +63,7 @@ public class Cli<B> {
 
 	/**
 	 * Interface of the handler context, that is being passed to
-	 * {@link Option#handler(FailableBiConsumer)}
+	 * {@link Option#handler(Functions.FailableBiConsumer)}
 	 * @param <O> Type of the options bean.
 	 */
 	public interface Context<O> {

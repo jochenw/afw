@@ -56,8 +56,8 @@ import groovyjarjarantlr4.v4.runtime.misc.NotNull;
  *       .send()
  * </pre>
  * 
- * If your request is supposed to create a result, replace {@link Builder#send()}
- * with {@link Builder#call(FailableFunction)}.
+ * If your request is supposed to create a result, replace {@link RestAccess.Builder#send()}
+ * with {@code RestAccess.Builder#call(FailableFunction)}.
  */
 public class RestAccess {
 	private @Inject HttpConnector httpConnector;
@@ -108,8 +108,8 @@ public class RestAccess {
 		/** Returns the HTTP request method, like POST, PUT, DELETE, or GET.
 		 * May be null, in which case GET is used as the default.
 		 * @return The HTTP request method, or null.
-		 * @see RestAccess.Builder#post(FailableConsumer)
-		 * @see RestAccess.Builder#put(FailableConsumer)
+		 * @see RestAccess.Builder#post(Functions.FailableConsumer)
+		 * @see RestAccess.Builder#put(Functions.FailableConsumer)
 		 */
 		public String getMethod() { return method; }
 		/** Returns the REST resource URI, which will be appended to the {@link #getUrl() REST API URL}.
@@ -142,15 +142,15 @@ public class RestAccess {
 		/** Returns a producer for the request body.
 		 * <em>Note:</em> Keep in mind, that the {@link #getMethod() HTTP request method}
 		 * must be "POST", or "PUT", if you have a request body. The best way to ensure this
-		 * is to use the methods {@link RestAccess.Builder#post(FailableConsumer)}, or
-		 * {@link RestAccess.Builder#put(FailableConsumer)}, rather than
-		 * {@link RestAccess.Builder#body(FailableConsumer)}.
+		 * is to use the methods {@link RestAccess.Builder#post(Functions.FailableConsumer)}, or
+		 * {@link RestAccess.Builder#put(Functions.FailableConsumer)}, rather than
+		 * {@link RestAccess.Builder#body(Functions.FailableConsumer)}.
 		 * @return The producer for the request body, or null.
 		 */
 		public FailableConsumer<OutputStream, ?> getBody() { return body; }
 		/** Returns a consumer for the response body.
 		 * <em>Note:</em> If your consumer is supposed to produce a result,
-		 * consider using a {@link RestAccess#call(Request, FailableFunction) result
+		 * consider using a {@link RestAccess#call(Request, Functions.FailableFunction) result
 		 * function} instead.
 		 * @return The consumer for the response body, or null.
 		 */
@@ -163,7 +163,7 @@ public class RestAccess {
 		 * {@link #getBody() body producer}, {@link #getConsumer() response consumer},
 		 * and the {@link #getErrorConsumer() error response consumer}, as necessary.
 		 * If your response is supposed to produce a result, consider using
-		 * {@link #call(FailableFunction)} instead.
+		 * {@link #call(Functions.FailableFunction)} instead.
 		 */
 		public void send() {
 			RestAccess.this.send(this);

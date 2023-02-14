@@ -178,7 +178,7 @@ public class ObservableInputStream extends InputStream {
 	 * notifies the given listener, while doing so.
 	 * @param pIn The input stream, which is actually being read.
 	 * @param pListener The listener, which are being notified about data events.
-	 *   For multiple listeners, see {@link Listener#of(Listener...)}.
+	 *   For multiple listeners, see {@link ObservableInputStream.Listener#of(ObservableInputStream.Listener...)}.
 	 */
 	public ObservableInputStream(InputStream pIn, Listener pListener) {
 		in = pIn;

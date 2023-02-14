@@ -32,8 +32,8 @@ import com.github.jochenw.afw.core.util.Streams;
  */
 public interface IReadable {
 	/**
-	 * This exception is being thrown, if the methods {@link IReadable#read(FailableConsumer)},
-	 * or {@link IReadable#read(FailableConsumer, Charset)} are invoked more than once on a
+	 * This exception is being thrown, if the methods {@code IReadable.read(FailableConsumer)},
+	 * or {@code IReadable.read(FailableConsumer, Charset)} are invoked more than once on a
 	 * {@link IReadable}, which isn't repeatable.
 	 */
 	public static class NoLongerReadableException extends RuntimeException {
@@ -66,19 +66,19 @@ public interface IReadable {
 	}
 	/**
 	 * Returns, whether this {@link IReadable} is readable. If so, the methods
-	 * {@link IReadable#read(FailableConsumer)}, or {@link IReadable#read(FailableConsumer, Charset)}
+	 * {@code IReadable.read(FailableConsumer)}, or {@code IReadable.read(FailableConsumer, Charset)}
 	 * may be invoked, at least once.
 	 * @return True, if this {@link IReadable} is readable. If so, the methods
-	 * {@link IReadable#read(FailableConsumer)}, or {@link IReadable#read(FailableConsumer, Charset)}
+	 * {@code IReadable.read(FailableConsumer)}, or {@code IReadable.read(FailableConsumer, Charset)}
 	 * may be invoked, at least once.
 	 */
 	public boolean isReadable();
 	/**
 	 * Returns, whether this {@link IReadable} is repeatable. If so, the methods
-	 * {@link IReadable#read(FailableConsumer)}, or {@link IReadable#read(FailableConsumer, Charset)}
+	 * {@code IReadable.read(FailableConsumer)}, or {@code IReadable.read(FailableConsumer, Charset)}
 	 * may be invoked more than once.
 	 * @return True, if this {@link IReadable} is repeatable. If so, the methods
-	 * {@link IReadable#read(FailableConsumer)}, or {@link IReadable#read(FailableConsumer, Charset)}
+	 * {@code IReadable#read(FailableConsumer)}, or {@code IReadable.read(FailableConsumer, Charset)}
 	 * may be invoked more than once.
 	 */
 	public boolean isRepeatable();
@@ -166,7 +166,7 @@ public interface IReadable {
 	 * @param pName The value, that's being returned by invoking the
 	 *   created {@link IReadable readable's} method {@link IReadable#getName()}.
 	 * @param pSupplier Supplies the value, that's being returned by invoking the
-	 *   created {@link IReadable readable's} method {@link IReadable#read(FailableConsumer)}.
+	 *   created {@link IReadable readable's} method {@code IReadable.read(FailableConsumer)}.
 	 * @return A new instance of {@link IReadable}, with the given name, and data stream.
 	 */
 	public static IReadable of(String pName, FailableSupplier<InputStream,?> pSupplier) {

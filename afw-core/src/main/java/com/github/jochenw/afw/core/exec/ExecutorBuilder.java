@@ -254,8 +254,6 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pStdOutHandler} is null.
      * @see #stdOut(File)
-     * @see #stdOut(FailableConsumer)
-     * @see #stdOut(FailableSupplier)
      * @see #stdOut(Path)
      * @see #stdOut(OutputStream)
      */
@@ -273,10 +271,8 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pSupplier} is null.
      * @see #stdOut(File)
-     * @see #stdOut(FailableConsumer)
      * @see #stdOut(Path)
      * @see #stdOut(OutputStream)
-     * @see #stdErr(FailableConsumer)
      */
     public ExecutorBuilder stdOut(FailableSupplier<OutputStream,?> pSupplier) {
     	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
@@ -297,8 +293,6 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pOutputStream} is null.
      * @see #stdOut(File)
-     * @see #stdOut(FailableConsumer)
-     * @see #stdOut(FailableSupplier)
      * @see #stdOut(Path)
      * @see #stdErr(OutputStream)
      */
@@ -316,8 +310,6 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pOutputFile} is null.
      * @see #stdOut(File)
-     * @see #stdOut(FailableConsumer)
-     * @see #stdOut(FailableSupplier)
      * @see #stdOut(OutputStream)
      * @see #stdOut(Path)
      */
@@ -339,8 +331,6 @@ i     */
      *   output stream will be written.
      * @return This builder.
      * @throws NullPointerException The parameter {@code pOutputFile} is null.
-     * @see #stdOut(FailableConsumer)
-     * @see #stdOut(FailableSupplier)
      * @see #stdOut(OutputStream)
      * @see #stdOut(Path)
      * @see #stdErr(File)
@@ -376,8 +366,6 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pStdOutHandler} is null.
      * @see #stdErr(File)
-     * @see #stdErr(FailableConsumer)
-     * @see #stdErr(FailableSupplier)
      * @see #stdErr(Path)
      * @see #stdErr(OutputStream)
      */
@@ -395,10 +383,8 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pSupplier} is null.
      * @see #stdErr(File)
-     * @see #stdErr(FailableConsumer)
      * @see #stdErr(Path)
      * @see #stdErr(OutputStream)
-     * @see #stdOut(FailableConsumer)
      */
     public ExecutorBuilder stdErr(FailableSupplier<OutputStream,?> pSupplier) {
     	final FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
@@ -423,10 +409,8 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pSupplier} is null.
      * @see #stdErr(File)
-     * @see #stdErr(FailableConsumer)
      * @see #stdErr(Path)
      * @see #stdErr(OutputStream)
-     * @see #stdOut(FailableConsumer)
      */
     public ExecutorBuilder stdErr(FailableSupplier<Writer,?> pSupplier, Charset pCharset) {
     	final FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
@@ -448,8 +432,6 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pOutputStream} is null.
      * @see #stdErr(File)
-     * @see #stdErr(FailableConsumer)
-     * @see #stdErr(FailableSupplier)
      * @see #stdErr(Path)
      * @see #stdOut(OutputStream)
      */
@@ -469,10 +451,7 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pOutputStream} is null.
      * @see #stdErr(File)
-     * @see #stdErr(FailableConsumer)
-     * @see #stdErr(FailableSupplier)
      * @see #stdErr(Path)
-     * @see #stdOut(FailableSupplier)
      */
     public ExecutorBuilder stdErr(Writer pWriter, Charset pCharset) {
 		final Writer w = Objects.requireNonNull(pWriter, "Writer");
@@ -488,8 +467,6 @@ i     */
      * @return This builder.
      * @throws NullPointerException The parameter {@code pOutputFile} is null.
      * @see #stdErr(File)
-     * @see #stdErr(FailableConsumer)
-     * @see #stdErr(FailableSupplier)
      * @see #stdErr(OutputStream)
      * @see #stdOut(Path)
      */
@@ -511,8 +488,6 @@ i     */
      *   error stream will be written.
      * @return This builder.
      * @throws NullPointerException The parameter {@code pOutputFile} is null.
-     * @see #stdErr(FailableConsumer)
-     * @see #stdErr(FailableSupplier)
      * @see #stdErr(OutputStream)
      * @see #stdErr(Path)
      * @see #stdOut(File)

@@ -58,9 +58,9 @@ public class BeanWalker {
 		 * @param pFieldName The fields name.
 		 * @param pType The fields type.
 		 * @return True, if this field is considered atomic, in which
-		 *   case {@link #visitAtomicProperty(Context, Field, Supplier, Consumer)}
+		 *   case {@link #visitAtomicProperty(BeanWalker.Context, Field, Supplier, Consumer)}
 		 *   will be invoked for this field. False, if this field isn't considered
-		 *   atomic, in which case {@link #isComplex(Context, String, Class)}
+		 *   atomic, in which case {@link #isComplex(BeanWalker.Context, String, Class)}
 		 *   will be invoked.
 		 */
 		boolean isAtomic(C pContext, String pFieldName, Class<?> pType);
@@ -71,8 +71,8 @@ public class BeanWalker {
 		 * @param pFieldName The fields name.
 		 * @param pType The fields type.
 		 * @return True, if this field is considered complex, in which
-		 *   case {@link #startVisiting(Context, Object)}, and (later on)
-		 *   {@link #endVisiting(Context, Object)} will be invoked. False,
+		 *   case {@link #startVisiting(BeanWalker.Context, Object)}, and (later on)
+		 *   {@link #endVisiting(BeanWalker.Context, Object)} will be invoked. False,
 		 *   if this field isn't complex, in which case the field will be
 		 *   ignored.
 		 */
