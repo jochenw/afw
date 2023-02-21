@@ -7,7 +7,6 @@ import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
-import com.github.jochenw.afw.di.api.Key;
 
 
 /** Abstract base class for implementations of {@link IComponentFactory}.
@@ -16,13 +15,19 @@ import com.github.jochenw.afw.di.api.Key;
  */
 public abstract class AbstractComponentFactory implements IComponentFactory {
 	private IAnnotationProvider annotationProvider;
-	private Key<IComponentFactory> key;
 
 	@Override
 	public IAnnotationProvider getAnnotations() {
 		return annotationProvider;
 	}
 
+	/** Sets the component factories annotation provider.
+	 * The purpose of the annotation provider is adaptation
+	 * to varying annotation namespaces, like
+	 * {@code javax.inject}, or {@code jakarta.inject}. 
+	 * @param pAnnotationProvider The annotation provider,
+	 *   which is being used by the component factory.
+	 */
 	protected void setAnnotationProvider(IAnnotationProvider pAnnotationProvider) {
 		annotationProvider = pAnnotationProvider;
 	}
@@ -41,8 +46,4 @@ public abstract class AbstractComponentFactory implements IComponentFactory {
 			                       IOnTheFlyBinder pOnTheFlyBinder,
 			                       List<BindingBuilder<Object>> pBuilders,
 			                       Set<Class<?>> pStaticInjectionClasses);
-
-	protected Key<IComponentFactory> getKey() {
-		return key;
-	}
 }

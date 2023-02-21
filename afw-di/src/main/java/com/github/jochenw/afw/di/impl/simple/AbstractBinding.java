@@ -11,8 +11,13 @@ import com.github.jochenw.afw.di.util.Exceptions;
 public abstract class AbstractBinding implements Binding {
 	private final Function<SimpleComponentFactory,Object> baseSupplier;
 
-	protected AbstractBinding(Function<SimpleComponentFactory,Object> baseSupplier) {
-		this.baseSupplier = baseSupplier;
+	/** Creates a new instance. The given supplier will be invoked, if
+	 * the binding needs to create an instance.
+	 * @param pBaseSupplier The supplier, which is actually providing
+	 *   instances on behalf of the binding.
+	 */
+	protected AbstractBinding(Function<SimpleComponentFactory,Object> pBaseSupplier) {
+		baseSupplier = pBaseSupplier;
 	}
 
 	@Override

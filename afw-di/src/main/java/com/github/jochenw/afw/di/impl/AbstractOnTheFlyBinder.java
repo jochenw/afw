@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
+import com.github.jochenw.afw.di.api.LogInject;
+import com.github.jochenw.afw.di.api.PropInject;
 
 /** Abstract base class for implementing an {@link IOnTheFlyBinder}.
  */
@@ -16,9 +18,40 @@ public abstract class AbstractOnTheFlyBinder implements IOnTheFlyBinder {
 	private static class IsInjectableException extends RuntimeException {
 		private static final long serialVersionUID = 2820548098780229944L;
 	}
+
+	/** Returns, whether a value for the given field can be injected.
+	 * @param pField The field, which is being tested.
+	 * @return True, if a value can be injected. This is typically the
+	 *   case, if the field is annotated with a suitable annotation,
+	 *   like {@link LogInject}, or {@link PropInject}, and has a
+	 *   suitable data type. Otherwise, returns false.
+	 *   @see #getInjector(Field)
+	 */
 	protected abstract boolean isInjectable(Field pField);
+	/** Returns, whether a value can be injected by invoking the#
+	 *    given method.
+	 * @param pMethod The method, which is being tested.
+	 * @return True, if a value can be injected. This is typically the
+	 *   case, if the method is annotated with a suitable annotation,
+	 *   like {@link LogInject}, or {@link PropInject}, and has a
+	 *   suitable parameter type. Otherwise, returns false.
+	 */
 	protected abstract boolean isInjectable(Method pMethod);
+	/** If {@link #isInjectable(Field)} returns true, then
+	 * this method will be invoked, to create an actual injector.
+	 * @param pField The field, on which the created injector
+	 *   must operate.
+	 * @return An injector, which injects a value into the given
+	 * field.
+	 */
 	protected abstract BiConsumer<IComponentFactory,Object> getInjector(Field pField);
+	/** If {@link #isInjectable(Method)} returns true, then
+	 * this method will be invoked, to create an actual injector.
+	 * @param pMethod The method, on which the created injector
+	 *   must operate.
+	 * @return An injector, which injects a value by invoking
+	 *   the given method.
+	 */
 	protected abstract BiConsumer<IComponentFactory,Object> getInjector(Method pMethod);
 
 	@Override

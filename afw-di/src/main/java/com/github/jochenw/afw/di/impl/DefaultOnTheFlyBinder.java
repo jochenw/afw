@@ -60,10 +60,34 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 		}
 	}
 
+	/** Returns, whether the given annotation indicates, that a value must
+	 * be injected into the given field.
+	 * @param pField The field, which is being tested.
+	 * @param pAnnotation An annotation of the given field.
+	 * @param pAnnotations The array of all the fields annotations.
+	 *   The annotation {@code pAnnotation} is an element in this
+	 *   array.
+	 * @return True, if a value must be injected into the given field.
+	 *   This is the case, if the given annotation is an instance of
+	 *   {@link LogInject}, or {@link PropInject}. Otherwise, false is
+	 *   returned.
+	 */
 	protected boolean isAnnotationInjectable(Field pField, Annotation pAnnotation, Annotation[] pAnnotations) {
 		return pAnnotation instanceof LogInject  ||  pAnnotation instanceof PropInject;
 	}
 
+	/** Returns, whether the given annotation indicates, that a value must
+	 * be injected by invoking the given method.
+	 * @param pMethod The method, which is being annotated.
+	 * @param pAnnotation An annotation of the given method.
+	 * @param pAnnotations The array of all the methods annotations.
+	 *   The annotation {@code pAnnotation} is an element in this
+	 *   array.
+	 * @return True, if a value must be injected by invoking the
+	 *   given method, This is the case, if the given annotation
+	 *   is an instance of {@link LogInject}, or {@link PropInject}.
+	 *   Otherwise, false is returned.
+	 */
 	protected boolean isAnnotationInjectable(Method pMethod, Annotation pAnnotation, Annotation[] pAnnotations) {
 		return pAnnotation instanceof PostConstruct  ||  pAnnotation instanceof PreDestroy
 				||  pAnnotation instanceof jakarta.annotation.PostConstruct
@@ -71,16 +95,49 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 				||  pAnnotation instanceof LogInject  ||  pAnnotation instanceof PropInject;
 	}
 
+	/** Creates an instance of the given logger type, with the given
+	 * logger id.
+	 * @param pFactory The component factory, which is being used to
+	 *   create the instance.
+	 * @param pType Type of the created logger.
+	 * @param pId Id of the created logger.
+	 * @return The created logger instance.
+	 */
 	protected Object getLogger(IComponentFactory pFactory, Class<?> pType, String pId) {
 		return null;
 	}
 
+	/** Creates an instance of the given property type, with the given
+	 * property key, and the given default value.
+	 * @param pFactory The component factory, which is being used to
+	 *   create the instance.
+	 * @param pType Type of the created property.
+	 * @param pId Key of the created property.
+	 * @param pDefaultValue The created properties default value.
+	 * @param pNullable True, if the requested property value may be
+	 *   null, after applying a potential default value. 
+	 * @return The created property instance.
+	 */
 	protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId, String pDefaultValue,
 			                     boolean pNullable) {
 		return null;
 	}
 
-	
+
+	/** Creates an injectable value for the given field, or method.
+	 * This method delegates to {@link #getInjectableLogger(IComponentFactory, Member, LogInject)},
+	 * or {@link #getInjectableProperty(IComponentFactory, Member, PropInject)},
+	 * depending on the type of the given {@code pAnnotation}.
+	 * @param pComponentFactory The component factory, which is being used to
+	 *   create the instance.
+	 * @param pMember The fieĺd, or method, for which an injectable value
+	 *   is being created.
+	 * @param pAnnotation The annotation, which requests, that a value
+	 *   must be injected.
+	 * @param pAllAnnotations The members array of annotations. The
+	 *   annotation {@code pAnnotation} is an element in the array.
+	 * @return The created injectable value.
+	 */
 	protected Object getInjectableValue(IComponentFactory pComponentFactory,
 										Member pMember,
 										Annotation pAnnotation,
@@ -96,6 +153,15 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 		}
 	}
 
+	/** Creates an injectable property value for the given field, or method.
+	 * @param pComponentFactory The component factory, which is being used to
+	 *   create the instance.
+	 * @param pMember The fieĺd, or method, for which an injectable value
+	 *   is being created.
+	 * @param pPropInject The annotation, which requests, that a value
+	 *   must be injected.
+	 * @return The created injectable value.
+	 */
 	protected Object getInjectableProperty(IComponentFactory pComponentFactory, Member pMember, final PropInject pPropInject) {
 		final String id;
 		if (pPropInject.id().length() == 0) {
@@ -114,6 +180,16 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 		return property;
 	}
 
+	/** Creates an injectable logger value for the given field, or method.
+	 * depending on the type of the given {@code pAnnotation}.
+	 * @param pComponentFactory The component factory, which is being used to
+	 *   create the instance.
+	 * @param pMember The fieĺd, or method, for which an injectable value
+	 *   is being created.
+	 * @param pLogInject The annotation, which requests, that a value
+	 *   must be injected.
+	 * @return The created injectable value.
+	 */
 	protected Object getInjectableLogger(IComponentFactory pComponentFactory, Member pMember, final LogInject pLogInject) {
 		final String id;
 		if (pLogInject.id().length() == 0) {
@@ -129,6 +205,14 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 		return logger;
 	}
 
+	/** Returns the type of the value, that must be injected
+	 * for the given fieĺd, or method.
+	 * @param pMember The field, or method, which requires an
+	 *   injectable value.
+	 * @return The requested type. If the member is a field,
+	 *   then the fields type. For a method, returns the
+	 *   type of the first parameter.
+	 */
 	protected Class<?> getInjectableValueType(Member pMember) {
 		final Class<?> type;
 		if (pMember instanceof Field) {

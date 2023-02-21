@@ -32,8 +32,6 @@ import com.github.jochenw.afw.di.impl.BindingBuilder;
 import com.github.jochenw.afw.di.util.Exceptions;
 import com.github.jochenw.afw.di.util.Reflection;
 
-import jakarta.inject.Provider;
-
 
 /** Default implementation of an {@link IComponentFactory}:
  * A simple, and fast, standalone implementation, without
@@ -113,6 +111,10 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		}
 	}
 
+	/** Creates a metadata instance for the given type.
+	 * @param pType The type, which is being inspected.
+	 * @return The created metadata instance.
+	 */
 	protected MetaData newMetaData(Class<Object> pType) {
 		final Function<SimpleComponentFactory,Object> instantiator = newInstantiator(pType);
 		final BiConsumer<SimpleComponentFactory,Object> injector = newInjector(pType);
@@ -133,6 +135,12 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		void accept(O1 pO1, O2 pO2, O3 pO3);
 	}
 
+	/** Returns an injector for the given type.
+	 * The injector has the ability to configure an instance
+	 * of the given type by injecting values.
+	 * @param pType The type, for which an injector must be created.
+	 * @return The created injector.
+	 */
 	protected BiConsumer<SimpleComponentFactory,Object> newInjector(Class<Object> pType) {
 		final List<BiConsumer<SimpleComponentFactory,Object>> list = new ArrayList<>();
 		Class<Object> clazz = pType;
@@ -159,6 +167,14 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return (scf,o) -> list.forEach((consumer) -> consumer.accept(scf, o));
 	}
 
+	/** Creates a method injector for the given method.
+	 * The injector has the ability to configure an instance
+	 * of the methods declaring type by invoking the given method,
+	 * passing injectable values as the parameters.
+	 * @param pSink A consumer for the created injector.
+	 * @param pMethod The method, for which an injector
+	 *   must be created.
+	 */
 	protected void newMethodInjector(final Consumer<BiConsumer<SimpleComponentFactory, Object>> pSink, Method pMethod) {
 		if (Modifier.isAbstract(pMethod.getModifiers())) {
 			throw new IllegalStateException("The method " + asString(pMethod)
@@ -185,6 +201,18 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		});
 	}
 
+	/** Creates an injector for the given field.
+	 * The injector has the ability to configure an instance
+	 * of the fields declaring type by injecting a value
+	 * into the field, passing an injectable value.
+	 * @param pSink A consumer for the created injector.
+	 * @param pClazz The class, to which the field belongs.
+	 *   (The field's declaring class, or a subclass.)
+	 * @param pStaticInjection True, if static injection is
+	 *   being supported.
+	 * @param pField The field, for which an injector
+	 *   must be created.
+	 */
 	protected void newFieldInjector(final Consumer<BiConsumer<SimpleComponentFactory, Object>> pSink, Class<Object> pClazz,
 			boolean pStaticInjection, final Field pField) {
 		if (Annotations.isInjectPresent(pField)) {
