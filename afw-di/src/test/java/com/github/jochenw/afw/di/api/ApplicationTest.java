@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Provider;
+import javax.annotation.PreDestroy;
 
 import org.junit.Test;
 
@@ -41,13 +41,27 @@ public class ApplicationTest {
 	 * provides an appropriate error message. 
 	 */
 	public static class InvalidApplicationClass extends Application {
+		/** Creates a new instance. The created instance will invoke
+		 * the given {@link Supplier module supplier} to acquire a
+		 * {@link IComponentFactory component factory}.
+		 * @param pModuleSupplier The {@link Supplier module supplier},
+		 *   which is being invoked to acquire a
+		 *   {@link IComponentFactory component factory}.
+		 */
 		protected InvalidApplicationClass(Supplier<Module> pModuleSupplier) {
 			super(pModuleSupplier);
 			throw new IllegalStateException("Not implemented");
 		}
 
-		protected InvalidApplicationClass(ComponentFactorySupplier pComponentFctoryProvider) {
-			super(pComponentFctoryProvider);
+		/** Creates a new instance. The created instance will invoke
+		 * the given {@link ComponentFactorySupplier component factory
+		 * provider} to acquire a {@link IComponentFactory component factory}.
+		 * @param pComponentFactoryProvider The {@link ComponentFactorySupplier
+		 * component factory provider}, which is being invoked to acquire a
+		 *   {@link IComponentFactory component factory}.
+		 */
+		protected InvalidApplicationClass(ComponentFactorySupplier pComponentFactoryProvider) {
+			super(pComponentFactoryProvider);
 			throw new IllegalStateException("Not implemented");
 		}
 	}
@@ -63,6 +77,13 @@ public class ApplicationTest {
 		validate(appl, false);
 	}
 
+	/** Tests, whether the given application's component factory
+	 * works as expected.
+	 * @param pApplication The application, that is being tested.
+	 * @param pNoApplication False, if the test includes a check,
+	 *   that the component factory has a binding for the
+	 *   {@link Application} itself. Otherwise true.
+	 */
 	protected void validate(final Application pApplication, boolean pNoApplication) {
 		assertNotNull(pApplication);
 		final IComponentFactory cf = pApplication.getComponentFactory();
@@ -142,14 +163,27 @@ public class ApplicationTest {
 		validate(appl, true);
 	}
 
+	/** A test class for testing {@code @PostConstruct},
+	 *   and {@code PreDestroy}.
+	 */
 	public static class Startable {
 		private boolean started, stopped;
 
+		/** Called to start the instance.
+		 */
 		@PostConstruct
 		public void start() { started = true; }
+		/** Returns, whether the instance has been started.
+		 * @return True, if {@link #start()} has been invoked.
+		 */
 		public boolean isStarted() { return started; }
-		@PostConstruct
+		/** Called to stop the instance.
+		 */
+		@PreDestroy
 		public void stop() { stopped = true; }
+		/** Returns, whether the instance has been stopped.
+		 * @return True, if {@link #stop()} has been invoked.
+		 */
 		public boolean isStopped() { return stopped; }
 	}
 

@@ -236,6 +236,11 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		}
 	}
 
+	/** Creates a textual description of the given method,
+	 * for use in error messages.
+	 * @param pMethod The method, that is being described.
+	 * @return The created description.
+	 */
 	protected String asString(Method pMethod) {
 		final Type[] parameterTypes = pMethod.getGenericParameterTypes();
 		final StringBuilder sb = new StringBuilder();
@@ -251,6 +256,13 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return sb.toString();
 	}
 
+	/** Called to find a binding with the given type, that matches the
+	 * given set of annotations.
+	 * @param pType The requested bindings type.
+	 * @param pAnnotations The set of annotations, that are being matched
+	 *   by the requested binding.
+	 * @return The requested binding, if any, or null.
+	 */
 	protected Binding findBinding(Type pType, Annotation[] pAnnotations) {
 		Binding binding = bindings.find(pType, pAnnotations);
 		if (binding == null) {
@@ -305,6 +317,24 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return binding;
 	}
 
+	/** Creates a supplier for an object of the given type:
+	 * <ol>
+	 *   <li>If the given type has a constructor, that is annotated
+	 *   with {@code @Inject}, then that constructor will be used
+	 *     by the created supplier. If so, the given component
+	 *     factory will be used as a supplier for the constructor
+	 *     parameters.
+	 *   </li>
+	 *   <li>Otherwise, of the given type has a default constructor
+	 *     (a public no-arguments constructor), then the created
+	 *     supplier will use that constructor, and the given
+	 *     component factory will be ignored, because no arguments
+	 *     are required.</li>
+	 *   <li>Otherwise, the value null (no function) will be returned.
+	 * </ol>
+	 * @param pType The type, for which a supplier must be created.
+	 * @return The created function, if any, or null.
+	 */
 	protected Function<SimpleComponentFactory,Object> newInstantiator(Class<Object> pType) {
 		Function<SimpleComponentFactory,Object> result = null;
 		for (Constructor<?> cons : pType.getDeclaredConstructors()) {
@@ -343,10 +373,6 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 			};
 		}
 		return result;
-	}
-
-	protected Binding asBinding(BindingBuilder<Object> pBindingBuilder) {
-		throw new IllegalStateException("Not implemented");
 	}
 
 	@Override

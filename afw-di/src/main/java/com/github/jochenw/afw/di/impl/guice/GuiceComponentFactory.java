@@ -10,8 +10,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import javax.inject.Provider;
-
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
@@ -159,10 +157,25 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 		injector = Guice.createInjector(module);
 	}
 
+	/** Converts the given {@link Key AFW DI binding key pKey} into an
+	 * equivalent {@link com.google.inject.Key Guice key}.
+	 * @param <O> The keys type.
+	 * @param pKey The key, that is being converted.
+	 * @return The created Guice key.
+	 */
 	protected <O> com.google.inject.Key<O> asGuiceKey(final Key<O> pKey) {
 		return asGuiceKey(pKey, null, null);
 	}
 
+	/** Converts the given {@link Key AFW DI binding key pKey} into an
+	 * equivalent {@link com.google.inject.Key Guice key}, applying
+	 * the given {@code pAnnotation}, or the given {@code pAnnotationType}.
+	 * @param <O> The keys type.
+	 * @param pKey The key, that is being converted.
+	 * @param pAnnotation The created keys annotation, if any, or null..
+	 * @param pAnnotationType The created keys annotation type, if any, or null.
+	 * @return The created Guice key.
+	 */
 	protected <O> com.google.inject.Key<O> asGuiceKey(final Key<O> pKey, Annotation pAnnotation, Class<? extends Annotation> pAnnotationType) {
 		final com.google.inject.Key<?> gkey;
 		final Annotation annotation = pKey.getAnnotation() == null ? pAnnotation : pKey.getAnnotation();
@@ -188,5 +201,4 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 		final com.google.inject.Key<Object> gkey = asGuiceKey(key);
 		return injector.getBinding(gkey) != null;
 	}
-
 }

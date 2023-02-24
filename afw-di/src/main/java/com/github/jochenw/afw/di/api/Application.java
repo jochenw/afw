@@ -21,11 +21,20 @@ public class Application {
 	private final Supplier<IComponentFactory> componentFactoryProvider;
 	private IComponentFactory componentFactory;
 
+	/** Creates a new instance. The instances component factory is
+	 * configured by a module, that is returned by an invocation of
+	 * the given supplier.
+	 * @param pModuleSupplier The modules supplier.
+	 */
 	protected Application(Supplier<Module> pModuleSupplier) {
 		moduleSupplier = Objects.requireNonNull(pModuleSupplier, "Supplier");
 		componentFactoryProvider = null;
 	}
 
+	/** Creates a new instance. The instances component factory is
+	 * created by the given component factory provider.
+	 * @param pComponentFactoryProvider The component factories provider.
+	 */
 	protected Application(ComponentFactorySupplier pComponentFactoryProvider) {
 		componentFactoryProvider = Objects.requireNonNull(pComponentFactoryProvider, "Provider");
 		moduleSupplier = null;
@@ -41,9 +50,22 @@ public class Application {
 		return componentFactory;
 	}
 
+	/** Returns the applications {@link IOnTheFlyBinder}.
+	 * @return The applications {@link IOnTheFlyBinder}.
+	 */
 	protected IOnTheFlyBinder getOnTheFlyBinder() {
 		return null;
 	}
+
+	/** Called internally to create the applications component
+	 * factory. If the application has been created by using the
+	 * {@link Application#Application(ComponentFactorySupplier)
+	 * component factory supplier constructor}, then that
+	 * supplier will be invoked. Otherwise, the
+	 * {@link #Application(Supplier) module supplier} will
+	 * be invoked, to create the component factory.
+	 * @return The created component factory.
+	 */
 	protected IComponentFactory newComponentFactory() {
 		if (componentFactoryProvider == null) {
 			final Module mInner = Objects.requireNonNull(moduleSupplier.get(),

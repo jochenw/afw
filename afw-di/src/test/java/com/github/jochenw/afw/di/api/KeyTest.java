@@ -20,9 +20,10 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.di.impl.JavaxAnnotationProvider;
 import com.github.jochenw.afw.di.util.Exceptions;
 
+/** Test suite for the {@link Key} class.
+ */
 public class KeyTest {
 	/** Test for {@link Key#of(Type)}.
 	 */

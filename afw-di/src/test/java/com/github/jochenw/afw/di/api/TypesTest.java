@@ -19,8 +19,11 @@ public class TypesTest {
 		assertNotNull(new Types());
 	}
 
+	/** Test for {@link Types.Type#Type() creating} an instance with
+	 * a generic type.
+	 */
 	@Test
-	public void test() {
+	public void testCreateGenericType() {
 		final Types.Type<String> stringType = new Types.Type<String>() {};
 		assertEquals(String.class, stringType.getRawType());
 		final Types.Type<List<String>> listStringType = new Types.Type<List<String>>() {};

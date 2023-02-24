@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -39,9 +40,7 @@ public class Reflection {
 					for (int i = 0;  i < parameterTypes.length;  i++) {
 						args[i] = pParameterSupplier.apply(i);
 					}
-					if (!pConstructor.isAccessible()) {
-						pConstructor.setAccessible(true);
-					}
+					makeAccessible(pConstructor);
 					try {
 						return pConstructor.newInstance(args);
 					} catch (Throwable t) {
@@ -68,6 +67,20 @@ public class Reflection {
 		}
 	}
 
+	/** Tests, whether the given {@link AccessibleObject} is
+	 * accessible, or not, by invoking
+	 * {@code AccessibleObject.isAccessible()} on it. If not,
+	 * invokes {@code AccessibleObject.setAccessible(true)},
+	 * to change the status.
+	 * @param pAccessibleObject The object, that is being tested.
+	 */
+	@SuppressWarnings("deprecation")
+	public static void makeAccessible(AccessibleObject pAccessibleObject) {
+		if (!pAccessibleObject.isAccessible()) {
+			pAccessibleObject.setAccessible(true);
+		}
+	}
+
 	/** Returns a {@link BiConsumer}, which may be used to set the given fields value
 	 * on an instance.
 	 * @param pField The field, to which the injector will write the value.
@@ -83,9 +96,7 @@ public class Reflection {
 			if (privateLookup == null) {
 				// Java 8
 				return (pojo,value) -> {
-					if (!pField.isAccessible()) {
-						pField.setAccessible(true);
-					}
+					makeAccessible(pField);
 					try {
 						pField.set(pojo, value);
 					} catch (Throwable t) {
@@ -126,9 +137,7 @@ public class Reflection {
 			if (privateLookup == null) {
 				// Java 8
 				return (pojo,value) -> {
-					if (!pMethod.isAccessible()) {
-						pMethod.setAccessible(true);
-					}
+					makeAccessible(pMethod);
 					try {
 						pMethod.invoke(pojo, value);
 					} catch (Throwable t) {
@@ -163,7 +172,18 @@ public class Reflection {
 			throw Exceptions.show(t);
 		}
 	}
-	
+
+	/** Creates an instance of {@link Lookup}, that is suitable
+	 * for access to private fields, or methods, of the given type.
+	 * For Java 9, or later, this method will always return a
+	 * non-null value. For Java 8, it will always return null.
+	 * As a consequence, this method can (and is being) used
+	 * a detector for the JVM's version.
+	 * @param pType The type, for which a {@link Lookup} must be
+	 *   created.
+	 * @return The created {@link Lookup} (for Java 9, or later),
+	 * or null (for Java 8).
+	 */
 	protected static Lookup getPrivateLookup(Class<?> pType) {
 		try {
 			final Method method = MethodHandles.class.getDeclaredMethod("privateLookupIn", Class.class, Lookup.class);

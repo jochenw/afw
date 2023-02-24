@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Named;
 
 import com.github.jochenw.afw.di.impl.simple.Binding;
 

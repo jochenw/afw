@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.Key;
@@ -35,6 +36,11 @@ public class BindingRegistry implements IComponentFactoryAware {
 		initBindings(pFactory, pBindingBuilders);
 	}
 
+	/** Initializes the binding registry by applying the given set of
+	 * {@code BindingBuilder bindings}. 
+	 * @param pFactory The binding registries component factory.
+	 * @param pBindingBuilders The bindings, that are being applied.
+	 */
 	protected void initBindings(IComponentFactory pFactory, List<BindingBuilder<Object>> pBindingBuilders) {
 		for (BindingBuilder<Object> bb : pBindingBuilders) {
 			final Key<Object> key = bb.getKey();
@@ -57,6 +63,10 @@ public class BindingRegistry implements IComponentFactoryAware {
 		}
 	}
 
+	/** Returns the binding with the given key, if any, or null.
+	 * @param pKey The requested bindings key.
+	 * @return The requested binding, if any, or null.
+	 */
 	protected Binding getBinding(Key<Object> pKey) {
 		final BindingSet bs = bindings.get(pKey.getType());
 		if (bs == null) {
@@ -65,6 +75,17 @@ public class BindingRegistry implements IComponentFactoryAware {
 		return bs.find(pKey);
 	}
 
+	/** Creates a function, which may be used as a supplier for
+	 * an initialized object. Ensures, that the initialization
+	 * will take place only once.
+	 * @param pInitializableObject An envelope object, which acts as
+	 * a holder for the supplied, initialized object. Synchronization
+	 * on the envelope object will be used to make the created function
+	 * thread safe.
+	 * @param pSupplier A supplier, which creates the raw object, that
+	 * needs synchronization.
+	 * @return The created function.
+	 */
 	protected Function<SimpleComponentFactory,Object> asInitializable(Object pInitializableObject, Supplier<Object> pSupplier) {
 		return new Function<SimpleComponentFactory,Object>() {
 			private boolean initialized;
@@ -83,7 +104,14 @@ public class BindingRegistry implements IComponentFactoryAware {
 		};
 	}
 	
-	
+
+	/** Converts the given {@link BindingBuilder binding builder},
+	 * as supplied by the {@link ComponentFactoryBuilder component
+	 * factory builder} into a {@link Binding binding}.
+	 * @param pBindingBuilder The binding builder, that is being
+	 *   converted.
+	 * @return The created binding.
+	 */
 	protected Binding asBinding(BindingBuilder<Object> pBindingBuilder) {
 		final Function<SimpleComponentFactory,Object> baseSupplier;
 		if (pBindingBuilder.getTargetClass() == null) {

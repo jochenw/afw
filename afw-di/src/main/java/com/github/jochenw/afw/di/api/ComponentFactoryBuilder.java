@@ -179,6 +179,11 @@ public class ComponentFactoryBuilder {
 		void finished();
 	}
 
+	/** Called to configure the given instance by applying the bindings,
+	 * that have been created by the {@link #getModules() modules}.
+	 * @param pComponentFactory The configured instance, which is now
+	 *   ready to use.
+	 */
 	protected void configure(AbstractComponentFactory pComponentFactory) {
 		final List<BindingBuilder<Object>> builders = new ArrayList<>();
 		final Set<Class<?>> staticInjectionClasses = new HashSet<>();
@@ -292,6 +297,10 @@ public class ComponentFactoryBuilder {
 		}
 	}
 
+	/** Creates a supplier for the component factory instance.
+	 * @param pType The component factories type.
+	 * @return The created supplier.
+	 */
 	protected Supplier<AbstractComponentFactory> newSupplier(Class<? extends AbstractComponentFactory> pType) {
 		return () -> {
 			try {

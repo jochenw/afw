@@ -8,14 +8,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -270,6 +268,8 @@ public class ComponentFactoryTests {
 		assertSame(overwritingInstance, cf2.requireInstance(Object.class));
 	}
 
+	/** Test class for dynamic binding, aka using the {@link IOnTheFlyBinder}.
+	 */
 	public static class DynmicallyBindableComponent {
 		private boolean started;
 		private boolean stopped;
@@ -278,27 +278,55 @@ public class ComponentFactoryTests {
 		private @LogInject(id="myLogger") Logger myLogger;
 		private @LogInject() Logger otherLogger;
 
+		/** Called to start the component.
+		 */
 		@PostConstruct
 		public void start() {
 			started = true;
 		}
 
+		/** Called to stop the component.
+		 */
 		@PreDestroy
 		public void shutdown() {
 			stopped = true;
 		}
 
+		/** Returns, whether the component has been started.
+		 * @return True, if {@link #start()} has been invoked.
+		 *   Otherwise false.
+		 */
 		public boolean isStopped() {
 			return stopped;
 		}
 
+		/** Returns, whether the component has been stopped.
+		 * @return True, if {@link #shutdown()} has been invoked.
+		 *   Otherwise false.
+		 */
 		public boolean isStarted() {
 			return started;
 		}
 
+		/** Returns the value of the "myProperty" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "myProperty" attribute.
+		 */
 		public String getMyProperty() { return myProperty; }
+		/** Returns the value of the "otherProperty" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "otherProperty" attribute.
+		 */
 		public String getOtherProperty() { return otherProperty; }
+		/** Returns the value of the "myLogger" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "myLogger" attribute.
+		 */
 		public Logger getMyLogger() { return myLogger; }
+		/** Returns the value of the "otherLogger" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "otherLogger" attribute.
+		 */
 		public Logger getOtherLogger() { return otherLogger; }
 	}
 
