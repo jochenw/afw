@@ -16,8 +16,9 @@
 /**
  * This package provides utility classes for working with CSV files.
  * To read a CSV file, create a {@link java.util.function.Consumer Consumer&lt;CsvReader.CsvRow&gt;}, and
- * use the {@link CsvReader}.
- * On the other hand, to write a CSV file, use the {@link CsvWriter}.
+ * use the {@link com.github.jochenw.afw.core.csv.CsvReader}.
+ * On the other hand, to write a CSV file, use the
+ * {@link com.github.jochenw.afw.core.csv.CsvWriter}.
  */
 package com.github.jochenw.afw.core.csv;
 

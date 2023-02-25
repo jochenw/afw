@@ -16,7 +16,6 @@
 /target/
 /.classpath
 /.project
-/.settings/
 /nb-configuration.xml
 /bin/
 /pom.xml.releaseBackup
