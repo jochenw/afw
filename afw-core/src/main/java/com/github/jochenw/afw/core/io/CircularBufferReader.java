@@ -16,7 +16,6 @@
 package com.github.jochenw.afw.core.io;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.util.Objects;
 

@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import javax.annotation.Nonnull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
-import com.github.jochenw.afw.core.io.ObservableInputStream.Listener;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 

@@ -785,15 +785,6 @@ public class Streams {
     	}, Objects.notNull(pCharset, StandardCharsets.UTF_8));
     }
 
-    @FunctionalInterface
-    public interface InputStreamObserver {
-    	default void open() throws IOException {}
-    	void data(byte[] pBuffer, int pOffset, int pLen) throws IOException;
-    	default void eof() throws IOException {}
-    	default void close() throws IOException {}
-   
-    }
-
     /** Creates an {@link InputStream}, which returns the contents of the given
      * {@link InputStream} {@code pIn}, but allows creating a copy of the data
      * by sending it to the given delegates.

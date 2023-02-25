@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
-
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
@@ -632,7 +630,7 @@ public class Cli<B> {
 	 */
 	public B parse(String[] pArgs) {
 		final String[] argsArray = Objects.requireNonNull(pArgs, "Args");
-		final List<String> args = new ArrayList(Arrays.asList(argsArray));
+		final List<String> args = new ArrayList<String>(Arrays.asList(argsArray));
 		final Map<String,String> optionValues = new HashMap<>();
 		while (!args.isEmpty()) {
 			final String arg = args.remove(0);
