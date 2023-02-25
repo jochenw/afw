@@ -583,6 +583,8 @@ public class RestAccess {
 
 		/** Called to invoke {@link #build()}, followed by
 		 * {@link RestAccess#call(Request, FailableFunction)}, in one go.
+	     * @param <O> Type of the result object, that is returned by the
+	     * {@code pCallable}, and then this method.
 		 * @param pCallable The callable, which is being supplied as a
 		 *   parameter when calling {@link RestAccess#call(Request, FailableFunction)}
 		 * @return The result of invoking the given {@code pCallable}.
@@ -593,7 +595,7 @@ public class RestAccess {
 	}
 
 	/** Called to execute the given {@link RestAccess.Request}. The given
-	 * {@codec pCallable} will be invoked to read the servers response body.
+	 * {@code pCallable} will be invoked to read the servers response body.
 	 * The callable is supposed to return a result object, which will
 	 * then be returned as this methods result object.
 	 * <em>Note:</em> 

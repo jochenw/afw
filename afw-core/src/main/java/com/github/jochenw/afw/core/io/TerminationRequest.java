@@ -9,6 +9,9 @@ package com.github.jochenw.afw.core.io;
  */
 public class TerminationRequest extends RuntimeException {
 	private static final long serialVersionUID = -3342240140383270621L;
+	/** The result object, that is being returned when catching this
+	 * termination request.
+	 */
 	private final Object value;
 
 	/** Creates a new instance with the given result value.
