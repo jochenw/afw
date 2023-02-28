@@ -81,7 +81,7 @@ public class PluginListParser {
 		 */
 		public @Nonnull default Map<String,String> getProperties() { return EMPTY_MAP; }
 	}
-	/** Default return value for {@link #getProperties()}.
+	/** Default return value for {@link PluginListParser.IInitializerSpec#getProperties()}.
 	 */
 	static final Map<String,String> EMPTY_MAP = new HashMap<>();
 
