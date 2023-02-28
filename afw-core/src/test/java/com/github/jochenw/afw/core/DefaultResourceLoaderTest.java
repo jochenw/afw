@@ -113,6 +113,9 @@ public class DefaultResourceLoaderTest {
 		}
 	}
 
+	/** Creates a special test {@link ClassLoader}.
+	 * @return The created {@link ClassLoader}.
+	 */
 	protected ClassLoader newClassLoader() {
 		final ClassLoader cl = new ClassLoader() {
 			@Override
@@ -128,6 +131,13 @@ public class DefaultResourceLoaderTest {
 		return cl;
 	}
 
+	/** Asserts, that a specific resource can be located using the given {@link DefaultResourceLoader},
+	 * or the given {@link ClassLoader}.
+	 * @param pLoader The {@link DefaultResourceLoader}, that is being tested.
+	 * @param pCl The {@link ClassLoader}, that is backing the {@code pLoader}.
+	 * @param pUri The URI, that is supposed to be locatable.
+	 * @param pContent The expected resource contents.
+	 */
 	protected void assertResource(DefaultResourceLoader pLoader, ClassLoader pCl, String pUri, String pContent) {
 		final URL url;
 		if (pCl == null) {
@@ -147,6 +157,13 @@ public class DefaultResourceLoaderTest {
 		assertEquals(pContent, got);
 	}
 
+	/** Asserts, that a specific resource can <em>not</em> be located using
+	 * the given {@link DefaultResourceLoader},
+	 * or the given {@link ClassLoader}.
+	 * @param pLoader The {@link DefaultResourceLoader}, that is being tested.
+	 * @param pCl The {@link ClassLoader}, that is backing the {@code pLoader}.
+	 * @param pUri The URI, that is supposed not to be locatable.
+	 */
 	protected void assertNoResource(DefaultResourceLoader pLoader, ClassLoader pCl, String pUri) {
 		final URL url;
 		if (pCl == null) {

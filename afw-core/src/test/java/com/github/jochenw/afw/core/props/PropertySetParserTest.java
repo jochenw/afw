@@ -58,6 +58,11 @@ public class PropertySetParserTest {
 			 " This is a comment." + System.lineSeparator() + " The comments second line.");
 	}
 
+	/** Tests parsing the given content.
+	 * @param pContent The content, that is being parsed.
+	 * @param pFileName The file name, for use in error messages.
+	 * @return The set of key/value/comment triplets, that nas been parsed.
+	 */
 	protected List<String> parseTestFile(String pContent, String pFileName) {
 		final List<String> list = new ArrayList<>();
 		final FailableTriConsumer<String,String,String,?> consumer = (key, value, comment) -> {
@@ -77,6 +82,12 @@ public class PropertySetParserTest {
 		return list;
 	}
 
+	/** Tests, whether the given content contains the given set of key/value/comment
+	 * triplets.
+	 * @param pContent The content, that is being parsed.
+	 * @param pFileName The file name for use in error messages.
+	 * @param pValues The expected key/value/comment triplets.
+	 */
 	@SuppressWarnings("unused")
 	protected void test(String pContent, String pFileName, String... pValues) {
 		if (false) {

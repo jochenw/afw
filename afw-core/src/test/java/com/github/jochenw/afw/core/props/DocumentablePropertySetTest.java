@@ -51,6 +51,11 @@ public class DocumentablePropertySetTest {
 			 " This is a comment." + System.lineSeparator() + " The comments second line.");
 	}
 
+	/** Creates an {@link OrderedPropertySet} by parsing the given content.
+	 * @param pContent The content, that is being parsed.
+	 * @param pFileName The file name, for use in error messages.
+	 * @return The parsed {@link OrderedPropertySet}
+	 */
 	protected OrderedPropertySet parseTestFile(String pContent, String pFileName) {
 		final IReadable readable = IReadable.of(pFileName, () -> {
 			final byte[] bytes = pContent.getBytes(StandardCharsets.UTF_8);
@@ -59,6 +64,12 @@ public class DocumentablePropertySetTest {
 		return OrderedPropertySet.of(readable, StandardCharsets.UTF_8);
 	}
 
+	/** Tests, whether the given content contains the given set of key/value/comment
+	 * triplets.
+	 * @param pContent The content, that is being parsed.
+	 * @param pFileName The file name for use in error messages.
+	 * @param pValues The expected key/value/comment triplets.
+	 */
 	protected void test(String pContent, String pFileName, String... pValues) {
 		final BiConsumer<String, OrderedPropertySet> validator = (fileName, pset) -> {
 			if (pValues == null) {

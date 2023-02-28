@@ -16,7 +16,6 @@ import static org.junit.Assert.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableBiFunction;
 import com.github.jochenw.afw.core.function.Functions.FailableBiIntPredicate;
@@ -31,7 +30,7 @@ import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
-/** Test for {@link Functions}.
+/** Test for the {@link Functions} class.
  */
 public class FunctionsTest {
 	/** A special Exception class, for use in tests.
@@ -580,6 +579,14 @@ public class FunctionsTest {
         assertTrue(co.isClosed());
     }
 
+    /** Asserts, that running the given {@link Functions.FailableRunnable}
+     * throws the expected exception.
+     * @param <T> The expected type of exception.
+     * @param pType The expected type of exception.
+     * @param pRunnable The code, that is being executed to produce the exception.
+     * @return The actual exception, if it is of the expected type.
+     * @throws RuntimeException The actual exception, of an unexpected type.
+     */
     protected <T extends Throwable> T assertThrows(Class<T> pType, FailableRunnable<Throwable> pRunnable) {
     	try {
     		pRunnable.run();

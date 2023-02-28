@@ -58,7 +58,12 @@ public class DefaultObjectComparatorTest {
 		compare(twoElementMap, threeElementMap, "baz", "Unexpected element: true");
 		compare(threeElementMap, twoElementMap, "baz", "Expected element not found: true");
 	}
-	
+
+	/** Compares an actual object against an expected-
+	 * @param pExpect The expected object
+	 * @param pGot The actual object.
+	 * @param pIssues The list of expected issues.
+	 */
 	protected void compare(Object pExpect, Object pGot, String... pIssues) {
 		final List<String> issues = new ArrayList<String>();
 		new DefaultObjectComparator().compare(new Listener() {

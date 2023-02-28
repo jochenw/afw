@@ -23,9 +23,7 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.io.AbstractFileVisitor;
 import com.github.jochenw.afw.core.util.Tests;
 
-/**
- * @author jwi
- *
+/** Test suite for the {@link DefaultZipHandler} class.
  */
 public class DefaultZipHandlerTest {
 	/** Test for {@link DefaultZipHandler#createZipFile(Path, Path, boolean)},
@@ -47,6 +45,8 @@ public class DefaultZipHandlerTest {
 
 	/** Implementation of {@link #testCreateAndValidateWithBaseDir()}, and
 	 * {@link #testCreateAndValidateWithoutBaseDir()}.
+	 * @param pBaseDirIncluded Whether to include the base directory in the
+	 * zip file entry names.
 	 * @throws IOException The respective test failed.
 	 */
 	protected void createAndValidate(boolean pBaseDirIncluded) throws IOException {
@@ -72,6 +72,13 @@ public class DefaultZipHandlerTest {
 		assertEntry(entries, "test", DefaultZipHandlerTest.class, pBaseDirIncluded);
 	}
 
+	/** Asserts, that the given list of entries contains a specific one.
+	 * @param pEntries The list of entries, that is being tested.
+	 * @param pSrcSubDir The source directory, that is supposed to contain the
+	 *   expected class
+	 * @param pClass The expected class.
+	 * @param pBaseDirIncluded Whether the base directory is included in the entry names.
+	 */
 	protected void assertEntry(List<String> pEntries, String pSrcSubDir, Class<?> pClass, boolean pBaseDirIncluded) {
 		final String className = pClass.getName();
 		final String entry = (pBaseDirIncluded ? "src/" : "") + pSrcSubDir + "/java/"

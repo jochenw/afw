@@ -20,6 +20,9 @@ import com.github.jochenw.afw.core.util.Tests;
  * Test suite for the {@link Data} class.
  */
 public class DataTest {
+	/** Creates a map object with basic test data.
+	 * @return The created map.
+	 */
 	protected Map<String, Object> getMap() {
 		final Map<String, Object> map = new HashMap<>();
 		map.put("foo", "bar");
@@ -30,6 +33,9 @@ public class DataTest {
 		return map;
 	}
 
+	/** Creates a property set with basic test data.
+	 * @return The created property set.
+	 */
 	protected Properties getProperties() {
 		final Properties props = new Properties();
 		props.putAll(getMap());
@@ -486,7 +492,7 @@ public class DataTest {
 		}
 	}
 
-	/** Test case for {@link Data.Accessible#getStringString()}
+	/** Test case for {@link Data.Accessible#getString(String, String)}
 	 */
 	@Test
 	public void testAccessableGetStringStringString() {
@@ -669,7 +675,7 @@ public class DataTest {
 	}
 
 
-	/** Test case for {@link Data#getBoolean(Map<String,Object>,String,String)}.
+	/** Test case for {@link Data#getBoolean(Map,String,String)}.
      */
 	@Test
 	public void testAccessableGetBooleanString() {
@@ -706,7 +712,7 @@ public class DataTest {
 		assertTrue(acc.getBoolean("test").booleanValue());
 	}
 
-	/** Test case for {@link Data.Accessible#of(Map<String,Object>)}
+	/** Test case for {@link Data.Accessible#of(Map)}
 	 */
 	@Test
 	public void testAccessibleOfMap() {
@@ -716,7 +722,7 @@ public class DataTest {
 		assertTrue(acc.getBoolean("test").booleanValue());
 	}
 
-	/** Test case for {@link Data#requirePath(Map<String,Object>,String)}
+	/** Test case for {@link Data#requirePath(Map,String)}
 	 */
 	@Test
 	public void testRequirePathMapString() {
@@ -733,7 +739,7 @@ public class DataTest {
 		assertEquals(Paths.get("."), Data.requirePath(map, "path"));
 	}
 
-	/** Test case for {@link Data.Accessor#requirePath(Map<String,Object>,String)}
+	/** Test case for {@link Data.Accessor#requirePath(Object,String)}
 	 */
 	@Test
 	public void testAccessorRequirePathMapString() {
@@ -750,7 +756,7 @@ public class DataTest {
 		assertEquals(Paths.get("."), Data.MAP_ACCESSOR.requirePath(map, "path"));
 	}
 
-	/** Test case for {@link Data.Accessor#requireString(Object,String) {
+	/** Test case for {@link Data.Accessor#requireString(Object,String,String)}
 	 */
 	@Test
 	public void testAccessorRequireStringObjectString() {

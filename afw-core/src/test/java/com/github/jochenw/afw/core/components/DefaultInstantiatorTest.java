@@ -20,25 +20,45 @@ public class DefaultInstantiatorTest {
 	/** A bean class with multiple properties, of different types.
 	 */
 	public static class ABean {
+		@SuppressWarnings("javadoc")
 		protected int intProperty;
+		@SuppressWarnings("javadoc")
 		protected Integer intObjProperty;
+		@SuppressWarnings("javadoc")
 		protected long longProperty;
+		@SuppressWarnings("javadoc")
 		protected Long longObjProperty;
+		@SuppressWarnings("javadoc")
 		protected short shortProperty;
+		@SuppressWarnings("javadoc")
 		protected Short shortObjProperty;
+		@SuppressWarnings("javadoc")
 		protected byte byteProperty;
+		@SuppressWarnings("javadoc")
 		protected Byte byteObjProperty;
+		@SuppressWarnings("javadoc")
 		protected float floatProperty;
+		@SuppressWarnings("javadoc")
 		protected Float floatObjProperty;
+		@SuppressWarnings("javadoc")
 		protected double doubleProperty;
+		@SuppressWarnings("javadoc")
 		protected Double doubleObjProperty;
+		@SuppressWarnings("javadoc")
 		protected boolean boolProperty;
+		@SuppressWarnings("javadoc")
 		protected Boolean boolObjProperty;
+		@SuppressWarnings("javadoc")
 		protected String stringProperty;
+		@SuppressWarnings("javadoc")
 		protected BigInteger bigIntegerProperty;
+		@SuppressWarnings("javadoc")
 		protected BigDecimal bigDecimalProperty;
+		@SuppressWarnings("javadoc")
 		protected Path pathProperty;
+		@SuppressWarnings("javadoc")
 		protected File fileProperty;
+		@SuppressWarnings("javadoc")
 		protected URL urlProperty;
 
 		/** Returns the intProperty field.
@@ -363,6 +383,9 @@ public class DefaultInstantiatorTest {
 		assertEquals(20, bBean.getNumberOfSetterInvocations());
 	}
 
+	/** Validates, that the given bean has the expected property values.
+	 * @param pBean The bean, that is being tested.
+	 */
 	protected void validate(ABean pBean) {
 		assertEquals(23, pBean.getIntProperty());
 		assertEquals(24, pBean.getIntObjProperty().intValue());
@@ -388,6 +411,10 @@ public class DefaultInstantiatorTest {
 	private final String BIGINT_EXAMPLE = String.valueOf(Long.MAX_VALUE) + String.valueOf(Long.MAX_VALUE);
 	private final String BIGDEC_EXAMPLE = BIGINT_EXAMPLE + ".0";
 
+	/**
+	 * Returns the expected bean properties as a string array.
+	 * @return The expected set of bean properties.
+	 */
 	protected String[] getBeanPropertiesAsArray() {
 		return new String[]{ "intProperty", "23",
 				"intObjProperty", "24", "longProperty", "25",
@@ -406,6 +433,10 @@ public class DefaultInstantiatorTest {
 				};
 	}
 
+	/**
+	 * Returns the expected bean properties as a map.
+	 * @return The expected set of bean properties.
+	 */
 	protected Map<String,String> getBeanPropertiesAsMap() {
 		final Map<String,String> map = new HashMap<>();
 		final String[] propertiesArray = getBeanPropertiesAsArray();

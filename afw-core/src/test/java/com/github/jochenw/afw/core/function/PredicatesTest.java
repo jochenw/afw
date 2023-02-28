@@ -13,13 +13,8 @@ import java.util.function.Predicate;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.function.Predicates;
-import com.github.jochenw.afw.core.function.TriFunction;
 
-
-/**
- * @author jwi
- *
+/** Test for the {@link Predicates} class.
  */
 public class PredicatesTest {
 	/**
@@ -51,6 +46,10 @@ public class PredicatesTest {
 		validate(truePred, false);
 	}
 
+    /** Validates, that the given (constant) predicate produces the expected results
+     * @param pPredicate The predicate, that is being tested.
+     * @param pStatus The predicates constant result value.
+     */
 	protected void validate(Predicate<? extends Object> pPredicate, boolean pStatus) {
 		@SuppressWarnings("unchecked")
 		final Predicate<String> strPred = (Predicate<String>) pPredicate;

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,13 +14,9 @@ import java.security.KeyStore.Entry;
 import java.security.KeyStore.Entry.Attribute;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.util.Set;
 
 import org.junit.Test;
@@ -49,8 +44,11 @@ public class SelfSignedCertificateGeneratorTest {
 		validate(scgen);
 	}
 
-	protected void validate(SelfSignedCertificateGenerator pGenerator) throws KeyStoreException, IOException, NoSuchAlgorithmException,
-			CertificateException, UnrecoverableEntryException {
+	/** Runs a test for the given {@link SelfSignedCertificateGenerator},
+	 * @param pGenerator The generator, that is being tested.
+	 * @throws Exception The test failed.
+	 */
+	protected void validate(SelfSignedCertificateGenerator pGenerator) throws Exception {
 		final Path keyStorePath = Paths.get("target/unit-tests/SelfSignedCertificateGeneratorTest/keystore.jks");
 		Files.createDirectories(keyStorePath.getParent());
 		Files.deleteIfExists(keyStorePath);

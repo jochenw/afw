@@ -26,6 +26,9 @@ import com.github.jochenw.afw.core.components.IZipFileHandler;
  *
  */
 public class AbstractFileVisitorTest {
+	/** Creates the list of files, that the file visitor is expected to produce.
+	 * @return The created list.
+	 */
 	protected List<String> expectedFiles() {
 		final List<Class<?>> mainList = Arrays.asList(AbstractFileVisitor.class, IZipFileHandler.class,
 				                                   DefaultZipHandler.class);

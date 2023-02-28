@@ -29,7 +29,7 @@ public class SymbolicLinksHandlerTest {
 	@Test
 	public void testWindowsCmdSymbolicLinksHandler() throws Exception {
 		Assume.assumeTrue(Systems.isWindows());
-		runTest(new WindowsCmdSymbolicLinksHandler());
+		runCreateDirectoryTest(new WindowsCmdSymbolicLinksHandler());
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class SymbolicLinksHandlerTest {
 	@Test
 	public void testJavaNioSymbolicLinksHandler() throws Exception {
 		Assume.assumeTrue(Systems.isLinuxOrUnix());
-		runTest(new JavaNioSymbolicLinksHandler());
+		runCreateDirectoryTest(new JavaNioSymbolicLinksHandler());
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class SymbolicLinksHandlerTest {
 	 */
 	@Test
 	public void testDefaultSymbolicLinksHandler() throws Exception {
-		runTest(new DefaultSymbolicLinksHandler());
+		runCreateDirectoryTest(new DefaultSymbolicLinksHandler());
 	}
 
 	/**
@@ -78,13 +78,13 @@ public class SymbolicLinksHandlerTest {
 				return SymbolicLinks.checkLink(pPath);
 			}
 		};
-		runTest(h);
-	}
-	
-	protected void runTest(ISymbolicLinksHandler pHandler) throws IOException{
-		runCreateDirectoryTest(pHandler);
+		runCreateDirectoryTest(h);
 	}
 
+	/** Tests creating a symbolic directory link with the given handler.
+	 * @param pHandler The handler, that is being tested.
+	 * @throws IOException The test failed.
+	 */
 	protected void runCreateDirectoryTest(ISymbolicLinksHandler pHandler) throws IOException {
 		final Path testDir = Paths.get("target/unit-tests/SymbolicLinksHandlerTest");
 		Files.createDirectories(testDir);

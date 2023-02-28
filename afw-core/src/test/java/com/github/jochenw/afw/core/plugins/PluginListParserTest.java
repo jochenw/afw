@@ -221,6 +221,14 @@ public class PluginListParserTest {
 		tester.accept(xmlPluginDependencies101, "101");
 	}
 
+	/** Asserts, that the the given list of initializers contains a particular element at the
+	 * given index.
+	 * @param pList The list of initializers, that is being tested.
+	 * @param pIndex The index of the element in the list, that is being tested.
+	 * @param pType The expected type of the element.
+	 * @param pId The expected id of the element.
+	 * @param pDependsOn The expected dependencies of the element.
+	 */
 	protected static void assertPlugin(List<Initializer> pList, int pIndex, Class<?> pType, String pId, String... pDependsOn) {
 		final Initializer initializer = pList.get(pIndex);
 		Assert.assertNotNull(initializer);
@@ -238,19 +246,35 @@ public class PluginListParserTest {
 			Assert.assertEquals(pDependsOn.length, dependsOn.size());
 		}
 	}
-	
+
+	/** Creates a {@link Source}, that produces the given input.
+	 * @param pIn The created sources input.
+	 * @return The created source.
+	 */
 	protected Source newSource(InputStream pIn) {
 		return new StreamSource(pIn);
 	}
 
+	/** Creates a {@link InputSource}, that produces the given input.
+	 * @param pIn The created sources input.
+	 * @return The created source.
+	 */
 	protected InputSource newInputSource(InputStream pIn) {
 		return new InputSource(pIn);
 	}
 
+	/** Creates a {@link Source}, that produces the given input.
+	 * @param pXml The created sources input.
+	 * @return The created source.
+	 */
 	protected Source newSource(String pXml) {
 		return new StreamSource(new StringReader(pXml));
 	}
 
+	/** Creates an {@link InputSource}, that produces the given input.
+	 * @param pXml The created sources input.
+	 * @return The created source.
+	 */
 	protected InputSource newInputSource(String pXml) {
 		return new InputSource(new StringReader(pXml));
 	}

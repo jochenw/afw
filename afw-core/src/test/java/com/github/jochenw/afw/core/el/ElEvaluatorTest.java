@@ -59,6 +59,10 @@ public class ElEvaluatorTest {
 		Assert.assertTrue(((Boolean) evaluator.evaluate(expr2, toMap("id", "foo", "num", Integer.valueOf(3)))).booleanValue());
 	}
 
+	/** Converts the given key/value pairs into a map.
+	 * @param pArgs The list of key/value pairs.
+	 * @return The created map.
+	 */
 	protected Map<String,Object> toMap(Object... pArgs) {
 		final Map<String,Object> map = new HashMap<>();
 		for (int i = 0;  i < pArgs.length;  i += 2) {
