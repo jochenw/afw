@@ -33,7 +33,8 @@ public class CircularBufferInputStream extends InputStream {
 	/** The buffers size.
 	 */
 	protected final int bufferSize;
-	/** Whether the {@link #in actual InputStream has already reported EOF.
+	/** Whether the {@link #in actual InputStream}
+	 * has already reported EOF.
 	 */
 	private boolean eofSeen;
 

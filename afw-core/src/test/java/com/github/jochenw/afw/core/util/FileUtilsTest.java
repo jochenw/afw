@@ -57,6 +57,10 @@ public class FileUtilsTest {
 		}
 	}
 
+	/** Asserts, that an actual path is equal to an expected path.
+	 * @param pExpectedPath The expected path.
+	 * @param pActualPath The actual path.
+	 */
 	protected void assertEquals(String pExpectedPath, String pActualPath) {
 		final String validPath1 = pExpectedPath;
 		final String validPath2 = pExpectedPath.replace('\\', '/');

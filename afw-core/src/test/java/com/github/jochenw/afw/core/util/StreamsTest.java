@@ -58,6 +58,8 @@ import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.io.ObservableInputStream.Listener;
 
+import junit.framework.AssertionFailedError;
+
 
 /** Test case for the {@link Streams} class.
  */
@@ -385,6 +387,11 @@ public class StreamsTest {
     	assertSameProperties(props, xmlGot);
     }
 
+    /** Creates a basic set of properties for use in the
+     * test cases.
+     * @return A basic set of properties for use in the
+     *   test cases.
+     */
     protected Properties newTestProperties() {
     	final Properties props = new Properties();
     	props.put("answer", "42");
@@ -393,6 +400,14 @@ public class StreamsTest {
     	return props;
     }
 
+    /**
+     * Creates a basic property file for use in the test cases.
+     * @param pProps The property set, that is being stored in the
+     *   property file.
+     * @param pXml True, if the created property file should have
+     *   XML format. False for the basic property file.
+     * @return Path of the created property file.
+     */
     protected Path createTestProperties(Properties pProps, boolean pXml) {
     	final Path testDir = Paths.get("target");
     	final Path testFile;
@@ -417,6 +432,12 @@ public class StreamsTest {
     	return testFile;
     }
 
+    /** Validates, that a property set has the expected content, by
+     * comparing it with an expected property set.
+     * @param pExpect The expected property set.
+     * @param pGot The actual property set.
+     * @throws AssertionFailedError The validation failed.
+     */
     protected void assertSameProperties(Properties pExpect, Properties pGot) {
     	assertEquals(pExpect.size(), pGot.size());
     	for (Map.Entry<Object,Object> en : pExpect.entrySet()) {
@@ -587,6 +608,7 @@ public class StreamsTest {
     }
 
     /** Test for {@link Streams#uncloseableReader(Reader)}.
+     * @throws IOException The test failed.
      */
     @Test
     public void testUncloseableReader() throws IOException {
@@ -605,7 +627,8 @@ public class StreamsTest {
     	assertFalse(closed.isSet());
     }
 
-    /** Test for {@link Streams#multiplex(InptStream, Object...)}.
+    /** Test for {@link Streams#multiplex(OutputStream, Object...)}.
+     * @throws Exception The test failed.
      */
     @Test
     public void testMultiplex() throws Exception {
@@ -622,7 +645,6 @@ public class StreamsTest {
 
     	// Step 1: Test using read()
     	{
-    		final byte[] buffer = new byte[7];
     		final CloseableInputStream cis = CloseableInputStream.newInstance(input);
     		try (InputStream in = Streams.multiplex(cis, Listener.of(() -> baos))) {
     			for (;;) {

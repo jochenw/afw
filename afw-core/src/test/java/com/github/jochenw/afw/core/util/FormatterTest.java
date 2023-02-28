@@ -7,7 +7,15 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.data.Data;
 import com.github.jochenw.afw.core.util.Formatter.Resolver;
 
+
+/** Test suite for the {@link Formatter}.
+ */
 public class FormatterTest {
+	/** Test case for a format string with only basic parameter
+	 * references ("{}"), as opposed to numbered parameter
+	 * references ("{n}"), or named parameter references
+	 * ("{var}").
+	 */
 	@Test
 	public void testNoNumbersOrNames() {
 		final Resolver resolver = newResolver();

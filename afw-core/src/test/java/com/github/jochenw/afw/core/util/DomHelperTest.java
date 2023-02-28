@@ -7,7 +7,6 @@ import static org.junit.Assert.*;
 
 import java.io.StringReader;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
@@ -79,6 +78,10 @@ public class DomHelperTest {
 			+ "</body>\n"
 			+ "</html>";
 
+	/** Creates a {@link LocalizableDocument sample document} by parsing
+	 * the {@link #SAMPLE_DOCUMENT sample document string}. 
+	 * @return The created sample document.
+	 */
 	protected LocalizableDocument getSampleDocument() {
 		final InputSource isource = new InputSource(new StringReader(SAMPLE_DOCUMENT));
 		isource.setSystemId("SAMPLE_DOCUMENT");

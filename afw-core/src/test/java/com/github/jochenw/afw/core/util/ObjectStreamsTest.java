@@ -12,8 +12,12 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.ObjectStreams.FailableStream;
 
-public class ObjectStreamsTest {
 
+/** Test suite for the {@link ObjectStreams} class.
+ */
+public class ObjectStreamsTest {
+	/** Tests, whether an exception in a filter is properly handled.
+	 */
 	@Test
 	public void testExceptionInFilter() {
 		final List<String> list = Arrays.asList("0", "1", "2", "3", "4", "5");
@@ -33,6 +37,9 @@ public class ObjectStreamsTest {
 		}
 	}
 
+	/** Tests, whether a filter, that doesn't throw an exception, works
+	 * as expected.
+	 */
 	@Test
 	public void testFilterOkay() {
 		final List<String> list = Arrays.asList("0", "1", "2", "3", "4", "5");
@@ -49,6 +56,10 @@ public class ObjectStreamsTest {
 		assertListEquals(evenNumbers, "0", "2", "4");
 	}
 
+	/** Tests the filter result by comparing it against a list of expected objects.
+	 * @param pExpect The expected filter result, as an array.
+	 * @param pGot The actual filter result, as a list.
+	 */
 	protected <O> void assertListEquals(List<O> pGot,
 			                            @SuppressWarnings("unchecked") O... pExpect) {
 		assertEquals(pExpect.length, pGot.size());

@@ -65,6 +65,9 @@ public class DefaultInterpolatorTest {
 		assertEquals("hsql:file:target/test/db/mydb", interpolatedProps.get("dbUrl"));
 	}
 
+	/** Creates a new property set for use in the test cases.
+	 * @return The created property set.
+	 */
 	protected Properties newProperties() {
 		final Properties props = new Properties();
 		props.put("targetDir", "target");
@@ -74,6 +77,10 @@ public class DefaultInterpolatorTest {
 		return props;
 	}
 
+	/** Creates a new {@link DefaultInterpolator} with the instances {@link #properties}
+	 * as the backing property set.
+	 * @return The created {@link DefaultInterpolator}.
+	 */
 	protected DefaultInterpolator newInterpolator() {
 		try {
 			final DefaultInterpolator ip = new DefaultInterpolator((s) -> properties.getProperty(s));

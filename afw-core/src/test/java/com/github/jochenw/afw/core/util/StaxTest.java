@@ -17,14 +17,14 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.util.Stax.ElementAction;
 import com.github.jochenw.afw.core.util.Stax.ElementListener;
 
-/** Test case for {@link Stax}.
+/** Test case for the {@link Stax} class.
  */
 public class StaxTest {
 	/** Test case for {@link Stax#asLocalizedMessage(String, String, int, int)}.
 	 */
 	@Test
 	public void testAsLocalizedMessage() {
-		validate("Some error", null, -1, -1);
+		validate("Some error", "Some error", null, -1, -1);
 		validate("At SomeFile: Some error", "Some error", "SomeFile", -1, -1);
 		validate("At SomeFile, line 15: Some error", "Some error", "SomeFile", 15, -1);
 		validate("At SomeFile, column 31: Some error", "Some error", "SomeFile", -1, 31);
@@ -34,10 +34,14 @@ public class StaxTest {
 		validate("At line 14, column 61: Some error", "Some error", null, 14, 61);
 	}
 
-	protected void validate(String pMsg, String pSystemId, int pLineNumber, int pColumnNumber) {
-		validate(pMsg, pMsg, pSystemId, pLineNumber, pColumnNumber);
-	}
-
+	/** Tests {@link Stax#asLocalizedMessage(String, String, int, int)} by invoking
+	 * it with the given parameters, and comparing the result with the expected string.
+	 * @param pExpect The expected result string.
+	 * @param pMsg The error message, that is being reported.
+	 * @param pSystemId The reported system id, or null.
+	 * @param pLineNumber The reported line number, or -1.
+	 * @param pColumnNumber The reported column number, or -1.
+	 */
 	protected void validate(String pExpect, String pMsg, String pSystemId, int pLineNumber, int pColumnNumber) {
 		assertEquals(pExpect, Stax.asLocalizedMessage(pMsg, pSystemId, pLineNumber, pColumnNumber));
 		final Location loc = new Location() {
@@ -141,6 +145,15 @@ public class StaxTest {
 		}
 	}
 
+	/** Creates a new {@link XMLStreamReader}, that parses the given
+	 * XML string, using the given namespace URI, and the given local name
+	 * @param pXml The XML string, that is being parsed.
+	 * @param pUri Namespace URI of an element, that is expected in the XML string.
+	 * @param pLocalName Local name of the same element.
+	 * @return The created {@link XMLStreamReader}, positioned after the start element
+	 *   of the given element.
+	 * @throws XMLStreamException Parsing the XML string has failed.
+	 */
 	protected XMLStreamReader newReader(String pXml, String pUri, String pLocalName) throws XMLStreamException {
 		final Reader r = new StringReader(pXml);
 		final XMLStreamReader rdr = XMLInputFactory.newFactory().createXMLStreamReader(r);

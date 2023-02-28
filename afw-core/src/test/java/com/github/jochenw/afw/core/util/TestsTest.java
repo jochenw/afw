@@ -56,7 +56,6 @@ public class TestsTest {
 
 	/** Test case for {@link Tests#requireTestDirectory()}.
 	 */
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testRequireTestDirectory() {
 		final File file = Tests.requireTestDirectory();

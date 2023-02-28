@@ -33,6 +33,10 @@ public class DomTest {
 			+ "</body>\n"
 			+ "</html>";
 
+	/** Creates a {@link LocalizableDocument sample document} by parsing
+	 * the {@link #SAMPLE_DOCUMENT sample document string}. 
+	 * @return The created sample document.
+	 */
 	protected LocalizableDocument getSampleDocument() {
 		final InputSource isource = new InputSource(new StringReader(SAMPLE_DOCUMENT));
 		isource.setSystemId("SAMPLE_DOCUMENT");

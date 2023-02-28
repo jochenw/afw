@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+
+/** Test suite for the {@link MutableBoolean}.
+ */
 public class MutableBooleanTest {
 	/** Tests, whether a created instance is, indeed, mutable.
 	 */

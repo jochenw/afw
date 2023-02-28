@@ -83,6 +83,11 @@ public class KeysTest {
 		test("keystore3.jks", kh, "123456");
 	}
 
+	/** Creates a new {@link IKeyHandler}, which is internally using the
+	 * {@link Keys} class, thereby enabling testing this class with the
+	 * tests for the {@link IKeyHandler}.
+	 * @return The created {@link IKeyHandler}.
+	 */
 	protected IKeyHandler newKeysHandler() {
 		return new IKeyHandler() {
 			@Override
@@ -124,6 +129,18 @@ public class KeysTest {
 			}
 		};
 	};
+
+	/** Tests the given {@link IKeyHandler} by creating a file with the
+	 * given {@code pFileName}, that contains a self-certified keystore.
+	 * The created keystore will then be used to encrypt, and decrypt, a 
+	 * password, expecting the result to be the original, unencrypted
+	 * password.
+	 * @param pFileName The file name of the created key store.
+	 * @param pHandler The key handler, that is being used for
+	 *   encryption, and decryption.
+	 * @param pKeyPassword The keys password.
+	 * @throws IOException Creating, or reading the key store, has failed.
+	 */
 	protected void test(@Nonnull String pFileName, @Nonnull IKeyHandler pHandler, @Nullable String pKeyPassword) throws IOException {
 		final Path dir = Paths.get("target/unit-tests/KeysTest");
 		final Path file = dir.resolve(pFileName);

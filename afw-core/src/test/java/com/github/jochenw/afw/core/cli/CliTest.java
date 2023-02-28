@@ -24,7 +24,7 @@ public class CliTest {
 	}
 
 	/**
-	 * A simple test case for {@link Cli.Builder#build(String[])},
+	 * A simple test case for {@link Cli#parse(String[])},
 	 * with no problems.
 	 */
 	@Test
