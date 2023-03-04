@@ -100,6 +100,30 @@ public class Functions {
 	}
 
 	/**
+	 * Represents an operation that accepts a two arguments, the first of which is a {@code boolean}.
+	 * This is a primitive type specialization of {@link BiConsumer} for {@code boolean}.
+	 * Unlike most other functional interfaces, {@code ShortConsumer} is expected to operate via side-effects.
+	 *
+	 * <p>This is a <a href="package-summary.html">functional interface</a>
+	 * whose functional method is {@link #accept(boolean, Object)}.
+	 * @param <I> Type of the second (the non-primitive) parameter.
+	 *
+	 * @see Consumer
+	 * @since 0.6
+	 */
+	@FunctionalInterface
+	public interface BooleanBiConsumer<I> {
+	    /**
+	     * Performs this operation on the given argument.
+	     *
+	     * @param pValue the first (boolean) input argument
+	     * @param pNonPrimitiveValue The second (non-primitive) inp
+	     */
+		public void accept(boolean pValue, I pNonPrimitiveValue);
+	}
+
+
+	/**
 	 * Represents an operation that accepts a single {@code float}-valued argument and
 	 * returns no result.  This is the primitive type specialization of
 	 * {@link Consumer} for {@code float}.  Unlike most other functional interfaces,
