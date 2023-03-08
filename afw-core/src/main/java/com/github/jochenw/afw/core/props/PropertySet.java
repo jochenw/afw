@@ -1,11 +1,17 @@
 package com.github.jochenw.afw.core.props;
 
+import java.io.File;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.function.Consumer;
 
+import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.util.Objects;
 
 
@@ -116,10 +122,11 @@ public class PropertySet {
 	 *   value, and comment.
 	 */
 	public Entry put(String pKey, String pValue, String pComment) {
-		final MutableEntry entry = map.get(pKey);
+		final String key = Objects.requireNonNull(pKey);
+		final MutableEntry entry = map.get(key);
 		if (entry == null) {
 			// Create a new entry, and add it to the end of the linked entry list.
-			final MutableEntry newEntry = new MutableEntry(pKey, pValue, pComment, null);
+			final MutableEntry newEntry = new MutableEntry(key, pValue, pComment, null);
 			if (last != null) {
 				last.successor = newEntry;
 			}
@@ -127,10 +134,10 @@ public class PropertySet {
 				first = newEntry;
 			}
 			last = newEntry;
-			map.put(pKey, newEntry);
+			map.put(key, newEntry);
 			return null;
 		} else {
-			final Entry result = new Entry(pKey, entry.value, entry.comment);
+			final Entry result = new Entry(key, entry.value, entry.comment);
 			entry.value = pValue;
 			entry.comment = pComment;
 			return result;
@@ -404,5 +411,87 @@ public class PropertySet {
 		} else {
 			return entry.getComment();
 		}
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link IReadable}.
+	 * @param pReadable The {@link Readable}, that is being parsed.
+	 * @param pCharset The readable's {@link Charset character set}.
+	 * @return The property set, that has been parsed from the {@link IReadable}.
+	 * @see #of(IReadable)
+	 */
+	public static PropertySet of(IReadable pReadable, Charset pCharset) {
+		return pReadable.apply((in) -> {
+			return new PropertySetParser().parse(in, pReadable.getName());
+		}, pCharset);
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link IReadable},
+	 * using the character set {@link StandardCharsets#UTF_8}.
+	 * @param pReadable The {@link Readable}, that is being parsed.
+	 * @return The property set, that has been parsed from the {@link IReadable}.
+	 * @see #of(IReadable, Charset)
+	 */
+	public static PropertySet of(IReadable pReadable) {
+		return of(pReadable, StandardCharsets.UTF_8);
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link Path file}.
+	 * @param pPath The {@link Path file}, that is being parsed.
+	 * @param pCharset The file's {@link Charset character set}.
+	 * @return The property set, that has been parsed from the {@link Path file}.
+	 * @see #of(Path)
+	 */
+	public static PropertySet of(Path pPath, Charset pCharset) {
+		return of(IReadable.of(pPath), pCharset);
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link Path file},
+	 * using the character set {@link StandardCharsets#UTF_8}.
+	 * @param pPath The {@link Path file}, that is being parsed.
+	 * @return The property set, that has been parsed from the {@link Path file}.
+	 * @see #of(Path, Charset)
+	 */
+	public static PropertySet of(Path pPath) {
+		return of(pPath, StandardCharsets.UTF_8);
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link File file}.
+	 * @param pFile The {@link File file}, that is being parsed.
+	 * @param pCharset The file's {@link Charset character set}.
+	 * @return The property set, that has been parsed from the {@link File file}.
+	 * @see #of(File)
+	 */
+	public static PropertySet of(File pFile, Charset pCharset) {
+		return of(IReadable.of(pFile), pCharset);
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link File file},
+	 * using the character set {@link StandardCharsets#UTF_8}.
+	 * @param pFile The {@link File file}, that is being parsed.
+	 * @return The property set, that has been parsed from the {@link File file}.
+	 * @see #of(File, Charset)
+	 */
+	public static PropertySet of(File pFile) {
+		return of(pFile, StandardCharsets.UTF_8);
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link URL url}.
+	 * @param pUrl The {@link URL url}, that is being parsed.
+	 * @param pCharset The URL's {@link Charset character set}.
+	 * @return The property set, that has been parsed from the {@link URL url}.
+	 * @see #of(URL)
+	 */
+	public static PropertySet of(URL pUrl, Charset pCharset) {
+		return of(IReadable.of(pUrl), pCharset);
+	}
+
+	/** Creates a new {@link PropertySet} by parsing the given {@link URL url},
+	 * using the character set {@link StandardCharsets#UTF_8}.
+	 * @param pUrl The {@link URL url}, that is being parsed.
+	 * @return The property set, that has been parsed from the {@link URL url}.
+	 * @see #of(URL, Charset)
+	 */
+	public static PropertySet of(URL pUrl) {
+		return of(pUrl, StandardCharsets.UTF_8);
 	}
 }

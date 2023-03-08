@@ -2,6 +2,11 @@ package com.github.jochenw.afw.core.props;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +15,7 @@ import java.util.function.Consumer;
 
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.props.PropertySet.Entry;
 
 
@@ -157,5 +163,33 @@ public class PropertySetTest {
 				assertEquals(comment, ps2.getComment(key));
 			}
 		}
+	}
+
+	/** Test for the various {@code of} methods.
+	 * @throws Exception The test has failed.
+	 */
+	@Test
+	public void testOfMethods() throws Exception {
+		final Path testDir = Paths.get("target/unit-tests/PropertySetTest");
+		Files.createDirectories(testDir);
+		final Path testFile = Files.createTempFile(testDir, "ps", ".properties");
+		try (BufferedWriter bw = Files.newBufferedWriter(testFile, StandardCharsets.UTF_8)) {
+			bw.write("# A comment\r\nprop1=prop1Value\r\n");
+		}
+		final Consumer<PropertySet> validator = (p) -> {
+			assertFalse(p.isEmpty());
+			assertEquals(1, p.size());
+			final PropertySet.Entry en = p.getEntry("prop1");
+			assertEquals("prop1Value", en.getValue());
+			assertEquals(" A comment", en.getComment());
+		};
+		final PropertySet ps0 = PropertySet.of(testFile);
+		validator.accept(ps0);
+		final PropertySet ps1 = PropertySet.of(testFile.toFile());
+		validator.accept(ps1);
+		final PropertySet ps2 = PropertySet.of(testFile.toUri().toURL());
+		validator.accept(ps2);
+		final PropertySet ps3 = PropertySet.of(IReadable.of(testFile));
+		validator.accept(ps3);
 	}
 }

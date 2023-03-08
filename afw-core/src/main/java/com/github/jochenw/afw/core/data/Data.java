@@ -362,7 +362,7 @@ public class Data {
 			}
 		}
 
-		/** Extracts a path from the given data store, ensuring that the path
+		/** Extracts a path from the data store, ensuring that the path
 		 * meets the given criteria.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @param pDescription Short description of the expected value, for use in error messages.
@@ -391,7 +391,7 @@ public class Data {
 			return path;
 		}
 
-		/** Extracts a path value from the given map.
+		/** Extracts a path value from the data store.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The path, which has been retrieved.
 		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
@@ -402,7 +402,7 @@ public class Data {
 			return requirePath(pKey, pKey);
 		}
 
-		/** Extracts a boolean value from the given map.
+		/** Extracts a boolean value from the data store.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @param pDescription Short description of the expected value, for use in error messages.
 		 * @return The string, which has been retrieved.
@@ -425,7 +425,7 @@ public class Data {
 			}
 		}
 
-		/** Extracts a boolean value from the given map.
+		/** Extracts a boolean value from the data store.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The string, which has been retrieved.
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,

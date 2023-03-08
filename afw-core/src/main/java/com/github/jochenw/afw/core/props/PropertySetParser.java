@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -120,13 +121,14 @@ public class PropertySetParser {
 		}
 		@Override
 		public void propertyLine(String pKey, String pValue, boolean pContinued) {
+			final String key = Objects.requireNonNull(pKey, "Key");
 			if (pContinued) {
-				propertyKey = pKey;
+				propertyKey = key;
 				propertyValueCollector = new StringBuilder();
 				propertyValueCollector.append(pValue);
 			} else {
 				final String comment = commentCollector == null ? null : commentCollector.toString();
-				if (propertySet.put(propertyKey, pValue, comment) != null) {
+				if (propertySet.put(key, pValue, comment) != null) {
 					throw new PropertyFileSyntaxException(null, "Duplicate property key: " + propertyKey);
 				}
 			}
@@ -363,11 +365,23 @@ public class PropertySetParser {
 				final StringBuilder whiteSpacePrefix = new StringBuilder();
 				final int i1 = cs.read();
 				if (i1 == -1) {
-					pListener.skippedWhitespaceLine(whiteSpacePrefix.toString());
+					if (whiteSpacePrefix.length() > 0) {
+						pListener.skippedWhitespaceLine(whiteSpacePrefix.toString());
+					}
 					state = -1; 
 				} else {
 					final char c1 = (char) i1;
-					if (Character.isWhitespace(c1)) {
+					if (c1 == '\n') {
+						final String ws;
+						final int len = whiteSpacePrefix.length();
+						if (len > 0  &&  whiteSpacePrefix.charAt(len-1) == '\r') {
+							ws = whiteSpacePrefix.substring(0, len-1);
+						} else {
+							ws = whiteSpacePrefix.toString();
+						}
+						pListener.skippedWhitespaceLine(ws);
+						whiteSpacePrefix.setLength(0);
+					} else if (Character.isWhitespace(c1)) {
 						whiteSpacePrefix.append(c1);
 						break;
 					} else if ('#' == c1  ||  '!' == c1) {
@@ -384,6 +398,7 @@ public class PropertySetParser {
 				  });
 			}
 		}
+		pListener.endOfFile();
 	}
 
 	/** Called to parse a comment line, after the comment character ('#', or '!') has
@@ -435,6 +450,7 @@ public class PropertySetParser {
 				});
 			} else {
 				propertyKeySb.append(c1);
+				i1 = pCharSource.read();
 			}
 		}
 	}
