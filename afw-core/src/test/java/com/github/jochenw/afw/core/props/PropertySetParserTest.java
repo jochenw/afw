@@ -2,64 +2,22 @@ package com.github.jochenw.afw.core.props;
 
 import static org.junit.Assert.*;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.function.Functions.FailableTriConsumer;
-import com.github.jochenw.afw.core.io.IReadable;
-import com.github.jochenw.afw.core.props.PropertySetParser.CharSource;
+import com.github.jochenw.afw.core.props.PropertySetParser.Context;
 import com.github.jochenw.afw.core.props.PropertySetParser.PropertyFileListener;
-import com.github.jochenw.afw.core.util.Exceptions;
 
 
 /** Test suite for the {@link PropertySetParser}.
  */
 public class PropertySetParserTest {
-	/** Test case for the {@link PropertySetParser.CharSource}.
-	 * @throws Exception The test failed.
-	 */
-	@Test
-	public void testCharSource() throws Exception {
-		final long l = 1677786244224l; // System.currentTimeMillis() at the time, when
-		                              // this test has been created.
-		final StringBuilder buffer = new StringBuilder();
-		for (int i = 0;  i < 32;  i++) {
-			buffer.append("abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-		}
-		final String source = buffer.toString();
-		final Random rnd = new Random(l);
-		final CharSource cs = new CharSource(new StringReader(source), "testCharSource");
-		final StringBuilder sb = new StringBuilder();
-		for (;;) {
-			final int i = cs.read();
-			if (i == -1) {
-				break;
-			} else {
-				final char c = (char) i;
-				if (rnd.nextDouble() < 0.1) {
-					cs.pushback(c);
-				} else {
-					sb.append(c);
-				}
-			}
-		}
-		assertEquals(source, sb.toString());
-		assertEquals(0, cs.getLineNumber());
-		assertEquals(source.length(), cs.getColumnNumber());
-		assertEquals("testCharSource", cs.getUri());
-	}
-
 	/**
 	 * Test case for parsing an empty file.
 	 */
@@ -86,9 +44,8 @@ public class PropertySetParserTest {
 	 */
 	@Test
 	public void testParseSingleProperty() {
-		test("prop1=prop1Value\r\n", "SINGLE_PROPERTY_FILE", "prop1", "prop1Value", null);
-		test("# This is a comment.\r\nprop1=prop1Value\\r\\n",
-			 "SINGLE_PROPERTY_COMMENTED_FILE", "prop1", "prop1Value", " This is a comment.");
+		test("prop1=prop1Value\r\n", "SINGLE_PROPERTY_FILE_CRLF", "prop1", "prop1Value", null);
+		test("prop1=prop1Value\n", "SINGLE_PROPERTY_FILE", "prop1", "prop1Value", null);
 	}
 
 	/** Test case for parsing a property file with a single property, and a comment.
@@ -96,7 +53,7 @@ public class PropertySetParserTest {
 	@Test
 	public void testParseSinglePropertyWithComment() {
 		test("# This is a comment.\r\nprop1=prop1Value\\r\\n",
-			 "SINGLE_PROPERTY_COMMENTED_FILE", "prop1", "prop1Value", " This is a comment.");
+			 "SINGLE_PROPERTY_COMMENTED_FILE_CRLF", "prop1", "prop1Value", " This is a comment.");
 	}
 
 	/** Test case for parsing a property file with a single property, and a multi-line comment.
@@ -117,30 +74,16 @@ public class PropertySetParserTest {
 		final List<String> list = new ArrayList<>();
 		final PropertyFileListener listener = new PropertyFileListener() {
 			@Override
-			public void skippedWhitespaceLine(String pWhitespace) {
-				list.add(":" + pWhitespace);
-			}
-			@Override
-			public void commentLine(String pComment) {
-				list.add("c:" + pComment);
-			}
-			@Override
-			public void propertyLine(String pKey, String pValue, boolean pContinued) {
-				list.add("k:" + pKey);
-				propertyValueContinuationLine(pValue, pContinued);
-			}
-			@Override
-			public void propertyValueContinuationLine(String pValue, boolean pContinued) {
-				if (pContinued) {
-					list.add("vc:" + pValue);
-				} else {
-					list.add("v:" + pValue);
-				}
+			public void propertyDefinition(Context pCtx, String pKey, String pValue, String pComment) {
+				list.add(pKey);
+				list.add(pValue);
+				list.add(pComment);
 			}
 		};
 		try {
-			new PropertySetParser().parse(new StringReader(pContent),
-										  pFileName, listener);
+			final StringReader sr = new StringReader(pContent);
+			final BufferedReader br = new BufferedReader(sr);
+			new PropertySetParser("\n").parse(listener, pFileName, br);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
