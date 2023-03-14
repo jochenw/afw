@@ -52,7 +52,7 @@ public class PropertySetParserTest {
 	 */
 	@Test
 	public void testParseSinglePropertyWithComment() {
-		test("# This is a comment.\r\nprop1=prop1Value\\r\\n",
+		test("# This is a comment.\r\nprop1=prop1Value\r\n",
 			 "SINGLE_PROPERTY_COMMENTED_FILE_CRLF", "prop1", "prop1Value", " This is a comment.");
 	}
 
@@ -60,9 +60,9 @@ public class PropertySetParserTest {
 	 */
 	@Test
 	public void testParseSinglePropertyWithMultLineComment() {
-		test("# This is a comment.\r\n# The comments second line.\r\nprop1=prop1Value\\r\\n",
+		test("# This is a comment.\r\n# The comments second line.\r\nprop1=prop1Value\r\n",
 			 "SINGLE_PROPERTY_COMMENTED_FILE", "prop1", "prop1Value",
-			 " This is a comment." + System.lineSeparator() + " The comments second line.");
+			 " This is a comment.\n The comments second line.");
 	}
 
 	/** Tests parsing the given content.

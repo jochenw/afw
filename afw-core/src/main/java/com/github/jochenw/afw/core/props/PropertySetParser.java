@@ -69,6 +69,8 @@ public class PropertySetParser {
 		public boolean nextLine() {
 			try {
 				currentLine = br.readLine();
+				columnNumber = 0;
+				lineNumber++;
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
