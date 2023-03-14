@@ -383,8 +383,8 @@ public class PropertySetParser {
 					}
 				}
 			}
-			
 		}
+		pListener.endOfFile(ctx);
 	}
 
 	/** Called to parse a comment line, after the comment introducer

@@ -3,11 +3,15 @@ package com.github.jochenw.afw.core.props;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -30,7 +34,6 @@ public class PropertySetParserTest {
 
 	/** Test case for parsing comment lines, interspersed with white space.
 	 */
-	@Test
 	public void testComments() {
 		final String content = "# Comment 1<LF>  <LF>  # Comment 2<LF>";
 		final String[] expectedTokens = new String[] {
@@ -98,6 +101,7 @@ public class PropertySetParserTest {
 	 */
 	protected void test(String pContent, String pFileName, String... pValues) {
 		final List<String> list = parseTestFile(pContent, pFileName);
+		final Properties expectedProperties = new Properties();
 		if (pValues == null) {
 			assertTrue(list.isEmpty());
 		} else {
@@ -105,9 +109,33 @@ public class PropertySetParserTest {
 				fail("Expected " + String.join(",", pValues)
 				     + ", got "  + String.join(",", list));
 			}
-			for (int i = 0;  i < pValues.length;  i++) {
-				assertEquals(String.valueOf(i), pValues[i], list.get(i));
+			for (int i = 0;  i < pValues.length;  i += 3) {
+				final String key = pValues[i];
+				final String value = pValues[i+1];
+				final String comment = pValues[i+2];
+				if (key != null) {
+					expectedProperties.put(key, value);
+					assertEquals(key, list.get(i));
+					assertEquals(value, list.get(i+1));
+					if (comment == null) {
+						assertNull(list.get(i+2));
+					} else {
+						assertEquals(comment, list.get(i+2));
+					}
+				}
 			}
+		}
+		final Properties actualProperties = new Properties();
+		final byte[] bytes = pContent.getBytes(StandardCharsets.ISO_8859_1);
+		try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes)) {
+			actualProperties.load(bais);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		assertEquals(expectedProperties.size(), actualProperties.size());
+		for (Object key : expectedProperties.keySet()) {
+			final String value = expectedProperties.getProperty((String) key);
+			assertEquals(value, actualProperties.getProperty((String) key));
 		}
 	}
 }
