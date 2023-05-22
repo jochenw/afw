@@ -1,6 +1,8 @@
 package com.github.jochenw.afw.core.jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import javax.inject.Inject;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
+import com.github.jochenw.afw.core.jdbc.JdbcHelper.Row;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
@@ -65,14 +68,84 @@ public class Worker {
 			}
 		}
 
-		/** Called to execute an SQL query, and process the results.
+		/** Called to execute an SQL query, and process the results by repeatably calling a
+		 * {@link FailableConsumer consumer}, that produces no result.
 		 * @param pSql The SQL query, that is being executed.
 		 * @param pConsumer The consumer, that is being called to process the result.
 		 * @param pParams The query parameters, if any.
+		 * @see #executeQueryCall(String, FailableFunction, Object...)
 		 */
 		public void executeQuery(String pSql, FailableConsumer<JdbcHelper.Row,?> pConsumer, Object... pParams) {
-			try {
-				getJdbcHelper().executeQuery(getConnection(), this::add, pSql, pConsumer, pParams);
+			try (Connection conn = getConnectionProvider().open();
+				 PreparedStatement stmt = conn.prepareStatement(pSql)) {
+				final JdbcHelper jh = getJdbcHelper();
+				jh.setParameters(stmt, pParams);
+				try (final ResultSet rs = stmt.executeQuery()) {
+					final Row row = jh.newRow(rs);
+					while (rs.next()) {
+						try {
+							pConsumer.accept(row);
+						} catch (Throwable t) {
+							throw Exceptions.show(t, SQLException.class);
+						}
+					}
+				}
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		}
+
+		/** Called to execute an SQL query, process the results, and return an output object,
+		 * which is created by invoking the given {@link FailableFunction}.
+		 * @param pSql The SQL query, that is being executed.
+		 * @param pFunction The function, that is being called to process the result, and
+		 *   produce the output object. The function should <em>not</em> close the given
+		 *   {@link ResultSet} result set, because that's done by the caller.
+		 * @param pParams The query parameters, if any.
+		 * @param <O> Type of the output object.
+		 * @return The output object, which has been produced by calling the
+		 *   given {@link FailableFunction} function.
+		 * @see #executeQuery(String, FailableConsumer, Object...)
+		 * @see #executeSingleRowQuery(String, FailableFunction, Object...)
+		 * @see #executeCountQuery(String, Object...)
+		 */
+		public <O> O executeQueryCall(String pSql, FailableFunction<ResultSet,O,?> pFunction, Object... pParams) {
+			try (Connection conn = getConnectionProvider().open();
+				 PreparedStatement stmt = conn.prepareStatement(pSql)) {
+				getJdbcHelper().setParameters(stmt, pParams);
+				try (ResultSet rs = stmt.executeQuery()) {
+					return pFunction.apply(rs);
+				}
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		}
+
+		/** Called to execute an SQL query, that produces a single result row, process the results,
+		 * and return an output object, which is created by invoking the given {@link FailableFunction}.
+		 * @param pSql The SQL query, that is being executed.
+		 * @param pFunction The function, that is being called to process the result, and
+		 *   produce the output object. The function should <em>not</em> close the given
+		 *   {@link ResultSet} result set, because that's done by the caller.
+		 * @param pParams The query parameters, if any.
+		 * @param <O> Type of the output object.
+		 * @return The output object, which has been produced by calling the
+		 *   given {@link FailableFunction} function.
+		 * @see #executeQueryCall(String, FailableFunction, Object...)
+		 * @see #executeCountQuery(String, Object...)
+		 */
+		public <O> O executeSingleRowQuery(String pSql, FailableFunction<JdbcHelper.Row,O,?> pFunction, Object... pParams) {
+			try (Connection conn = getConnectionProvider().open();
+				 PreparedStatement stmt = conn.prepareStatement(pSql)) {
+				getJdbcHelper().setParameters(stmt, pParams);
+				try (ResultSet rs = stmt.executeQuery()) {
+					JdbcHelper.Row row = getJdbcHelper().newRow(rs);
+					if (row.next()) {
+						return pFunction.apply(row);
+					} else {
+						throw new IllegalStateException("Expected result row not available.");
+					}
+				}
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
 			}
@@ -82,13 +155,31 @@ public class Worker {
 		 * @param pSql The statement, that is being executed.
 		 * @param pParams The parameters, if any.
 		 * @return The number of affected rows.
+		 * @see #executeQuery(String, FailableConsumer, Object...)
 		 */
 		public int executeUpdate(String pSql, Object... pParams) {
-			try {
-				return getJdbcHelper().executeUpdate(getConnection(), this::add, pSql, pParams);
+			try (Connection conn = getConnectionProvider().open();
+				 PreparedStatement stmt = conn.prepareStatement(pSql)) {
+				getJdbcHelper().setParameters(stmt, pParams);
+				return stmt.executeUpdate();
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
 			}
+		}
+
+		/** Called to execute an SQL query, which returns exactly one row, and one column,
+		 * which has an integer, or long value.
+		 * @param pSql The statement, that is being executed.
+		 * @param pParams The parameters, if any.
+		 * @return The value of the single result cell.
+		 * @throws IllegalStateException The query did not return a result row.
+		 * @see #executeSingleRowQuery(String, FailableFunction, Object...)
+		 * @see #executeQueryCall(String, FailableFunction, Object...)
+		 */
+		public long executeCountQuery(String pSql, Object... pParams) {
+			return executeSingleRowQuery(pSql, (r) -> {
+				return r.nextLongObj();
+			}, pParams).longValue();
 		}
 
 		/** Returns the database dialect.

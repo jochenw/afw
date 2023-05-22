@@ -1,7 +1,6 @@
 package com.github.jochenw.afw.core.jdbc;
 
 import java.io.InputStream;
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -925,49 +924,12 @@ public class JdbcHelper {
 		}
 	}
 
-	/** Called to execute an SQL query, and to process the result set.
-	 * @param pConnection The database connection, which is being used.
-	 * @param pTracker A tracker object, which is responsible for closing resource objects.
-	 * @param pSql The SQL statement, that is being executed. The SQL statement may contain
-	 *   parameter indicators ('?'), that are given by the parameter {@code pParameters}.
-	 * @param pConsumer An action object, that is being invoked to process the results.
-	 * @param pParameters The statement parameters.
-	 * @throws SQLException Executing the query has failed.
+	/** Creates a new instance of {@link Row}, which encapsulates the given {@link ResultSet}.
+	 * @param pResultSet The {@link ResultSet result set}, which is being encapsulated.
+	 * @return The created {@link Row row}.
 	 */
-	public void executeQuery(@Nonnull Connection pConnection, @Nonnull Consumer<AutoCloseable> pTracker,
-			                 @Nonnull String pSql, @Nonnull FailableConsumer<JdbcHelper.Row,?> pConsumer,
-			                 @Nullable Object... pParameters) throws SQLException {
-		PreparedStatement stmt = pConnection.prepareStatement(pSql);
-		pTracker.accept(stmt);
-		setParameters(stmt, pParameters);
-		final ResultSet rs = stmt.executeQuery();
-		pTracker.accept(rs);
-		final Row row = new Row(rs);
-		while (row.next()) {
-			try {
-				pConsumer.accept(row);
-			} catch (Throwable t) {
-				throw Exceptions.show(t, SQLException.class);
-			}
-		}
-	}
-
-	/** Called to execute an SQL update statement, and to return the number of affected rows.
-	 * @param pConnection The database connection, which is being used.
-	 * @param pTracker A tracker object, which is responsible for closing resource objects.
-	 * @param pSql The SQL statement, that is being executed. The SQL statement may contain
-	 *   parameter indicators ('?'), that are given by the parameter {@code pParameters}.
-	 * @param pParameters The statement parameters.
-	 * @return The number of affected rows, if applicable, or 0.
-	 * @throws SQLException Executing the query has failed.
-	 */
-	public int executeUpdate(@Nonnull Connection pConnection, @Nonnull Consumer<AutoCloseable> pTracker,
-			                 @Nonnull String pSql, 
-			                 @Nullable Object... pParameters) throws SQLException {
-		PreparedStatement stmt = pConnection.prepareStatement(pSql);
-		pTracker.accept(stmt);
-		setParameters(stmt, pParameters);
-		return stmt.executeUpdate();
+	protected Row newRow(ResultSet pResultSet) {
+		return new Row(pResultSet);
 	}
 
 	/** Applies the given parameter list to the given {@link PreparedStatement}.
