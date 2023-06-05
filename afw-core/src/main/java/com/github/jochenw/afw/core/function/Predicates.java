@@ -121,4 +121,78 @@ public class Predicates {
 		}
 		return true;
 	}
+
+	/** Creates a new predicate, which implements a logical OR on all of
+	 * the given predicates.
+	 * @param pPredicates The terms of the logical OR.
+	 * @param <O> Type of the terms, and the created predicate.
+	 * @return The created predicate, which implements a logical OR
+	 *   on all of the terms.
+	 */
+	@SafeVarargs
+	public static <O> Predicate<O> or(Predicate<O>... pPredicates) {
+		return (o) -> {
+			for (Predicate<O> pr : pPredicates) {
+				if (pr.test(o)) {
+					return true;
+				}
+			}
+			return false;
+		};
+	}
+
+	/** Creates a new predicate, which implements a logical OR on all of
+	 * the given predicates.
+	 * @param pPredicates The terms of the logical OR.
+	 * @param <O> Type of the terms, and the created predicate.
+	 * @return The created predicate, which implements a logical OR
+	 *   on all of the terms.
+	 */
+	public static <O> Predicate<O> or(Iterable<Predicate<O>> pPredicates) {
+		return (o) -> {
+			for (Predicate<O> pr : pPredicates) {
+				if (pr.test(o)) {
+					return true;
+				}
+			}
+			return false;
+		};
+	}
+
+	/** Creates a new predicate, which implements a logical AND on all of
+	 * the given predicates.
+	 * @param pPredicates The terms of the logical AND.
+	 * @param <O> Type of the terms, and the created predicate.
+	 * @return The created predicate, which implements a logical AND
+	 *   on all of the terms.
+	 */
+	@SafeVarargs
+	public static <O> Predicate<O> and(Predicate<O>... pPredicates) {
+		return (o) -> {
+			for (Predicate<O> pr : pPredicates) {
+				if (pr.test(o)) {
+					return false;
+				}
+			}
+			return true;
+		};
+	}
+
+	/** Creates a new predicate, which implements a logical AND on all of
+	 * the given predicates.
+	 * @param pPredicates The terms of the logical AND.
+	 * @param <O> Type of the terms, and the created predicate.
+	 * @return The created predicate, which implements a logical AND
+	 *   on all of the terms.
+	 */
+	public static <O> Predicate<O> and(Iterable<Predicate<O>> pPredicates) {
+		return (o) -> {
+			for (Predicate<O> pr : pPredicates) {
+				if (pr.test(o)) {
+					return false;
+				}
+			}
+			return true;
+		};
+	}
 }
