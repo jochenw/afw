@@ -262,7 +262,7 @@ public class Objects {
 	 * @return The created array
 	 */
 	@SafeVarargs
-	public static <O> @Nonnull O[] arrayOf(@Nonnull O... pValues) {
+	public static @Nonnull <O> O[] arrayOf(@Nonnull O... pValues) {
 		return pValues;
 	}
 }

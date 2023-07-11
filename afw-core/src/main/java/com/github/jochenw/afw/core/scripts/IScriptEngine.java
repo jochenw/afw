@@ -31,7 +31,7 @@ public interface IScriptEngine {
 		 * @param pParameters The data model, that is being applied by the script.
 		 * @return The result object, that has been returned by the script.
 		 */
-		public <O> @Nullable O call(@Nullable Map<String,Object> pParameters);
+		public @Nullable <O> O call(@Nullable Map<String,Object> pParameters);
 		/**
 		 * Invokes a script, that doesn't return a result value.
 		 * @param pParameters The data model, that is being applied by the script.
