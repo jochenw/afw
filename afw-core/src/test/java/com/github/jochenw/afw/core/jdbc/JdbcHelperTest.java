@@ -6,7 +6,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -22,7 +21,6 @@ import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
 import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
 import com.github.jochenw.afw.core.props.IPropertyFactory;
-import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.MutableBoolean;
 import com.github.jochenw.afw.core.util.Streams;
 import com.github.jochenw.afw.di.api.Application;
@@ -97,7 +95,7 @@ public class JdbcHelperTest {
 		assertEquals(expectedLocalTime, actualLocalTime);
 	}
 	
-	/** Test for {@link Worker.Context#executeUpdate(String, Object...)}.
+	/** Test for {@link Worker.Context#query(String, Object[])}.
 	 */
 	@Test
 	public void testCreateTable() {
@@ -110,20 +108,8 @@ public class JdbcHelperTest {
 		final Worker worker = application.getComponentFactory().requireInstance(Worker.class);
 		final MutableBoolean success = new MutableBoolean();
 		worker.run((c) -> {
-			try {
-				c.executeUpdate(sqlDrop);
-			} catch (Throwable t) {
-				final SQLException cause = Exceptions.getCause(t, SQLException.class);
-				if (cause != null) {
-					final Dialect dialect = c.getDialect();
-					if (!dialect.isDroppedTableDoesnExistError(cause)) {
-						throw Exceptions.show(t);
-					}
-				} else {
-					throw Exceptions.show(t);
-				}
-			}
-			final int affectedRows = c.executeUpdate(sqlCreate);
+			c.query(sqlDrop).run();
+			final int affectedRows = c.query(sqlCreate).affectedRows();
 			assertEquals(0, affectedRows);
 			success.set();
 		});
@@ -155,20 +141,8 @@ public class JdbcHelperTest {
 		final Worker worker = application.getComponentFactory().requireInstance(Worker.class);
 		final MutableBoolean success = new MutableBoolean();
 		worker.run((c) -> {
-			try {
-				c.executeUpdate(sqlDrop);
-			} catch (Throwable t) {
-				final SQLException cause = Exceptions.getCause(t, SQLException.class);
-				if (cause != null) {
-					final Dialect dialect = c.getDialect();
-					if (!dialect.isDroppedTableDoesnExistError(cause)) {
-						throw Exceptions.show(t);
-					}
-				} else {
-					throw Exceptions.show(t);
-				}
-			}
-			final int affectedRowsForCreate = c.executeUpdate(sqlCreate);
+			c.query(sqlDrop).run();
+			final int affectedRowsForCreate = c.query(sqlCreate).affectedRows();
 			assertEquals(0, affectedRowsForCreate);
 			final byte byteColumnValue = (byte) 31;
 			final short shortColumnValue = (short) 42;
@@ -185,7 +159,7 @@ public class JdbcHelperTest {
 			final LocalDateTime localDateTimeColumnValue = zonedDateTimeValue.toLocalDateTime();
 			final LocalDate localDateColumnValue = zonedDateTimeValue.toLocalDate();
 			final LocalTime localTimeColumnValue = zonedDateTimeValue.toLocalTime();
-			c.executeUpdate("INSERT INTO table_two (id, tinyIntColumn, smallIntColumn,"
+			c.query("INSERT INTO table_two (id, tinyIntColumn, smallIntColumn,"
 			        + " intColumn, bigIntColumn, varCharColumn, varBinaryColumn,"
 			        + " timeStampColumn, dateColumn, timeColumn, zonedDateTimeColumn,"
 			        + " localDateTimeColumn, localDateColumn, localTimeColumn) VALUES"
@@ -194,11 +168,11 @@ public class JdbcHelperTest {
 			        bigIntColumnValue, varCharColumnValue, varBinaryColumnValue,
 			        timeStampColumnValue, dateColumnValue, timeColumnValue,
 			        zonedDateTimeColumnValue, localDateTimeColumnValue, localDateColumnValue,
-			        localTimeColumnValue);
-			c.executeUpdate("INSERT INTO table_two (id) VALUES"
-			        + " (?)",
-			        Long.valueOf(2));
-			c.executeQuery("SELECT * FROM table_two WHERE id=?", (row) -> {
+			        localTimeColumnValue).run();
+			c.query("INSERT INTO table_two (id) VALUES (?)",
+			        Long.valueOf(2)).run();
+			c.query("SELECT * FROM table_two WHERE id=?", Long.valueOf(1))
+			    .withRows((row) -> {
 				assertEquals(1, row.nextLong());
 				assertEquals(byteColumnValue, row.nextByte());
 				assertEquals(shortColumnValue, row.nextShort());
@@ -229,39 +203,40 @@ public class JdbcHelperTest {
 				  .nextLocalDateTime((l) -> assertEquals(localDateTimeColumnValue, l))
 				  .nextLocalDate((l) -> assertEquals(localDateColumnValue, l), zoneId)
 				  .nextLocalTime((l) -> assertEquals(localTimeColumnValue, l), zoneId);
-			}, Long.valueOf(1));
-			c.executeQuery("SELECT * FROM table_two WHERE id=?", (row) -> {
-				assertEquals(2, row.nextLong());
-				assertNull(row.nextByteObj());
-				assertNull(row.nextShortObj());
-				assertNull(row.nextIntObj());
-				assertNull(row.nextLongObj());
-				assertNull(row.nextStr());
-				assertNull(row.nextBytes());
-				assertNull(row.nextTimestamp());
-				assertNull(row.nextDate());
-				assertNull(row.nextTime());
-				assertNull(row.nextZonedDateTime(zoneId));
-				assertNull(row.nextLocalDateTime());
-				assertNull(row.nextLocalDate(zoneId));
-				assertNull(row.nextLocalTime(zoneId));
-				row.reset();
-				row
-				  .nextLongObj((l) -> assertEquals(2, l.longValue()))
-				  .nextByteObj((b) -> assertNull(b))
-				  .nextShortObj((s) -> assertNull(s))
-				  .nextIntObj((i) -> assertNull(i))
-				  .nextLongObj((l) -> assertNull(l))
-				  .nextStr((s) -> assertNull(s))
-				  .nextBytes((b) -> assertNull(b))
-				  .nextTimestamp((t) -> assertNull(t))
-				  .nextDate((d) -> assertNull(d))
-				  .nextTime((t) -> assertNull(t))
-				  .nextZonedDateTime((z) -> assertNull(z), zoneId)
-				  .nextLocalDateTime((l) -> assertNull(l))
-				  .nextLocalDate((l) -> assertNull(l), zoneId)
-				  .nextLocalTime((l) -> assertNull(l), zoneId);
-			}, Long.valueOf(2));
+			}).run();
+			c.query("SELECT * FROM table_two WHERE id=?", Long.valueOf(2))
+			    .withRows((row) -> {
+			    	assertEquals(2, row.nextLong());
+			    	assertNull(row.nextByteObj());
+			    	assertNull(row.nextShortObj());
+			    	assertNull(row.nextIntObj());
+			    	assertNull(row.nextLongObj());
+			    	assertNull(row.nextStr());
+			    	assertNull(row.nextBytes());
+			    	assertNull(row.nextTimestamp());
+			    	assertNull(row.nextDate());
+			    	assertNull(row.nextTime());
+			    	assertNull(row.nextZonedDateTime(zoneId));
+			    	assertNull(row.nextLocalDateTime());
+			    	assertNull(row.nextLocalDate(zoneId));
+			    	assertNull(row.nextLocalTime(zoneId));
+			    	row.reset();
+			    	row
+			    	.nextLongObj((l) -> assertEquals(2, l.longValue()))
+			    	.nextByteObj((b) -> assertNull(b))
+			    	.nextShortObj((s) -> assertNull(s))
+			    	.nextIntObj((i) -> assertNull(i))
+			    	.nextLongObj((l) -> assertNull(l))
+			    	.nextStr((s) -> assertNull(s))
+			    	.nextBytes((b) -> assertNull(b))
+			    	.nextTimestamp((t) -> assertNull(t))
+			    	.nextDate((d) -> assertNull(d))
+			    	.nextTime((t) -> assertNull(t))
+			    	.nextZonedDateTime((z) -> assertNull(z), zoneId)
+			    	.nextLocalDateTime((l) -> assertNull(l))
+			    	.nextLocalDate((l) -> assertNull(l), zoneId)
+			    	.nextLocalTime((l) -> assertNull(l), zoneId);
+			    }).run();
 			success.set();
 		});
 		assertTrue(success.isSet());
