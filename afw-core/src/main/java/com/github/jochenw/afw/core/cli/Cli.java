@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -79,6 +80,21 @@ public class Cli<B> {
 		 * @return The exception, that is being thrown.
 		 */
 		public RuntimeException error(String pMsg);
+	}
+	/**
+	 * Interface of a class, that provides a CLI by
+	 * processing an options bean.
+	 * @param <B> The options bean class
+	 */
+	public static interface CliClass<B> {
+		/** Called to produce an exception, based on the given error message.
+		 * @param pEroorMsg The error message, if any, or null (Help message requested).
+		 */
+		/** Called to perform the actual execution by using the given options bean.
+		 * @param pOptionsBean The options bean, which has been created by parsing the
+		 * command line options.
+		 */
+		void run(B pOptionsBean);
 	}
 	/** Builder for an option value.
 	 * @param <T> The option value's type.
@@ -793,5 +809,32 @@ public class Cli<B> {
 	 */
 	public static <T> Cli<T> of(T pBean) {
 		return new Cli<T>(pBean);
+	}
+
+	/** Parses a set of command line options, and processes the created options bean.
+	 * @param pCliClass The programs main class, which processes the created options bean
+	 *   by invoking {@link CliClass#run(Object)}. This class <em>must</em> have a
+	 *   public default constructor (no-args constructor).
+	 * @param pBeanClass The class of the options bean. This class <em>must</em> have a
+	 *   public default constructor (no-args constructor).
+	 * @param pArgs The command line arguments.
+	 * @param pOptionsConfigurator An object, which is called to configure the Cli object
+	 *   by adding options.
+	 * @param pErrorHandler  The error handler, a function, which converts an error message
+	 *   into a RuntimeException, that is being thrown by the caller.
+	 */
+	public static <B> void main(Class<? extends CliClass<B>> pCliClass, Class<B> pBeanClass, String[] pArgs,
+			                    Consumer<Cli<B>> pOptionsConfigurator,
+			                    Function<String,RuntimeException> pErrorHandler) {
+		try {
+			final CliClass<B> cliObject = pCliClass.getConstructor().newInstance();
+			final B bean = pBeanClass.getConstructor().newInstance();
+			final Cli<B> cli = Cli.of(bean);
+			pOptionsConfigurator.accept(cli);
+			cli.errorHandler(pErrorHandler);
+			cliObject.run(cli.parse(pArgs));
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
 	}
 }

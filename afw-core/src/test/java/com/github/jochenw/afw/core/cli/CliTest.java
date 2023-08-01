@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Function;
 
 import org.junit.Test;
 
@@ -183,4 +184,44 @@ public class CliTest {
 		assertEquals("/var/lib/of.log", ob2.outputFile.toString().replace('\\', '/'));
 		
 	}
+
+	/** Test for implementing a {@link Cli.CliClass}.
+	 */
+	@Test
+	public void testCliClass() {
+		final FailableBiConsumer<Context<OptionsBean>, String, ?> ofHandler = (c,s) -> {
+			c.getBean().outputFile = Paths.get(s);
+		};
+		final MutableBoolean configured = new MutableBoolean();
+		final Function<String,RuntimeException> errorHandler = (s) -> new IllegalStateException(s);
+		assertNull(TestCliClass.options);
+		Cli.main(TestCliClass.class, OptionsBean.class, new String[] {
+			"-if", "pom.xml", "-of", "./logs/of.log"
+		}, (cli) -> {
+			configured.set();
+			cli.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
+			   .stringOption("outputFile", "of").required().handler(ofHandler).end();
+		}, errorHandler);
+		assertTrue(configured.isSet());
+		final OptionsBean ob = TestCliClass.options; 
+		assertNotNull(ob);
+		assertEquals("pom.xml", ob.inputFile.toString());
+		assertEquals("./logs/of.log", ob.outputFile.toString().replace('\\', '/'));
+	}
+
+	/** Test class for the {@link Cli.CliClass}.
+	 */
+	public static class TestCliClass implements Cli.CliClass<OptionsBean> {
+		private static OptionsBean options;
+
+		@Override
+		public void run(OptionsBean pOptionsBean) {
+			options = pOptionsBean;
+		}
+
+		public OptionsBean getOptions() {
+			return options;
+		}
+	}
+
 }
