@@ -78,6 +78,7 @@ public class Worker {
 		 */
 		public Executor query(@Nonnull String pStatement, @Nullable Object... pParameters) {
 			return getJdbcHelper().query(() -> getConnectionProvider().open(),
+					                     getDialect(),
 					                     pStatement, pParameters);
 		}
 
@@ -176,7 +177,9 @@ public class Worker {
 	 * @return The created {@link JdbcHelper.Executor query executor}.
 	 */
 	public Executor query(@Nonnull String pStatement, @Nullable Object... pParameters) {
-		return getJdbcHelper().query(() -> getConnectionProvider().open(),
+		final ConnectionProvider cp = getConnectionProvider();
+		return getJdbcHelper().query(() -> cp.open(),
+				                     cp.getDialect(),
 				                     pStatement, pParameters);
 	}
 }

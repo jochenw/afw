@@ -79,19 +79,24 @@ public class JdbcHelper {
 		private final String query;
 		private final Object[] parameters;
 		private final JdbcHelper helper;
+		private final Dialect dialect;
 		private final FailableSupplier<Connection,?> connectionProvider;
 
 		/** Creates a new instance.
 		 * @param pHelper The {@link JdbcHelper}, that is creating this object.
+		 * @param pDialect The {@link Dialect SQL Dialect}, if available,
+		 *   for support in error handling.
 		 * @param pConnProvider The connection provider.
 		 * @param pQuery The SQL query, that is being executed.
 		 * @param pParameters The query parameters.
 		 */
 		public Executor(@Nonnull JdbcHelper pHelper,
+				        @Nullable Dialect pDialect,
 				        @Nonnull FailableSupplier<Connection,?> pConnProvider,
 				        @Nonnull String pQuery,
 				        @Nullable Object... pParameters) {
 			helper = Objects.requireNonNull(pHelper, "JdbcHelper");
+			dialect = pDialect;
 			connectionProvider = Objects.requireNonNull(pConnProvider, "Connection Provider");
 			query = Objects.requireNonNull(pQuery, "Query");
 			parameters = pParameters;
@@ -117,7 +122,7 @@ public class JdbcHelper {
 						return function.apply(rs);
 					}
 				} catch (Throwable t) {
-					throw Exceptions.show(t);
+					throw handleError(t);
 				}
 			};
 		}
@@ -141,7 +146,7 @@ public class JdbcHelper {
 						consumer.accept(rs);
 					}
 				} catch (Throwable t) {
-					throw Exceptions.show(t);
+					throw handleError(t);
 				}
 			};
 		}
@@ -166,7 +171,7 @@ public class JdbcHelper {
 						return function.apply(helper.newRows(rs));
 					}
 				} catch (Throwable t) {
-					throw Exceptions.show(t);
+					throw handleError(t);
 				}
 			};
 		}
@@ -187,7 +192,9 @@ public class JdbcHelper {
 					 PreparedStatement stmt = conn.prepareStatement(query)) {
 					helper.setParameters(stmt, parameters);
 					try (ResultSet rs = stmt.executeQuery()) {
-						consumer.accept(helper.newRows(rs));
+						while (rs.next()) {
+							consumer.accept(helper.newRows(rs));
+						}
 					}
 				} catch (Throwable t) {
 					throw Exceptions.show(t);
@@ -220,7 +227,7 @@ public class JdbcHelper {
 						return o;
 					}
 				} catch (Throwable t) {
-					throw Exceptions.show(t);
+					throw handleError(t);
 				}
 			};
 		}
@@ -236,7 +243,7 @@ public class JdbcHelper {
 				helper.setParameters(stmt, parameters);
 				return stmt.executeUpdate();
 			} catch (Throwable t) {
-				throw Exceptions.show(t);
+				throw handleError(t);
 			}
 		}
 
@@ -245,6 +252,27 @@ public class JdbcHelper {
 		 */
 		public void run() {
 			affectedRows();
+		}
+
+		/** Called to handle an error, that has occurred.
+		 * @param pError The error, that has occurred, typically
+		 * an {@link SQLException}.
+		 * @return The error, that is being reported. This might be the
+		 *   same as the parameter {@code pError}, but not necessarily.
+		 *   The return value null indicates, that no error is being
+		 *   reported.
+		 */
+		protected RuntimeException handleError(Throwable pError) {
+			final Throwable error = Objects.requireNonNull(pError, "Error");
+			if (pError instanceof SQLException) {
+				if (dialect != null) {
+					final SQLException se = (SQLException) error;
+					if (dialect.isDroppedTableDoesnExistError(se)) {
+						throw new DroppedTableDoesntExistException(se);
+					}
+				}
+			}
+			throw Exceptions.show(error);
 		}
 	}
 
@@ -1338,12 +1366,15 @@ public class JdbcHelper {
 	 * The query will be executed by invocation of a suitable method on the
 	 * {@link JdbcHelper.Executor query executor}.
 	 * @param pConnectionSupplier A database connection provider.
+	 * @param pDialect The SQL dialect, if available, for support in
+	 *   error handling.
 	 * @param pStatement The SQL statement, which is being executed.
 	 * @param pParameters The numbered statement parameters.
 	 * @return The created {@link JdbcHelper.Executor query executor}.
 	 */
 	public Executor query(@Nonnull FailableSupplier<Connection,?> pConnectionSupplier,
+			              @Nullable Dialect pDialect,
 			              @Nonnull String pStatement, @Nullable Object... pParameters) {
-		return new Executor(this, pConnectionSupplier, pStatement, pParameters);
+		return new Executor(this, pDialect, pConnectionSupplier, pStatement, pParameters);
 	}
 }

@@ -45,7 +45,7 @@ public class JdbcHelperTest {
 			b.bind(ILogFactory.class).toInstance(SimpleLogFactory.ofSystemOut());
 			b.bind(IPropertyFactory.class).toSupplier(() -> {
 				final String uri = "com/github/jochenw/afw/core/jdbc/db-test.properties";
-				final URL url = Thread.currentThread().getContextClassLoader().getResource(uri);
+				final URL url = JdbcHelperTest.class.getResource("db-test.properties");
 				if (url == null) {
 					throw new IllegalStateException("Unable to locate resource: " + uri);
 				}
@@ -108,7 +108,11 @@ public class JdbcHelperTest {
 		final Worker worker = application.getComponentFactory().requireInstance(Worker.class);
 		final MutableBoolean success = new MutableBoolean();
 		worker.run((c) -> {
-			c.query(sqlDrop).run();
+			try {
+				c.query(sqlDrop).run();
+			} catch (DroppedTableDoesntExistException e) {
+				// Ignore this.
+			}
 			final int affectedRows = c.query(sqlCreate).affectedRows();
 			assertEquals(0, affectedRows);
 			success.set();
@@ -141,7 +145,11 @@ public class JdbcHelperTest {
 		final Worker worker = application.getComponentFactory().requireInstance(Worker.class);
 		final MutableBoolean success = new MutableBoolean();
 		worker.run((c) -> {
-			c.query(sqlDrop).run();
+			try {
+				c.query(sqlDrop).run();
+			} catch (DroppedTableDoesntExistException dtde) {
+				// Ignore this.
+			}
 			final int affectedRowsForCreate = c.query(sqlCreate).affectedRows();
 			assertEquals(0, affectedRowsForCreate);
 			final byte byteColumnValue = (byte) 31;
@@ -164,8 +172,9 @@ public class JdbcHelperTest {
 			        + " timeStampColumn, dateColumn, timeColumn, zonedDateTimeColumn,"
 			        + " localDateTimeColumn, localDateColumn, localTimeColumn) VALUES"
 			        + " (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-			        Long.valueOf(1), byteColumnValue, shortColumnValue, intColumnValue,
-			        bigIntColumnValue, varCharColumnValue, varBinaryColumnValue,
+			        Long.valueOf(1), Byte.valueOf(byteColumnValue),
+			        Short.valueOf(shortColumnValue), Integer.valueOf(intColumnValue),
+			        Long.valueOf(bigIntColumnValue), varCharColumnValue, varBinaryColumnValue,
 			        timeStampColumnValue, dateColumnValue, timeColumnValue,
 			        zonedDateTimeColumnValue, localDateTimeColumnValue, localDateColumnValue,
 			        localTimeColumnValue).run();
