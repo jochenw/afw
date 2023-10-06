@@ -1,5 +1,22 @@
+/*
+ * Copyright 2023 Jochen Wiedmann
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jochenw.afw.core.extprop;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,16 +46,16 @@ public class ExtProperties {
 	 */
 	public static class ExtProperty {
 		final @Nonnull String key, value;
-		final @Nullable String comment;
+		final @Nullable String[] comments;
 		/** Creates a new entry with the given key, value, and comment.
 		 * @param pKey The property key,
 		 * @param pValue The property value.
-		 * @param pComment The property comment.
+		 * @param pComments The property comments.
 		 */
-		public ExtProperty(@Nonnull String pKey, @Nonnull String pValue, @Nullable String pComment) {
+		public ExtProperty(@Nonnull String pKey, @Nonnull String pValue, @Nullable String[] pComments) {
 			key = Objects.requireNonNull(pKey, "Key");
 			value = Objects.requireNonNull(pValue, "Value");
-			comment = pComment;
+			comments = pComments;
 		}
 		/** Returns the properties key.
 		 * @return The properties key. Never null.
@@ -51,7 +68,7 @@ public class ExtProperties {
 		/** Returns the properties comment, if any, or null.
 		 * @return The properties comment, if any, or null.
 		 */
-		public @Nullable String getComment() { return comment; }
+		public @Nullable String[] getComments() { return comments; }
 	}
 
 	private final Map<String, ExtProperty> entries;
@@ -122,28 +139,28 @@ public class ExtProperties {
 	 *   instead.
 	 * @throws NullPointerException The parameter {@code pKey} is null.
 	 */
-	public @Nullable String getComment(@Nonnull String pKey) throws NullPointerException {
+	public @Nullable String[] getComment(@Nonnull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final ExtProperty ep = entries.get(key);
 		if (ep == null) {
 			return null;
 		} else {
-			return ep.getComment();
+			return ep.getComments();
 		}
 	}
 
 	/** Sets the given properties value, and comment.
 	 * @param pKey The properties key, must not be null.
 	 * @param pValue The property value, must not be null.
-	 * @param pComment The property comment, may be null.
+	 * @param pComments The property comment, may be null.
 	 * @throws NullPointerException Either of the parameters {@code pKey}, or
 	 *   {@code pValue} is null.
 	 */
-	public void setProperty(String pKey, String pValue, String pComment) throws NullPointerException {
+	public void setProperty(String pKey, String pValue, String[] pComments) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final String value = Objects.requireNonNull(pValue, "Value");
 		entries.compute(pKey, (k, ep) -> {
-			return new ExtProperty(key, value, pComment);
+			return new ExtProperty(key, value, pComments);
 		});
 	}
 
@@ -167,7 +184,7 @@ public class ExtProperties {
 					return ep;
 				} else {
 					// Value is being changed, return a new object with the same comment,
-					return new ExtProperty(k, value, ep.getComment());
+					return new ExtProperty(k, value, ep.getComments());
 				}
 			}
 		});
@@ -177,28 +194,51 @@ public class ExtProperties {
 	 * If the property already exists, then the value will be left, as it is. Otherwise,
 	 * a new property will be created, with an empty string ("") as the value.
 	 * @param pKey The properties key, must not be null.
-	 * @param pComment The property comment, may be null.
+	 * @param pComments The property comment, may be null.
 	 * @throws NullPointerException The parameter {@code pKey} is null.
 	 */
-	public void setComment(String pKey, String pComment) throws NullPointerException {
+	public void setComments(String pKey, String[] pComments) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		entries.compute(key, (k, ep) -> {
 			if (ep == null) {
-				return new ExtProperty(k, "", pComment);
+				return new ExtProperty(k, "", pComments);
 			} else {
-				final String comment = ep.getComment();
-				if ((comment == null &&  pComment == null)
-					||  (comment != null  &&  comment.equals(pComment))) {
+				final String[] comments = ep.getComments();
+				final boolean commentsIsNull = isNull(comments);
+				if ((commentsIsNull &&  isNull(pComments))
+					||  (!commentsIsNull  &&  isEqual(comments, pComments))) {
 					// No need to change the comment, return the existing object.
 					return ep;
 				} else {
 					// Comment is being changed, return a new object with the same value,
-					return new ExtProperty(k, ep.getValue(), pComment);
+					return new ExtProperty(k, ep.getValue(), pComments);
 				}
 			}
 		});
 	}
 
+	private boolean isNull(String[] pArray) {
+		return pArray == null  ||  pArray.length == 0;
+	}
+	private boolean isEqual(@Nonnull String[] pArr1, @Nullable String[] pArr2) {
+		if (pArr2 == null) {
+			return false;
+		}
+		final @Nonnull String[] arr2 = pArr2;
+		if (pArr1.length != arr2.length) {
+			return false;
+		}
+		for (int i = 0;  i < pArr1.length;  i++) {
+			final String s1 = pArr1[i];
+			final String s2 = arr2[i];
+			if (s1 == null) {
+				if (s2 != null) { return false; }
+			} else {
+				if (!s1.equals(s2)) { return false; }
+			}
+		}
+		return true;
+	}
 	/** Iterates over the properties in the property sets native order.
 	 * @param pConsumer A consumer, which is being invoked for every
 	 * property, in the property sets native order.
@@ -245,7 +285,42 @@ public class ExtProperties {
 	 * @return The internal Map of extended properties.
 	 */
 	Map<String,ExtProperty> getEntries() { return entries; }
-	
+
+	/** Creates a new instance of {@link IExtPropertiesWriter},
+	 * with the {@link StandardCharsets#UTF_8 UTF8 character set},
+	 * and the {@link System#lineSeparator() default line separator}.
+	 * In other words, this is equivalent to
+	 * <pre>
+	 *   writer(StandardCharsets.UTF_8, System.lineSeparator())
+	 * </pre>
+	 * @return A new instance of {@link IExtPropertiesWriter},
+	 * with the {@link StandardCharsets#UTF_8 UTF8 character set},
+	 * and the {@link System#lineSeparator() default line separator}.
+	 */
+	public static IExtPropertiesWriter writer() {
+		return writer(StandardCharsets.UTF_8,
+				      System.lineSeparator());
+	}
+
+	/** Creates a new instance of {@link IExtPropertiesWriter},
+	 * with the given {@link Charset character set},
+	 * and the given line separator.
+	 * @param pCharset The character set, which is being used
+	 *   to convert characters into bytes. Typically, this
+	 *   would be {@link StandardCharsets#UTF_8}.
+	 * @param pLineSeparator The string, which is being used
+	 *   as the line separator, typically
+	 *   {@link System#lineSeparator()}, "\n" (LF), or
+	 *   "\r\n" (CRLF).
+	 * @return A new instance of {@link IExtPropertiesWriter},
+	 * with the {@link StandardCharsets#UTF_8 UTF8 character set},
+	 * and the {@link System#lineSeparator() default line separator}.
+	 */
+	public static IExtPropertiesWriter writer(Charset pCharset,
+			                                  String pLineSeparator) {
+		return new DefaultExtPropertiesWriter(pCharset, pLineSeparator);
+	}
+
 	/** Creates a new, empty property set. The property set will have
 	 * explicit ordering, if the given comparator is null. Otherwise,
 	 * the property set will preserve order of insertion.
@@ -360,8 +435,12 @@ public class ExtProperties {
 	}
 
 	/** Splits the given string list into key / value / comment triplets, and applies
-	 * them to the given property set by invoking {@link #setProperty(String, String, String)}
+	 * them to the given property set by invoking {@link #setProperty(String, String, String[])}
 	 * for each triplet.
+	 * <em>Note:</em> This method is based on the assumption, that a comment is a single
+	 * string, rather than multiple strings. While this may meet a lot of real-world
+	 * scenarios, it may not always be correct, in which case the less convenient
+	 * {@link #setProperty(String, String, String[])} must be used.
 	 * @param pValues The string list, which provides the key/value/comment triplets. For
 	 *   obvious reasons, the number of elements in the list must be a multiple of 3.
 	 * @throws NullPointerException The string list {@code pValues} is null, or either of the
@@ -385,7 +464,7 @@ public class ExtProperties {
 				throw new NullPointerException("The value at index " + (i+1) + " in the string list (pValues) is null");
 			}
 			final String comment = pValues[i+2];
-			setProperty(key, value, comment);
+			setProperty(key, value, new String[] {comment});
 		}
 	}
 }

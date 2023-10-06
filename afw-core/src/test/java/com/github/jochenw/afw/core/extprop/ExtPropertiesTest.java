@@ -103,29 +103,29 @@ public class ExtPropertiesTest {
 		assertSame(ep1, ep2);
 	}
 
-	/** Test case for {@link ExtProperties#setComment(String,String)}.
+	/** Test case for {@link ExtProperties#setComments(String,String[])}.
 	 */
 	@Test
-	public void testSetComment() {
+	public void testSetComments() {
 		final String[] values = ONE_PROPERTY;
 		final ExtProperties ep = ExtProperties.of(values);
 		assertValues(ep, values);
 		// Change an existing property.
-		ep.setComment("foo", "Property foo");
+		ep.setComments("foo", new String[]{"Property foo"});
 		assertValues(ep, "foo", "bar", "Property foo");
 		// Create a new property without comment.
-		ep.setComment("answer", null);
+		ep.setComments("answer", null);
 		assertValues(ep, "foo", "bar", "Property foo",
 				         "answer", "", null);
 		// "Change" an existing comment with the same value.
 		final ExtProperty ep1 = ep.getProperty("answer");
 		assertNotNull(ep1);
-		ep.setComment("answer", null);
+		ep.setComments("answer", null);
 		assertSame(ep1, ep.getProperty("answer"));
-		ep.setComment("answer", "*The* answer");
+		ep.setComments("answer", new String[]{"*The* answer"});
 		final ExtProperty ep2 = ep.getProperty("answer");
 		assertNotSame(ep1, ep2);
-		ep.setComment("answer", "*The* answer");
+		ep.setComments("answer", new String[]{"*The* answer"});
 		assertSame(ep2, ep.getProperty("answer"));
 	}
 
@@ -140,7 +140,7 @@ public class ExtPropertiesTest {
 		for (int i = 0;  i < THREE_PROPERTIES.length;  i += 3) {
 			epSorted.setProperty(THREE_PROPERTIES[i],
 					             THREE_PROPERTIES[i+1],
-					             THREE_PROPERTIES[i+2]);
+					             new String[] {THREE_PROPERTIES[i+2]});
 		}
 		assertValues(epSorted, THREE_PROPERTIES_SORTED);
 	}
@@ -165,7 +165,7 @@ public class ExtPropertiesTest {
 				assertNotNull(ep1);
 				assertEquals(key, ep1.getKey());
 				assertEquals(value, ep1.getValue());
-				assertStringEquals(comment, ep1.getComment());
+				assertStringEquals(comment, ep1.getComments()[0]);
 				final ExtProperty ep2 = ep.getProperty(key);
 				assertSame(ep1, ep2);
 				final ExtProperty ep3 = ep.requireProperty(key);
@@ -215,9 +215,11 @@ public class ExtPropertiesTest {
 	@Test
 	public void testGetComment() {
 		final ExtProperties epr = ExtProperties.of(TWO_PROPERTIES);
-		assertEquals(TWO_PROPERTIES[2], epr.getComment(TWO_PROPERTIES[0]));
+		final String[] fooComment = epr.getComment(TWO_PROPERTIES[0]);
+		assertEquals(TWO_PROPERTIES[2], fooComment[0]);
 		assertNull(epr.getComment("$$"));
-		assertNull(epr.getComment(TWO_PROPERTIES[3]));
+		String[] answerComment = epr.getComment(TWO_PROPERTIES[3]);
+		assertNull(answerComment[0]);
 	}
 
 	/** Test case for {@link ExtProperties#createSynchronized(ExtProperties)}.
@@ -271,7 +273,12 @@ public class ExtPropertiesTest {
 		final Consumer<ExtProperty> consumer = (ep) -> {
 			list.add(ep.getKey());
 			list.add(ep.getValue());
-			list.add(ep.getComment());
+			final String[] comments = ep.getComments();
+			if (comments != null  &&  comments.length > 0) {
+				list.add(comments[0]);
+			} else {
+				list.add(null);
+			}
 		};
 		if (pSorter == null) {
 			pEp.forEach(consumer);
@@ -327,6 +334,6 @@ public class ExtPropertiesTest {
 			                   String pComment) {
 		assertEquals(pKey, pActual.getKey());
 		assertEquals(pValue, pActual.getValue());
-		assertStringEquals(pComment, pActual.getComment());
+		assertStringEquals(pComment, pActual.getComments()[0]);
 	}
 }
