@@ -37,7 +37,7 @@ public class DefaultExtPropertiesWriterTest {
 	/** Test creating an empty property file, using an {@link OutputStream}.
 	 */
 	@Test
-	public void testEmptyProperiesToOutputStream() {
+	public void testEmptyPropertiesToOutputStream() {
 		final ExtProperties ep = ExtProperties.create();
 		testUsingOutputStream(ep, (result) -> {
 			assertNotNull(result);
@@ -77,5 +77,23 @@ public class DefaultExtPropertiesWriterTest {
 			final String actual = new String(result, StandardCharsets.UTF_8);
 			assertEquals(expect, actual);
 		});
+	}
+
+	/** Test creating a property file with several entries, including values with
+	 * german Umlaut's.
+	 */
+	@Test
+	public void testSeveralPropertiesWithUmlautsUsingOutputStream() {
+		final ExtProperties ep = ExtProperties.create();
+		ep.setProperty("foo", "bar", null);
+		ep.setProperty("AeProperty", "abc\u00e4def\u00c4", new String[] {"German Umlaut ae"});
+		ep.setProperty("Whatever", "works", null);
+		testUsingOutputStream(ep, (bytes) -> {
+			final String actual = new String(bytes, StandardCharsets.UTF_8);
+			final String expect = "# German Umlaut ae\n"
+					            + "AeProperty=abc\u00e4def\u00c4\n";
+			assertEquals(expect, actual);
+		});
+		testUsingOutputStream(ep, null);
 	}
 }

@@ -80,7 +80,6 @@ public class Holder<T> implements Supplier<T> {
 					pHolder.set(pValue);
 				}
 			}
-			
 		};
 	}
 }
