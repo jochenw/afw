@@ -59,12 +59,12 @@ public class ProgressMonitorTest {
 		}
 	}
 
-	/** Test case for {@link ProgressMonitor#ProgressMonitor(long, Functions.FailableConsumer)}.
+	/** Test case for {@link ProgressMonitor#of(long, Functions.FailableConsumer)}.
 	 */
 	@Test
 	public void testProgressMonitorLongConsumer() {
 		final Listener1 listener = new Listener1();
-		final ProgressMonitor pm = new ProgressMonitor(5, listener);
+		final ProgressMonitor pm = ProgressMonitor.of(5, listener);
 		for (int i = 0;  i < 9;  i++) {
 			pm.inc();
 		}
@@ -77,12 +77,12 @@ public class ProgressMonitorTest {
 		assertEquals("10", reports.get(3));
 	}
 
-	/** Test case for {@link ProgressMonitor#ProgressMonitor(long, Functions.FailableConsumer)}.
+	/** Test case for {@link ProgressMonitor#of(long, Functions.FailableConsumer)}.
 	 */
 	@Test
 	public void testProgressMonitorLongLongConsumer() {
 		final Listener1 listener = new Listener1();
-		final ProgressMonitor pm = new ProgressMonitor(10, 3, listener);
+		final ProgressMonitor pm = ProgressMonitor.of(10, 3, listener);
 		for (int i = 0;  i < 9;  i++) {
 			pm.inc();
 		}
@@ -99,12 +99,12 @@ public class ProgressMonitorTest {
 		assertEquals("10/10 100.00%: ", reports.get(7));
 	}
 
-	/** Test case for {@link ProgressMonitor#ProgressMonitor(long, Functions.FailableBiConsumer)}.
+	/** Test case for {@link ProgressMonitor#of(long, Functions.FailableBiConsumer)}.
 	 */
 	@Test
 	public void testProgressMonitorLongBiConsumer() {
 		final Listener2 listener = new Listener2(-1);
-		final ProgressMonitor pm = new ProgressMonitor(5, listener);
+		final ProgressMonitor pm = ProgressMonitor.of(5, listener);
 		for (int i = 0;  i < 9;  i++) {
 			pm.inc();
 		}
@@ -117,12 +117,12 @@ public class ProgressMonitorTest {
 		assertEquals("10", reports.get(3));
 	}
 
-	/** Test case for {@link ProgressMonitor#ProgressMonitor(long, Functions.FailableBiConsumer)}.
+	/** Test case for {@link ProgressMonitor#of(long, Functions.FailableBiConsumer)}.
 	 */
 	@Test
 	public void testProgressMonitorLongLongBiConsumer() {
 		final Listener2 listener = new Listener2(10);
-		final ProgressMonitor pm = new ProgressMonitor(10, 3, listener);
+		final ProgressMonitor pm = ProgressMonitor.of(10, 3, listener);
 		for (int i = 0;  i < 9;  i++) {
 			pm.inc();
 		}
@@ -138,5 +138,4 @@ public class ProgressMonitorTest {
 		assertEquals(Integer.valueOf(4), reports.get(6));
 		assertEquals("10/10 100.00%: ", reports.get(7));
 	}
-
 }

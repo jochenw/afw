@@ -95,4 +95,36 @@ public class MutableLong extends Number implements Comparable<MutableLong> {
     	setValue(value-1);
     	return value;
     }
+
+    /** Adds the given value to the mutables current value.
+     * In other words, the following are equivalent:
+     * <pre>
+     *   MutableLong ml;
+     *   ml.add(7l);
+     *   ml.setValue(ml.getValue()+7l);
+     * </pre>
+     * @param pValue The value, which is being added to the mutables current value.
+     * @return The mutables new value, after adding the parameter {@code pValue}. 
+     */
+    public long add(long pValue) {
+    	final long v = getValue()+pValue; 
+    	setValue(v);
+    	return v;
+	}
+
+    /** Adds the given value to the mutables current value.
+     * In other words, the following are equivalent:
+     * <pre>
+     *   MutableLong ml;
+     *   ml.add(7l);
+     *   ml.setValue(ml.getValue()+7l);
+     * </pre>
+     * @param pValue The value, which is being added to the mutables current value.
+     * @return The mutables new value, after adding the parameter {@code pValue}. 
+     */
+    public long add(int pValue) {
+    	final long v = getValue()+pValue; 
+    	setValue(v);
+    	return v;
+	}
 }
