@@ -37,6 +37,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
+
 
 /** Utility class for working with strings. As you are always working with strings,
  * this class ought to be useful always.
@@ -771,6 +774,78 @@ public class Strings {
 			}
 		}
 		return tokens;
+	}
+
+	/** Creates a string representation of the list, or collection {@code pValues},
+	 * like {@link String#join(CharSequence, Iterable)}, except that the current
+	 * method accepts arbitrary lists.
+	 * @param <O> Element type of the list
+	 * @param pSeparator String, which separates two consecutive elements in the
+	 *   string representation.
+	 * @param pValues The value list, which is being converted into a string
+	 *   representation.
+	 * @param pMapper A mapping function, which will be invoked for every element
+	 *   in the list, in order to create a string representation of a single
+	 *   element.
+	 * @return The created string representation.
+	 * @throws NullPointerException Either of the parameters is null.
+	 */
+	public static <O> String join(CharSequence pSeparator, Iterable<O> pValues, FailableFunction<O,String,?> pMapper) {
+		final CharSequence separator = Objects.requireNonNull(pSeparator, "Separator");
+		final Iterable<O> values = Objects.requireNonNull(pValues, "Values");
+		final FailableFunction<O,String,?> mapper = Objects.requireNonNull(pMapper, "Mapper");
+		final StringBuilder sb = new StringBuilder();
+		CharSequence sep = null;
+		for (O o : values) {
+			if (sep == null) {
+				sep = separator;
+			} else {
+				sb.append(sep);
+			}
+			sb.append(Functions.apply(mapper, o));
+		}
+		return sb.toString();
+	}
+
+	/** Creates a string representation of the array {@code pValues},
+	 * like {@link String#join(CharSequence, String[])}, except that the current
+	 * method accepts arbitrary arrays.
+	 * @param <O> Element type of the list
+	 * @param pSeparator String, which separates two consecutive elements in the
+	 *   string representation.
+	 * @param pValues The value list, which is being converted into a string
+	 *   representation.
+	 * @param pMapper A mapping function, which will be invoked for every element
+	 *   in the list, in order to create a string representation of a single
+	 *   element.
+	 * @return The created string representation.
+	 * @throws NullPointerException Either of the parameters is null.
+	 * @see #join(CharSequence, Iterable, FailableFunction)
+	 */
+	public static <O> String join(CharSequence pSeparator, O[] pValues, FailableFunction<O,String,?> pMapper) {
+		final O[] array = Objects.requireNonNull(pValues, "Values");
+		return join(pSeparator, Arrays.asList(array), pMapper);
+	}
+
+	/** Creates a string representation of the given {@code pValues},
+	 * like {@link #join(String, String[])}, except that the current
+	 * method accepts arbitrary values.
+	 * @param <O> Element type of the values
+	 * @param pSeparator String, which separates two consecutive elements in the
+	 *   string representation.
+	 * @param pMapper A mapping function, which will be invoked for every element
+	 *   in the list, in order to create a string representation of a single
+	 *   element.
+	 * @param pValues The value list, which is being converted into a string
+	 *   representation.
+	 * @return The created string representation.
+	 * @throws NullPointerException Either of the parameters is null.
+	 * @see #join(CharSequence, Iterable, FailableFunction)
+	 */
+	public static <O> String join(CharSequence pSeparator, FailableFunction<O,String,?> pMapper,
+			                      @SuppressWarnings("unchecked") O... pValues) {
+		final O[] array = Objects.requireNonNull(pValues, "Values");
+		return join(pSeparator, Arrays.asList(array), pMapper);
 	}
 }
 
