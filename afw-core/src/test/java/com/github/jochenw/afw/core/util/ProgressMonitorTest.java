@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.junit.Test;
 
@@ -26,35 +27,12 @@ public class ProgressMonitorTest {
 	}
 	private static class Listener2 implements Functions.FailableBiConsumer<ProgressMonitor,String,RuntimeException> {
 		private List<Object> reports = new ArrayList<>();
-		private int count;
-		private final long total;
-
-		/** Creates a new instance with the given expected total.
-		 * @param pTotal The expected total.
-		 */
-		public Listener2(long pTotal) {
-			total = pTotal;
-		}
 
 		@Override
 		public void accept(ProgressMonitor pReporter, String pStatus) throws RuntimeException {
-			long expectedCnt = ++count * pReporter.getInterval();
-			final long expectedCount;
-			if (total == -1) {
-				expectedCount = expectedCnt;
-			} else {
-				if (total < expectedCnt) {
-					expectedCount = total;
-				} else {
-					expectedCount = expectedCnt;
-				}
-			}
-			final long actualCount = pReporter.getCount();
-			if (expectedCount != actualCount) {
-				// Trigger an error using JUnit's error reporting
-				assertEquals(Long.valueOf(expectedCount), Long.valueOf(actualCount));
-			}
-			reports.add(Integer.valueOf(count));
+			reports.add(Long.valueOf(pReporter.getCount()));
+			reports.add(Long.valueOf(pReporter.getTotal()));
+			reports.add(Long.valueOf(pReporter.getInterval()));
 			reports.add(pStatus);
 		}
 	}
@@ -103,39 +81,61 @@ public class ProgressMonitorTest {
 	 */
 	@Test
 	public void testProgressMonitorLongBiConsumer() {
-		final Listener2 listener = new Listener2(-1);
+		final Listener2 listener = new Listener2();
 		final ProgressMonitor pm = ProgressMonitor.of(5, listener);
 		for (int i = 0;  i < 9;  i++) {
 			pm.inc();
 		}
 		pm.inc();
 		final List<Object> reports = listener.reports;
-		assertEquals(4, reports.size());
-		assertEquals(Integer.valueOf(1), reports.get(0));
-		assertEquals("5", reports.get(1));
-		assertEquals(Integer.valueOf(2), reports.get(2));
-		assertEquals("10", reports.get(3));
+		final Consumer<List<Object>> validator = (list) -> {
+			assertEquals(Long.valueOf(5), list.get(0));
+			assertEquals(Long.valueOf(-1), list.get(1));
+			assertEquals(Long.valueOf(5), list.get(2));
+			assertEquals("5", list.get(3));
+			assertEquals(Long.valueOf(10), list.get(4));
+			assertEquals(Long.valueOf(-1), list.get(5));
+			assertEquals(Long.valueOf(5), list.get(6));
+			assertEquals("10", reports.get(7));
+		};
+		assertEquals(8, reports.size());
+		validator.accept(reports);
+		pm.finish();
+		assertEquals(12, reports.size());
+		validator.accept(reports);
+		assertEquals(Long.valueOf(10), reports.get(8));
+		assertEquals(Long.valueOf(10), reports.get(9));
+		assertEquals(Long.valueOf(5), reports.get(10));
+		assertEquals("10/10 100.00%: ", reports.get(11));
 	}
 
 	/** Test case for {@link ProgressMonitor#of(long, Functions.FailableBiConsumer)}.
 	 */
 	@Test
 	public void testProgressMonitorLongLongBiConsumer() {
-		final Listener2 listener = new Listener2(10);
+		final Listener2 listener = new Listener2();
 		final ProgressMonitor pm = ProgressMonitor.of(10, 3, listener);
-		for (int i = 0;  i < 9;  i++) {
+		for (int i = 0;  i < 10;  i++) {
 			pm.inc();
 		}
-		pm.inc();
 		final List<Object> reports = listener.reports;
-		assertEquals(8, reports.size());
-		assertEquals(Integer.valueOf(1), reports.get(0));
-		assertEquals("3/10 30.00%: ", reports.get(1));
-		assertEquals(Integer.valueOf(2), reports.get(2));
-		assertEquals("6/10 60.00%: ", reports.get(3));
-		assertEquals(Integer.valueOf(3), reports.get(4));
-		assertEquals("9/10 90.00%: ", reports.get(5));
-		assertEquals(Integer.valueOf(4), reports.get(6));
-		assertEquals("10/10 100.00%: ", reports.get(7));
+		assertEquals(16, reports.size());
+		assertEquals(Long.valueOf(3), reports.get(0));
+		assertEquals(Long.valueOf(10), reports.get(1));
+		assertEquals(Long.valueOf(3), reports.get(2));
+		assertEquals("3/10 30.00%: ", reports.get(3));
+		assertEquals(Long.valueOf(6), reports.get(4));
+		assertEquals(Long.valueOf(10), reports.get(5));
+		assertEquals(Long.valueOf(3), reports.get(6));
+		assertEquals("6/10 60.00%: ", reports.get(7));
+		assertEquals(Long.valueOf(9), reports.get(8));
+		assertEquals(Long.valueOf(10), reports.get(9));
+		assertEquals(Long.valueOf(3), reports.get(10));
+		assertEquals("9/10 90.00%: ", reports.get(11));
+		assertEquals(Long.valueOf(10), reports.get(12));
+		assertEquals(Long.valueOf(10), reports.get(13));
+		assertEquals(Long.valueOf(3), reports.get(14));
+		assertEquals("10/10 100.00%: ", reports.get(15));
+		
 	}
 }

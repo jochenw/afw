@@ -12,9 +12,9 @@ import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
  * action has been done.
  */
 public class ProgressMonitor {
-	private long count, intervalCount;
+	private long count, intervalCount, total;
 	private boolean silent;
-	private final long total, interval;
+	private long interval;
 	private final FailableBiConsumer<ProgressMonitor,String,?> listener;
 
 	/** Creates a new instance with the given interval, a total of -1, and
@@ -125,6 +125,7 @@ public class ProgressMonitor {
 					finish();
 				} else if (intervalCount >= interval) {
 					report(count, total);
+					intervalCount = 0;
 				}
 			}
 		}
@@ -182,6 +183,7 @@ public class ProgressMonitor {
 	 */
 	public void finish() {
 		if (total == -1) {
+			total = count;
 			report(count, count);
 		} else {
 			report(total, total);
