@@ -127,9 +127,9 @@
 				  <goals><goal>execute</goal></goals>
 				  <phase>generate-sources</phase>
 				  <configuration>
-					  <source>src/main/build-helper/removeDeprecatedAnnotations.groovy</source>
+					  <source>${project.basedir}/src/main/build-helper/removeDeprecatedAnnotations.groovy</source>
 					  <properties>
-						  <filesToProcess>target/generated-sources/javacc/com/github/jochenw/afw/core/el/jcc/SimpleCharStream.java</filesToProcess>
+						  <filesToProcess>${project.basedir}/target/generated-sources/javacc/com/github/jochenw/afw/core/el/jcc/SimpleCharStream.java</filesToProcess>
 					  </properties>
 				  </configuration>
 		      </execution>

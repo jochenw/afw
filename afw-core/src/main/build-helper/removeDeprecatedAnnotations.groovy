@@ -2,8 +2,9 @@
  * Remove @deprecated annotations from
  * target/generated-sources/javacc/com/github/jochenw/afw/core/el/jcc/SimpleCharStream.java
  */
+System.out.println("Removing invalid @deprecated annotations.");
 final java.nio.file.Path path =
-    java.nio.file.Paths.get("target/generated-sources/javacc/com/github/jochenw/afw/core/el/jcc/SimpleCharStream.java");
+    java.nio.file.Paths.get("${project.basedir}/target/generated-sources/javacc/com/github/jochenw/afw/core/el/jcc/SimpleCharStream.java");
 if (!java.nio.file.Files.isRegularFile(path)) {
     throw new IllegalStateException("File not found: " + path);
 }
