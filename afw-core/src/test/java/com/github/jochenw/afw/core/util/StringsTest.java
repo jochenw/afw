@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.log.ILog.Level;
 
 
@@ -341,5 +342,66 @@ public class StringsTest {
     	assertSame(DEFAULT, Strings.notEmpty("", () -> DEFAULT));
     	assertEquals("0", Strings.notEmpty("0", () -> DEFAULT));
     	assertEquals("false", Strings.notEmpty("false", () -> DEFAULT));
+    }
+
+    private static class Person {
+    	private final String name;
+    	private Person(String pName) {
+    		name = pName;
+    	}
+    	public String getName() { return name; }
+    	public static Person of(String pName) {
+    		return new Person(pName);
+    	}
+    	public static Person[] SOME_PERSONS = new Person[] {
+        	of("Dennis Ritchie"),
+        	of("Ken Thompson"),
+    		of("Linus Torvalds"),
+    		of("Michael Widenius")
+    	};
+    	public static String SOME_PERSONS_STRING =
+    		"Dennis Ritchie, Ken Thompson, Linus Torvalds, Michael Widenius";
+    }
+
+    /**
+     * Test case for {@link Strings#tokenize(String, String)}.
+     */
+    @Test
+    public void testTokenizeStringString() {
+    	final List<String> names = Strings.tokenize(", ", Person.SOME_PERSONS_STRING);
+    	final List<String> names2 = Strings.tokenize(",", Person.SOME_PERSONS_STRING);
+    	assertEquals(Person.SOME_PERSONS.length, names.size());
+    	assertEquals(Person.SOME_PERSONS.length, names2.size());
+    	for (int i = 0;  i < names.size();  i++) {
+    		assertEquals(Person.SOME_PERSONS[i].getName(), names.get(i));
+    		if (i == 0) {
+        		assertEquals(Person.SOME_PERSONS[i].getName(), names2.get(i));
+    		} else {
+        		assertEquals(" " + Person.SOME_PERSONS[i].getName(), names2.get(i));
+    		}
+    	}
+    }
+    /** Test case for {@link Strings#join(CharSequence, Iterable, Functions.FailableFunction)}.
+     */
+    @Test
+    public void testJoinStringIterableFunction() {
+    	final String actual = Strings.join(", ", Arrays.asList(Person.SOME_PERSONS), Person::getName);
+    	assertEquals(Person.SOME_PERSONS_STRING, actual);
+    }
+
+    /** Test case for {@link Strings#join(CharSequence, Object[], Functions.FailableFunction)}.
+     */
+    @Test
+    public void testJoinStringArrayFunction() {
+    	final String actual = Strings.join(", ", Person.SOME_PERSONS, Person::getName);
+    	assertEquals(Person.SOME_PERSONS_STRING, actual);
+    }
+
+    /** Test case for {@link Strings#join(CharSequence, Functions.FailableFunction, Object...)}
+     */
+    @Test
+    public void testJoinStringFunctionArray() {
+    	final String actual = Strings.join(", ", Person::getName, Person.SOME_PERSONS);
+    	assertEquals(Person.SOME_PERSONS_STRING, actual);
     }
 }

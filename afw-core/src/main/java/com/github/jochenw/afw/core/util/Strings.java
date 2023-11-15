@@ -38,6 +38,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 
 
@@ -754,25 +755,42 @@ public class Strings {
 	 * equivalent to the {@link StringTokenizer}, except that the latter
 	 * interprets the delimiter as a set of characters, rater than a
 	 * separator string.
-	 * @param pString The string, that is being tokenized.
 	 * @param pDelimiter The separator string, that is supposed to
 	 *   separate the various tokens.
-	 * @return The tokens, that were found.
+	 * @param pString The string, that is being tokenized.
+	 * @param pConsumer A consumer, which is being invoked the tokens in
+	 *   the order of occurrence.
 	 */
-	public static @Nonnull List<String> tokenize(@Nonnull String pString, @Nonnull String pDelimiter) {
+	public static @Nonnull void tokenize(@Nonnull String pDelimiter,
+			                             @Nonnull String pString,
+			                             FailableConsumer<String,?> pConsumer) {
 		String string = Objects.requireNonNull(pString, "String");
 		final String delim = Objects.requireNonNull(pDelimiter, "Delimiter");
-		List<String> tokens = new ArrayList<>();
 		while (string.length() > 0) {
 			final int offset = string.indexOf(delim);
 			if (offset == -1) {
-				tokens.add(string);
+				Functions.accept(pConsumer, string);
 				break;
 			} else {
-				tokens.add(string.substring(0, offset));
+				Functions.accept(pConsumer, string.substring(0, offset));
 				string = string.substring(offset + delim.length());
 			}
 		}
+	}
+
+	/** Converts the given {@code pString} into a stream of tokens,
+	 * which are separated by the given {@code pDelimiter}. This is mainly
+	 * equivalent to the {@link StringTokenizer}, except that the latter
+	 * interprets the delimiter as a set of characters, rater than a
+	 * separator string.
+	 * @param pDelimiter The separator string, that is supposed to
+	 *   separate the various tokens.
+	 * @param pString The string, that is being tokenized.
+	 * @return The tokens, that were found.
+	 */
+	public static @Nonnull List<String> tokenize(@Nonnull String pDelimiter, @Nonnull String pString) {
+		List<String> tokens = new ArrayList<>();
+		tokenize(pDelimiter, pString, tokens::add);
 		return tokens;
 	}
 
