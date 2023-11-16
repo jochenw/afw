@@ -47,7 +47,7 @@ public class DefaultExtPropertiesWriterTest {
 
 	private void testUsingOutputStream(final ExtProperties ep, Consumer<byte[]> pValidator) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ExtProperties.writer().write(ep, baos);
+		ExtProperties.writer(StandardCharsets.UTF_8, "\n").write(ep, baos);
 		final byte[] result = baos.toByteArray();
 		if (pValidator != null) {
 			pValidator.accept(result);
@@ -71,8 +71,8 @@ public class DefaultExtPropertiesWriterTest {
 	@Test
 	public void testSinglePropertyUsingOutputStream() {
 		final ExtProperties ep = ExtProperties.of("foo", "bar", "The foo property");
-	    final String expect = "# The foo property" + System.lineSeparator()
-        + "foo=bar" + System.lineSeparator();
+	    final String expect = "# The foo property\n"
+        + "foo=bar\n";
 		testUsingOutputStream(ep, (result) -> {
 			final String actual = new String(result, StandardCharsets.UTF_8);
 			assertEquals(expect, actual);
@@ -90,8 +90,10 @@ public class DefaultExtPropertiesWriterTest {
 		ep.setProperty("Whatever", "works", null);
 		testUsingOutputStream(ep, (bytes) -> {
 			final String actual = new String(bytes, StandardCharsets.UTF_8);
-			final String expect = "# German Umlaut ae\n"
-					            + "AeProperty=abc\u00e4def\u00c4\n";
+			final String expect = "foo=bar\n"
+					            + "# German Umlaut ae\n"
+					            + "AeProperty=abc\u00e4def\u00c4\n"
+					            + "Whatever=works\n";
 			assertEquals(expect, actual);
 		});
 		testUsingOutputStream(ep, null);

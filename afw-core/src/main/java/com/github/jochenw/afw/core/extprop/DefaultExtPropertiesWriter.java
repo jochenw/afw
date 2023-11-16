@@ -40,15 +40,15 @@ public class DefaultExtPropertiesWriter implements IExtPropertiesWriter {
 			final String key = ep.getKey();
 			final String value = ep.getValue();
 			final String[] comments = ep.getComments();
-			if (comments != null) {
-				try {
+			try {
+				if (comments != null  &&  comments.length > 0) {
 					for (String comment : comments) {
 						writeComment(pWriter, comment);
 					}
-					writeProperty(pWriter, key, value);
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
 				}
+				writeProperty(pWriter, key, value);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
 		});
 	}
