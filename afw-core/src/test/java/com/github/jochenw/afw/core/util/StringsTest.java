@@ -403,6 +403,7 @@ public class StringsTest {
     public void testJoinStringFunctionArray() {
     	final String actual = Strings.join(", ", Person::getName, Person.SOME_PERSONS);
     	assertEquals(Person.SOME_PERSONS_STRING, actual);
+    }
 
     /** Test case for {@link Strings#requireNonNull(String,String)}.
      */
