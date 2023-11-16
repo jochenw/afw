@@ -57,6 +57,18 @@ import java.nio.charset.CodingErrorAction;
  * @since 2.0
  */
 public class WriterOutputStream extends OutputStream {
+	private static boolean byteBufferCanFlip;
+	static {
+		boolean canFlip;
+		try {
+			final ByteBuffer byteBuffer = ByteBuffer.allocate(128);
+			byteBuffer.flip();
+			canFlip = true;
+		} catch (Throwable t) {
+			canFlip = false;
+		}
+		byteBufferCanFlip = canFlip;
+	}
     private static final int BUFFER_SIZE = 1024;
 
     private final Writer writer;
@@ -212,17 +224,6 @@ public class WriterOutputStream extends OutputStream {
         }
     }
 
-    private static final boolean ByteBufferClassHasFlipMethod;
-    static {
-    	Method byteBufferFlipMethod;
-    	try {
-    		byteBufferFlipMethod = ByteBuffer.class.getMethod("flip");
-    	} catch (NoSuchMethodException e) {
-    		byteBufferFlipMethod = null;
-    	}
-    	ByteBufferClassHasFlipMethod = byteBufferFlipMethod != null;
-    }
-
     /**
      * Decode the contents of the input ByteBuffer into a CharBuffer.
      *
@@ -231,7 +232,7 @@ public class WriterOutputStream extends OutputStream {
      */
     private void processInput(final boolean endOfInput) throws IOException {
         // Prepare decoderIn for reading
-    	if (ByteBufferClassHasFlipMethod) {
+    	if (byteBufferCanFlip) {
     		decoderIn.flip();
     	} else {
     		((Buffer) decoderIn).flip();

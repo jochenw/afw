@@ -23,8 +23,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -322,6 +324,25 @@ public class StringsTest {
     	assertEquals("TRACE|DEBUG|INFO|WARN|ERROR|FATAL", joinedNames);
     }
 
+    /** Test case for {@link Strings#join(String,String...)}
+     */
+    @Test
+    public void testJoinStrings() {
+    	final List<String> namesList = Arrays.asList(Person.SOME_PERSONS).stream().map(Person::getName).collect(Collectors.toList());
+    	final String[] namesArray = namesList.toArray(new String[namesList.size()]);
+    	assertEquals(Person.SOME_PERSONS_STRING, Strings.join(", ", namesArray));
+    	assertEquals(Person.SOME_PERSONS_STRING.replace(", ", ","), Strings.join(",", namesArray));
+    }
+
+    /** Test case for {@link Strings#join(String,Iterable)}
+     */
+    @Test
+    public void testJoinStringList() {
+    	final List<String> namesList = Arrays.asList(Person.SOME_PERSONS).stream().map(Person::getName).collect(Collectors.toList());
+    	assertEquals(Person.SOME_PERSONS_STRING, Strings.join(", ", namesList));
+    	assertEquals(Person.SOME_PERSONS_STRING.replace(", ", ","), Strings.join(",", namesList));
+    }
+
     /** Test case for {@link Strings#notEmpty(String,String)}.
      */
     @Test
@@ -411,6 +432,7 @@ public class StringsTest {
     public void testRequireNonEmptyStringString() {
     	final String abc = "abc";
     	assertSame(abc, Strings.requireNonEmpty(abc, "abc"));
+    	assertSame(" ", Strings.requireNonEmpty(" ", "abc"));
     	try {
     		Strings.requireNonEmpty(null, "abc");
     		fail("Expected Exception");
@@ -422,6 +444,32 @@ public class StringsTest {
     		fail("Expected Exception");
     	} catch (IllegalArgumentException e) {
     		assertEquals(e.getMessage(), "String value must not be empty: abc");
+    	}
+    }
+
+    /** Test case for {@link Strings#requireTrimmedNonEmpty(String,String)}.
+     */
+    @Test
+    public void testRequireTrimmedNonEmptyStringString() {
+    	final String abc = "abc";
+    	assertSame(abc, Strings.requireTrimmedNonEmpty(abc, "abc"));
+    	try {
+    		Strings.requireTrimmedNonEmpty(null, "abc");
+    		fail("Expected Exception");
+    	} catch (NullPointerException e) {
+    		assertEquals(e.getMessage(), "String value must not be null: abc");
+    	}
+    	try {
+    		Strings.requireTrimmedNonEmpty("", "abc");
+    		fail("Expected Exception");
+    	} catch (IllegalArgumentException e) {
+    		assertEquals(e.getMessage(), "String value must not be empty: abc");
+    	}
+    	try {
+    		Strings.requireTrimmedNonEmpty(" ", "abc");
+    		fail("Expected Exception");
+    	} catch (IllegalArgumentException e) {
+    		assertEquals(e.getMessage(), "String value must not be empty (after trimming): abc");
     	}
     }
 
@@ -437,5 +485,35 @@ public class StringsTest {
     	} catch (NullPointerException e) {
     		assertEquals("abc is null", e.getMessage());
     	}
+    }
+   
+    /** Test case for {@link Strings#append(StringBuilder, Object)}.
+     */
+    @Test
+    public void testAppendStringBuilderObject() {
+    	final Function<Object,String> tester = (o) -> {
+    		final StringBuilder sb = new StringBuilder();
+    		Strings.append(sb, o);
+    		return sb.toString();
+    	};
+    	assertEquals("abc", tester.apply("abc"));
+    	assertEquals("null", tester.apply(null));
+    	assertEquals("42", tester.apply(Integer.valueOf(42)));
+    	assertEquals("true", tester.apply(Boolean.TRUE));
+    }
+
+    /** Test case for {@link Strings#append(StringBuilder, Object...)}.
+     */
+    @Test
+    public void testAppendStringBuilderObjects() {
+    	final Function<Object[],String> tester = (objs) -> {
+    		final StringBuilder sb = new StringBuilder();
+    		Strings.append(sb, objs);
+    		return sb.toString();
+    	};
+    	assertEquals("abc, def", tester.apply(new String[] {"abc", "def"}));
+    	assertEquals("null", tester.apply(null));
+    	assertEquals("42", tester.apply(new Object[] {Integer.valueOf(42)}));
+    	assertEquals("true", tester.apply(new Object[] {Boolean.TRUE}));
     }
 }

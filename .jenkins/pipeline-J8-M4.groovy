@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools { 
-        maven 'Maven3' 
+        maven 'Maven4'
         jdk 'Java8' 
     }
     stages {
@@ -9,7 +9,7 @@ pipeline {
             steps {
                 withMaven(
                      // Maven installation declared in the Jenkins "Global Tool Configuration"
-                     maven: 'Maven3',
+                     maven: 'Maven4',
 
                      // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
                      mavenLocalRepo: '.repository',

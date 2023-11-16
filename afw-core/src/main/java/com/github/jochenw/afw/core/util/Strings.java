@@ -290,7 +290,7 @@ public class Strings {
 	public static String requireTrimmedNonEmpty(String pValue, String pName) {
 		requireNonEmpty(pValue, pName);
 		if (pValue.trim().length() == 0) {
-			throw new NullPointerException("String value must not be empty (after trimming): " + pName);
+			throw new IllegalArgumentException("String value must not be empty (after trimming): " + pName);
 		}
 		return pValue;
 	}
