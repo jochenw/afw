@@ -403,5 +403,38 @@ public class StringsTest {
     public void testJoinStringFunctionArray() {
     	final String actual = Strings.join(", ", Person::getName, Person.SOME_PERSONS);
     	assertEquals(Person.SOME_PERSONS_STRING, actual);
+
+    /** Test case for {@link Strings#requireNonNull(String,String)}.
+     */
+    @Test
+    public void testRequireNonEmptyStringString() {
+    	final String abc = "abc";
+    	assertSame(abc, Strings.requireNonEmpty(abc, "abc"));
+    	try {
+    		Strings.requireNonEmpty(null, "abc");
+    		fail("Expected Exception");
+    	} catch (NullPointerException e) {
+    		assertEquals(e.getMessage(), "String value must not be null: abc");
+    	}
+    	try {
+    		Strings.requireNonEmpty("", "abc");
+    		fail("Expected Exception");
+    	} catch (IllegalArgumentException e) {
+    		assertEquals(e.getMessage(), "String value must not be empty: abc");
+    	}
+    }
+
+    /** Test case for {@link Strings#requireNonNull(String,String)}.
+     */
+    @Test
+    public void testRequireNonNullStringString() {
+    	final String abc = "abc";
+    	assertSame(abc, Strings.requireNonNull(abc, "abc"));
+    	try {
+    		Strings.requireNonNull(null, "abc is null");
+    		fail("Expected Exception");
+    	} catch (NullPointerException e) {
+    		assertEquals("abc is null", e.getMessage());
+    	}
     }
 }

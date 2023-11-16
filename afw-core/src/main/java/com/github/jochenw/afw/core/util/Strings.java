@@ -90,31 +90,6 @@ public class Strings {
 		return Objects.requireNonNull(pValue, pMessage);
 	}
 
-	/** Converts the given string into a byte array, using the UTF-8
-	 * character set.
-	 * @param pContents The string veing converted.
-	 * @return The converted string.
-	 * @throws UncheckedIOException The conversion failed.
-	 */
-	public static byte[] getBytes(String pContents) {
-        return getBytes(pContents, "UTF-8");
-    }
-
-	/** Converts the given string into a byte array, using the given
-	 * character set.
-	 * @param pContents The string veing converted.
-	 * @param pCharset The character set being used.
-	 * @return The converted string.
-	 * @throws UncheckedIOException The conversion failed.
-	 */
-    public static byte[] getBytes(String pContents, String pCharset) {
-        try {
-            return pContents.getBytes(pCharset);
-        } catch (UnsupportedEncodingException e) {
-            throw Exceptions.newUncheckedIOException(e);
-        }
-    }
-
     /** Converts the given object to a string, using the
      * {@link Object#toString()} method.
      * @param pArg The object to convert into a string.
@@ -136,9 +111,11 @@ public class Strings {
     }
 
     /** Writes the given objects as a string to the given {@link StringBuilder}.
+     * For all practical purposes, this is identical with
+     * {@link #append(Appendable, Object...)}, except that it doesn't throw
+     * an {@link IOException}.
      * @param pSb The target stream.
      * @param pArgs The objects being written.
-	 * @throws UncheckedIOException The writing failed.
      */
     public static void append(StringBuilder pSb, Object... pArgs) {
         try {
@@ -167,6 +144,8 @@ public class Strings {
     }
 
     /** Writes the given object as a string to the given {@link StringBuilder}.
+     * For all practical purposes, this is identical with
+     * {@link #append(Appendable, Object)}, except that it doesn't throw
      * @param pSb The target stream.
      * @param pArg The object being written.
 	 * @throws UncheckedIOException The writing failed.

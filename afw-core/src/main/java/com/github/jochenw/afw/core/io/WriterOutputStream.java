@@ -3,6 +3,8 @@ package com.github.jochenw.afw.core.io;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.lang.reflect.Method;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -210,6 +212,17 @@ public class WriterOutputStream extends OutputStream {
         }
     }
 
+    private static final boolean ByteBufferClassHasFlipMethod;
+    static {
+    	Method byteBufferFlipMethod;
+    	try {
+    		byteBufferFlipMethod = ByteBuffer.class.getMethod("flip");
+    	} catch (NoSuchMethodException e) {
+    		byteBufferFlipMethod = null;
+    	}
+    	ByteBufferClassHasFlipMethod = byteBufferFlipMethod != null;
+    }
+
     /**
      * Decode the contents of the input ByteBuffer into a CharBuffer.
      *
@@ -218,7 +231,11 @@ public class WriterOutputStream extends OutputStream {
      */
     private void processInput(final boolean endOfInput) throws IOException {
         // Prepare decoderIn for reading
-        decoderIn.flip();
+    	if (ByteBufferClassHasFlipMethod) {
+    		decoderIn.flip();
+    	} else {
+    		((Buffer) decoderIn).flip();
+    	}
         CoderResult coderResult;
         while (true) {
             coderResult = decoder.decode(decoderIn, decoderOut, endOfInput);
