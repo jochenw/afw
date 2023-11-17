@@ -13,13 +13,14 @@ pipeline {
 
                      // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
                      mavenLocalRepo: '.repository',
+
+					 // Additional diagnostic output
+					 traceability: true
                 ) {
 				    script {
 				        if (isUnix()) {
-				            sh 'mvn --version'
     			            sh 'mvn -fpom.xml -Pjacoco clean install'
 					    } else {
-				            bat 'mvn.cmd --version'
     			            bat 'mvn.cmd -fpom.xml -Pjacoco clean install'
 					    }
 					}
