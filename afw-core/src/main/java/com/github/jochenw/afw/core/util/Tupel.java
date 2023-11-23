@@ -1,5 +1,6 @@
 package com.github.jochenw.afw.core.util;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 
@@ -9,7 +10,8 @@ import java.util.Objects;
  * @param <O1> Type of the first attribute.
  * @param <O2> Type of the second attribute.
  */
-public class Tupel<O1, O2> {
+public class Tupel<O1, O2> implements Serializable {
+	private static final long serialVersionUID = -7117927702865287177L;
 	private final O1 attribute1;
 	private final O2 attribute2;
 

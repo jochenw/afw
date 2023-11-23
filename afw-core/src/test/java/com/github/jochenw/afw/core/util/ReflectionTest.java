@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public class ReflectionTest {
 		private boolean boolProperty1;
 		private boolean boolProperty2;
 		private boolean boolProperty3;
+		private static String staticProperty4;
 
 		boolean isBoolProperty2() {
 			return boolProperty2;
@@ -98,6 +100,12 @@ public class ReflectionTest {
 		} catch (NoSuchFieldError e) {
 			Assert.assertEquals("Field not found: com.github.jochenw.afw.core.util.ReflectionTest$B.propPerty3", e.getMessage());
 		}
+		try {
+			Reflection.setValue(b,  null, null);
+			Assert.fail("Expected Exception");
+		} catch (NullPointerException e) {
+			Assert.assertEquals("The field name must not be null, or empty.", e.getMessage());
+		}
 	}
 
 	/** Test case for {@link Reflection#getGetters(Class)}.
@@ -113,4 +121,42 @@ public class ReflectionTest {
 		Assert.assertNotNull(getters.get("boolProperty1")); // Boolean property using "get" detexted?
 		Assert.assertNotNull(getters.get("boolProperty3")); // Boolean property using "is" detected?
 	}
+
+	/** Test case for {@link Reflection#getStaticField(Class, String)}.
+	 */
+	@Test
+	public void testGetStaticField() {
+		final Field field = Reflection.getStaticField(A.class, "staticProperty4");
+		Assert.assertNotNull(field);
+		Assert.assertNull(Reflection.getStaticField(A.class, "noSuchPropertyExists"));
+	}
+
+	private static class C {
+		private final String value;
+		private final Integer number;
+		C(RuntimeException pException) {
+			throw pException;
+		}
+		C(String pValue, Integer pNumber) {
+			value = pValue;
+			number = pNumber;
+		}
+	}
+	/** Test case for {@link Reflection#newObject(String, Object...)}.
+	 */
+	@Test
+	public void testNewObject() {
+		final RuntimeException rte = new RuntimeException("Constructor failed");
+		try {
+			Reflection.newObject(C.class.getName(), rte);
+			Assert.fail("Expected Exception");
+		} catch (RuntimeException e) {
+			Assert.assertSame(rte, e);
+		}
+		final C c = Reflection.newObject(C.class.getName(), "42", Integer.valueOf(3));
+		Assert.assertNotNull(c);
+		Assert.assertEquals("42", c.value);
+		Assert.assertEquals(Integer.valueOf(3), c.number);
+	}
+	
 }
