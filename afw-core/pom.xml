@@ -202,12 +202,6 @@
         <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore</artifactId>
-        <version>4.4.13</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
     	<groupId>org.bouncycastle</groupId>
     	<artifactId>bcprov-jdk15to18</artifactId>
     	<version>1.76</version>
@@ -241,6 +235,12 @@
     	<groupId>com.github.jochenw.afw</groupId>
     	<artifactId>afw-di</artifactId>
     	<version>0.7.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.httpcomponents.core5</groupId>
+        <artifactId>httpcore5</artifactId>
+        <version>5.2</version>
+        <scope>test</scope>
     </dependency>
   </dependencies>
   <reporting>

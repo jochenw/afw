@@ -40,18 +40,39 @@ public class HttpConnector {
 		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		}
 	};
+
 	/**
 	 * A wrapper for an {@link HttpURLConnection}, which implements
 	 * {@link AutoCloseable}.
 	 */
-	public interface HttpConnection extends AutoCloseable {
-		/** Returns the underlying {@link HttpURLConnection}.
+	public static class HttpConnection implements AutoCloseable {
+		private final HttpURLConnection urlConn;
+
+		/** Creates a new instance, which wraps the given
+		 * {@link HttpURLConnection}. Closing this object will
+		 * {@link HttpURLConnection#disconnect() disconnect} the
+		 * HTTP connection.
+		 * @param pConn The HTTP connection object. Typically, the actual
+		 *   network connection hasn't yet been established, and the
+		 *   HTTP connection is just ready for configuration.
+		 */
+		public HttpConnection(HttpURLConnection pConn) {
+			urlConn = pConn;
+		}
+
+		@Override
+		public void close() {
+			urlConn.disconnect();
+		}
+
+		/** Returns the wrapped {@link HttpURLConnection}.
 		 * @return The wrapped {@link HttpURLConnection}
 		 */
-		public HttpURLConnection getUrlConnection();
-		@Override
-		public void close();
+		public HttpURLConnection getUrlConnection() {
+			return urlConn;
+		}
 	}
+
 
 	private boolean trustingAllCertificates;
 	private Path trustStore;
@@ -191,17 +212,7 @@ public class HttpConnector {
 		} else {
 			urlConn = (HttpURLConnection) pUrl.openConnection();
 		}
-		return new HttpConnection() {
-			@Override
-			public void close() {
-				urlConn.disconnect();
-			}
-			
-			@Override
-			public HttpURLConnection getUrlConnection() {
-				return urlConn;
-			}
-		};
+		return new HttpConnection(urlConn);
 	}
 
 	/** Creates an {@link AutoCloseable}, that provides a connection to the given
@@ -219,17 +230,7 @@ public class HttpConnector {
 			urlConn = (HttpsURLConnection) pUrl.openConnection();
 		}
 		urlConn.setSSLSocketFactory(getSSLSocketFactory());
-		return new HttpConnection() {
-			@Override
-			public void close() {
-				urlConn.disconnect();
-			}
-			
-			@Override
-			public HttpURLConnection getUrlConnection() {
-				return urlConn;
-			}
-		};
+		return new HttpConnection(urlConn);
 	}
 
 	/** Creates an {@link SSLSocketFactory SSL socket factory},

@@ -308,7 +308,7 @@ public interface IReadable {
 	 *     by invoking {@link ClassLoader#getResource(String)} on the current threads
 	 *     context class loader, passing the string {@code pDefaultUri} + "/suburi". If
 	 *     the parameter {@code pDefaultUri} is null, throws an exception.</li>
-	 *   <li>If the Uri con be converted into an URL, then the URL is being resolved.</li>
+	 *   <li>If the Uri can be converted into an URL, then the URL is being resolved.</li>
 	 *   <li>Otherwise, the Uri is interpreted as the path of a file, that must be read.</li>
 	 * </ol>
 	 * @param pUri The Uri, which supplies the data stream, and the name.
