@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
@@ -1320,9 +1321,7 @@ public class JdbcHelper {
 	 *   storage into the database.
 	 */
 	public Date asDate(LocalDate pLocalDateValue) {
-		final ZonedDateTime zdtApp = ZonedDateTime.of(pLocalDateValue, ZERO_TIME, getAppZoneId());
-		final ZonedDateTime zdtDb = zdtApp.withZoneSameInstant(getDbZoneId());
-		return new Date(zdtDb.toInstant().toEpochMilli());
+		return Date.valueOf(pLocalDateValue);
 	}
 	private static final LocalTime ZERO_TIME = LocalTime.of(0, 0, 0, 0);
 
@@ -1332,9 +1331,7 @@ public class JdbcHelper {
 	 * @return A local dateTime value, which represents the same date.
 	 */
 	public LocalDate asLocalDate(Date pDate) {
-		final ZonedDateTime zdtDb = ZonedDateTime.ofInstant(Instant.ofEpochMilli(pDate.getTime()), getDbZoneId());
-		final ZonedDateTime zdtApp = zdtDb.withZoneSameInstant(getAppZoneId());
-		return zdtApp.toLocalDate();
+		return pDate.toLocalDate();
 	}
 
 	/** Converts a local time value from the {@link #getAppZoneId() applications time zone}

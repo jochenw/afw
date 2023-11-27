@@ -18,6 +18,7 @@ package com.github.jochenw.afw.core.util;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -448,6 +449,8 @@ public class Reflection {
 			@SuppressWarnings("unchecked")
 			final O o = (O) cons.newInstance(objects.toArray(new Object[objects.size()]));
 			return o;
+		} catch (InvocationTargetException e) {
+			throw Exceptions.show(e.getCause());
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}

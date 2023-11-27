@@ -151,7 +151,11 @@ public class ReflectionTest {
 			Reflection.newObject(C.class.getName(), rte);
 			Assert.fail("Expected Exception");
 		} catch (RuntimeException e) {
-			Assert.assertSame(rte, e);
+			Assert.assertSame(rte,  e);
+		} catch (Throwable t) {
+			System.err.println("Unexpected Exception:");
+			t.printStackTrace(System.err);
+			throw Exceptions.show(t);
 		}
 		final C c = Reflection.newObject(C.class.getName(), "42", Integer.valueOf(3));
 		Assert.assertNotNull(c);
