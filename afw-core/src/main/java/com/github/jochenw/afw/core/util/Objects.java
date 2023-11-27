@@ -16,10 +16,18 @@
 package com.github.jochenw.afw.core.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -264,5 +272,149 @@ public class Objects {
 	@SafeVarargs
 	public static @Nonnull <O> O[] arrayOf(@Nonnull O... pValues) {
 		return pValues;
+	}
+
+	/** This class is being used by the {@link CachedObjectManager} for
+	 * serialization, and deserialization. The purpose is the ability
+	 * to use different mechanism for serialization, and deserialization,
+	 * if necessary.
+	 */
+	public static class CachedObjectSerializer {
+		/** Serializes the given object to the given output stream.
+		 * (Called to write the cached object to the cache file.).
+		 * @param pObject The object, that is being cached.
+		 * @param pOut The output stream, to which the
+		 *   cached object is being written.
+		 */
+		public void write(@Nonnull Object pObject, @Nonnull OutputStream pOut) {
+			final Object object = Objects.requireNonNull(pObject, "Object");
+			final OutputStream os = Objects.requireNonNull(pOut, "OutputStream"); 
+			try {
+				final ObjectOutputStream oos = new ObjectOutputStream(os);
+				oos.writeObject(object);
+				oos.flush();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+		/** Deserializes the given object from the given input stream.
+		 * (Called to read the cached object from the cache file.).
+		 * @param pIn The input stream, from which the
+		 *   cached object is being read.
+		 * @return The cached object, that has been read from the input
+		 *   stream.
+		 */
+		public @Nonnull Object read(@Nonnull InputStream pIn) {
+			final InputStream in = Objects.requireNonNull(pIn, "InputStream");
+			try {
+				final ObjectInputStream ois = new ObjectInputStream(in);
+				return ois.readObject();
+			} catch (ClassNotFoundException e) {
+				throw new UndeclaredThrowableException(e);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
+	/** A builder-like object, which is being
+	 * used by the {@link Objects#getCacheableObject(Path, FailableSupplier)} method.
+	 * @param <O> Type of the cached object.
+	 */
+	public static class CachedObjectManager<O> {
+		private final Path cacheFile;
+		private final FailableSupplier<O,?> supplier;
+		private CachedObjectSerializer serializer;
+
+		/** Creates a new instance with the given cache file, and
+		 * cached object supplier.
+		 * @param pCacheFile The cache file. If a cached object has been created, it
+		 *   will be stored here.
+		 * @param pSupplier The cached object supplier. It will be invoked,
+		 *   if the cache file doesn't exist.
+		 */
+	    protected CachedObjectManager(@Nonnull Path pCacheFile, @Nonnull FailableSupplier<O,?> pSupplier) {
+			cacheFile = Objects.requireNonNull(pCacheFile, "Cache file path");
+			supplier = Objects.requireNonNull(pSupplier, "Object supplier");
+		}
+
+	    /** Returns the cache file.
+		 * @return The cache file.
+	     */
+		public Path getCacheFile() {
+			return cacheFile;
+		}
+		/** Returns the serializer/deserializer.
+		 * @return The serializer/deserializer.
+		 */
+		public CachedObjectSerializer getSerializer() {
+			if (serializer == null) {
+				serializer = new CachedObjectSerializer();
+			}
+			return serializer;
+		}
+		/** Sets the serializer/deserializer, overriding the
+		 * default implementation.
+		 * @param pSerializer The serializer/deserializer to use,
+		 *   or null (restore the default behavior).
+		 * @return This cached object manager.
+		 */
+		public CachedObjectManager<O> serializer(CachedObjectSerializer pSerializer) {
+			serializer = pSerializer;
+			return this;
+		}
+		/** Creates a new instance with the given cache file, and
+		 * cached object supplier.
+		 * @param pCacheFile The cache file. If a cached object has been created, it
+		 *   will be stored here.
+		 * @param pSupplier The cached object supplier. It will be invoked,
+		 *   if the cache file doesn't exist.
+		 * @return The created instance.
+		 */
+		public static <O> CachedObjectManager<O> of(@Nonnull Path pCacheFile, FailableSupplier<O,?> pSupplier) {
+			return new CachedObjectManager<>(pCacheFile, pSupplier);
+		}
+		/** Returns the cached object, if available.
+		 * Otherwise, invokes the cached object supplier, caches the
+		 * created object, and returns it.
+		 * @return The cached, or created object.
+		 */
+		public O get() {
+			final Path cf = getCacheFile();
+			if (Files.isRegularFile(cf)) {
+				try (InputStream in = Files.newInputStream(cf)) {
+					@SuppressWarnings("unchecked")
+					final O o = (O) getSerializer().read(in);
+					return o;
+				} catch (IOException e) {
+					throw Exceptions.show(e);
+				}
+			} else {
+				try {
+					final O o = supplier.get();
+					FileUtils.createDirectoryFor(cf);
+					try (OutputStream out = Files.newOutputStream(cf)) {
+						getSerializer().write(o, out);
+					}
+					return o;
+				} catch (Throwable t) {
+					throw Exceptions.show(t);
+				}
+			}
+		}
+	}
+	
+	/** Returns a cached object, if available. Otherwise, invokes the cached object supplier,
+	 * stores the created object in the cache file, and returns it. Subsequent invocations of
+	 * the same method with the same parameters will no longer invoke the cached object
+	 * supplier, but read the object from the cache file.
+	 * @param pCacheFile The cache file. If that file exists, it is assumed to contain a valid
+	 *   cached object.
+	 * @param pSupplier The cached object supplier, which will be invoked to create the
+	 *   cached object afresh, if the cace file isn't found.
+	 * @return The cached, or created object.
+	 */
+	public static <O> O getCacheableObject(@Nonnull Path pCacheFile, FailableSupplier<O,? > pSupplier) {
+		return CachedObjectManager.of(pCacheFile, pSupplier).get();
 	}
 }
