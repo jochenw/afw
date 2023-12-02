@@ -26,8 +26,8 @@ import com.github.jochenw.afw.core.util.Strings;
  * as a context attribute.
  * @param <Data> The data objects type.
  */
-public abstract class AFWCoreContextInitializer<Data extends Object> implements ServletContextListener {
-	private static final String KEY = AFWCoreContextInitializer.class.getName() + ".KEY";
+public abstract class AfwCoreContextInitializer<Data extends Object> implements ServletContextListener {
+	private static final String KEY = AfwCoreContextInitializer.class.getName() + ".KEY";
 
 	@Override
 	public void contextInitialized(ServletContextEvent pSce) {
