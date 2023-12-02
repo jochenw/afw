@@ -804,7 +804,7 @@ public class Strings {
 	}
 
 	/** Creates a string representation of the array {@code pValues},
-	 * like {@link String#join(CharSequence, String[])}, except that the current
+	 * like {@link String#join(CharSequence, CharSequence[])}, except that the current
 	 * method accepts arbitrary arrays.
 	 * @param <O> Element type of the list
 	 * @param pSeparator String, which separates two consecutive elements in the

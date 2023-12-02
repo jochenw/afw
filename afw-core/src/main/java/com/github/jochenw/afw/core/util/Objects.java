@@ -318,7 +318,7 @@ public class Objects {
 	}
 
 	/** A builder-like object, which is being
-	 * used by the {@link Objects#getCacheableObject(Path, FailableSupplier)} method.
+	 * used by the {@link Objects#getCacheableObject(Path, FailableSupplier<Object,Throwable>)} method.
 	 * @param <O> Type of the cached object.
 	 */
 	public static class CachedObjectManager<O> {

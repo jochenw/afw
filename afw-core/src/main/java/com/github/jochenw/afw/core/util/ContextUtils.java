@@ -66,8 +66,8 @@ public class ContextUtils {
 	 * @param <C> Type of the context objects.
 	 * @param pSupplier The supplier of the context object, which
 	 *   will be invoked, whenever the context providers
-	 *   {@link IContextProvider#run(IRunnable) run}, or
-	 *   {@link IContextProvider#call(ICallable) call}
+	 *   {@link IContextProvider#run(ContextUtils.IRunnable) run}, or
+	 *   {@link IContextProvider#call(ContextUtils.ICallable) call}
 	 *   methods are being invoked.
 	 * @return The created context provider.
 	 */
@@ -101,11 +101,11 @@ public class ContextUtils {
 	 * @param <C> Type of the context objects.
 	 * @param pSupplier The supplier of the context object, which
 	 *   will be invoked, whenever the context providers
-	 *   {@link IContextProvider#run(IRunnable) run}, or
-	 *   {@link IContextProvider#call(ICallable) call}
+	 *   {@link IContextProvider#run(ContextUtils.IRunnable) run}, or
+	 *   {@link IContextProvider#call(ContextUtils.ICallable) call}
 	 *   methods are being invoked.
 	 * @param pTerminator An optional resource deallocator,
-	 *   which will be callled when the context object
+	 *   which will be called when the context object
 	 *   is being disposed.
 	 * @return The created context provider.
 	 */
