@@ -656,6 +656,7 @@ public class Http {
 	 *   and an {@link InputStream} with the HTTP servers response body. The
 	 *   error consumer may be null, in which case the servers response will
 	 *   be ignored. Instead, an Exception will be thrown.
+	 * @param <O> Type of the output object.
 	 * @return The output object, that was returned by the response consumer in
 	 *   case of success. Null, if the request wasn't successful, and the error
 	 *   response consumer was invoked. If you need to distinguish between the

@@ -26,7 +26,12 @@ import java.util.Objects;
  * @param <O2> Type of the second attribute.
  */
 public class Tupel<O1, O2> implements Serializable {
+	private static final long serialVersionUID = -7117927702865287177L;
+	/** The tupel's first attribute.
+	 */
 	private final O1 attribute1;
+	/** The tupel's second attribute.
+	 */
 	private final O2 attribute2;
 
 	/** Creates a new instance, which wraps the given objects.

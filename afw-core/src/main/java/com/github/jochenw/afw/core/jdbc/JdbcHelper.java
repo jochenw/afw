@@ -294,6 +294,7 @@ public class JdbcHelper {
 
 		
 		/** Returns the next object in the column list.
+		 * @param <O> The expected object type.
 		 * @return The next object in the column list.
 		 */
 		public <O> O nextObject() {
@@ -302,6 +303,7 @@ public class JdbcHelper {
 
 		/** Returns the object with the given index in the column list.
 		 * @param pIndex A JDBC-style column index (1-based).
+		 * @param <O> Expected column type.
 		 * @return The object with the given index in the column list.
 		 */
 		public <O> O getObject(int pIndex) {

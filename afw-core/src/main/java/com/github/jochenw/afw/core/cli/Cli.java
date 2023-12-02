@@ -820,6 +820,7 @@ public class Cli<B> {
 	 * @param pArgs The command line arguments.
 	 * @param pOptionsConfigurator An object, which is called to configure the Cli object
 	 *   by adding options.
+	 * @param <B> Type of the options bean.
 	 * @param pErrorHandler  The error handler, a function, which converts an error message
 	 *   into a RuntimeException, that is being thrown by the caller.
 	 */

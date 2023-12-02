@@ -369,6 +369,7 @@ public class Objects {
 		 *   will be stored here.
 		 * @param pSupplier The cached object supplier. It will be invoked,
 		 *   if the cache file doesn't exist.
+		 * @param <O> Type of the cached object.
 		 * @return The created instance.
 		 */
 		public static <O> CachedObjectManager<O> of(@Nonnull Path pCacheFile, FailableSupplier<O,?> pSupplier) {
@@ -411,7 +412,8 @@ public class Objects {
 	 * @param pCacheFile The cache file. If that file exists, it is assumed to contain a valid
 	 *   cached object.
 	 * @param pSupplier The cached object supplier, which will be invoked to create the
-	 *   cached object afresh, if the cace file isn't found.
+	 *   cached object afresh, if the cache file isn't found.
+	 * @param <O> Type of the cached object.
 	 * @return The cached, or created object.
 	 */
 	public static <O> O getCacheableObject(@Nonnull Path pCacheFile, FailableSupplier<O,? > pSupplier) {

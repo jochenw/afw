@@ -20,7 +20,7 @@ public class ProgressMonitor {
 	/** Creates a new instance with the given interval, a total of -1, and
 	 * the given listener. In other words, this is equivalent to
 	 * <pre>
-	 *   new ProgressMonitor(-1, pInterval, pListener);
+	 *   new ProgressMonitor(-1, pInterval, pListener);f
 	 * </pre>
 	 * @param pInterval The reporting interval. For example, if the interval is 1000, then
 	 *   the progress monitor will report its status after a count of 1000, 2000, 3000, ...
@@ -93,6 +93,7 @@ public class ProgressMonitor {
 	 *   the progress monitor will report its status after a count of 1000, 2000, 3000, ...
 	 * @param pListener The listener will be notified whenever the count has reached the
 	 *   interval.
+	 * @return The created instance.
 	 */
 	public static ProgressMonitor of(long pTotal, long pInterval, FailableBiConsumer<ProgressMonitor,String,?> pListener) {
 		return new ProgressMonitor(pTotal, pInterval, pListener);
