@@ -23,12 +23,9 @@ public class DefaultScriptEngineRegisty implements IScriptEngineRegistry {
 		final List<IScriptEngine> engines = new ArrayList<IScriptEngine>();
 		IScriptEngine groovyEngine;
 		try {
-			groovyEngine = new GroovyScriptEngine();
+			engines.add(new GroovyScriptEngine());
 		} catch (Throwable t) {
-			groovyEngine = null;
-		}
-		if (groovyEngine != null) {
-			engines.add(groovyEngine);
+			t.printStackTrace(System.err);
 		}
 		return engines;
 	}

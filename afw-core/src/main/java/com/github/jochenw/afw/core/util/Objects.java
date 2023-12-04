@@ -34,6 +34,7 @@ import java.nio.file.Paths;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 
 
@@ -318,7 +319,7 @@ public class Objects {
 	}
 
 	/** A builder-like object, which is being
-	 * used by the {@link Objects#getCacheableObject(Path, FailableSupplier<Object,Throwable>)} method.
+	 * used by the {@link Objects#getCacheableObject(Path, Functions.FailableSupplier)} method.
 	 * @param <O> Type of the cached object.
 	 */
 	public static class CachedObjectManager<O> {

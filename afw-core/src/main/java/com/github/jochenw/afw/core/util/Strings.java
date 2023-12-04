@@ -816,7 +816,7 @@ public class Strings {
 	 *   element.
 	 * @return The created string representation.
 	 * @throws NullPointerException Either of the parameters is null.
-	 * @see #join(CharSequence, Iterable, FailableFunction)
+	 * @see #join(CharSequence, Iterable, Functions.FailableFunction)
 	 */
 	public static <O> String join(CharSequence pSeparator, O[] pValues, FailableFunction<O,String,?> pMapper) {
 		final O[] array = Objects.requireNonNull(pValues, "Values");
@@ -836,7 +836,7 @@ public class Strings {
 	 *   representation.
 	 * @return The created string representation.
 	 * @throws NullPointerException Either of the parameters is null.
-	 * @see #join(CharSequence, Iterable, FailableFunction)
+	 * @see #join(CharSequence, Iterable, Functions.FailableFunction)
 	 */
 	public static <O> String join(CharSequence pSeparator, FailableFunction<O,String,?> pMapper,
 			                      @SuppressWarnings("unchecked") O... pValues) {
