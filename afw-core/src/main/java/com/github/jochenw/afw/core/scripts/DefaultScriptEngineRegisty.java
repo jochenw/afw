@@ -25,7 +25,7 @@ public class DefaultScriptEngineRegisty implements IScriptEngineRegistry {
 		try {
 			engines.add(new GroovyScriptEngine());
 		} catch (Throwable t) {
-			t.printStackTrace(System.err);
+			// Do nothing, ignore this engine.
 		}
 		return engines;
 	}
