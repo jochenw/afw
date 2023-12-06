@@ -34,7 +34,7 @@ pipeline {
 		}
 		stage ('Collect JavaDocs') {
 		    steps {
-		        javadoc(javadocDir: '**/apidocs', keepAll: false)
+		        javadoc(javadocDir: './afw-core/target/site/apidocs', keepAll: false)
 		    }
 		}
     }
