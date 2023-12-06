@@ -32,5 +32,10 @@ pipeline {
                 step( [ $class: 'JacocoPublisher' ] )
 			}
 		}
+		stage ('Collect JavaDocs') {
+		    steps {
+		        javadoc
+		    }
+		}
     }
 }
