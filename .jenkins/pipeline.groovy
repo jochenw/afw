@@ -19,7 +19,7 @@ pipeline {
                 ) {
 				    script {
 				        if (isUnix()) {
-    			            sh 'mvn -fpom.xml -Pjacoco javadoc:javadoc install javadoc:javadoc'
+    			            sh 'mvn -fpom.xml -Pjacoco clean install javadoc:javadoc'
 					    } else {
     			            bat 'mvn.cmd -fpom.xml -Pjacoco clean install javadoc:javadoc'
 					    }
@@ -34,7 +34,7 @@ pipeline {
 		}
 		stage ('Collect JavaDocs') {
 		    steps {
-		        javadoc
+		        javadoc()
 		    }
 		}
     }
