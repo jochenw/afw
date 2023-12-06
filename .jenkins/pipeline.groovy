@@ -34,7 +34,7 @@ pipeline {
 		}
 		stage ('Collect JavaDocs') {
 		    steps {
-		        javadoc()
+		        javadoc(javadocDir: '**/apidocs')
 		    }
 		}
     }
