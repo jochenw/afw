@@ -60,26 +60,36 @@ public class Holder<T> implements Supplier<T> {
 		value = pValue;
 	}
 
+	/** Creates a new Holder, which wraps the given object.
+	 * @param pObject The object, that is being wrapped by the created
+	 *   Holder.
+	 * @param <O> Type of the wrapped object.
+	 * @return The created instance.
+	 */
+	public static <O> Holder<O> of(O pObject) {
+		final Holder<O> holder = new Holder<O>();
+		holder.set(pObject);
+		return holder;
+	}
+
 	/** Converts the Holder into a thread safe version, that wraps the same object.
 	 * @param <O> Type of the wrapped object.
-	 * @param pHolder The Holder, that is being converted.
+	 * @param pObject The wrapped object.
 	 * @return A thread safe Holder, which is wrapping the same object.
 	 */
-	public static <O> Holder<O> synchronizedHolder(Holder<O> pHolder) {
-		return new Holder<O>() {
+	public static <O> Holder<O> ofSynchronized(O pObject) {
+		final Holder<O> holder = new Holder<O>() {
 			@Override
-			public O get() {
-				synchronized(pHolder) {
-					return pHolder.get();
-				}
+			public synchronized O get() {
+				return super.get();
 			}
 
 			@Override
-			public void set(O pValue) {
-				synchronized(pHolder) {
-					pHolder.set(pValue);
-				}
+			public synchronized void set(O pValue) {
+				super.set(pValue);
 			}
 		};
+		holder.set(pObject);
+		return holder;
 	}
 }

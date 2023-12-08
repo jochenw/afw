@@ -19,12 +19,12 @@ public class HolderTest {
 		holder.set("0");
 		assertEquals("0", holder.get());
 		assertEquals("0", holder.require());
-		final Holder<String> otherHolder = Holder.synchronizedHolder(holder);
+		final Holder<String> otherHolder = Holder.ofSynchronized(holder.get());
 		assertEquals("0", otherHolder.get());
 		otherHolder.set("1");
 		assertEquals("1", otherHolder.get());
 		assertEquals("1", otherHolder.require());
-		assertEquals("1", holder.get());
+		assertEquals("0", holder.get());
 		holder.set(null);
 		try {
 			holder.require();
