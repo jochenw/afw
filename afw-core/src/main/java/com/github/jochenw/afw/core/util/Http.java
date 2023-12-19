@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -85,14 +86,22 @@ public class Http {
 		 * @return Values of the requested header field, if present, or null.
 		 */
 		List<String> getHeaderFields(String pKey);
-		/** Returns the request body, or null. For performance reasons, the
-		 * body will only available, if no body
-		 * has been specified, using {@link Http.Request#body(String)},
-		 * {@link Http.Request#body(File)},
-		 * {@link Http.Request#body(Path)}, or a similar method.
-		 * @return The request body, if any, or null.
+		/** Returns the response body, or null. For performance reasons, the
+		 * body will only available, if no response body consumer has been
+		 * specified. To specify a response body consumer, use the 
+		 * method {@link Http#send(Request, FailableBiConsumer)}, or
+		 * {@link Http#send(Request, FailableBiConsumer, FailableBiConsumer)}.
+		 * @return The response body, if available, or null.
 		 */
 		public byte[] getResponseBody();
+		/** Sets the response body, as a byte array. This will only be done,
+		 * if no response body consumer has been specified. In other words,
+		 * if you are using {@link Http#send(Request)}, or
+		 * {@link Http#send(Request, FailableConsumer)}.
+		 * @param pResponseBody The response body.
+		 */
+		public void setResponseBody(byte[] pResponseBody);
+		/** Sets the response body.
 		/** Returns the request object, which has been used to create this
 		 * response object.
 		 * @return The request object, which has been used to create this
@@ -500,7 +509,10 @@ public class Http {
 	 */
 	public void send(Request pRequest,
 			         FailableConsumer<Response,?> pResponseConsumer) {
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		send(pRequest, (res, is) -> {
+			Streams.copy(is, baos);
+			res.setResponseBody(baos.toByteArray());
 			if (pResponseConsumer != null) {
 				pResponseConsumer.accept(res);
 			}
@@ -822,6 +834,8 @@ public class Http {
 		final int stCode = statusCode;
 		final String stMessage = statusMessage;
 		return new Response() {
+			private byte[] responseBody;
+
 			@Override
 			public int getStatusCode() {
 				return stCode;
@@ -842,13 +856,18 @@ public class Http {
 
 			@Override
 			public byte[] getResponseBody() {
-				if (pBodyContents == null) {
+				if (responseBody == null) {
 					throw new IllegalStateException("Use the supplied InputStream"
 							+ " to read the HTTP response body. This method is only"
 							+ " available, if you didn't specify a response consumer.");
 				} else {
-					return pBodyContents;
+					return responseBody;
 				}
+			}
+			
+			@Override
+			public void setResponseBody(byte[] pResponseBody) {
+				responseBody = pResponseBody;
 			}
 
 			@Override
@@ -898,6 +917,4 @@ public class Http {
 	public HttpConnector getHttpConnector() {
 		return httpConnector;
 	}
-
-
 }

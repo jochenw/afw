@@ -185,6 +185,7 @@ public class LimitedComponentFactoryTest {
 
 	/** Test for the {@link LimitedComponentFactory.Key} class.
 	 */
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void testKeys() {
 		final Key key1 = new Key(Map.class, "a");
@@ -200,6 +201,8 @@ public class LimitedComponentFactoryTest {
 		assertFalse(key1.equals(null));
 		final Key key5 = new Key(Map.class, "a") {};
 		assertFalse(key1.equals(key5));
+		assertFalse(key1.equals(Boolean.TRUE));
+		assertFalse(key1.equals(null));
 	}
 
 	/** Test for null values.
