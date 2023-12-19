@@ -89,15 +89,15 @@ public class Http {
 		/** Returns the response body, or null. For performance reasons, the
 		 * body will only available, if no response body consumer has been
 		 * specified. To specify a response body consumer, use the 
-		 * method {@link Http#send(Request, FailableBiConsumer)}, or
-		 * {@link Http#send(Request, FailableBiConsumer, FailableBiConsumer)}.
+		 * method {@link Http#send(Request, Functions.FailableBiConsumer)}, or
+		 * {@link Http#send(Request, Functions.FailableBiConsumer, Functions.FailableBiConsumer)}.
 		 * @return The response body, if available, or null.
 		 */
 		public byte[] getResponseBody();
 		/** Sets the response body, as a byte array. This will only be done,
 		 * if no response body consumer has been specified. In other words,
 		 * if you are using {@link Http#send(Request)}, or
-		 * {@link Http#send(Request, FailableConsumer)}.
+		 * {@link Http#send(Request, Functions.FailableConsumer)}.
 		 * @param pResponseBody The response body.
 		 */
 		public void setResponseBody(byte[] pResponseBody);
