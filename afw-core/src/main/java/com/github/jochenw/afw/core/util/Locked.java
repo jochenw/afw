@@ -2,7 +2,7 @@ package com.github.jochenw.afw.core.util;
 
 import java.util.concurrent.locks.StampedLock;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /** A wrapper for a hidden object, that is being protected from external access.
@@ -56,7 +56,7 @@ public class Locked<T> {
 	 * @param pRunnable The accessor, which will be invoked with the
 	 * hidden object.
 	 */
-	public void runReadLocked(@Nonnull Runnable<T> pRunnable) {
+	public void runReadLocked(@NonNull Runnable<T> pRunnable) {
 		final long l = lock.readLock();
 		try {
 			pRunnable.run(object);
@@ -72,7 +72,7 @@ public class Locked<T> {
 	 * @param pRunnable The accessor, which will be invoked with the
 	 * hidden object.
 	 */
-	public void runWriteLocked(@Nonnull Runnable<T> pRunnable) {
+	public void runWriteLocked(@NonNull Runnable<T> pRunnable) {
 		final long l = lock.readLock();
 		try {
 			pRunnable.run(object);
@@ -91,7 +91,7 @@ public class Locked<T> {
 	 * @return The result object, that has been provided by invoking
 	 * the given callable.
 	 */
-	public <O> O callReadLocked(@Nonnull Callable<T,O> pCallable) {
+	public <O> O callReadLocked(@NonNull Callable<T,O> pCallable) {
 		final long l = lock.readLock();
 		try {
 			return pCallable.call(object);
@@ -110,7 +110,7 @@ public class Locked<T> {
 	 * @return The result object, that has been provided by invoking
 	 * the given callable.
 	 */
-	public <O> O callWriteLocked(@Nonnull Callable<T,O> pCallable) {
+	public <O> O callWriteLocked(@NonNull Callable<T,O> pCallable) {
 		final long l = lock.writeLock();
 		try {
 			return pCallable.call(object);

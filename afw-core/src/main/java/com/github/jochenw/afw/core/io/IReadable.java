@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
@@ -316,7 +316,7 @@ public interface IReadable {
 	 * @return A new instance of {@link IReadable}, with the given file' name,
 	 *   and the file's contents as a data stream.
 	 */
-	public static @Nonnull IReadable of(@Nonnull String pUri, @Nonnull String pDefaultUri) {
+	public static @NonNull IReadable of(@NonNull String pUri, @NonNull String pDefaultUri) {
 		final String uri = Objects.requireNonNull(pUri, "Uri");
 		final String defaultUri = Objects.requireNonNull(pDefaultUri, "DefaultUri");
 		if (uri.startsWith("resource:")) {

@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.exec.Executor;
 import com.github.jochenw.afw.core.exec.ExecutorBuilder;
@@ -44,10 +44,10 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	}
 
 	@Override
-	protected void createSymbolicDirLink(@Nonnull Path pTarget, @Nonnull Path pLink) {
-		final @Nonnull Path target = Objects.requireNonNull(pTarget, "Target");
-		final @Nonnull Path link = Objects.requireNonNull(pLink, "Link");
-		final @Nonnull Path fileName = Objects.requireNonNull(link.getFileName(), "File name"); 
+	protected void createSymbolicDirLink(@NonNull Path pTarget, @NonNull Path pLink) {
+		final @NonNull Path target = Objects.requireNonNull(pTarget, "Target");
+		final @NonNull Path link = Objects.requireNonNull(pLink, "Link");
+		final @NonNull Path fileName = Objects.requireNonNull(link.getFileName(), "File name"); 
 		final Path dir = Objects.notNull(pLink.getParent(), () -> Paths.get("."));
 		final String[] command = { "mklink", "/j", "/d", fileName.toString(),
 				                   target.toAbsolutePath().toString() };

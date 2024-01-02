@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.inject.Inject;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
@@ -76,7 +76,7 @@ public class Worker {
 		 * @param pParameters The numbered statement parameters.
 		 * @return The created {@link JdbcHelper.Executor query executor}.
 		 */
-		public Executor query(@Nonnull String pStatement, @Nullable Object... pParameters) {
+		public Executor query(@NonNull String pStatement, @Nullable Object... pParameters) {
 			return getJdbcHelper().query(() -> getConnectionProvider().open(),
 					                     getDialect(),
 					                     pStatement, pParameters);
@@ -120,7 +120,7 @@ public class Worker {
 	 * @see #setConnectionProvider(ConnectionProvider)
 	 * @throws NullPointerException No connection provider has been cnfigured.
 	 */
-	public @Nonnull ConnectionProvider getConnectionProvider() {
+	public @NonNull ConnectionProvider getConnectionProvider() {
 		return Objects.requireNonNull(connectionProvider, "ConnectionProvider");
 	}
 
@@ -128,7 +128,7 @@ public class Worker {
 	 * @param pHelper The {@link JdbcHelper}, which is going to be used internally.
 	 * @see #getJdbcHelper()
 	 */
-	public @Inject void setJdbcHelper(@Nonnull JdbcHelper pHelper) {
+	public @Inject void setJdbcHelper(@NonNull JdbcHelper pHelper) {
 		jdbcHelper = Objects.requireNonNull(pHelper, "JdbcHelper");
 	}
 
@@ -137,7 +137,7 @@ public class Worker {
 	 * @throws NullPointerException No {@link JdbcHelper} has been configured.
 	 * @see #setJdbcHelper(JdbcHelper)
 	 */
-	public @Nonnull JdbcHelper getJdbcHelper() {
+	public @NonNull JdbcHelper getJdbcHelper() {
 		return Objects.requireNonNull(jdbcHelper, "JdbcHelper");
 	}
 
@@ -176,7 +176,7 @@ public class Worker {
 	 * @param pParameters The numbered statement parameters.
 	 * @return The created {@link JdbcHelper.Executor query executor}.
 	 */
-	public Executor query(@Nonnull String pStatement, @Nullable Object... pParameters) {
+	public Executor query(@NonNull String pStatement, @Nullable Object... pParameters) {
 		final ConnectionProvider cp = getConnectionProvider();
 		return getJdbcHelper().query(() -> cp.open(),
 				                     cp.getDialect(),

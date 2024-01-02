@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
@@ -43,10 +43,10 @@ public class TimeoutHandler {
 	 *   should implement a way to terminate the task.
 	 * @param pExceptionHandler Either of the handlers has failed, and thrown an exception,
 	 *   which is being passed as an argument to the exception handlers. <em>Note:</em> The
-	 *   exception handler <em>mut not</em> fail in the sense, that it must not throw an
+	 *   exception handler <em>must not</em> fail in the sense, that it must not throw an
 	 *   exception. If it does, that exception is being silently ignored. 
 	 */
-	public void runWithTimeout(@Nonnull FailableRunnable<?> pTask, long pWaitMillis,
+	public void runWithTimeout(@NonNull FailableRunnable<?> pTask, long pWaitMillis,
 			                   @Nullable FailableBiConsumer<Boolean,Throwable,?> pSuccessHandler,
 			                   @Nullable FailableRunnable<?> pExpirationHandler,
 			                   @Nullable Consumer<Throwable> pExceptionHandler) {

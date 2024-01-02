@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.inject.Inject;
 
 import com.github.jochenw.afw.core.props.IPropertyFactory;
@@ -17,21 +17,21 @@ import com.github.jochenw.afw.di.api.IComponentFactory;
  * _prefix_ is "jdbc", but may be {@link #setPrefix(String) overwritten}.
  */
 public class DefaultConnectionProvider implements ConnectionProvider {
-	private @Nonnull String prefix = "jdbc";
+	private @NonNull String prefix = "jdbc";
 	private IPropertyFactory propertyFactory;
 	private IComponentFactory componentFactory;
 
 	/** Returns the value of the property prefix.
 	 * @return The value of the property prefix.
 	 */
-	public @Nonnull String getPrefix() {
+	public @NonNull String getPrefix() {
 		return prefix;
 	}
 
 	/** Sets the value of the property prefix.
 	 * @param pPrefix The value of the property prefix.
 	 */
-	public void setPrefix(@Nonnull String pPrefix) {
+	public void setPrefix(@NonNull String pPrefix) {
 		prefix = Objects.requireNonNull(pPrefix, "Prefix");
 	}
 
@@ -50,7 +50,7 @@ public class DefaultConnectionProvider implements ConnectionProvider {
 	}
 
 	@Override
-	public @Nonnull Connection open() throws SQLException {
+	public @NonNull Connection open() throws SQLException {
 		final String driverClassName = getProperty("driver");
 		try {
 			Class.forName(driverClassName);

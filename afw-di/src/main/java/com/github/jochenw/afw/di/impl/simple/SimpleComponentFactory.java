@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.di.api.Annotations;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
@@ -96,10 +96,10 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public void configure(@Nonnull IAnnotationProvider pAnnotationProvider,
-			              @Nonnull IOnTheFlyBinder pOnTheFlyBinder,
-			              @Nonnull List<BindingBuilder<Object>> pBuilders,
-			              @Nonnull Set<Class<?>> pStaticInjectionClasses) {
+	public void configure(@NonNull IAnnotationProvider pAnnotationProvider,
+			              @NonNull IOnTheFlyBinder pOnTheFlyBinder,
+			              @NonNull List<BindingBuilder<Object>> pBuilders,
+			              @NonNull Set<Class<?>> pStaticInjectionClasses) {
 		setAnnotationProvider(pAnnotationProvider);
 		onTheFlyBinder = pOnTheFlyBinder;
 		staticInjectionPredicate = (cl) -> pStaticInjectionClasses.contains(cl);

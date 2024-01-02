@@ -17,7 +17,7 @@ package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.ParameterizedType;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -46,7 +46,7 @@ public class Types {
 	 * @param <T> The parameter type.
 	 */
 	public static class Type<T extends Object> {
-		private @Nonnull final java.lang.reflect.Type rawType;
+		private final java.lang.reflect.@NonNull Type rawType;
 
 		/**
 		 * Creates a new instance.
@@ -73,7 +73,7 @@ public class Types {
 		/** Returns the parameter type.
 		 * @return The parameter type.
 		 */
-		public @Nonnull java.lang.reflect.Type getRawType() {
+		public java.lang.reflect.@NonNull Type getRawType() {
 			return rawType;
 		}
 	}

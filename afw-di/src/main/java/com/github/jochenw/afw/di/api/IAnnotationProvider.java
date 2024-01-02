@@ -22,8 +22,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.impl.simple.Binding;
 
@@ -36,37 +36,37 @@ public interface IAnnotationProvider {
 	/** Returns the frameworks Inject annotation class.
 	 * @return The frameworks Inject annotation class.
 	 */
-	@Nonnull Class<? extends Annotation> getInjectClass();
+	@NonNull Class<? extends Annotation> getInjectClass();
 	/** Returns the frameworks Named annotation class.
 	 * @return The frameworks Named annotation class.
 	 */
-	@Nonnull Class<? extends Annotation> getNamedClass();
+	@NonNull Class<? extends Annotation> getNamedClass();
 	/** Returns the frameworks Provider class.
 	 * @return The frameworks Provider class.
 	 */
-	@Nonnull Class<?> getProviderClass();
+	@NonNull Class<?> getProviderClass();
 	/** Creates a Provider for the given binding.
 	 * @param pBinding The binding, for which a provider is being created.
 	 * @return The created provider.
 	 */
-	@Nonnull Binding getProvider(Binding pBinding);
+	@NonNull Binding getProvider(Binding pBinding);
 	/** If this object is an instance of the frameworks Named annotation class:
 	 * Returns the Named annotations value. Otherwise, returns null.
 	 * @param pAnnotation The annotation object, which is considered to
 	 *   be an instance of the frameworks Named annotation class.
 	 * @return The Named annotations value, if applicable, or null.
 	 */
-	@Nullable String getNamedValue(@Nonnull Annotation pAnnotation);
+	@Nullable String getNamedValue(@NonNull Annotation pAnnotation);
 	/** Returns the annotation providers id. As of this writing, valid id's
 	 * are "javax.inject", "jakarta.inject", and "com.google.inject".
 	 * @return The annotation providers id.
 	 */
-	@Nonnull String getId();
+	@NonNull String getId();
 	/** Creates a new Named annotation with the given value.
 	 * @param pValue The created annotations value.
 	 * @return The created Named annotation.
 	 */
-	default @Nonnull Annotation newNamed(@Nonnull String pValue) {
+	default @NonNull Annotation newNamed(@NonNull String pValue) {
 		final Class<?>[] interfaces = (Class<?>[]) Array.newInstance(Class.class, 1);
 		interfaces[0] = getNamedClass();
 		return (Annotation) Proxy.newProxyInstance(Annotations.class.getClassLoader(), interfaces, new InvocationHandler() {

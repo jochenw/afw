@@ -31,8 +31,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
@@ -51,7 +51,7 @@ public class Objects {
 	 * @param pDefault The default value to return, if the input value is null.
 	 * @return The input value, if non-null. Otherwise the default value.
 	 */
-	public static @Nonnull <T> T notNull(@Nullable T pValue, @Nonnull T pDefault) {
+	public static @NonNull <T> T notNull(@Nullable T pValue, @NonNull T pDefault) {
 		if (pValue == null) {
 			return pDefault;
 		} else {
@@ -69,7 +69,7 @@ public class Objects {
 	 * @return The input value, if non-null. Otherwise the default value.
 	 * @throws NullPointerException The default value supplier
 	 */
-	public static @Nonnull <T> T notNull(@Nullable T pValue, @Nonnull FailableSupplier<T,?> pSupplier) {
+	public static @NonNull <T> T notNull(@Nullable T pValue, @NonNull FailableSupplier<T,?> pSupplier) {
 		if (pValue == null) {
 			final T value;
 			try {
@@ -91,7 +91,7 @@ public class Objects {
 	 * @param pMessage The exceptions message, if the input value is null.
 	 * @return The input value, if non-null.
 	 */
-	public static @Nonnull <T> T requireNonNull(@Nullable T pValue, String pMessage) {
+	public static @NonNull <T> T requireNonNull(@Nullable T pValue, String pMessage) {
         if (pValue == null) {
         	if (pMessage == null) {
         		throw new NullPointerException();
@@ -109,7 +109,7 @@ public class Objects {
 	 * @param pValue The input value, if non-null.
 	 * @return The input value, if non-null.
 	 */
-	public static @Nonnull <T> T requireNonNull(T pValue) {
+	public static @NonNull <T> T requireNonNull(T pValue) {
         if (pValue == null)
             throw new NullPointerException();
         return pValue;
@@ -122,11 +122,11 @@ public class Objects {
 	 * @param pDescription Used to construct an error message, if necessary.
 	 * @return The unmodified input array.
 	 */
-	public static @Nonnull <T> T[] requireAllNonNull(T[] pValues, String pDescription) {
+	public static @NonNull <T> T[] requireAllNonNull(T[] pValues, String pDescription) {
 		if (pValues == null) {
 			throw new NullPointerException(pDescription + "s");
 		} else {
-			final @Nonnull T[] array = pValues;
+			final @NonNull T[] array = pValues;
 			for (int i = 0;  i < array.length;  i++) {
 				if (array[i] == null) {
 					throw new NullPointerException(pDescription + ", element " + i);
@@ -143,11 +143,11 @@ public class Objects {
 	 * @param pDescription Used to construct an error message, if necessary.
 	 * @return The unmodified input {@link Iterable iterable}.
 	 */
-	public static @Nonnull <T> Iterable<T> requireAllNonNull(Iterable<T> pValues, String pDescription) {
+	public static @NonNull <T> Iterable<T> requireAllNonNull(Iterable<T> pValues, String pDescription) {
 		if (pValues == null) {
 			throw new NullPointerException(pDescription + "s");
 		} else {
-			final @Nonnull Iterable<T> iterable = pValues;
+			final @NonNull Iterable<T> iterable = pValues;
 			int i = 0;
 			for (T t : iterable) {
 				if (t == null) {
@@ -271,7 +271,7 @@ public class Objects {
 	 * @return The created array
 	 */
 	@SafeVarargs
-	public static @Nonnull <O> O[] arrayOf(@Nonnull O... pValues) {
+	public static @NonNull <O> O[] arrayOf(@NonNull O... pValues) {
 		return pValues;
 	}
 
@@ -287,7 +287,7 @@ public class Objects {
 		 * @param pOut The output stream, to which the
 		 *   cached object is being written.
 		 */
-		public void write(@Nonnull Object pObject, @Nonnull OutputStream pOut) {
+		public void write(@NonNull Object pObject, @NonNull OutputStream pOut) {
 			final Object object = Objects.requireNonNull(pObject, "Object");
 			final OutputStream os = Objects.requireNonNull(pOut, "OutputStream"); 
 			try {
@@ -305,7 +305,7 @@ public class Objects {
 		 * @return The cached object, that has been read from the input
 		 *   stream.
 		 */
-		public @Nonnull Object read(@Nonnull InputStream pIn) {
+		public @NonNull Object read(@NonNull InputStream pIn) {
 			final InputStream in = Objects.requireNonNull(pIn, "InputStream");
 			try {
 				final ObjectInputStream ois = new ObjectInputStream(in);
@@ -334,7 +334,7 @@ public class Objects {
 		 * @param pSupplier The cached object supplier. It will be invoked,
 		 *   if the cache file doesn't exist.
 		 */
-	    protected CachedObjectManager(@Nonnull Path pCacheFile, @Nonnull FailableSupplier<O,?> pSupplier) {
+	    protected CachedObjectManager(@NonNull Path pCacheFile, @NonNull FailableSupplier<O,?> pSupplier) {
 			cacheFile = Objects.requireNonNull(pCacheFile, "Cache file path");
 			supplier = Objects.requireNonNull(pSupplier, "Object supplier");
 		}
@@ -373,7 +373,7 @@ public class Objects {
 		 * @param <O> Type of the cached object.
 		 * @return The created instance.
 		 */
-		public static <O> CachedObjectManager<O> of(@Nonnull Path pCacheFile, FailableSupplier<O,?> pSupplier) {
+		public static <O> CachedObjectManager<O> of(@NonNull Path pCacheFile, FailableSupplier<O,?> pSupplier) {
 			return new CachedObjectManager<>(pCacheFile, pSupplier);
 		}
 		/** Returns the cached object, if available.
@@ -417,7 +417,7 @@ public class Objects {
 	 * @param <O> Type of the cached object.
 	 * @return The cached, or created object.
 	 */
-	public static <O> O getCacheableObject(@Nonnull Path pCacheFile, FailableSupplier<O,? > pSupplier) {
+	public static <O> O getCacheableObject(@NonNull Path pCacheFile, FailableSupplier<O,? > pSupplier) {
 		return CachedObjectManager.of(pCacheFile, pSupplier).get();
 	}
 }

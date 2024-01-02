@@ -1,7 +1,7 @@
 package com.github.jochenw.afw.core.util;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.xml.XMLConstants;
 
 import org.w3c.dom.Element;
@@ -19,7 +19,7 @@ public class Dom {
 	 * @param pNode The parent node, which is being queried for child elements.
 	 * @return The parent nodes child elements.
 	 */
-	public static @Nonnull Iterable<Element> getChildren(@Nonnull Node pNode) {
+	public static @NonNull Iterable<Element> getChildren(@NonNull Node pNode) {
 		return domHelper.getChildren(pNode);
 	}
 
@@ -30,7 +30,7 @@ public class Dom {
 	 * @return The parent nodes child elements with the given local name,
 	 *   and the {@link XMLConstants#NULL_NS_URI null namespace URI}.
 	 */
-	public static @Nonnull Iterable<Element> getChildren(@Nonnull Node pNode, @Nonnull String pLocalName) {
+	public static @NonNull Iterable<Element> getChildren(@NonNull Node pNode, @NonNull String pLocalName) {
 		return domHelper.getChildren(pNode, pLocalName);
 	}
 
@@ -43,7 +43,7 @@ public class Dom {
 	 * @return The parent nodes child elements with the given local name,
 	 *   and the given namespace URI.
 	 */
-	public static @Nonnull Iterable<Element> getChildrenNS(@Nonnull Node pNode, @Nullable String pNamespaceUri, @Nonnull String pLocalName) {
+	public static @NonNull Iterable<Element> getChildrenNS(@NonNull Node pNode, @Nullable String pNamespaceUri, @NonNull String pLocalName) {
 		return domHelper.getChildrenNS(pNode, pNamespaceUri, pLocalName);
 	}
 
@@ -57,7 +57,7 @@ public class Dom {
 	 * @return True, if the given node is an element with the given namespace URI, and the given
 	 * local name.
 	 */
-	public static boolean isElementNS(@Nonnull Node pNode, @Nullable String pNamespaceUri, @Nonnull String pLocalName) {
+	public static boolean isElementNS(@NonNull Node pNode, @Nullable String pNamespaceUri, @NonNull String pLocalName) {
 		return domHelper.isElementNS(pNode, pNamespaceUri, pLocalName);
 	}
 
@@ -67,7 +67,7 @@ public class Dom {
 	 * @param pNode The node, which is being tested.
 	 * @throws LocalizableException The assertion failed.
 	 */
-	public static void assertElement(@Nonnull Node pNode) throws LocalizableException {
+	public static void assertElement(@NonNull Node pNode) throws LocalizableException {
 		domHelper.assertElement(pNode);
 	}
 
@@ -79,7 +79,7 @@ public class Dom {
 	 * @param pLocalName The expected local name.
 	 * @throws LocalizableException The assertion failed.
 	 */
-	public static void assertElement(@Nonnull Node pNode, @Nonnull String pLocalName) throws LocalizableException {
+	public static void assertElement(@NonNull Node pNode, @NonNull String pLocalName) throws LocalizableException {
 		domHelper.assertElement(pNode, pLocalName);
 	}
 
@@ -93,7 +93,7 @@ public class Dom {
 	 * @param pLocalName The expected local name.
 	 * @throws LocalizableException The assertion failed.
 	 */
-	public static void assertElementNS(@Nonnull Node pNode, @Nullable String pNamespaceURI, @Nonnull String pLocalName) throws LocalizableException {
+	public static void assertElementNS(@NonNull Node pNode, @Nullable String pNamespaceURI, @NonNull String pLocalName) throws LocalizableException {
 		domHelper.assertElementNS(pNode, pNamespaceURI, pLocalName);
 	}
 
@@ -106,7 +106,7 @@ public class Dom {
 	 * {@link XMLConstants#NULL_NS_URI null namespace URI},
 	 * and the given local name.
 	 */
-	public static boolean isElement(@Nonnull Node pNode, @Nonnull String pLocalName) {
+	public static boolean isElement(@NonNull Node pNode, @NonNull String pLocalName) {
 		return domHelper.isElement(pNode, pLocalName);
 	}
 
@@ -119,7 +119,7 @@ public class Dom {
 	 * {@link XMLConstants#NULL_NS_URI null namespace URI}, and the
 	 * given local name. Null, if no such child is present.
 	 */
-	public static @Nullable Element getFirstChild(@Nonnull Node pNode, String pLocalName) {
+	public static @Nullable Element getFirstChild(@NonNull Node pNode, String pLocalName) {
 		return domHelper.getFirstChild(pNode, pLocalName);
 	}
 
@@ -132,7 +132,7 @@ public class Dom {
 	 * @return The first child element of the given node, which has the given
 	 * namespace URI, and the given local name. Null, if no such child is present.
 	 */
-	public static @Nullable Element getFirstChildNS(@Nonnull Node pNode, String pNamespaceURI, String pLocalName) {
+	public static @Nullable Element getFirstChildNS(@NonNull Node pNode, String pNamespaceURI, String pLocalName) {
 		return domHelper.getFirstChildNS(pNode, pNamespaceURI, pLocalName);
 	}
 
@@ -147,7 +147,7 @@ public class Dom {
 	 * found, throws a {@link LocalizableException}.
 	 * @throws LocalizableException No matching child is present.
 	 */
-	public static @Nullable Element requireFirstChild(@Nonnull Node pNode, String pLocalName) throws LocalizableException {
+	public static @Nullable Element requireFirstChild(@NonNull Node pNode, String pLocalName) throws LocalizableException {
 		return domHelper.requireFirstChild(pNode, pLocalName);
 	}
 
@@ -162,7 +162,7 @@ public class Dom {
 	 * found, throws a {@link LocalizableException}.
 	 * @throws LocalizableException No matching child is present.
 	 */
-	public static @Nonnull Element requireFirstChildNS(@Nonnull Node pNode, String pNamespaceURI, String pLocalName)
+	public static @NonNull Element requireFirstChildNS(@NonNull Node pNode, String pNamespaceURI, String pLocalName)
 	    throws LocalizableException {
 		return domHelper.requireFirstChildNS(pNode, pNamespaceURI, pLocalName);
 	}
@@ -175,7 +175,7 @@ public class Dom {
 	 * or null, if no such attribute is present.
 	 * @throws LocalizableException The given node is not an element.
 	 */
-	public static @Nullable String getAttribute(@Nonnull Node pNode, String pName) throws LocalizableException {
+	public static @Nullable String getAttribute(@NonNull Node pNode, String pName) throws LocalizableException {
 		return domHelper.getAttribute(pNode, pName);
 	}
 
@@ -187,7 +187,7 @@ public class Dom {
 	 * doesn't have an attribute with the name {@code pName}, or the attribute is
 	 * empty.
 	 */
-	public static @Nullable String requireAttribute(@Nonnull Node pNode, String pName) throws LocalizableException {
+	public static @Nullable String requireAttribute(@NonNull Node pNode, String pName) throws LocalizableException {
 		return domHelper.requireAttribute(pNode, pName);
 	}
 
@@ -198,7 +198,7 @@ public class Dom {
 	 * @return The value of the attribute {@code pName} in the element {@code pName}.
 	 * @throws LocalizableException The given node is not an element.
 	 */
-	public static @Nonnull String requireAttribute(@Nonnull Node pNode, @Nonnull String pName, @Nonnull String pDefaultValue) throws LocalizableException {
+	public static @NonNull String requireAttribute(@NonNull Node pNode, @NonNull String pName, @NonNull String pDefaultValue) throws LocalizableException {
 		return domHelper.requireAttribute(pNode, pName, pDefaultValue);
 	}
 
@@ -209,7 +209,7 @@ public class Dom {
 	 * @return The boolean value of the attribute {@code pName} in the element {@code pName}.
 	 * @throws LocalizableException The given node is not an element.
 	 */
-	public static @Nonnull boolean requireAttribute(@Nonnull Node pNode, @Nonnull String pName, @Nonnull boolean pDefaultValue) throws LocalizableException {
+	public static @NonNull boolean requireAttribute(@NonNull Node pNode, @NonNull String pName, @NonNull boolean pDefaultValue) throws LocalizableException {
 		return domHelper.requireAttribute(pNode, pName, pDefaultValue);
 	}
 }

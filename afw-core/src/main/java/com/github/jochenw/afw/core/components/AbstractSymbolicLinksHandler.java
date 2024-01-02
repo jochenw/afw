@@ -7,8 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /** Abstract base implementation of {@link ISymbolicLinksHandler}.
@@ -43,23 +43,23 @@ public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHand
          *   refer.
          * @param pLink The path of the link, that is being created.
          */
-        protected abstract void createSymbolicDirLink(@Nonnull Path pTarget, @Nonnull Path pLink);
+        protected abstract void createSymbolicDirLink(@NonNull Path pTarget, @NonNull Path pLink);
         /** Creates a symbolic file link.
          * @param pTarget The file, to which the link is supposed to
          *   refer.
          * @param pLink The path of the link, that is being created.
          */
-	protected abstract void createSymbolicFileLink(@Nonnull Path pTarget, @Nonnull Path pLink);
+	protected abstract void createSymbolicFileLink(@NonNull Path pTarget, @NonNull Path pLink);
         /** Checks, whether the given object is a symbolic link.
          * @param pPath The path, which is being checked.
          * @return If the object is a symbolic link: Path of the object, to which the link refers.
          *   Otherwise null.
          */
-	protected abstract @Nullable Path checkSymbolicLink(@Nonnull Path pPath);
+	protected abstract @Nullable Path checkSymbolicLink(@NonNull Path pPath);
         /** Removes a symbolic link.
          * @param pPath Path of the symbolic link, that is being removed.
          */
-	protected abstract void removeSymbolicLink(@Nonnull Path pPath);
+	protected abstract void removeSymbolicLink(@NonNull Path pPath);
 
         /** Creates a directory link.
          * @param pTarget Path of the directory, to which the created
@@ -67,7 +67,7 @@ public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHand
          * @param pLink Path of the link, that is being created.
          */
 	@Override
-	public void createDirectoryLink(@Nonnull Path pTarget, @Nonnull Path pLink) {
+	public void createDirectoryLink(@NonNull Path pTarget, @NonNull Path pLink) {
 		assertDirectory(pTarget);
 		createSymbolicDirLink(pTarget, pLink);
 	}

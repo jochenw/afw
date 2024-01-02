@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 import java.net.URLConnection;
@@ -222,7 +222,7 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
 	 * is null.
 	 * @throws IllegalStateException Neither of the given files was found.
 	 */
-	public static DefaultPropertyFactory of(@Nonnull String... pUris) {
+	public static DefaultPropertyFactory of(@NonNull String... pUris) {
 		return of(true, pUris);
 	}
 
@@ -237,7 +237,7 @@ public class DefaultPropertyFactory extends AbstractPropertyFactory {
 	 * @throws IllegalStateException Neither of the given files was found, and the parameter
 	 * {@code pRequired} is true.
 	 */
-	public static DefaultPropertyFactory of(boolean pFileRequired, @Nonnull String... pUris) {
+	public static DefaultPropertyFactory of(boolean pFileRequired, @NonNull String... pUris) {
 		final Properties props = new Properties();
 		boolean found = false;
 		for (String uri : pUris) {

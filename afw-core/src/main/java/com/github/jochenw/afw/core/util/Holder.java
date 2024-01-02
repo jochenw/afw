@@ -18,8 +18,8 @@ package com.github.jochenw.afw.core.util;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /** A {@link Holder} is an envelope for another object. Holders are typically used in Lambda's, when
  * you need a final object (the Holder), that is mutable.
@@ -45,7 +45,7 @@ public class Holder<T> implements Supplier<T> {
 	 * @see #get()
 	 * @see #set(Object)
 	 */
-	public @Nonnull T require() throws NoSuchElementException {
+	public @NonNull T require() throws NoSuchElementException {
 		final T v = get();
 		if (v == null) {
 			throw new NoSuchElementException("No value has been given.");

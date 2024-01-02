@@ -5,8 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.codehaus.groovy.ast.ASTNode;
 
@@ -45,7 +45,7 @@ public class GroovyScriptEngine implements IScriptEngine {
 		 * @param pParameters The map of parameters.
 		 * @return The created parameter map.
 		 */
-		protected @Nonnull Map<String,Object> asParameters(Map<String,Object> pParameters) {
+		protected @NonNull Map<String,Object> asParameters(Map<String,Object> pParameters) {
 			if (pParameters == null) {
 				return Collections.emptyMap();
 			} else {
@@ -54,7 +54,7 @@ public class GroovyScriptEngine implements IScriptEngine {
 		}
 		@Override
 		public <O> O call(Map<String, Object> pParameters) {
-			final @Nonnull Map<String,Object> parameters = asParameters(pParameters);
+			final @NonNull Map<String,Object> parameters = asParameters(pParameters);
 			gScript.setBinding(new Binding(parameters));
 			@SuppressWarnings("unchecked")
 			final O o = (O) run();
@@ -84,8 +84,8 @@ public class GroovyScriptEngine implements IScriptEngine {
 		}
 
 		@Override
-		public void run(@Nonnull Map<String, Object> pParameters) {
-			final @Nonnull Map<String,Object> parameters = asParameters(pParameters);
+		public void run(@NonNull Map<String, Object> pParameters) {
+			final @NonNull Map<String,Object> parameters = asParameters(pParameters);
 			gScript.setBinding(new Binding(parameters));
 			run();
 		}
@@ -93,13 +93,13 @@ public class GroovyScriptEngine implements IScriptEngine {
 	}
 	private final GroovyShell gsh = new GroovyShell();
 	@Override
-	public boolean isScriptable(@Nonnull IReadable pReadable) {
+	public boolean isScriptable(@NonNull IReadable pReadable) {
 		String name = pReadable.getName();
 		return pReadable.isReadable()  &&  (name.endsWith(".groovy") || name.endsWith(".grv"));
 	}
 
 	@Override
-	public @Nonnull Script getScript(@Nonnull IReadable pReadable, @Nullable Charset pCharset) {
+	public @NonNull Script getScript(@NonNull IReadable pReadable, @Nullable Charset pCharset) {
 		final IReadable ir = Objects.requireNonNull(pReadable, "IReadable");
 		final Charset charSet = Objects.notNull(pCharset, StandardCharsets.UTF_8);
 		final Holder<Script> holder = new Holder<Script>();

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /** A Formatter is an object, that takes as input a format string,
@@ -250,8 +250,8 @@ import javax.annotation.Nonnull;
 	 * @param pFormatString The format string to apply.
 	 * @return The created result.
 	 */
-	public String format(@Nonnull CharSequence pFormatString) {
-		final @Nonnull CharSequence formatString = Objects.requireNonNull(pFormatString, "Format string");
+	public String format(@NonNull CharSequence pFormatString) {
+		final @NonNull CharSequence formatString = Objects.requireNonNull(pFormatString, "Format string");
 		final StringBuilder value = new StringBuilder();
 		StringBuilder reference = null;
 		boolean verboseReference = false;

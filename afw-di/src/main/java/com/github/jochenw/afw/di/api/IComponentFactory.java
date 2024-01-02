@@ -4,8 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.NoSuchElementException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 
@@ -30,7 +30,7 @@ public interface IComponentFactory {
 	 * The key can be used for registration, or retrieval of
 	 * dependencies.
 	 */
-	public default <O> Key<O> asKey(@Nonnull Type pType) {
+	public default <O> Key<O> asKey(@NonNull Type pType) {
 		return Key.of(pType);
 	}
 	/**
@@ -47,7 +47,7 @@ public interface IComponentFactory {
 	 *   and the given name. The key can be used for registration, or
 	 *   retrieval of dependencies.
 	 */
-	public default <O> Key<O> asKey(@Nonnull Type pType, @Nonnull String pName) {
+	public default <O> Key<O> asKey(@NonNull Type pType, @NonNull String pName) {
 		if (pName == null  ||  pName.length() == 0) {
 			return Key.of(pType);
 		} else {
@@ -89,7 +89,7 @@ public interface IComponentFactory {
 	 * @see #getInstance(Type)
 	 * @see #getInstance(Types.Type)
 	 */
-	public default @Nullable <O> O getInstance(@Nonnull Class<O> pType) {
+	public default @Nullable <O> O getInstance(@NonNull Class<O> pType) {
 		return getInstance(asKey(pType));
 	}
 	/**
@@ -109,7 +109,7 @@ public interface IComponentFactory {
 	 * @see #getInstance(Type)
 	 * @see #getInstance(Types.Type)
 	 */
-	public default @Nullable <O> O getInstance(@Nonnull Class<O> pType, @Nonnull String pName) {
+	public default @Nullable <O> O getInstance(@NonNull Class<O> pType, @NonNull String pName) {
 		return getInstance(asKey(pType, pName));
 	}
 	/**
@@ -128,7 +128,7 @@ public interface IComponentFactory {
 	 * @see #requireInstance(Types.Type)
 	 * @throws NoSuchElementException No such dependency has been registered.
 	 */
-	public default @Nonnull <O> O requireInstance(Key<O> pKey) throws NoSuchElementException {
+	public default @NonNull <O> O requireInstance(Key<O> pKey) throws NoSuchElementException {
 		final O o = getInstance(pKey);
 		if (o == null) {
 			throw new NoSuchElementException("No such instance: " + pKey.getDescription());
@@ -151,7 +151,7 @@ public interface IComponentFactory {
 	 * @see #requireInstance(Types.Type)
 	 * @throws NoSuchElementException No such dependency has been registered.
 	 */
-	public default @Nonnull <O> O requireInstance(@Nonnull Class<O> pType) {
+	public default @NonNull <O> O requireInstance(@NonNull Class<O> pType) {
 		return requireInstance(asKey(pType));
 	}
 	/**
@@ -173,7 +173,7 @@ public interface IComponentFactory {
 	 * @see #requireInstance(Types.Type)
 	 * @throws NoSuchElementException No such dependency has been registered.
 	 */
-	public default @Nonnull <O> O requireInstance(@Nonnull Class<O> pType, @Nonnull String pName) {
+	public default @NonNull <O> O requireInstance(@NonNull Class<O> pType, @NonNull String pName) {
 		return requireInstance(asKey(pType, pName));
 	}
 	/** Creates a new instance of the given type.
@@ -194,7 +194,7 @@ public interface IComponentFactory {
 	 * @return The newly created instance. May be null, if no
 	 *   such binding has been registered.
 	 */
-	public default <O> O getInstance(@Nonnull Type pType) {
+	public default <O> O getInstance(@NonNull Type pType) {
 		final Key<O> key = Key.of(pType);
 		return getInstance(key);
 	}
@@ -204,7 +204,7 @@ public interface IComponentFactory {
 	 * @return The newly created instance. Never null.
 	 * @throws NoSuchElementException No such binding has been registered.
 	 */
-	public default <O> O requireInstance(@Nonnull Type pType) {
+	public default <O> O requireInstance(@NonNull Type pType) {
 		final Key<O> key = Key.of(pType);
 		return requireInstance(key);
 	}
@@ -214,7 +214,7 @@ public interface IComponentFactory {
 	 * @return The newly created instance. May be null, if no
 	 *   such binding has been registered.
 	 */
-	public default <O> O getInstance(@Nonnull Types.Type<O> pType) {
+	public default <O> O getInstance(Types.@NonNull Type<O> pType) {
 		final Key<O> key = Key.of(pType.getRawType());
 		return getInstance(key);
 	}
@@ -224,7 +224,7 @@ public interface IComponentFactory {
 	 * @return The newly created instance. Never null.
 	 * @throws NoSuchElementException No such binding has been registered.
 	 */
-	public default <O> O requireInstance(@Nonnull Types.Type<O> pType) {
+	public default <O> O requireInstance(Types.@NonNull Type<O> pType) {
 		final Key<O> key = Key.of(pType.getRawType());
 		return requireInstance(key);
 	}

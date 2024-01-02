@@ -10,8 +10,8 @@ import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
 import com.github.jochenw.afw.core.util.Objects;
@@ -38,7 +38,7 @@ public class Data {
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The value, which has been retrieved.
 		 */
-		public @Nullable Object getValue(@Nonnull O pData, @Nonnull String pKey) {
+		public @Nullable Object getValue(@NonNull O pData, @NonNull String pKey) {
 			final O object = Objects.requireNonNull(pData, "Object");
 			final String key = Objects.requireNonNull(pKey, "Key");
 			return function.apply(object, key);
@@ -51,7 +51,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable String getString(@Nonnull O pData, @Nonnull String pKey, @Nonnull String pDescription) {
+		public @Nullable String getString(@NonNull O pData, @NonNull String pKey, @NonNull String pDescription) {
 			Object value = getValue(pData, pKey);
 			if (value == null) {
 				return null;
@@ -72,7 +72,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable String getString(@Nonnull O pData, @Nonnull String pKey) {
+		public @Nullable String getString(@NonNull O pData, @NonNull String pKey) {
 			return getString(pData, pKey, pKey);
 		}
 		/** Extracts a non-empty string from the given data store.
@@ -84,8 +84,8 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull String requireString(@Nonnull O pData, @Nonnull String pKey,
-				                             @Nonnull String pDescription) {
+		public @NonNull String requireString(@NonNull O pData, @NonNull String pKey,
+				                             @NonNull String pDescription) {
 			Object value = getValue(pData, pKey);
 			if (value == null) {
 				throw new NullPointerException("Missing value for parameter " + pDescription);
@@ -110,7 +110,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull String requireString(@Nonnull O pData, @Nonnull String pKey) {
+		public @NonNull String requireString(@NonNull O pData, @NonNull String pKey) {
 			return requireString(pData, pKey, pKey);
 		}
 
@@ -123,8 +123,8 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull Path requirePath(@Nonnull O pData, @Nonnull String pKey,
-				                         @Nonnull String pDescription) {
+		public @NonNull Path requirePath(@NonNull O pData, @NonNull String pKey,
+				                         @NonNull String pDescription) {
 			Object value = getValue(pData, pKey);
 			if (value == null) {
 				throw new NullPointerException("Missing value for parameter " + pDescription);
@@ -178,8 +178,8 @@ public class Data {
 		 * @see Data#DIR_EXISTS
 		 * @see Data#NOT_EXISTS
 		 */
-		public @Nonnull Path requirePath(@Nonnull O pData, @Nonnull String pKey,
-				                         @Nonnull String pDescription, PathCriterion... pCriteria) {
+		public @NonNull Path requirePath(@NonNull O pData, @NonNull String pKey,
+				                         @NonNull String pDescription, PathCriterion... pCriteria) {
 			final Path path = requirePath(pData, pKey, pDescription);
 			if (pCriteria != null) {
 				for (PathCriterion pc : pCriteria) {
@@ -200,7 +200,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull Path requirePath(@Nonnull O pData, @Nonnull String pKey) {
+		public @NonNull Path requirePath(@NonNull O pData, @NonNull String pKey) {
 			return requirePath(pData, pKey, pKey);
 		}
 
@@ -212,7 +212,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable Boolean getBoolean(@Nonnull O pData, @Nonnull String pKey, @Nonnull String pDescription) {
+		public @Nullable Boolean getBoolean(@NonNull O pData, @NonNull String pKey, @NonNull String pDescription) {
 			final Object value = getValue(pData, pKey);
 			if (value == null) {
 				return null;
@@ -235,7 +235,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable Boolean getBoolean(@Nonnull O pData, @Nonnull String pKey) {
+		public @Nullable Boolean getBoolean(@NonNull O pData, @NonNull String pKey) {
 			return getBoolean(pData, pKey, "Map key " + pKey);
 		}
 	}
@@ -260,7 +260,7 @@ public class Data {
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The value, which has been retrieved.
 		 */
-		public @Nullable Object getValue(@Nonnull String pKey) {
+		public @Nullable Object getValue(@NonNull String pKey) {
 			final String key = Objects.requireNonNull(pKey, "Key");
 			return function.apply(key);
 		}
@@ -271,7 +271,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable String getString(@Nonnull String pKey, @Nonnull String pDescription) {
+		public @Nullable String getString(@NonNull String pKey, @NonNull String pDescription) {
 			Object value = getValue(pKey);
 			if (value == null) {
 				return null;
@@ -291,7 +291,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable String getString(@Nonnull String pKey) {
+		public @Nullable String getString(@NonNull String pKey) {
 			return getString(pKey, pKey);
 		}
 		/** Extracts a non-empty string from the given data store.
@@ -302,8 +302,8 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull String requireString(@Nonnull String pKey,
-				                             @Nonnull String pDescription) {
+		public @NonNull String requireString(@NonNull String pKey,
+				                             @NonNull String pDescription) {
 			Object value = getValue(pKey);
 			if (value == null) {
 				throw new NullPointerException("Missing value for parameter " + pDescription);
@@ -327,7 +327,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull String requireString(@Nonnull String pKey) {
+		public @NonNull String requireString(@NonNull String pKey) {
 			return requireString(pKey, pKey);
 		}
 
@@ -339,8 +339,8 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull Path requirePath(@Nonnull String pKey,
-				                         @Nonnull String pDescription) {
+		public @NonNull Path requirePath(@NonNull String pKey,
+				                         @NonNull String pDescription) {
 			Object value = getValue(pKey);
 			if (value == null) {
 				throw new NullPointerException("Missing value for parameter " + pDescription);
@@ -377,8 +377,8 @@ public class Data {
 		 * @see Data#DIR_EXISTS
 		 * @see Data#NOT_EXISTS
 		 */
-		public @Nonnull Path requirePath(@Nonnull String pKey,
-				                         @Nonnull String pDescription, PathCriterion... pCriteria) {
+		public @NonNull Path requirePath(@NonNull String pKey,
+				                         @NonNull String pDescription, PathCriterion... pCriteria) {
 			final Path path = requirePath(pKey, pDescription);
 			if (pCriteria != null) {
 				for (PathCriterion pc : pCriteria) {
@@ -398,7 +398,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
-		public @Nonnull Path requirePath(@Nonnull String pKey) {
+		public @NonNull Path requirePath(@NonNull String pKey) {
 			return requirePath(pKey, pKey);
 		}
 
@@ -409,7 +409,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable Boolean getBoolean(@Nonnull String pKey, @Nonnull String pDescription) {
+		public @Nullable Boolean getBoolean(@NonNull String pKey, @NonNull String pDescription) {
 			final Object value = getValue(pKey);
 			if (value == null) {
 				return null;
@@ -431,7 +431,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is not a string.
 		 */
-		public @Nullable Boolean getBoolean(@Nonnull String pKey) {
+		public @Nullable Boolean getBoolean(@NonNull String pKey) {
 			return getBoolean(pKey, pKey);
 		}
 
@@ -515,7 +515,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable String getString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey, @Nonnull String pDescription) {
+	public static @Nullable String getString(@NonNull Map<String,Object> pMap, @NonNull String pKey, @NonNull String pDescription) {
 		return MAP_ACCESSOR.getString(pMap, pKey, pDescription);
 	}
 
@@ -526,7 +526,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable String getString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
+	public static @Nullable String getString(@NonNull Map<String,Object> pMap, @NonNull String pKey) {
 		return MAP_ACCESSOR.getString(pMap, pKey);
 	}
 
@@ -538,7 +538,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable String getString(@Nonnull Properties pProperties, @Nonnull String pKey, @Nonnull String pDescription) {
+	public static @Nullable String getString(@NonNull Properties pProperties, @NonNull String pKey, @NonNull String pDescription) {
 		return PROPS_ACCESSOR.getString(pProperties, pKey, pDescription);
 	}
 
@@ -549,7 +549,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable String getString(@Nonnull Properties pProperties, @Nonnull String pKey) {
+	public static @Nullable String getString(@NonNull Properties pProperties, @NonNull String pKey) {
 		return PROPS_ACCESSOR.getString(pProperties, pKey, pKey);
 	}
 
@@ -562,8 +562,8 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull String requireString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey,
-			                                    @Nonnull String pDescription) {
+	public static @NonNull String requireString(@NonNull Map<String,Object> pMap, @NonNull String pKey,
+			                                    @NonNull String pDescription) {
 		return MAP_ACCESSOR.requireString(pMap, pKey, pDescription);
 	}
 
@@ -575,7 +575,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull String requireString(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
+	public static @NonNull String requireString(@NonNull Map<String,Object> pMap, @NonNull String pKey) {
 		return MAP_ACCESSOR.requireString(pMap, pKey, pKey);
 	}
 
@@ -588,8 +588,8 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Object requireString(@Nonnull Properties pProperties, @Nonnull String pKey,
-			                             @Nonnull String pDescription) {
+	public static @NonNull Object requireString(@NonNull Properties pProperties, @NonNull String pKey,
+			                             @NonNull String pDescription) {
 		return PROPS_ACCESSOR.requireString(pProperties, pKey, pDescription);
 	}
 
@@ -601,7 +601,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull String requireString(@Nonnull Properties pProperties, @Nonnull String pKey) {
+	public static @NonNull String requireString(@NonNull Properties pProperties, @NonNull String pKey) {
 		return PROPS_ACCESSOR.requireString(pProperties, pKey, pKey);
 	}
 
@@ -614,8 +614,8 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Path requirePath(@Nonnull Map<String,Object> pMap, @Nonnull String pKey,
-			                         @Nonnull String pDescription) {
+	public static @NonNull Path requirePath(@NonNull Map<String,Object> pMap, @NonNull String pKey,
+			                         @NonNull String pDescription) {
 		return MAP_ACCESSOR.requirePath(pMap, pKey, pDescription);
 	}
 
@@ -627,7 +627,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Path requirePath(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
+	public static @NonNull Path requirePath(@NonNull Map<String,Object> pMap, @NonNull String pKey) {
 		return MAP_ACCESSOR.requirePath(pMap, pKey, "Map key " + pKey);
 	}
 
@@ -640,8 +640,8 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Path requirePath(@Nonnull Properties pProperties, @Nonnull String pKey,
-			                                @Nonnull String pDescription) {
+	public static @NonNull Path requirePath(@NonNull Properties pProperties, @NonNull String pKey,
+			                                @NonNull String pDescription) {
 		return PROPS_ACCESSOR.requirePath(pProperties, pKey, pDescription);
 	}
 
@@ -653,7 +653,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is empty, or not a string.
 	 */
-	public static @Nonnull Path requirePath(@Nonnull Properties pProperties, @Nonnull String pKey) {
+	public static @NonNull Path requirePath(@NonNull Properties pProperties, @NonNull String pKey) {
 		return PROPS_ACCESSOR.requirePath(pProperties, pKey, pKey);
 	}
 
@@ -665,7 +665,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Boolean getBoolean(@Nonnull Map<String,Object> pMap, @Nonnull String pKey, @Nonnull String pDescription) {
+	public static @Nullable Boolean getBoolean(@NonNull Map<String,Object> pMap, @NonNull String pKey, @NonNull String pDescription) {
 		return MAP_ACCESSOR.getBoolean(pMap, pKey, pDescription);
 	}
 
@@ -676,7 +676,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Boolean getBoolean(@Nonnull Map<String,Object> pMap, @Nonnull String pKey) {
+	public static @Nullable Boolean getBoolean(@NonNull Map<String,Object> pMap, @NonNull String pKey) {
 		return MAP_ACCESSOR.getBoolean(pMap, pKey, pKey);
 	}
 	/** Extracts a boolean value from the given property set.
@@ -687,7 +687,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Boolean getBoolean(@Nonnull Properties pProperties, @Nonnull String pKey, @Nonnull String pDescription) {
+	public static @Nullable Boolean getBoolean(@NonNull Properties pProperties, @NonNull String pKey, @NonNull String pDescription) {
 		return PROPS_ACCESSOR.getBoolean(pProperties, pKey, pDescription);
 	}
 
@@ -698,7 +698,7 @@ public class Data {
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
 	 */
-	public static @Nullable Boolean getBoolean(@Nonnull Properties pProperties, @Nonnull String pKey) {
+	public static @Nullable Boolean getBoolean(@NonNull Properties pProperties, @NonNull String pKey) {
 		return PROPS_ACCESSOR.getBoolean(pProperties, pKey, pKey);
 	}
 

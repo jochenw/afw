@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.scripts.DefaultScriptEngineRegisty;
@@ -17,14 +17,14 @@ import com.github.jochenw.afw.core.scripts.IScriptEngine.Script;
  * Utility class for working with templates.
  */
 public class Scripts {
-	private static @Nonnull IScriptEngineRegistry scriptEngineRegistry = new DefaultScriptEngineRegisty();
+	private static @NonNull IScriptEngineRegistry scriptEngineRegistry = new DefaultScriptEngineRegisty();
 
 
 	/**
 	 * Returns the default {@link IScriptEngineRegistry script engine registry}.
 	 * @return The default {@link IScriptEngineRegistry script engine registry}.
 	 */
-	public synchronized static @Nonnull IScriptEngineRegistry getScriptEngineRegistry() {
+	public synchronized static @NonNull IScriptEngineRegistry getScriptEngineRegistry() {
 		return scriptEngineRegistry;
 	}
 
@@ -33,7 +33,7 @@ public class Scripts {
 	 * @param pScriptEngineRegistry The new default {@link IScriptEngineRegistry script engine registry},
 	 *   replacing the current.
 	 */
-	public static synchronized void setScriptEngineRegistry(@Nonnull IScriptEngineRegistry pScriptEngineRegistry) {
+	public static synchronized void setScriptEngineRegistry(@NonNull IScriptEngineRegistry pScriptEngineRegistry) {
 		Scripts.scriptEngineRegistry = Objects.requireNonNull(pScriptEngineRegistry);
 	}
 

@@ -19,8 +19,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
 
@@ -32,7 +32,7 @@ import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
  * @param <O> Type of the binding, that is associated with the key.
  */
 public class Key<O extends Object> {
-	private final @Nonnull Type type;
+	private final @NonNull Type type;
 	private final @Nullable Annotation annotation;
 	private final @Nullable Class<? extends Annotation> annotationClass;
 
@@ -40,7 +40,7 @@ public class Key<O extends Object> {
 	 * and no annotation class.
 	 * @param pType The type, to which the keys binding is applicable.
 	 */
-	private Key(@Nonnull Type pType) {
+	private Key(@NonNull Type pType) {
 		type = pType;
 		annotation = null;
 		annotationClass = null;
@@ -52,7 +52,7 @@ public class Key<O extends Object> {
 	 * @param pAnnotation The annotation, which must be present to make
 	 * the keys binding applicable.
 	 */
-	private Key(@Nonnull Type pType, @Nonnull Annotation pAnnotation) {
+	private Key(@NonNull Type pType, @NonNull Annotation pAnnotation) {
 		type = pType;
 		annotation = pAnnotation;
 		annotationClass = null;
@@ -64,7 +64,7 @@ public class Key<O extends Object> {
 	 * @param pAnnotationClass The annotation class, which must be
 	 *   present to make the keys binding applicable.
 	 */
-	private Key(@Nonnull Type pType, @Nonnull Class<? extends Annotation> pAnnotationClass) {
+	private Key(@NonNull Type pType, @NonNull Class<? extends Annotation> pAnnotationClass) {
 		type = pType;
 		annotation = null;
 		annotationClass = pAnnotationClass;
@@ -143,7 +143,7 @@ public class Key<O extends Object> {
 	 * @return The keys description, as a string.
 	 * @see #toString()
 	 */
-	public @Nonnull String getDescription() {
+	public @NonNull String getDescription() {
 		final StringBuilder sb = new StringBuilder();
 		final Type t = getType();
 		if (t instanceof Class) {

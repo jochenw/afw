@@ -10,8 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
@@ -30,8 +30,8 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @return The created {@link ProcessOutputHandler}.
 	 * @throws NullPointerException The parameter {@code pOut} is null.
 	 */
-	public static ProcessOutputHandler of(@Nonnull OutputStream pOut) {
-		final @Nonnull OutputStream out = Objects.requireNonNull(pOut, "OutputStream");
+	public static ProcessOutputHandler of(@NonNull OutputStream pOut) {
+		final @NonNull OutputStream out = Objects.requireNonNull(pOut, "OutputStream");
 		return (in) -> Streams.copy(in, out);
 	}
 	/** Creates an {@link ProcessOutputHandler}, that forwards the external processes output
@@ -43,9 +43,9 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @return The created {@link ProcessOutputHandler}.
 	 * @throws NullPointerException The parameter {@code pWriter} is null.
 	 */
-	public static ProcessOutputHandler of(@Nonnull Writer pWriter, @Nullable Charset pCharset) {
-		final @Nonnull Writer w = Objects.requireNonNull(pWriter, "Writer");
-		final @Nonnull Charset cs = Objects.notNull(pCharset, null);
+	public static ProcessOutputHandler of(@NonNull Writer pWriter, @Nullable Charset pCharset) {
+		final @NonNull Writer w = Objects.requireNonNull(pWriter, "Writer");
+		final @NonNull Charset cs = Objects.notNull(pCharset, null);
 		return (in) -> Streams.copy(in, w, cs);
 	}
 	/** Creates an {@link ProcessOutputHandler}, that forwards the external processes output
@@ -56,10 +56,10 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @return The created {@link ProcessOutputHandler}.
 	 * @throws NullPointerException The parameter {@code pSupplier} is null.
 	 */
-	public static ProcessOutputHandler of(@Nonnull FailableSupplier<OutputStream,?> pSupplier) {
-		final @Nonnull FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
+	public static ProcessOutputHandler of(@NonNull FailableSupplier<OutputStream,?> pSupplier) {
+		final @NonNull FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
 		return (in) -> {
-			final @Nonnull OutputStream out = supplier.get();
+			final @NonNull OutputStream out = supplier.get();
 			Streams.copy(in, out);
 		};
 	}
@@ -74,12 +74,12 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @return The created {@link ProcessOutputHandler}.
 	 * @throws NullPointerException The parameter {@code pSupplier} is null.
 	 */
-	public static ProcessOutputHandler of(@Nonnull FailableSupplier<Writer,?> pSupplier,
+	public static ProcessOutputHandler of(@NonNull FailableSupplier<Writer,?> pSupplier,
 			                       @Nullable Charset pCharset) {
-		final @Nonnull FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
-		final @Nonnull Charset cs = Objects.notNull(pCharset, null);
+		final @NonNull FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
+		final @NonNull Charset cs = Objects.notNull(pCharset, null);
 		return (in) -> {
-			final @Nonnull Writer w = supplier.get();
+			final @NonNull Writer w = supplier.get();
 			Streams.copy(in, w, cs);
 		};
 	}
@@ -89,8 +89,8 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @return The created {@link ProcessOutputHandler}.
 	 * @throws NullPointerException The parameter {@code pPath} is null.
 	 */
-	public static ProcessOutputHandler of(@Nonnull Path pPath) {
-		final @Nonnull Path path = Objects.requireNonNull(pPath, "Path");
+	public static ProcessOutputHandler of(@NonNull Path pPath) {
+		final @NonNull Path path = Objects.requireNonNull(pPath, "Path");
 		FileUtils.createDirectoryFor(path);
 		return of(() -> new BufferedOutputStream(Files.newOutputStream(path)));
 	}
@@ -104,8 +104,8 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @return The created {@link ProcessOutputHandler}.
 	 * @throws NullPointerException The parameter {@code pPath} is null.
 	 */
-	public static ProcessOutputHandler of(@Nonnull Path pPath, @Nullable Charset pCharset) {
-		final @Nonnull Path path = Objects.requireNonNull(pPath, "Path");
+	public static ProcessOutputHandler of(@NonNull Path pPath, @Nullable Charset pCharset) {
+		final @NonNull Path path = Objects.requireNonNull(pPath, "Path");
 		FileUtils.createDirectoryFor(path);
 		return of(() -> Files.newBufferedWriter(path), pCharset);
 	}
@@ -119,8 +119,8 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @return The created {@link ProcessOutputHandler}.
 	 * @throws NullPointerException The parameter {@code pPath} is null.
 	 */
-	public static ProcessOutputHandler of(@Nonnull File pFile, @Nullable Charset pCharset) {
-		final @Nonnull Path path = Objects.requireNonNull(pFile, "File").toPath();
+	public static ProcessOutputHandler of(@NonNull File pFile, @Nullable Charset pCharset) {
+		final @NonNull Path path = Objects.requireNonNull(pFile, "File").toPath();
 		return of(path, pCharset);
 	}
 }

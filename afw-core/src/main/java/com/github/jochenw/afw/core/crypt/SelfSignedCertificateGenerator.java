@@ -9,8 +9,8 @@ import java.security.cert.Certificate;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.inject.Inject;
 
 import com.github.jochenw.afw.core.util.Exceptions;
@@ -136,7 +136,7 @@ public class SelfSignedCertificateGenerator {
 	 * @see #getAlias()
 	 * @throws NullPointerException The alias parameter is null.
 	 */
-	public void setAlias(@Nonnull String pAlias) {
+	public void setAlias(@NonNull String pAlias) {
 		alias = java.util.Objects.requireNonNull(pAlias, "Alias");
 	}
 
@@ -157,7 +157,7 @@ public class SelfSignedCertificateGenerator {
 	 * @see #setFileName(String)
 	 * @throws NullPointerException The parameter {@code pFileName} is null.
 	 */
-	public void setFileName(@Nonnull String pFileName) {
+	public void setFileName(@NonNull String pFileName) {
 		fileName = java.util.Objects.requireNonNull(pFileName, "File name");
 	}
 
@@ -220,7 +220,7 @@ public class SelfSignedCertificateGenerator {
 	 * @throws NullPointerException The parameter {@code pName} is null.
 	 * @see #getName()
 	 */
-	public void setName(@Nonnull String pName) {
+	public void setName(@NonNull String pName) {
 		name = java.util.Objects.requireNonNull(pName, "Name");
 	}
 

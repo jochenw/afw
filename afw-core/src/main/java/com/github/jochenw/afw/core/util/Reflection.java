@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
@@ -309,7 +309,7 @@ public class Reflection {
 	 * @param pType The type to inspect for fields.
 	 * @param pConsumer The consumer to notify about fields, which are detected.
 	 */
-	public static void findFields(@Nonnull Class<?> pType, @Nonnull FailableConsumer<Field,?> pConsumer) {
+	public static void findFields(@NonNull Class<?> pType, @NonNull FailableConsumer<Field,?> pConsumer) {
 		findFields(pType, pConsumer, null);
 	}
 
@@ -322,7 +322,7 @@ public class Reflection {
 	 * @param pMatcher A filter, which can be used to ignore fields. May be null,
 	 *   in which case a "matches all" filter will be assumed.
 	 */
-	public static void findFields(@Nonnull Class<?> pType, @Nonnull FailableConsumer<Field,?> pConsumer,
+	public static void findFields(@NonNull Class<?> pType, @NonNull FailableConsumer<Field,?> pConsumer,
 			                      @Nullable FailablePredicate<Field,?> pMatcher) {
 		try {
 			if (pType != null  &&  pType != Object.class) {

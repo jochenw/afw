@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /** The opposite of an {@link InputStreamReader}: An
@@ -30,9 +30,9 @@ import javax.annotation.Nonnull;
  * may vary.
  */
 public class ReaderInputStream extends InputStream {
-	private final @Nonnull Reader reader;
-	private final @Nonnull Charset charset;
-	private final @Nonnull List<ByteBuffer> buffers = new ArrayList<>();
+	private final @NonNull Reader reader;
+	private final @NonNull Charset charset;
+	private final @NonNull List<ByteBuffer> buffers = new ArrayList<>();
 	private boolean closedSeen, closedReported;
 	private final char[] chars = new char[8192];
 
@@ -45,7 +45,7 @@ public class ReaderInputStream extends InputStream {
 	 *   characters into bytes.
 	 * @throws NullPointerException Either of the parameters is null.
 	 */
-	public ReaderInputStream(@Nonnull Reader pReader, @Nonnull Charset pCharset) {
+	public ReaderInputStream(@NonNull Reader pReader, @NonNull Charset pCharset) {
 		reader = Objects.requireNonNull(pReader, "Reader");
 		charset = Objects.requireNonNull(pCharset, "Charset");
 	}

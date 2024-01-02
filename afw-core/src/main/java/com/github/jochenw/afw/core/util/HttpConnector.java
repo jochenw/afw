@@ -9,8 +9,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -150,8 +150,8 @@ public class HttpConnector {
 	 * @param pProxyDefinition A proxy definition in the form "host:port".
 	 * @see #setProxy(String, int)
 	 */
-	public void setProxy(@Nonnull String pProxyDefinition) {
-		final @Nonnull String proxy = Objects.requireNonNull(pProxyDefinition, "Proxy Definition");
+	public void setProxy(@NonNull String pProxyDefinition) {
+		final @NonNull String proxy = Objects.requireNonNull(pProxyDefinition, "Proxy Definition");
 		final int offset = proxy.indexOf(':');
 		if (offset == -1) {
 			throw new IllegalArgumentException("Invalid proxy definition: Expected host:port, got " + pProxyDefinition);
@@ -171,7 +171,7 @@ public class HttpConnector {
 	 * @param pProxyPort The proxy servers port number.
 	 * @see #setProxy(String)
 	 */
-	public void setProxy(@Nonnull String pProxyHost, int pProxyPort) {
+	public void setProxy(@NonNull String pProxyHost, int pProxyPort) {
 		final String proxyHost = Objects.requireNonNull(pProxyHost, "Proxy Host");
 		try {
 			proxy = new InetSocketAddress(proxyHost, pProxyPort);

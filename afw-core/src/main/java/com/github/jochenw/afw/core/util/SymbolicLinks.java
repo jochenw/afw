@@ -5,8 +5,8 @@ package com.github.jochenw.afw.core.util;
 
 import java.nio.file.Path;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.components.DefaultSymbolicLinksHandler;
 import com.github.jochenw.afw.core.components.ISymbolicLinksHandler;
@@ -22,7 +22,7 @@ public class SymbolicLinks {
 	 * @param pLink The symbolic link, which is being created.
 	 * @throws IllegalArgumentException The target is not a directory.
 	 */
-	public static void createDirectoryLink(@Nonnull Path pTarget, @Nonnull Path pLink) {
+	public static void createDirectoryLink(@NonNull Path pTarget, @NonNull Path pLink) {
 		handler.createDirectoryLink(pTarget, pLink);
 	}
 
@@ -33,7 +33,7 @@ public class SymbolicLinks {
 	 * @throws UnsupportedOperationException The handler doesn't implement symbolic links for files.
 	 * @throws IllegalArgumentException The target is not a file.
 	 */
-	public static void createFileLink(@Nonnull Path pTarget, @Nonnull Path pLink) throws UnsupportedOperationException {
+	public static void createFileLink(@NonNull Path pTarget, @NonNull Path pLink) throws UnsupportedOperationException {
 		handler.createFileLink(pTarget, pLink);
 	}
 
@@ -45,7 +45,7 @@ public class SymbolicLinks {
 	 *   of files.
 	 * @throws IllegalArgumentException The target does not exist.
 	 */
-	public static void createLink(@Nonnull Path pTarget, @Nonnull Path pLink) throws UnsupportedOperationException {
+	public static void createLink(@NonNull Path pTarget, @NonNull Path pLink) throws UnsupportedOperationException {
 		handler.createLink(pTarget, pLink);
 	}
 
@@ -56,14 +56,14 @@ public class SymbolicLinks {
 	 * @return The target, to which the symbolic link refers, if the given path is a symbolic link.
 	 *   Otherwise, returns null.
 	 */
-	public static @Nullable Path checkLink(@Nonnull Path pPath) {
+	public static @Nullable Path checkLink(@NonNull Path pPath) {
 		return handler.checkLink(pPath);
 	}
 
 	/** Deletes the given symbolic link.
 	 * @param pPath The symbolic link, which is being deleted.
 	 */
-	public static void removeLink(@Nonnull Path pPath) {
+	public static void removeLink(@NonNull Path pPath) {
 		handler.removeLink(pPath);
 	}
 

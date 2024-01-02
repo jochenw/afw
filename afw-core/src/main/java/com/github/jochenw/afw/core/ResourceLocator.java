@@ -18,8 +18,8 @@ package com.github.jochenw.afw.core;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -69,7 +69,7 @@ public abstract class ResourceLocator {
 	 *   or null, if the resource wasn't found.
 	 * @see #requireResource(String)
 	 */
-	public @Nullable URL getResource(@Nonnull String pUri) {
+	public @Nullable URL getResource(@NonNull String pUri) {
 		return getResource(Thread.currentThread().getContextClassLoader(), pUri);
 	}
 	/**

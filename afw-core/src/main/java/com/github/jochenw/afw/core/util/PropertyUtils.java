@@ -18,8 +18,8 @@ package com.github.jochenw.afw.core.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
@@ -32,14 +32,14 @@ public class PropertyUtils {
 	/** A class, which representy an entry in the property set.
 	 */
 	public static class Entry {
-		private final @Nonnull String key, value;
+		private final @NonNull String key, value;
 		private final @Nullable String comment;
 		/** Creates a new instance with the given key, value, and comment.
 		 * @param pKey The property key.
 		 * @param pValue The property value.
 		 * @param pComment The property comment.
 		 */
-		public Entry(@Nonnull String pKey, @Nonnull String pValue, @Nullable String pComment) {
+		public Entry(@NonNull String pKey, @NonNull String pValue, @Nullable String pComment) {
 			key = pKey;
 			value = pValue;
 			comment = pComment;
@@ -47,11 +47,11 @@ public class PropertyUtils {
 		/** Returns the property key.
 		 * @return The property key.
 		 */
-		public @Nonnull String getKey() { return key; }
+		public @NonNull String getKey() { return key; }
 		/** Returns the property value.
 		 * @return The property value.
 		 */
-		public @Nonnull String getValue() { return value; }
+		public @NonNull String getValue() { return value; }
 		/** Returns the property comment.
 		 * @return The property comment.
 		 */
@@ -88,7 +88,7 @@ public class PropertyUtils {
 	 * invoking the given consumer.
 	 * @param pConsumer  The consumer, which ought to process the property entries.
 	 */
-	public void forEach(@Nonnull FailableConsumer<Entry,?> pConsumer) {
+	public void forEach(@NonNull FailableConsumer<Entry,?> pConsumer) {
 		map.values().forEach((e) -> Functions.accept(pConsumer, e));
 	}
 	/**
@@ -96,7 +96,7 @@ public class PropertyUtils {
 	 * invoking the given consumer.
 	 * @param pConsumer The consumer, which ought to process the properties.
 	 */
-	public void forEach(@Nonnull FailableBiConsumer<String,String,?> pConsumer) {
+	public void forEach(@NonNull FailableBiConsumer<String,String,?> pConsumer) {
 		forEach((e) -> Functions.accept(pConsumer, e.getKey(), e.getValue()));
 	}
 	/**
@@ -105,7 +105,7 @@ public class PropertyUtils {
 	 * @param pKey The property key.
 	 * @param pValue The property value.
 	 */
-	public void put(@Nonnull String pKey, @Nonnull String pValue) {
+	public void put(@NonNull String pKey, @NonNull String pValue) {
 		put(pKey, pValue, null);
 	}
 	/**
@@ -115,7 +115,7 @@ public class PropertyUtils {
 	 * @param pValue The property value.
 	 * @param pComment The property comment.
 	 */
-	public void put(@Nonnull String pKey, @Nonnull String pValue, @Nullable String pComment) {
+	public void put(@NonNull String pKey, @NonNull String pValue, @Nullable String pComment) {
 		map.put(pKey, new Entry(pKey, pValue, pComment));
 	}
 }

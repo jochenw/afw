@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.util.Objects;
 
@@ -68,7 +68,7 @@ public class DefaultInterpolator implements Interpolator {
 	 * @param pPropertyProvider A function, which is invoked
 	 *   to resolve property values, that are being referenced.
 	 */
-	public DefaultInterpolator(@Nonnull Function<String,String> pPropertyProvider) {
+	public DefaultInterpolator(@NonNull Function<String,String> pPropertyProvider) {
 		propertyProvider = pPropertyProvider;
 	}
 
@@ -79,7 +79,7 @@ public class DefaultInterpolator implements Interpolator {
 	 * @param pProps A property set, which acts as the backend
 	 *   for looking up property values.
 	 */
-	public DefaultInterpolator(final @Nonnull Properties pProps) {
+	public DefaultInterpolator(final @NonNull Properties pProps) {
 		Objects.requireNonNull(pProps, "Properties");
 		propertyProvider = (s) -> pProps.getProperty(s);
 	}

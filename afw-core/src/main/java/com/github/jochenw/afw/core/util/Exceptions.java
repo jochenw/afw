@@ -21,8 +21,8 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.lang.reflect.UndeclaredThrowableException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -168,7 +168,7 @@ public class Exceptions {
      * @return The cause, if it meets the requested criteria, otherwise null.
      * @param <E> The type of the cause.
      */
-	public static @Nullable <E extends Throwable> E getCause(@Nonnull Throwable pTh, @Nonnull Class<E> pType) {
+	public static @Nullable <E extends Throwable> E getCause(@NonNull Throwable pTh, @NonNull Class<E> pType) {
 		final Throwable cause = pTh.getCause();
 		if (cause != null  &&  cause != pTh  &&  pType.isAssignableFrom(cause.getClass())) {
 			return pType.cast(cause);

@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
@@ -56,14 +56,14 @@ public interface IAppLog {
      * @see #setLevel(Level)
      * @see #isEnabled(Level)
      */
-    public @Nonnull Level getLevel();
+    public @NonNull Level getLevel();
 
     /** Sets the application loggers log level. Default is {@link Level#INFO}.
      * @param pLevel The application loggers new logging level.
      * @see #getLevel()
      * @see #isEnabled(Level)
      */
-    public void setLevel(@Nonnull Level pLevel);
+    public void setLevel(@NonNull Level pLevel);
 
     /**
      * Returns, whether logging is currently enabled for the given level.
@@ -72,7 +72,7 @@ public interface IAppLog {
      * @see #setLevel(Level)
      * @see #getLevel()
      */
-    public boolean isEnabled(@Nonnull Level pLevel);
+    public boolean isEnabled(@NonNull Level pLevel);
 
     /** Logs the given message.
      * @param pLevel The messages logging level.

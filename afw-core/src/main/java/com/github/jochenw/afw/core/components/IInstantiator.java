@@ -2,8 +2,8 @@ package com.github.jochenw.afw.core.components;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An instantiator is an object, which creates new instances.
@@ -20,7 +20,7 @@ public interface IInstantiator {
 	 * @return A new instance, configured with the requested set of
 	 * bean properties.
 	 */
-	public <O> O newInstance(@Nonnull ClassLoader pClassLoader, @Nonnull String pClassName, @Nullable Map<String,String> pBeanProperties); 
+	public <O> O newInstance(@NonNull ClassLoader pClassLoader, @NonNull String pClassName, @Nullable Map<String,String> pBeanProperties); 
 
 	/**
 	 * Creates a new instance, using the given {@link ClassLoader}.
@@ -34,5 +34,5 @@ public interface IInstantiator {
 	 * @return A new instance, configured with the requested set of
 	 * bean properties.
 	 */
-	public <O> O newInstance(@Nonnull ClassLoader pClassLoader, @Nonnull String pClassName, @Nullable String... pBeanProperties); 
+	public <O> O newInstance(@NonNull ClassLoader pClassLoader, @NonNull String pClassName, @Nullable String... pBeanProperties); 
 }

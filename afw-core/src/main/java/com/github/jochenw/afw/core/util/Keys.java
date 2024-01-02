@@ -8,8 +8,8 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.crypt.DefaultKeyHandler;
 import com.github.jochenw.afw.core.crypt.IKeyHandler;
@@ -18,13 +18,13 @@ import com.github.jochenw.afw.core.crypt.IKeyHandler;
 /** Utility class, which provides static encryption/decryption methods.
  */
 public class Keys {
-	private static volatile @Nonnull IKeyHandler keyHandler = new DefaultKeyHandler();
+	private static volatile @NonNull IKeyHandler keyHandler = new DefaultKeyHandler();
 
 	/**
 	 * Returns the default {@link IKeyHandler}, which is internally used.
 	 * @return The default {@link IKeyHandler}, which is internally used.
 	 */
-	public static @Nonnull IKeyHandler getKeyHandler() {
+	public static @NonNull IKeyHandler getKeyHandler() {
 		return keyHandler;
 	}
 
@@ -32,7 +32,7 @@ public class Keys {
 	 * Sets the default {@link IKeyHandler}, which is internally used.
 	 * @param pKeyHandler The default {@link IKeyHandler}, which is internally used.
 	 */
-	public static void setKeyHandler(@Nonnull IKeyHandler pKeyHandler) {
+	public static void setKeyHandler(@NonNull IKeyHandler pKeyHandler) {
 		keyHandler = Objects.requireNonNull(pKeyHandler, "IKeyHandler");
 	}
 
@@ -40,7 +40,7 @@ public class Keys {
 	 * Generates a new key pair
 	 * @return The generated key pair.
 	 */
-	public static @Nonnull KeyPair createKeyPair() {
+	public static @NonNull KeyPair createKeyPair() {
 		return getKeyHandler().createKeyPair();
 	}
 
@@ -52,8 +52,8 @@ public class Keys {
 	 * @param pValidity How long should the certificate be valid (in days)?
 	 * @return The generated certificate.
 	 */
-	public static @Nonnull Certificate generateCertificate(@Nonnull String pDn,
-			                                               @Nonnull KeyPair pKeyPair, int pValidity) {
+	public static @NonNull Certificate generateCertificate(@NonNull String pDn,
+			                                               @NonNull KeyPair pKeyPair, int pValidity) {
 		return getKeyHandler().generateCertificate(pDn, pKeyPair, pValidity);
 	}
 
@@ -69,10 +69,10 @@ public class Keys {
 	 *   is being used.
 	 * @return The generated certificate.
 	 */
-	public static @Nonnull KeyStore createKeyStore(@Nonnull PrivateKey pPrivateKey,
-                                                   @Nonnull Certificate pCertificate, @Nonnull String pAlias,
-                                                   @Nullable String pStoreType, @Nonnull String pStorePass,
-                                                   @Nonnull String pKeyPass) {
+	public static @NonNull KeyStore createKeyStore(@NonNull PrivateKey pPrivateKey,
+                                                   @NonNull Certificate pCertificate, @NonNull String pAlias,
+                                                   @Nullable String pStoreType, @NonNull String pStorePass,
+                                                   @NonNull String pKeyPass) {
 		return getKeyHandler().createKeyStore(pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 	}
 	/**
@@ -87,9 +87,9 @@ public class Keys {
 	 * @param pKeyPass The entries key password. May be null, in which case the store password
 	 *   is being used.
 	 */
-	public static void createKeyStore(@Nonnull OutputStream pOut, @Nonnull PrivateKey pPrivateKey,
-			                   @Nonnull Certificate pCertificate, @Nonnull String pAlias,
-			                   @Nullable String pStoreType, @Nonnull String pStorePass,
+	public static void createKeyStore(@NonNull OutputStream pOut, @NonNull PrivateKey pPrivateKey,
+			                   @NonNull Certificate pCertificate, @NonNull String pAlias,
+			                   @Nullable String pStoreType, @NonNull String pStorePass,
 			                   @Nullable String pKeyPass) {
 		getKeyHandler().createKeyStore(pOut, pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 	}
@@ -103,8 +103,8 @@ public class Keys {
 	 *   is being used.
 	 * @return A tupel with the entries private key, and the certificate.
 	 */
-	public static Tupel<PrivateKey,Certificate> readPrivateKey(@Nonnull InputStream pIn, @Nonnull String pAlias,
-			                                            @Nonnull String pStorePass, @Nullable String pKeyPass) {
+	public static Tupel<PrivateKey,Certificate> readPrivateKey(@NonNull InputStream pIn, @NonNull String pAlias,
+			                                            @NonNull String pStorePass, @Nullable String pKeyPass) {
 		return getKeyHandler().readPrivateKey(pIn, pAlias, pStorePass, pKeyPass);
 	}
 

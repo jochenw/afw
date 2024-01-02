@@ -25,8 +25,8 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.log.AbstractLog;
 import com.github.jochenw.afw.core.log.AbstractLogFactory;
@@ -154,7 +154,7 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 *   which case {@link Level#INFO} will be used as the log level.
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
-	public static @Nonnull ILogFactory of(@Nullable String pLogFile, @Nullable String pLogLevel) {
+	public static @NonNull ILogFactory of(@Nullable String pLogFile, @Nullable String pLogLevel) {
 		final Path logPath;
 		if (pLogFile == null  ||  pLogFile.length() == 0) {
 			logPath = null;
@@ -173,7 +173,7 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 *   which case {@link Level#INFO} will be used as the log level.
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
-	public static @Nonnull ILogFactory of(@Nullable Path pLogFile, @Nullable String pLogLevel) {
+	public static @NonNull ILogFactory of(@Nullable Path pLogFile, @Nullable String pLogLevel) {
 		Level level = null;
 		if (pLogLevel != null  &&  pLogLevel.length() > 0) {
 			try {
@@ -194,7 +194,7 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 *   which case {@link Level#INFO} will be used as the log level.
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
-	public static @Nonnull ILogFactory of(@Nullable Path pLogFile, @Nullable Level pLogLevel) {
+	public static @NonNull ILogFactory of(@Nullable Path pLogFile, @Nullable Level pLogLevel) {
 		final SimpleLogFactory slf;
 		if (pLogFile == null) {
 			slf = new SimpleLogFactory(System.out);

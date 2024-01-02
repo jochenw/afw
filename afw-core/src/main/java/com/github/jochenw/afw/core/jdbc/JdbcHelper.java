@@ -17,14 +17,13 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -42,13 +41,13 @@ import com.github.jochenw.afw.core.util.Exceptions;
  */
 public class JdbcHelper {
 	private static final ZoneId UTC = ZoneId.of("GMT");
-	private @Nonnull ZoneId dbZoneId = UTC;
-	private @Nonnull ZoneId appZoneId = ZoneId.systemDefault();
+	private @NonNull ZoneId dbZoneId = UTC;
+	private @NonNull ZoneId appZoneId = ZoneId.systemDefault();
 
 	/** Returns the database time zone id.
 	 * @return The database time zone id.
 	 */
-	public @Nonnull ZoneId getDbZoneId() {
+	public @NonNull ZoneId getDbZoneId() {
 		return dbZoneId;
 	}
 
@@ -62,7 +61,7 @@ public class JdbcHelper {
 	/** Returns the application time zone id.
 	 * @return The application time zone id.
 	 */
-	public @Nonnull ZoneId getAppZoneId() {
+	public @NonNull ZoneId getAppZoneId() {
 		return appZoneId;
 	}
 
@@ -91,10 +90,10 @@ public class JdbcHelper {
 		 * @param pQuery The SQL query, that is being executed.
 		 * @param pParameters The query parameters.
 		 */
-		public Executor(@Nonnull JdbcHelper pHelper,
+		public Executor(@NonNull JdbcHelper pHelper,
 				        @Nullable Dialect pDialect,
-				        @Nonnull FailableSupplier<Connection,?> pConnProvider,
-				        @Nonnull String pQuery,
+				        @NonNull FailableSupplier<Connection,?> pConnProvider,
+				        @NonNull String pQuery,
 				        @Nullable Object... pParameters) {
 			helper = Objects.requireNonNull(pHelper, "JdbcHelper");
 			dialect = pDialect;
@@ -113,8 +112,8 @@ public class JdbcHelper {
 		 *   the {@link ResultSet}.
 		 * @return The result object, that has been obtained by invoking the function.
 		 */
-		public @Nonnull <O> Callable<O> withResultSet(@Nonnull FailableFunction<ResultSet,O,?> pFunction) {
-			final @Nonnull FailableFunction<ResultSet,O,?> function = Objects.requireNonNull(pFunction, "Function");
+		public @NonNull <O> Callable<O> withResultSet(@NonNull FailableFunction<ResultSet,O,?> pFunction) {
+			final @NonNull FailableFunction<ResultSet,O,?> function = Objects.requireNonNull(pFunction, "Function");
 			return () -> {
 				try (Connection conn = connectionProvider.get();
 					 PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -137,8 +136,8 @@ public class JdbcHelper {
 		 *   the {@link ResultSet}.
 		 * @return The result object, that has been obtained by invoking the function.
 		 */
-		public @Nonnull Runnable withResultSet(@Nonnull FailableConsumer<ResultSet,?> pConsumer) {
-			final @Nonnull FailableConsumer<ResultSet,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+		public @NonNull Runnable withResultSet(@NonNull FailableConsumer<ResultSet,?> pConsumer) {
+			final @NonNull FailableConsumer<ResultSet,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			return () -> {
 				try (Connection conn = connectionProvider.get();
 					 PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -162,8 +161,8 @@ public class JdbcHelper {
 		 *   the {@link ResultSet}.
 		 * @return The result object, that has been obtained by invoking the function.
 		 */
-		public @Nonnull <O> Callable<O> withRows(@Nonnull FailableFunction<Rows,O,?> pFunction) {
-			final @Nonnull FailableFunction<Rows,O,?> function = Objects.requireNonNull(pFunction, "Function");
+		public @NonNull <O> Callable<O> withRows(@NonNull FailableFunction<Rows,O,?> pFunction) {
+			final @NonNull FailableFunction<Rows,O,?> function = Objects.requireNonNull(pFunction, "Function");
 			return () -> {
 				try (Connection conn = connectionProvider.get();
 					 PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -186,8 +185,8 @@ public class JdbcHelper {
 		 *   the {@link ResultSet}.
 		 * @return The result object, that has been obtained by invoking the function.
 		 */
-		public @Nonnull Runnable withRows(@Nonnull FailableConsumer<Rows,?> pConsumer) {
-			final @Nonnull FailableConsumer<Rows,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+		public @NonNull Runnable withRows(@NonNull FailableConsumer<Rows,?> pConsumer) {
+			final @NonNull FailableConsumer<Rows,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			return () -> {
 				try (Connection conn = connectionProvider.get();
 					 PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -214,7 +213,7 @@ public class JdbcHelper {
 		 * @param <O> Type of the result object.
 		 * @return The result object, that has been obtained from the query result.
 		 */
-		public @Nonnull <O> Callable<O> singleObject() {
+		public @NonNull <O> Callable<O> singleObject() {
 			return () -> {
 				try (Connection conn = connectionProvider.get();
 					 PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -829,7 +828,7 @@ public class JdbcHelper {
 		 * @param pConsumer The {@link DoubleConsumer}, that should receive the double.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextDouble(@Nonnull DoubleConsumer pConsumer) {
+		public @NonNull Rows nextDouble(@NonNull DoubleConsumer pConsumer) {
 			final DoubleConsumer consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getDouble(++index));
 			return this;
@@ -861,7 +860,7 @@ public class JdbcHelper {
 		 *   (possibly null) double object.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextDoubleObj(@Nonnull Consumer<Double> pConsumer) {
+		public @NonNull Rows nextDoubleObj(@NonNull Consumer<Double> pConsumer) {
 			final Consumer<Double> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getDoubleObj(++index));
 			return this;
@@ -900,7 +899,7 @@ public class JdbcHelper {
 		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextZonedDateTime(@Nonnull Consumer<ZonedDateTime> pConsumer,
+		public @NonNull Rows nextZonedDateTime(@NonNull Consumer<ZonedDateTime> pConsumer,
 				                              @Nullable ZoneId pZoneId) {
 			final Consumer<ZonedDateTime> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getZonedDateTime(++index, pZoneId));
@@ -943,7 +942,7 @@ public class JdbcHelper {
 		 *   (possibly null) LocalDateTime object.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextLocalDateTime(@Nonnull Consumer<LocalDateTime> pConsumer) {
+		public @NonNull Rows nextLocalDateTime(@NonNull Consumer<LocalDateTime> pConsumer) {
 			final Consumer<LocalDateTime> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getLocalDateTime(++index));
 			return this;
@@ -980,7 +979,7 @@ public class JdbcHelper {
 		 *   (possibly null) Timestamp object.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextTimestamp(@Nonnull Consumer<Timestamp> pConsumer) {
+		public @NonNull Rows nextTimestamp(@NonNull Consumer<Timestamp> pConsumer) {
 			final Consumer<Timestamp> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getTimestamp(++index));
 			return this;
@@ -1012,7 +1011,7 @@ public class JdbcHelper {
 		 *   (possibly null) Date object.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextDate(@Nonnull Consumer<Date> pConsumer) {
+		public @NonNull Rows nextDate(@NonNull Consumer<Date> pConsumer) {
 			final Consumer<Date> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getDate(++index));
 			return this;
@@ -1044,7 +1043,7 @@ public class JdbcHelper {
 		 *   (possibly null) Time object.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextTime(@Nonnull Consumer<Time> pConsumer) {
+		public @NonNull Rows nextTime(@NonNull Consumer<Time> pConsumer) {
 			final Consumer<Time> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getTime(++index));
 			return this;
@@ -1079,7 +1078,7 @@ public class JdbcHelper {
 		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextLocalDate(@Nonnull Consumer<LocalDate> pConsumer,
+		public @NonNull Rows nextLocalDate(@NonNull Consumer<LocalDate> pConsumer,
 				                          @Nullable ZoneId pZoneId) {
 			final Consumer<LocalDate> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getLocalDate(++index, pZoneId));
@@ -1120,7 +1119,7 @@ public class JdbcHelper {
 		 * @param pZoneId The requested objects time zone id. Defaults to UTC.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextLocalTime(@Nonnull Consumer<LocalTime> pConsumer,
+		public @NonNull Rows nextLocalTime(@NonNull Consumer<LocalTime> pConsumer,
 				                          @Nullable ZoneId pZoneId) {
 			final Consumer<LocalTime> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getLocalTime(++index, pZoneId));
@@ -1159,7 +1158,7 @@ public class JdbcHelper {
 		 *   (possibly null) byte array.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextBytes(@Nonnull Consumer<byte[]> pConsumer) {
+		public @NonNull Rows nextBytes(@NonNull Consumer<byte[]> pConsumer) {
 			final Consumer<byte[]> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getBytes(++index));
 			return this;
@@ -1191,7 +1190,7 @@ public class JdbcHelper {
 		 *   (possibly null) {@link InputStream}.
 		 * @return This row object. (Allows for builder-style code.)
 		 */
-		public @Nonnull Rows nextInputStream(@Nonnull Consumer<InputStream> pConsumer) {
+		public @NonNull Rows nextInputStream(@NonNull Consumer<InputStream> pConsumer) {
 			final Consumer<InputStream> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			consumer.accept(getInputStream(++index));
 			return this;
@@ -1224,7 +1223,7 @@ public class JdbcHelper {
 	 * @param pParams The parameter list, that is being applied.
 	 * @throws SQLException Applying the parameter list failed.
 	 */
-	public void setParameters(@Nonnull PreparedStatement pStmt, Object... pParams)
+	public void setParameters(@NonNull PreparedStatement pStmt, Object... pParams)
 	        throws SQLException {
 		if (pParams != null) {
 			for (int i = 0;  i < pParams.length;  i++) {
@@ -1240,7 +1239,7 @@ public class JdbcHelper {
 	 * @param pParam The parameter list, that is being applied.
 	 * @throws SQLException Applying the parameter failed.
 	 */
-	public void setParameter(@Nonnull PreparedStatement pStmt, int pInd, @Nullable Object pParam)
+	public void setParameter(@NonNull PreparedStatement pStmt, int pInd, @Nullable Object pParam)
 			throws SQLException {
 		if (pParam == null) {
 			pStmt.setNull(pInd, Types.NULL);
@@ -1371,9 +1370,9 @@ public class JdbcHelper {
 	 * @param pParameters The numbered statement parameters.
 	 * @return The created {@link JdbcHelper.Executor query executor}.
 	 */
-	public Executor query(@Nonnull FailableSupplier<Connection,?> pConnectionSupplier,
+	public Executor query(@NonNull FailableSupplier<Connection,?> pConnectionSupplier,
 			              @Nullable Dialect pDialect,
-			              @Nonnull String pStatement, @Nullable Object... pParameters) {
+			              @NonNull String pStatement, @Nullable Object... pParameters) {
 		return new Executor(this, pDialect, pConnectionSupplier, pStatement, pParameters);
 	}
 }

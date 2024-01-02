@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Exceptions;
@@ -56,7 +56,7 @@ public class ObservableInputStream extends InputStream {
 		 *   by the created instance.
 		 * @return The created listener proxy.
 		 */
-		public static @Nonnull Listener of(Listener... pListeners) {
+		public static @NonNull Listener of(Listener... pListeners) {
 			return new Listener() {
 				@Override
 				public void endOfFile() throws IOException {
@@ -100,7 +100,7 @@ public class ObservableInputStream extends InputStream {
 		 * @param pPath The file, to which incoming data is being copied.
 		 * @return The created {@code Listener} instance.
 		 */
-		public static @Nonnull Listener of(@Nonnull Path pPath) {
+		public static @NonNull Listener of(@NonNull Path pPath) {
     		return of(() -> Files.newOutputStream(pPath));
     	}
 		/** Creates a new {@code Listener} instance, which copies the incoming data
@@ -108,7 +108,7 @@ public class ObservableInputStream extends InputStream {
 		 * @param pFile The file, to which incoming data is being copied.
 		 * @return The created {@code Listener} instance.
 		 */
-    	public static @Nonnull Listener of(@Nonnull File pFile) {
+    	public static @NonNull Listener of(@NonNull File pFile) {
     		return of(() -> new FileOutputStream(pFile));
     	}
 		/** Creates a new {@code Listener} instance, which copies the incoming data
@@ -116,7 +116,7 @@ public class ObservableInputStream extends InputStream {
 		 * @param pOut The output stream, to which incoming data is being copied.
 		 * @return The created {@code Listener} instance.
 		 */
-    	public static @Nonnull Listener of(@Nonnull FailableSupplier<OutputStream,?> pOut) {
+    	public static @NonNull Listener of(@NonNull FailableSupplier<OutputStream,?> pOut) {
     		return new Listener() {
     			private BufferedOutputStream bOut;
 

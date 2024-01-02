@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.api.Types.Type;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
@@ -27,10 +27,10 @@ import com.github.jochenw.afw.di.util.Exceptions;
  * </pre>
  */
 public class ComponentFactoryBuilder {
-	private @Nonnull List<Module> modules = new ArrayList<>();
-	private @Nonnull Supplier<AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
+	private @NonNull List<Module> modules = new ArrayList<>();
+	private @NonNull Supplier<AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
 	private @Nullable IComponentFactory instance;
-	private @Nonnull IAnnotationProvider annotationProvider = Annotations.getDefaultProvider();
+	private @NonNull IAnnotationProvider annotationProvider = Annotations.getDefaultProvider();
 	private IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
 
 	/** Returns the {@link IAnnotationProvider}, which is being used by
@@ -117,7 +117,7 @@ public class ComponentFactoryBuilder {
 	 * factory.
 	 * @return This builder.
 	 */
-	public ComponentFactoryBuilder module(@Nonnull Module pModule) {
+	public ComponentFactoryBuilder module(@NonNull Module pModule) {
 		modules.add(pModule);
 		return this;
 	}
@@ -161,7 +161,7 @@ public class ComponentFactoryBuilder {
 	 * the same instance.
 	 * @return The created, anf configured component factory, ready to use.
 	 */
-	public @Nonnull IComponentFactory build() {
+	public @NonNull IComponentFactory build() {
 		if (instance == null) {
 			final AbstractComponentFactory inst = supplier.get();
 			if (inst == null) {

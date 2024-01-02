@@ -11,8 +11,8 @@ import java.security.cert.Certificate;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.util.Tupel;
 
@@ -25,7 +25,7 @@ public interface IKeyHandler {
 	 * Generates a new key pair
 	 * @return The generated key pair.
 	 */
-	public @Nonnull KeyPair createKeyPair();
+	public @NonNull KeyPair createKeyPair();
 	/**
 	 * Generates a self-signed certificate with the give key pair, the given distinguished name,
 	 * and the given validity in days.
@@ -34,8 +34,8 @@ public interface IKeyHandler {
 	 * @param pValidity How long should the certificate be valid (in days)?
 	 * @return The generated certificate.
 	 */
-	public @Nonnull Certificate generateCertificate(@Nonnull String pDn,
-			                                        @Nonnull KeyPair pKeyPair, int pValidity);
+	public @NonNull Certificate generateCertificate(@NonNull String pDn,
+			                                        @NonNull KeyPair pKeyPair, int pValidity);
 	/**
 	 * Creates a new key store with exactly one entry, representing the given private key,
 	 * and certificate.
@@ -48,10 +48,10 @@ public interface IKeyHandler {
 	 *   is being used.
 	 * @return The generated certificate.
 	 */
-	public @Nonnull KeyStore createKeyStore(@Nonnull PrivateKey pPrivateKey,
-                                            @Nonnull Certificate pCertificate, @Nonnull String pAlias,
-                                            @Nullable String pStoreType, @Nonnull String pStorePass,
-                                            @Nonnull String pKeyPass);
+	public @NonNull KeyStore createKeyStore(@NonNull PrivateKey pPrivateKey,
+                                            @NonNull Certificate pCertificate, @NonNull String pAlias,
+                                            @Nullable String pStoreType, @NonNull String pStorePass,
+                                            @NonNull String pKeyPass);
 
 	/**
 	 * Creates a new key store with exactly one entry, representing the given private key,
@@ -65,9 +65,9 @@ public interface IKeyHandler {
 	 * @param pKeyPass The entries key password. May be null, in which case the store password
 	 *   is being used.
 	 */
-	public void createKeyStore(@Nonnull OutputStream pOut, @Nonnull PrivateKey pPrivateKey,
-			                   @Nonnull Certificate pCertificate, @Nonnull String pAlias,
-			                   @Nullable String pStoreType, @Nonnull String pStorePass,
+	public void createKeyStore(@NonNull OutputStream pOut, @NonNull PrivateKey pPrivateKey,
+			                   @NonNull Certificate pCertificate, @NonNull String pAlias,
+			                   @Nullable String pStoreType, @NonNull String pStorePass,
 			                   @Nullable String pKeyPass);
 
 	/** Reads an private key/certificate entry from a key store, which is in turn read
@@ -79,8 +79,8 @@ public interface IKeyHandler {
 	 *   is being used.
 	 * @return A tupel with the entries private key, and the certificate.
 	 */
-	public Tupel<PrivateKey,Certificate> readPrivateKey(@Nonnull InputStream pIn, @Nonnull String pAlias,
-			                                            @Nonnull String pStorePass, @Nullable String pKeyPass);
+	public Tupel<PrivateKey,Certificate> readPrivateKey(@NonNull InputStream pIn, @NonNull String pAlias,
+			                                            @NonNull String pStorePass, @Nullable String pKeyPass);
 
 	/** Encrypts a byte array, using the given private key to a byte array.
 	 * @param pKey The (private) key to use for encryption.

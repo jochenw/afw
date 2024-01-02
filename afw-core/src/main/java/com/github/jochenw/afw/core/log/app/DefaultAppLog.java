@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Exceptions;
@@ -19,9 +19,9 @@ import com.github.jochenw.afw.core.util.Exceptions;
 /** Default implementation of {@link IAppLog}, writing to an {@link OutputStream}.
  */
 public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
-	private final @Nonnull BufferedOutputStream out;
-	private final @Nonnull BufferedWriter writer;
-	private final @Nonnull String lineSeparator;
+	private final @NonNull BufferedOutputStream out;
+	private final @NonNull BufferedWriter writer;
+	private final @NonNull String lineSeparator;
 
 	/** Creates a new instance.
 	 * @param pLevel The initial logging level. Can be changed later on using
@@ -30,8 +30,8 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 	 * @param pCharset The character set for converting strings into bytes.
 	 * @param pOut The output stream to write to.
 	 */
-	public DefaultAppLog(@Nonnull Level pLevel, @Nonnull Charset pCharset, @Nonnull String pLineSeparator,
-			             @Nonnull OutputStream pOut) {
+	public DefaultAppLog(@NonNull Level pLevel, @NonNull Charset pCharset, @NonNull String pLineSeparator,
+			             @NonNull OutputStream pOut) {
 		super(pLevel);
 		out = new BufferedOutputStream(pOut);
 		lineSeparator = pLineSeparator;

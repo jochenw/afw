@@ -28,8 +28,8 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.util.Objects;
 
@@ -45,14 +45,14 @@ public class ExtProperties {
 	/** A single entry in a set of {@link ExtProperties}. Extended properties are immutable, and serializable.
 	 */
 	public static class ExtProperty {
-		final @Nonnull String key, value;
+		final @NonNull String key, value;
 		final @Nullable String[] comments;
 		/** Creates a new entry with the given key, value, and comment.
 		 * @param pKey The property key,
 		 * @param pValue The property value.
 		 * @param pComments The property comments.
 		 */
-		public ExtProperty(@Nonnull String pKey, @Nonnull String pValue, @Nullable String[] pComments) {
+		public ExtProperty(@NonNull String pKey, @NonNull String pValue, @Nullable String[] pComments) {
 			key = Objects.requireNonNull(pKey, "Key");
 			value = Objects.requireNonNull(pValue, "Value");
 			comments = pComments;
@@ -60,11 +60,11 @@ public class ExtProperties {
 		/** Returns the properties key.
 		 * @return The properties key. Never null.
 		 */
-		public @Nonnull String getKey() { return key; }
+		public @NonNull String getKey() { return key; }
 		/** Returns the properties value.
 		 * @return The properties value. Never null.
 		 */
-		public @Nonnull String getValue() { return value; }
+		public @NonNull String getValue() { return value; }
 		/** Returns the properties comment, if any, or null.
 		 * @return The properties comment, if any, or null.
 		 */
@@ -92,7 +92,7 @@ public class ExtProperties {
 	 * @see #requireProperty(String)
 	 * @throws NullPointerException The parameter {@code pKey} is null.
 	 */
-	public @Nullable ExtProperty getProperty(@Nonnull String pKey) throws NullPointerException {
+	public @Nullable ExtProperty getProperty(@NonNull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		return entries.get(key);
 	}
@@ -105,7 +105,7 @@ public class ExtProperties {
 	 * @throws NoSuchElementException No property with the given key exists.
 	 * @throws NullPointerException The parameter {@code pKey} is null.
 	 */
-	public @Nonnull ExtProperty requireProperty(@Nonnull String pKey) throws NoSuchElementException, NullPointerException {
+	public @NonNull ExtProperty requireProperty(@NonNull String pKey) throws NoSuchElementException, NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final ExtProperty ep = entries.get(key);
 		if (ep == null) {
@@ -120,7 +120,7 @@ public class ExtProperties {
 	 *   A null result indicates, that this property does not exist.
 	 * @throws NullPointerException The parameter {@code pKey} is null.
 	 */
-	public @Nullable String getValue(@Nonnull String pKey) throws NullPointerException {
+	public @Nullable String getValue(@NonNull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final ExtProperty ep = entries.get(key);
 		if (ep == null) {
@@ -139,7 +139,7 @@ public class ExtProperties {
 	 *   instead.
 	 * @throws NullPointerException The parameter {@code pKey} is null.
 	 */
-	public @Nullable String[] getComment(@Nonnull String pKey) throws NullPointerException {
+	public @Nullable String[] getComment(@NonNull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final ExtProperty ep = entries.get(key);
 		if (ep == null) {
@@ -220,11 +220,11 @@ public class ExtProperties {
 	private boolean isNull(String[] pArray) {
 		return pArray == null  ||  pArray.length == 0;
 	}
-	private boolean isEqual(@Nonnull String[] pArr1, @Nullable String[] pArr2) {
+	private boolean isEqual(@NonNull String[] pArr1, @Nullable String[] pArr2) {
 		if (pArr2 == null) {
 			return false;
 		}
-		final @Nonnull String[] arr2 = pArr2;
+		final @NonNull String[] arr2 = pArr2;
 		if (pArr1.length != arr2.length) {
 			return false;
 		}

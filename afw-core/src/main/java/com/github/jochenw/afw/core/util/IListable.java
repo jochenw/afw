@@ -3,8 +3,8 @@ package com.github.jochenw.afw.core.util;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions.FailableBiIntConsumer;
 
@@ -45,7 +45,7 @@ public interface IListable<O> {
 	 * @return The created {@link IListable}.
 	 * @throws NullPointerException The parameter {@code pList} is null.
 	 */
-	public static @Nonnull <T> IListable<T> of(@Nonnull List<T> pList) {
+	public static @NonNull <T> IListable<T> of(@NonNull List<T> pList) {
 		final List<T> list = Objects.requireNonNull(pList, "List");
 		return new IListable<T>() {
 			@Override
@@ -86,7 +86,7 @@ public interface IListable<O> {
 	 * @return The created {@link IListable}.
 	 * @throws NullPointerException The parameter {@code pList} is null.
 	 */
-	public static @Nonnull <T> IListable<T> of(@SuppressWarnings("unchecked") T... pValues) {
+	public static @NonNull <T> IListable<T> of(@SuppressWarnings("unchecked") T... pValues) {
 		final T[] values = Objects.requireNonNull(pValues, "Values");
 		return new IListable<T>() {
 			@Override
@@ -128,7 +128,7 @@ public interface IListable<O> {
 	 * @throws NullPointerException The parameter {@code pArray} is null.
 	 * @throws IllegalArgumentException The parameter {@code pArray} is no array.
 	 */
-	public static @Nonnull <T> IListable<T> of(Object pArray) {
+	public static @NonNull <T> IListable<T> of(Object pArray) {
 		final Object array = Objects.requireNonNull(pArray, "Array");
 		if (!array.getClass().isArray()) {
 			throw new IllegalArgumentException("The parameter pArray is not an array, but a "

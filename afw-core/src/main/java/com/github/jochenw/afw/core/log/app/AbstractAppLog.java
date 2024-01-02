@@ -5,7 +5,7 @@ package com.github.jochenw.afw.core.log.app;
 
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableCallable;
 import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
@@ -16,14 +16,14 @@ import com.github.jochenw.afw.core.util.Locks.Lockable;
 /** Abstract base implementation of {@link IAppLog}.
  */
 public abstract class AbstractAppLog implements IAppLog {
-	private @Nonnull Level level;
+	private @NonNull Level level;
 	
-	private final @Nonnull Lockable lockable = Locks.newLockable();
+	private final @NonNull Lockable lockable = Locks.newLockable();
 
 	/** Creates a new instance with the given log level.
 	 * @param pLevel The app loggers logging level.
 	 */
-	protected AbstractAppLog(@Nonnull Level pLevel) {
+	protected AbstractAppLog(@NonNull Level pLevel) {
 		level = pLevel;
 	}
 
@@ -75,18 +75,18 @@ public abstract class AbstractAppLog implements IAppLog {
 	}
 	
 	@Override
-	public @Nonnull Level getLevel() {
+	public @NonNull Level getLevel() {
 		return callReadLocked(() -> level);
 	}
 
 	@Override
-	public void setLevel(@Nonnull Level pLevel) {
+	public void setLevel(@NonNull Level pLevel) {
 		final Level lvl = Objects.requireNonNull(pLevel);
 		runWriteLocked(() -> level = lvl);
 	}
 
 	@Override
-	public boolean isEnabled(@Nonnull Level pLevel) {
+	public boolean isEnabled(@NonNull Level pLevel) {
 		if (pLevel == null) {
 			return false;
 		} else {
@@ -102,7 +102,7 @@ public abstract class AbstractAppLog implements IAppLog {
 	 * @param pLevel The logging level, that is being tested.
 	 * @return True, if the given logging level is enabled.
 	 */
-	protected boolean isEnabledLocked(@Nonnull Level pLevel) {
+	protected boolean isEnabledLocked(@NonNull Level pLevel) {
 		if (pLevel == null) {
 			return false;
 		} else {

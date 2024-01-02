@@ -24,7 +24,7 @@ import com.github.jochenw.afw.core.util.Exceptions;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /** This class is responsible for collecting resources, that must
@@ -131,7 +131,7 @@ public class SimpleResourceWorker {
          * @param pResource The object, which is being tracked.
          */
 	protected void assertTrackable(Object pResource) {
-		final @Nonnull Object resource = Objects.requireNonNull(pResource, "Resource");
+		final @NonNull Object resource = Objects.requireNonNull(pResource, "Resource");
 		if (!(resource instanceof AutoCloseable)
 			&&  !(resource instanceof HttpURLConnection)) {
 			throw new IllegalStateException("Invalid resource: "
@@ -145,7 +145,7 @@ public class SimpleResourceWorker {
 	 * @throws Throwable Closing the resource has failed.
 	 */
 	protected void closeResource(Object pResource, boolean pCommit) throws Throwable {
-		final @Nonnull Object resource = Objects.requireNonNull(pResource, "Resource");
+		final @NonNull Object resource = Objects.requireNonNull(pResource, "Resource");
 		if (resource instanceof AutoCloseable) {
 			((AutoCloseable) resource).close();
 		} else if (pResource instanceof HttpURLConnection) {

@@ -4,8 +4,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.io.IReadable;
 
@@ -47,7 +47,7 @@ public interface IScriptEngine {
 	 * @return True, if the engine is ready to parse the {@link IReadable} as a
 	 *   script.
 	 */
-	public boolean isScriptable(@Nonnull IReadable pReadable);
+	public boolean isScriptable(@NonNull IReadable pReadable);
 	/**
 	 * Reads, and parses the given {@link IReadable} as a script, converting it
 	 * into an instance of {@link Script}.
@@ -58,5 +58,5 @@ public interface IScriptEngine {
 	 * @throws RuntimeException Reading, or parsing the script file failed.
 	 *   Possible reasons include I/O errors, or syntax errors.
 	 */
-	public Script getScript(@Nonnull IReadable pReadable, @Nullable Charset pCharset);
+	public Script getScript(@NonNull IReadable pReadable, @Nullable Charset pCharset);
 }

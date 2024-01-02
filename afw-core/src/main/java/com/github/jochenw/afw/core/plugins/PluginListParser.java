@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import javax.xml.XMLConstants;
 
 import org.xml.sax.Attributes;
@@ -61,12 +61,12 @@ public class PluginListParser {
 		 * Returns the initializers class name.
 		 * @return The initializers class name.
 		 */
-		public @Nonnull String getClassName();
+		public @NonNull String getClassName();
 		/**
 		 * Returns the initializers id.
 		 * @return The initializers id.
 		 */
-		public @Nonnull String getId();
+		public @NonNull String getId();
 		/**
 		 * Returns the initializers dependency list. The dependency list is defined as a set of id's.
 		 * The initializer expects, that the given initializers have been executed first.
@@ -74,12 +74,12 @@ public class PluginListParser {
 		 * The initializer expects, that the given initializers have been executed first.
 		 * The list may be empty, but bot null.
 		 */
-		public @Nonnull List<String> getDependsOn();
+		public @NonNull List<String> getDependsOn();
 		/**
 		 * Returns the set of bean properties, which are supposed to be set on the initializer.
 		 * @return the set of bean properties, which are supposed to be set on the initializer.
 		 */
-		public @Nonnull default Map<String,String> getProperties() { return EMPTY_MAP; }
+		public @NonNull default Map<String,String> getProperties() { return EMPTY_MAP; }
 	}
 	/** Default return value for {@link PluginListParser.IInitializerSpec#getProperties()}.
 	 */

@@ -1,7 +1,7 @@
 package com.github.jochenw.afw.di.api;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface of a module, that participates in the creation of bindings by
@@ -14,7 +14,7 @@ public interface Module {
 	 * @param pBinder The binder, which may be called to create
 	 * new binding builders.
 	 */
-	void configure(@Nonnull Binder pBinder);
+	void configure(@NonNull Binder pBinder);
 
 	/**
 	 * Creates a module, that extends the current module by calling

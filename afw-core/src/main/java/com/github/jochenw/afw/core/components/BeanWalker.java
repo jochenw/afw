@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
@@ -42,7 +42,7 @@ public class BeanWalker {
 		 * @param pObject The top level object, which is being iterated over.
 		 * @return The context object.
 		 */
-		@Nonnull C startWalking(@Nonnull Object pObject);
+		@NonNull C startWalking(@NonNull Object pObject);
 		/** Called, when the walker has successfully iterated over a top
 		 * level object. The main purpose is the cleanup of resources in
 		 * the context object.
@@ -50,7 +50,7 @@ public class BeanWalker {
 		 * @param pObject The top level object, which has been iterated
 		 * over.
 		 */
-		void endWalking(@Nonnull C pContext, @Nonnull Object pObject);
+		void endWalking(@NonNull C pContext, @NonNull Object pObject);
 		/**
 		 * Called, when a field has been detected. Takes as input the
 		 * fields type.

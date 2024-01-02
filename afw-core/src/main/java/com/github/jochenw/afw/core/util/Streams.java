@@ -49,8 +49,8 @@ import java.util.Properties;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
@@ -120,7 +120,7 @@ public class Streams {
      *   {@link StandardCharsets#UTF_8 UTF-8} will be used.
      * @return The contents, which have been read from {@code pIn}.
      */
-    public static @Nonnull String read(@Nonnull InputStream pIn, @Nullable Charset pCharset) {
+    public static @NonNull String read(@NonNull InputStream pIn, @Nullable Charset pCharset) {
     	final Charset charSet = Objects.notNull(pCharset, StandardCharsets.UTF_8);
     	return read(new InputStreamReader(pIn, charSet));
     }
@@ -276,7 +276,7 @@ public class Streams {
      * @return Another {@link InputStream}, which is actually reading
      * {@code pIn}.
      */
-    public static InputStream closeListeningStream(@Nonnull InputStream pIn, @Nonnull BooleanSupplier pCloseHook) {
+    public static InputStream closeListeningStream(@NonNull InputStream pIn, @NonNull BooleanSupplier pCloseHook) {
     	final InputStream in = Objects.requireNonNull(pIn, "InputStream");
     	final BooleanSupplier closeHook = Objects.requireNonNull(pCloseHook, "BooleanSupplier");
         return new FilterInputStream(in) {
@@ -323,7 +323,7 @@ public class Streams {
      * @return Another {@link Reader}, which is actually reading
      * {@code pIn}.
      */
-    public static Reader closeListeningReader(@Nonnull Reader pIn, @Nonnull BooleanSupplier pCloseHook) {
+    public static Reader closeListeningReader(@NonNull Reader pIn, @NonNull BooleanSupplier pCloseHook) {
     	final Reader in = Objects.requireNonNull(pIn, "Reader");
     	final BooleanSupplier closeHook = Objects.requireNonNull(pCloseHook, "BooleanSupplier");
         return new FilterReader(in) {
@@ -432,7 +432,7 @@ public class Streams {
      * @throws UncheckedIOException An error occurred, while opening
      *   the {@link URL}, or reading the {@link InputStream}.
      */
-    public static void accept(@Nonnull URL pUrl, @Nonnull FailableConsumer<InputStream,IOException> pConsumer) {
+    public static void accept(@NonNull URL pUrl, @NonNull FailableConsumer<InputStream,IOException> pConsumer) {
     	try (InputStream in = pUrl.openStream();
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
     		pConsumer.accept(bin);
@@ -450,7 +450,7 @@ public class Streams {
      * @throws UncheckedIOException An error occurred, while opening
      *   the {@link URL}, or reading the {@link InputStream}.
      */
-    public static void accept(@Nonnull Path pFile, @Nonnull FailableConsumer<InputStream,IOException> pConsumer) {
+    public static void accept(@NonNull Path pFile, @NonNull FailableConsumer<InputStream,IOException> pConsumer) {
     	try (InputStream in = Files.newInputStream(pFile);
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
     		pConsumer.accept(bin);
@@ -468,7 +468,7 @@ public class Streams {
      * @throws UncheckedIOException An error occurred, while opening
      *   the {@link URL}, or reading the {@link InputStream}.
      */
-    public static void accept(@Nonnull File pFile, @Nonnull FailableConsumer<InputStream,IOException> pConsumer) {
+    public static void accept(@NonNull File pFile, @NonNull FailableConsumer<InputStream,IOException> pConsumer) {
     	try (InputStream in = new FileInputStream(pFile);
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
     		pConsumer.accept(bin);
@@ -491,7 +491,7 @@ public class Streams {
      *   the {@link URL}, or reading the {@link InputStream}.
      * @return The result of invoking {@code pFunction}.
      */
-    public static <O> O apply(@Nonnull URL pUrl, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
+    public static <O> O apply(@NonNull URL pUrl, @NonNull FailableFunction<InputStream,O,IOException> pFunction) {
     	try (InputStream in = pUrl.openStream();
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
     		return pFunction.apply(bin);
@@ -514,7 +514,7 @@ public class Streams {
      *   the {@link URL}, or reading the {@link InputStream}.
      * @return The result of invoking {@code pFunction}.
      */
-    public static <O> O apply(@Nonnull Path pPath, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
+    public static <O> O apply(@NonNull Path pPath, @NonNull FailableFunction<InputStream,O,IOException> pFunction) {
     	try (InputStream in = Files.newInputStream(pPath);
     		 BufferedInputStream bin = new BufferedInputStream(in)) {
     		return pFunction.apply(bin);
@@ -537,7 +537,7 @@ public class Streams {
      *   the {@link URL}, or reading the {@link InputStream}.
      * @return The result of invoking {@code pFunction}.
      */
-    public static <O> O apply(@Nonnull File pFile, @Nonnull FailableFunction<InputStream,O,IOException> pFunction) {
+    public static <O> O apply(@NonNull File pFile, @NonNull FailableFunction<InputStream,O,IOException> pFunction) {
     	return apply(pFile.toPath(), pFunction);
     }
 
@@ -549,7 +549,7 @@ public class Streams {
      *   object.
      * @throws IOException Reading the input stream has failed.
      */
-    public static @Nonnull Properties load(InputStream pIn, String pUri) throws IOException {
+    public static @NonNull Properties load(InputStream pIn, String pUri) throws IOException {
     	final Properties props = new Properties();
     	if (pUri.endsWith(".xml")) {
     		props.loadFromXML(pIn);
@@ -565,7 +565,7 @@ public class Streams {
      * @return The contents of the given file, as a {@link java.util.Properties}
      *   object.
      */
-    public static @Nonnull Properties load(Path pPath) {
+    public static @NonNull Properties load(Path pPath) {
     	return Streams.apply(pPath, (in) -> { return load(in, pPath.getFileName().toString()); });
     }
 
@@ -575,7 +575,7 @@ public class Streams {
      * @return The contents of the given file, as a {@link java.util.Properties}
      *   object.
      */
-    public static @Nonnull Properties load(File pFile) {
+    public static @NonNull Properties load(File pFile) {
     	return Streams.apply(pFile, (in) -> { return load(in, pFile.getName()); });
     }
 
@@ -585,7 +585,7 @@ public class Streams {
      * @return The contents of the given URL, as a {@link java.util.Properties}
      *   object.
      */
-    public static @Nonnull Properties load(URL pUrl) {
+    public static @NonNull Properties load(URL pUrl) {
     	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
     }
 
@@ -601,7 +601,7 @@ public class Streams {
      *   or null, if the resource is absent, or otherwise invalid, and the
      *   parameter {@code pNullPermitted} is true.
      */
-    public static @Nullable Properties load(@Nonnull Object pResource, boolean pNullPermitted) {
+    public static @Nullable Properties load(@NonNull Object pResource, boolean pNullPermitted) {
     	final Object res = Objects.requireNonNull(pResource, "Resource");
     	if (res instanceof Path) {
     		final Path p = (Path) res;
@@ -661,7 +661,7 @@ public class Streams {
      *   If that is the case, then the property resource is simply ignored.
      * @return The created property set.
      */
-    public static @Nonnull Properties load(@Nonnull Object... pResources) {
+    public static @NonNull Properties load(@NonNull Object... pResources) {
     	final Object[] resources = Objects.requireNonNull(pResources, "Resources");
     	final Properties properties = new Properties();
     	int i = 0;
@@ -689,7 +689,7 @@ public class Streams {
      *   read.
      * @return The created property set, possibly empty.
      */
-    public static final @Nonnull Properties load(boolean pNullPermitted, @Nonnull Object... pResources) {
+    public static final @NonNull Properties load(boolean pNullPermitted, @NonNull Object... pResources) {
     	final Object[] resources = Objects.requireNonNull(pResources);
     	final Properties properties = new Properties();
     	for (Object res : resources) {
@@ -712,9 +712,9 @@ public class Streams {
      *     from {@code pReader}.
      * @throws NullPointerException The parameter {@code pReader} is null.
      */
-    public static @Nonnull ReaderInputStream asInputStream(@Nonnull Reader pReader, @Nullable Charset pCharset) {
-    	final @Nonnull Reader reader = Objects.requireNonNull(pReader, "Reader");
-    	final @Nonnull Charset charset = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    public static @NonNull ReaderInputStream asInputStream(@NonNull Reader pReader, @Nullable Charset pCharset) {
+    	final @NonNull Reader reader = Objects.requireNonNull(pReader, "Reader");
+    	final @NonNull Charset charset = Objects.notNull(pCharset, StandardCharsets.UTF_8);
     	return new ReaderInputStream(reader, charset);
     }
 
@@ -725,7 +725,7 @@ public class Streams {
      * @return A {@link ByteArrayInputStream}, returning the given byte array.
      * @throws NullPointerException The parameter {@code pBytes} is null.
      */
-    public static @Nonnull ByteArrayInputStream of(@Nonnull byte[] pBytes) {
+    public static @NonNull ByteArrayInputStream of(@NonNull byte[] pBytes) {
     	return new ByteArrayInputStream(Objects.requireNonNull(pBytes, "Bytes"));
     }
 
@@ -737,7 +737,7 @@ public class Streams {
      * @return A {@link StringReader}, returning the given string.
      * @throws NullPointerException The parameter {@code pString} is null.
      */
-    public static @Nonnull StringReader of(@Nonnull String pString) {
+    public static @NonNull StringReader of(@NonNull String pString) {
     	return new StringReader(Objects.requireNonNull(pString, "String"));
     }
 
@@ -751,8 +751,8 @@ public class Streams {
      * @return A {@link ByteArrayInputStream}, returning the given byte array.
      * @throws NullPointerException The parameter {@code pBytes} is null.
      */
-    public static @Nonnull ByteArrayInputStream of(@Nonnull String pString, @Nullable Charset pCharset) {
-    	final @Nonnull byte[] bytes = Objects.requireNonNull(pString, "String")
+    public static @NonNull ByteArrayInputStream of(@NonNull String pString, @Nullable Charset pCharset) {
+    	final @NonNull byte[] bytes = Objects.requireNonNull(pString, "String")
     			.getBytes(Objects.notNull(pCharset, StandardCharsets.UTF_8));
     	return of(bytes);
     }

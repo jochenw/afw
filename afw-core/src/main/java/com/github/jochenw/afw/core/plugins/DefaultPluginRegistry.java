@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /** Default implementation of {@link IPluginRegistry}.
@@ -30,13 +30,13 @@ public class DefaultPluginRegistry implements IPluginRegistry {
 	/** Key of a registered extension point.
 	 */
 	public static class Key {
-		private final @Nonnull Class<? extends Object> type;
-		private final @Nonnull String id;
+		private final @NonNull Class<? extends Object> type;
+		private final @NonNull String id;
 		/** Creates a new instance with the given type, and id.
 		 * @param pType The extension points type.
 		 * @param pId The extension points type.
 		 */
-		public Key(@Nonnull Class<? extends Object> pType, @Nonnull String pId) {
+		public Key(@NonNull Class<? extends Object> pType, @NonNull String pId) {
 			type = pType;
 			id = pId;
 		}

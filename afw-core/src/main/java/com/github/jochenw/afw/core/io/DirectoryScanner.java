@@ -26,7 +26,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -42,22 +42,22 @@ public class DirectoryScanner {
 		/** Returns the base directory, which is currently being scanned.
 		 * @return The base directory, which is currently being scanned.
 		 */
-		@Nonnull Path getBaseDir();
+		@NonNull Path getBaseDir();
 		/** Returns the current files attributes.
 		 * @return The current files attributes.
 		 */
-		@Nonnull BasicFileAttributes getAttrs();
+		@NonNull BasicFileAttributes getAttrs();
 		/** Returns the path of a file, which has been detected within the
 		 * base directory.
 		 * @return Path of the current file.
 		 */
-		@Nonnull Path getFile();
+		@NonNull Path getFile();
 		/** Returns the relative path of the file, within the base directory.
 		 * The path is in a normalized form, using "/" as the separator, as
 		 * is the case for a Unix file system.
 		 * @return Relative path of the current file, in normalized form.
 		 */
-		@Nonnull String getUri();
+		@NonNull String getUri();
 	}
 	/**
 	 * A listener object, which is being notified to collect the
@@ -117,7 +117,7 @@ public class DirectoryScanner {
 	 * @param pListener A listener, which is being notified to collect file names,
 	 *   that meet the given criteria.
 	 */
-	public void scan(@Nonnull Path pBaseDir, IMatcher[] pIncludes, IMatcher[] pExcludes, Listener pListener) {
+	public void scan(@NonNull Path pBaseDir, IMatcher[] pIncludes, IMatcher[] pExcludes, Listener pListener) {
 		final IMatcher matcher = DefaultMatcher.newMatcher(pIncludes, pExcludes);
 		scan(pBaseDir, matcher, pListener);
 	}
@@ -130,7 +130,7 @@ public class DirectoryScanner {
 	 * @param pListener A listener, which is being notified to collect file names,
 	 *   that meet the given criteria.
 	 */
-	public void scan(@Nonnull Path pBaseDir, Predicate<String> pMatcher, Listener pListener) {
+	public void scan(@NonNull Path pBaseDir, Predicate<String> pMatcher, Listener pListener) {
 		if (!Files.isDirectory(pBaseDir)) {
 			throw new IllegalArgumentException("Directory not found, or otherwise unreadable: " + pBaseDir);
 		}

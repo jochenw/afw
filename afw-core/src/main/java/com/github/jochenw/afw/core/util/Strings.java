@@ -33,8 +33,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
@@ -85,7 +85,7 @@ public class Strings {
 	 * @throws NullPointerException The check failed, because the input value
 	 *   is null.
 	 */
-	public static @Nonnull String requireNonNull(@Nullable String pValue, @Nonnull String pMessage) {
+	public static @NonNull String requireNonNull(@Nullable String pValue, @NonNull String pMessage) {
 		return Objects.requireNonNull(pValue, pMessage);
 	}
 
@@ -403,7 +403,7 @@ public class Strings {
 	 * @param pArgs The arguments, which are being written.
 	 * @throws IOException Appending to the {@link Appendable appendable} failed.
 	 */
-	public static void formatCb(@Nonnull Appendable pAppendable, @Nonnull String pMsg, @Nullable Object... pArgs) throws IOException {
+	public static void formatCb(@NonNull Appendable pAppendable, @NonNull String pMsg, @Nullable Object... pArgs) throws IOException {
 		if (pArgs == null) {
 			formatCb(pAppendable, pMsg, (IListable<String>) null);
 		} else {
@@ -430,7 +430,7 @@ public class Strings {
 	 * @param pArgs The arguments, which are being written.
 	 * @throws IOException Appending to the {@link Appendable appendable} failed.
 	 */
-	public static void formatCb(@Nonnull Appendable pAppendable, @Nonnull String pMsg, @Nullable IListable<?> pArgs) throws IOException {
+	public static void formatCb(@NonNull Appendable pAppendable, @NonNull String pMsg, @Nullable IListable<?> pArgs) throws IOException {
 		int argOffset = 0;
 		int offset = 0;
 		while (offset < pMsg.length()) {
@@ -471,7 +471,7 @@ public class Strings {
 	 * @param pArgs The arguments, which ought to replace the curly brace tokens.
 	 * @return The formatted string, with the curly brace tokens replaced.
 	 */
-	public static @Nonnull String formatCb(@Nonnull String pMsg, @Nullable Object... pArgs) {
+	public static @NonNull String formatCb(@NonNull String pMsg, @Nullable Object... pArgs) {
 		final StringBuilder sb = new StringBuilder();
 		try {
 			formatCb(sb, pMsg, pArgs);
@@ -487,7 +487,7 @@ public class Strings {
 	 * @param pTotal The number of items.
 	 * @return The number {@code pItem}, possibly prepended with leading zeroes.
 	 */
-	public static @Nonnull String formatLz(int pItem, int pTotal) {
+	public static @NonNull String formatLz(int pItem, int pTotal) {
 		Integer item = Integer.valueOf(pItem);
 		if (pTotal > 999999) {
 			throw new IllegalArgumentException("The total number of items must be lower than " + (999999 +1));
@@ -524,8 +524,8 @@ public class Strings {
 	 * @return A predicate, which tests, whether the given description
 	 *   matches it's input string.
 	 */
-	public static @Nonnull Predicate<String> matcher(@Nonnull String pMatcher) {
-		@Nonnull String matcher = Objects.requireNonNull(pMatcher, "Matcher");
+	public static @NonNull Predicate<String> matcher(@NonNull String pMatcher) {
+		@NonNull String matcher = Objects.requireNonNull(pMatcher, "Matcher");
 		final boolean excluding;
 		if (matcher.startsWith("!")) {
 			excluding = true;
@@ -608,9 +608,9 @@ public class Strings {
 	 * @return A predicate, which is true, if either of the subpredicates,
 	 *   created from {@code pMatchers} is true.
 	 */
-	public static @Nonnull Predicate<String> matchers(@Nonnull String pMatchers, @Nonnull String pSeparator) {
-		final @Nonnull String matchers = Objects.requireNonNull(pMatchers, "Matchers");
-		final @Nonnull String separator = Objects.requireNonNull(pSeparator, "Separator");
+	public static @NonNull Predicate<String> matchers(@NonNull String pMatchers, @NonNull String pSeparator) {
+		final @NonNull String matchers = Objects.requireNonNull(pMatchers, "Matchers");
+		final @NonNull String separator = Objects.requireNonNull(pSeparator, "Separator");
 		final List<Predicate<String>> includingPredicates = new ArrayList<>();
 		final List<Predicate<String>> excludingPredicates = new ArrayList<>();
 		for (StringTokenizer st = new StringTokenizer(matchers, separator);  st.hasMoreTokens();  ) {
@@ -684,8 +684,8 @@ public class Strings {
 	 * @return An {@link ArrayList} (a modifiable list) with the given values.
 	 * @throws NullPointerException The {@code pValues} parameter is null.
 	 */
-	public static @Nonnull ArrayList<String> list(@Nonnull String... pValues) {
-		final @Nonnull String[] values = Objects.requireNonNull(pValues, "Values");
+	public static @NonNull ArrayList<String> list(@NonNull String... pValues) {
+		final @NonNull String[] values = Objects.requireNonNull(pValues, "Values");
 		final ArrayList<String> list = new ArrayList<>(values.length);
 		for (String s : values) {
 			list.add(s);
@@ -699,8 +699,8 @@ public class Strings {
 	 * @return A string array with the given values.
 	 * @throws NullPointerException The {@code pValues} parameter is null.
 	 */
-	public static @Nonnull String[] array(@Nonnull String... pValues) {
-		final @Nonnull String[] values = Objects.requireNonNull(pValues, "Values");
+	public static @NonNull String[] array(@NonNull String... pValues) {
+		final @NonNull String[] values = Objects.requireNonNull(pValues, "Values");
 		return values;
 	}
 
@@ -739,9 +739,9 @@ public class Strings {
 	 * @param pConsumer A consumer, which is being invoked the tokens in
 	 *   the order of occurrence.
 	 */
-	public static @Nonnull void tokenize(@Nonnull String pDelimiter,
-			                             @Nonnull String pString,
-			                             FailableConsumer<String,?> pConsumer) {
+	public static void tokenize(@NonNull String pDelimiter,
+			                    @NonNull String pString,
+			                    @NonNull FailableConsumer<String,?> pConsumer) {
 		String string = Objects.requireNonNull(pString, "String");
 		final String delim = Objects.requireNonNull(pDelimiter, "Delimiter");
 		while (string.length() > 0) {
@@ -766,7 +766,7 @@ public class Strings {
 	 * @param pString The string, that is being tokenized.
 	 * @return The tokens, that were found.
 	 */
-	public static @Nonnull List<String> tokenize(@Nonnull String pDelimiter, @Nonnull String pString) {
+	public static @NonNull List<String> tokenize(@NonNull String pDelimiter, @NonNull String pString) {
 		List<String> tokens = new ArrayList<>();
 		tokenize(pDelimiter, pString, tokens::add);
 		return tokens;
