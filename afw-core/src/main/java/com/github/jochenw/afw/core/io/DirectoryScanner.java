@@ -85,22 +85,22 @@ public class DirectoryScanner {
 		private BasicFileAttributes attrs;
 
 		@Override
-		public Path getBaseDir() {
+		public @NonNull Path getBaseDir() {
 			return Objects.requireNonNull(baseDir);
 		}
 
 		@Override
-		public Path getFile() {
+		public @NonNull Path getFile() {
 			return Objects.requireNonNull(file);
 		}
 
 		@Override
-		public String getUri() {
+		public @NonNull String getUri() {
 			return Objects.requireNonNull(uri);
 		}
 
 		@Override
-		public BasicFileAttributes getAttrs() {
+		public @NonNull BasicFileAttributes getAttrs() {
 			return Objects.requireNonNull(attrs);
 		}
 	}

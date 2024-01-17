@@ -25,8 +25,8 @@ import org.jspecify.annotations.Nullable;
  * you need a final object (the Holder), that is mutable.
  * @param <T> Type of the wrapped object.
  */
-public class Holder<T> implements Supplier<T> {
-	private T value;
+public class Holder<T> implements Supplier<@Nullable T> {
+	private @Nullable T value;
 
 	/** Returns the wrapped object. May be null, if there the wrapped object hasn't been set.
 	 * @return The wrapped object. May be null, if there the wrapped object hasn't been set.
@@ -46,7 +46,7 @@ public class Holder<T> implements Supplier<T> {
 	 * @see #set(Object)
 	 */
 	public @NonNull T require() throws NoSuchElementException {
-		final T v = get();
+		final @Nullable T v = get();
 		if (v == null) {
 			throw new NoSuchElementException("No value has been given.");
 		}
@@ -80,7 +80,7 @@ public class Holder<T> implements Supplier<T> {
 	public static <O> Holder<O> ofSynchronized(O pObject) {
 		final Holder<O> holder = new Holder<O>() {
 			@Override
-			public synchronized O get() {
+			public synchronized @Nullable O get() {
 				return super.get();
 			}
 

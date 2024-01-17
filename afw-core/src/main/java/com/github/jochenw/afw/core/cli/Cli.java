@@ -13,6 +13,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
@@ -828,7 +830,8 @@ public class Cli<B> {
 			                    Consumer<Cli<B>> pOptionsConfigurator,
 			                    Function<String,RuntimeException> pErrorHandler) {
 		try {
-			final CliClass<B> cliObject = pCliClass.getConstructor().newInstance();
+			@SuppressWarnings("null")
+			final @NonNull CliClass<B> cliObject = pCliClass.getConstructor().newInstance();
 			final B bean = pBeanClass.getConstructor().newInstance();
 			final Cli<B> cli = Cli.of(bean);
 			pOptionsConfigurator.accept(cli);

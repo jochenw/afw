@@ -8,6 +8,8 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.util.Reflection;
 import com.github.jochenw.afw.core.util.Tupel;
@@ -30,30 +32,41 @@ public class DefaultKeyHandler implements IKeyHandler {
 		}
 	}
 	@Override
-	public KeyPair createKeyPair() {
+	public @NonNull KeyPair createKeyPair() {
 		return keyHandler.createKeyPair();
 	}
 
 	@Override
-	public Certificate generateCertificate(String pDn, KeyPair pKeyPair, int pValidity) {
+	public @NonNull Certificate generateCertificate(@NonNull String pDn, @NonNull KeyPair pKeyPair, int pValidity) {
 		return keyHandler.generateCertificate(pDn, pKeyPair, pValidity);
 	}
 
 	@Override
-	public KeyStore createKeyStore(PrivateKey pPrivateKey, Certificate pCertificate, String pAlias, String pStoreType,
-			String pStorePass, String pKeyPass) {
+	public @NonNull KeyStore createKeyStore(@NonNull PrivateKey pPrivateKey,
+			                                @NonNull Certificate pCertificate,
+			                                @NonNull String pAlias,
+			                                @Nullable String pStoreType,
+			                                @NonNull String pStorePass,
+			                                @Nullable String pKeyPass) {
 		return keyHandler.createKeyStore(pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 	}
 
 	@Override
-	public void createKeyStore(OutputStream pOut, PrivateKey pPrivateKey, Certificate pCertificate, String pAlias,
-			String pStoreType, String pStorePass, String pKeyPass) {
+	public void createKeyStore(@NonNull OutputStream pOut,
+			                   @NonNull PrivateKey pPrivateKey,
+			                   @NonNull Certificate pCertificate,
+			                   @NonNull String pAlias,
+			                   @Nullable String pStoreType,
+			                   @NonNull String pStorePass,
+			                   @Nullable String pKeyPass) {
 		keyHandler.createKeyStore(pOut, pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 	}
 
 	@Override
-	public Tupel<PrivateKey, Certificate> readPrivateKey(InputStream pIn, String pAlias, String pStorePass,
-			String pKeyPass) {
+	public Tupel<PrivateKey, Certificate> readPrivateKey(@NonNull InputStream pIn,
+			                                             @NonNull String pAlias,
+			                                             @NonNull String pStorePass,
+			                                             @Nullable String pKeyPass) {
 		return keyHandler.readPrivateKey(pIn, pAlias, pStorePass, pKeyPass);
 	}
 

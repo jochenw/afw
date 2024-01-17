@@ -51,7 +51,7 @@ public interface IKeyHandler {
 	public @NonNull KeyStore createKeyStore(@NonNull PrivateKey pPrivateKey,
                                             @NonNull Certificate pCertificate, @NonNull String pAlias,
                                             @Nullable String pStoreType, @NonNull String pStorePass,
-                                            @NonNull String pKeyPass);
+                                            @Nullable String pKeyPass);
 
 	/**
 	 * Creates a new key store with exactly one entry, representing the given private key,

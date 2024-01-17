@@ -3,6 +3,9 @@ package com.github.jochenw.afw.core.util;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.StampedLock;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.github.jochenw.afw.core.function.Functions.FailableCallable;
 import com.github.jochenw.afw.core.function.Functions.FailableLongSupplier;
 import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
@@ -37,7 +40,7 @@ public class Locks {
 		 * @param <O> The result type (of the callable, and this method)
 		 * @param pCallable The {@link FailableCallable} to call.
 		 */
-		public <O> O callReadLocked(FailableCallable<O,?> pCallable) {
+		public <O> @Nullable O callReadLocked(FailableCallable<@Nullable O,?> pCallable) {
 			return callLocked(() -> stampedLock.readLock(), pCallable);
 		}
 		/**
@@ -49,7 +52,7 @@ public class Locks {
 		 * @param <O> The result type (of the callable, and this method)
 		 * @param pCallable The {@link FailableCallable} to call.
 		 */
-		public <O> O callWriteLocked(FailableCallable<O,?> pCallable) {
+		public <O> @Nullable O callWriteLocked(FailableCallable<@Nullable O,?> pCallable) {
 			return callLocked(() -> stampedLock.writeLock(), pCallable);
 		}
 		/**
@@ -87,7 +90,7 @@ public class Locks {
 		 * @param pCallable The callable being called.
 		 * @param pSupplier The supplier, which creates the lock.
 		 */
-		public <O> O callLocked(FailableCallable<O,?> pCallable, FailableSupplier<Lock,?> pSupplier) {
+		public <O> @Nullable O callLocked(FailableCallable<@Nullable O,?> pCallable, FailableSupplier<Lock,?> pSupplier) {
 			return Locks.callLocked(pCallable, pSupplier);
 		}
 		/**
@@ -137,15 +140,18 @@ public class Locks {
 		 * @return The result object, which has been obtained by
 		 *   invoking the callable.
 		 */
-		protected <O> O callLocked(FailableLongSupplier<?> pSupplier, FailableCallable<O,?> pCallable) {
-			Long lock = null;
-			Throwable th = null;
-			O o = null;
+		protected <O> @Nullable O callLocked(FailableLongSupplier<?> pSupplier, FailableCallable<@Nullable O,?> pCallable) {
+			@Nullable Long lock = null;
+			@Nullable Throwable th = null;
+			@Nullable O o = null;
 			try {
-				lock = Long.valueOf(pSupplier.get());
+				@SuppressWarnings("null")
+				final @NonNull Long l = Long.valueOf(pSupplier.get());
+				lock = l;
 				o = pCallable.call();
-				stampedLock.unlock(lock.longValue());
+				final long lck = lock.longValue();
 				lock = null;
+				stampedLock.unlock(lck);
 			} catch (Throwable t) {
 				th = t;
 			} finally {
@@ -176,21 +182,20 @@ public class Locks {
 	 * @param pSupplier The supplier, which creates the lock.
 	 */
 	public static void runLocked(FailableRunnable<?> pRunnable, FailableSupplier<Lock,?> pSupplier) {
-		Lock lock = null;
-		boolean locked = false;
-		Throwable th = null;
+		@Nullable Lock lock = null;
+		@Nullable Throwable th = null;
 		try {
-			lock = pSupplier.get();
+			lock = Objects.requireNonNull(pSupplier.get(),
+					                      "The lock supplier returned a null value.");
 			lock.lock();
-			locked = true;
 			pRunnable.run();
-			lock.unlock();
-			locked = false;
+			final Lock lck = lock;
 			lock = null;
+			lck.unlock();
 		} catch (Throwable t) {
 			th = t;
 		} finally {
-			if (locked) {
+			if (lock != null) {
 				try {
 					lock.unlock();
 				} catch (Throwable t) {
@@ -218,23 +223,22 @@ public class Locks {
 	 * @param pCallable The callable being called.
 	 * @param pSupplier The supplier, which creates the lock.
 	 */
-	public static <O> O callLocked(FailableCallable<O,?> pCallable, FailableSupplier<Lock,?> pSupplier) {
-		Lock lock = null;
-		boolean locked = false;
-		Throwable th = null;
-		O o = null;
+	public static <O> @Nullable O callLocked(FailableCallable<@Nullable O,?> pCallable, FailableSupplier<Lock,?> pSupplier) {
+		@Nullable Lock lock = null;
+		@Nullable Throwable th = null;
+		@Nullable O o = null;
 		try {
-			lock = pSupplier.get();
+			lock = Objects.requireNonNull(pSupplier.get(),
+					                      "The supplier returned a non-null value.");
 			lock.lock();
-			locked = true;
 			o = pCallable.call();
-			lock.unlock();
-			locked = false;
+			final Lock lck = lock;
 			lock = null;
+			lck.unlock();
 		} catch (Throwable t) {
 			th = t;
 		} finally {
-			if (locked) {
+			if (lock != null) {
 				try {
 					lock.unlock();
 				} catch (Throwable t) {

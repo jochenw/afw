@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -54,7 +55,7 @@ public class SelfSignedCertificateGenerator {
 	 */
 	public void log(String pMessage) {
 		if (logger != null) {
-			logger.accept(pMessage);
+			Objects.requireNonNull(logger).accept(pMessage);
 		}
 	}
 
@@ -338,16 +339,22 @@ public class SelfSignedCertificateGenerator {
 		appender.accept("C", getCountry());
 		final IKeyHandler kh = getKeyHandler();
 		final KeyPair keyPair = kh.createKeyPair();
-		final Certificate certificate = kh.generateCertificate(inputSb.toString(), keyPair, validInDays);
+		final @NonNull PrivateKey private1 = Objects.requireNonNull(keyPair.getPrivate(),
+				                                 "The private key is null.");
+		@SuppressWarnings("null")
+		@NonNull String input = inputSb.toString();
+		final Certificate certificate = kh.generateCertificate(input, keyPair, validInDays);
 		final Path path = Paths.get(fileName);
 		final Path dir = path.getParent();
 		try {
 			if (dir != null) {
 				Files.createDirectories(dir);
 			}
-			try (OutputStream os = Files.newOutputStream(path)) {
-				kh.createKeyStore(os, keyPair.getPrivate(), certificate, getAlias(), getStoreType(),
-						          getStorePassword(), getKeyPassword());
+			try (@SuppressWarnings("null") @NonNull OutputStream os = Files.newOutputStream(path)) {
+				final @NonNull String alias = Objects.requireNonNull(getAlias(), "The Alias is null.");
+				final @NonNull String storePass = Objects.requireNonNull(getStorePassword(), "The store password is null.");
+				kh.createKeyStore(os, private1, certificate, alias, getStoreType(),
+						          storePass, getKeyPassword());
 			}
 		} catch (Throwable t) {
 			throw Exceptions.show(t);

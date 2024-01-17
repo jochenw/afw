@@ -67,13 +67,15 @@ public class Objects {
 	 * @param pSupplier A supplier, which returns the default value. The supplier is
 	 *   only invoked, if necessary. (If {@code pValue} is null.
 	 * @return The input value, if non-null. Otherwise the default value.
-	 * @throws NullPointerException The default value supplier
+	 * @throws NullPointerException The parameter {@code pSupplier} is null,
+	 *   or the supplier has returned a null value.
 	 */
 	public static @NonNull <T> T notNull(@Nullable T pValue, @NonNull FailableSupplier<T,?> pSupplier) {
 		if (pValue == null) {
+			final @NonNull FailableSupplier<T, ?> supplier = requireNonNull(pSupplier, "The parameter pSupplier must not be null.");
 			final T value;
 			try {
-				value = pSupplier.get();
+				value = supplier.get();
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
 			}

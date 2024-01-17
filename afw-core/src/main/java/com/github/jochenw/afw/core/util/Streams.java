@@ -121,7 +121,7 @@ public class Streams {
      * @return The contents, which have been read from {@code pIn}.
      */
     public static @NonNull String read(@NonNull InputStream pIn, @Nullable Charset pCharset) {
-    	final Charset charSet = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	final @NonNull Charset charSet = Objects.notNull(pCharset, UTF_8);
     	return read(new InputStreamReader(pIn, charSet));
     }
 
@@ -198,7 +198,7 @@ public class Streams {
      * @see #copy(java.io.InputStream, java.io.OutputStream, int)
      */
     public static void copy (InputStream pIn, Writer pWriter, int pBufSize, Charset pCharset) {
-    	final Charset cs = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	final Charset cs = Objects.notNull(pCharset, UTF_8);
     	final WriterOutputStream out = new WriterOutputStream(pWriter, cs);
 		copy(pIn, out);
 		try {
@@ -216,14 +216,16 @@ public class Streams {
      * @return The contents, which have been read from {@code pIn}.
      * @see #read(java.io.InputStream) 
      */
-    public static String read(Reader pIn) {
+    public static @NonNull String read(Reader pIn) {
         final StringWriter sw = new StringWriter();
         try (Reader in = pIn) {
             copy(in, sw);
         } catch (IOException e) {
             throw Exceptions.newUncheckedIOException(e);
         }
-        return sw.toString();
+        @SuppressWarnings("null")
+		@NonNull String str = sw.toString();
+		return str;
     }
 
     /** Copies the contents of the given {@link Reader} to the given
@@ -311,7 +313,24 @@ public class Streams {
      * method may be invoked, but it does nothing.)
      */
     public static InputStream uncloseableStream(final InputStream pIn) {
-    	return closeListeningStream(pIn, () -> true);
+    	final InputStream in = Objects.requireNonNull(pIn, "InputStream");
+		return new FilterInputStream(in) {
+		    @Override
+		    public void close() throws IOException {
+		    }
+		    @Override
+		    public int read(byte[] pBuffer) throws IOException {
+		        return in.read(pBuffer);
+		    }
+		    @Override
+		    public int read(byte[] pBuffer, int pOffset, int pLength) throws IOException {
+		        return in.read(pBuffer, pOffset, pLength);
+		    }
+		    @Override
+		    public int read() throws IOException {
+		        return in.read();
+		    }
+		};
     }
 
     /** Returns a {@link Reader}, which returns the same contents than the given,
@@ -357,8 +376,25 @@ public class Streams {
      * {@code pIn}, but cannot be closed. (The {@link Reader#close()}
      * method may be invoked, but it does nothing.)
      */
-    public static Reader uncloseableReader(final Reader pIn) {
-    	return closeListeningReader(pIn, () -> true);
+    public static Reader uncloseableReader(final @NonNull Reader pIn) {
+    	final Reader in = Objects.requireNonNull(pIn, "Reader");
+		return new FilterReader(in) {
+		    @Override
+		    public void close() throws IOException {
+		    }
+		    @Override
+		    public int read(char[] pBuffer) throws IOException {
+		        return in.read(pBuffer);
+		    }
+		    @Override
+		    public int read(char[] pBuffer, int pOffset, int pLength) throws IOException {
+		        return in.read(pBuffer, pOffset, pLength);
+		    }
+		    @Override
+		    public int read() throws IOException {
+		        return in.read();
+		    }
+		};
     }
 
     /** Returns an {@link OutputStream}, which copies its output to the given, but
@@ -538,7 +574,9 @@ public class Streams {
      * @return The result of invoking {@code pFunction}.
      */
     public static <O> O apply(@NonNull File pFile, @NonNull FailableFunction<InputStream,O,IOException> pFunction) {
-    	return apply(pFile.toPath(), pFunction);
+    	@SuppressWarnings("null")
+		final @NonNull Path path = pFile.toPath();
+    	return apply(path, pFunction);
     }
 
     /** Reads the given input stream, and returns it as an instance of
@@ -549,7 +587,7 @@ public class Streams {
      *   object.
      * @throws IOException Reading the input stream has failed.
      */
-    public static @NonNull Properties load(InputStream pIn, String pUri) throws IOException {
+    public static @NonNull Properties load(@NonNull InputStream pIn, String pUri) throws IOException {
     	final Properties props = new Properties();
     	if (pUri.endsWith(".xml")) {
     		props.loadFromXML(pIn);
@@ -565,8 +603,14 @@ public class Streams {
      * @return The contents of the given file, as a {@link java.util.Properties}
      *   object.
      */
-    public static @NonNull Properties load(Path pPath) {
-    	return Streams.apply(pPath, (in) -> { return load(in, pPath.getFileName().toString()); });
+    public static @NonNull Properties load(@NonNull Path pPath) {
+    	@SuppressWarnings("null")
+		final @NonNull String uri = pPath.getFileName().toString();
+    	return Streams.apply(pPath, (in) -> {
+    		@SuppressWarnings("null")
+			final @NonNull InputStream is = in;
+    		return load(is, uri);
+    	});
     }
 
     /** Loads the given property file, and returns it as an instance of
@@ -575,8 +619,14 @@ public class Streams {
      * @return The contents of the given file, as a {@link java.util.Properties}
      *   object.
      */
-    public static @NonNull Properties load(File pFile) {
-    	return Streams.apply(pFile, (in) -> { return load(in, pFile.getName()); });
+    public static @NonNull Properties load(@NonNull File pFile) {
+    	@SuppressWarnings("null")
+		final @NonNull String uri = pFile.getName();
+    	return Streams.apply(pFile, (in) -> {
+    		@SuppressWarnings("null")
+			final @NonNull InputStream is = in;
+    		return load(is, uri);
+    	});
     }
 
     /** Reads the given property URL, and returns it as an instance of
@@ -585,8 +635,14 @@ public class Streams {
      * @return The contents of the given URL, as a {@link java.util.Properties}
      *   object.
      */
-    public static @NonNull Properties load(URL pUrl) {
-    	return Streams.apply(pUrl, (in) -> { return load(in, pUrl.toExternalForm()); });
+    public static @NonNull Properties load(@NonNull URL pUrl) {
+    	@SuppressWarnings("null")
+		final @NonNull String uri = pUrl.toExternalForm();
+    	return Streams.apply(pUrl, (in) -> {
+    		@SuppressWarnings("null")
+			final @NonNull InputStream is = in;
+    		return load(is, uri);
+    	});
     }
 
     /** Returns a property set, which is obtained by reading the given
@@ -618,7 +674,8 @@ public class Streams {
     			throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + f);
     		}
     	} else if (res instanceof String) {
-    		final Path p = Paths.get((String) res);
+    		@SuppressWarnings("null")
+			final @NonNull Path p = Paths.get((String) res);
     		if (Files.isRegularFile(p)) {
     			return load(p);
     		} else if (!pNullPermitted) {
@@ -639,8 +696,11 @@ public class Streams {
     		}
     	} else if (res instanceof URL) {
     		final URL u = (URL) res;
-    		try (InputStream in = u.openStream()) {
-    			return load(in, u.toExternalForm());
+    		try (@SuppressWarnings("null")
+			     @NonNull InputStream in = u.openStream()) {
+    			@SuppressWarnings("null")
+				final @NonNull String uri = u.toExternalForm();
+    			return load(in, uri);
     		} catch (FileNotFoundException e) {
     			if (!pNullPermitted) {
     				throw new IllegalArgumentException("Property file does not exist, or is unreadable: " + u);
@@ -690,9 +750,9 @@ public class Streams {
      * @return The created property set, possibly empty.
      */
     public static final @NonNull Properties load(boolean pNullPermitted, @NonNull Object... pResources) {
-    	final Object[] resources = Objects.requireNonNull(pResources);
+    	final @NonNull Object[] resources = Objects.requireNonNull(pResources);
     	final Properties properties = new Properties();
-    	for (Object res : resources) {
+    	for (@NonNull Object res : resources) {
     		final Properties props = load(res, pNullPermitted);
     		if (props != null) {
     			properties.putAll(props);
@@ -714,7 +774,7 @@ public class Streams {
      */
     public static @NonNull ReaderInputStream asInputStream(@NonNull Reader pReader, @Nullable Charset pCharset) {
     	final @NonNull Reader reader = Objects.requireNonNull(pReader, "Reader");
-    	final @NonNull Charset charset = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	final @NonNull Charset charset = Objects.notNull(pCharset, UTF_8);
     	return new ReaderInputStream(reader, charset);
     }
 
@@ -725,7 +785,7 @@ public class Streams {
      * @return A {@link ByteArrayInputStream}, returning the given byte array.
      * @throws NullPointerException The parameter {@code pBytes} is null.
      */
-    public static @NonNull ByteArrayInputStream of(@NonNull byte[] pBytes) {
+    public static @NonNull ByteArrayInputStream of(byte[] pBytes) {
     	return new ByteArrayInputStream(Objects.requireNonNull(pBytes, "Bytes"));
     }
 
@@ -752,10 +812,14 @@ public class Streams {
      * @throws NullPointerException The parameter {@code pBytes} is null.
      */
     public static @NonNull ByteArrayInputStream of(@NonNull String pString, @Nullable Charset pCharset) {
-    	final @NonNull byte[] bytes = Objects.requireNonNull(pString, "String")
-    			.getBytes(Objects.notNull(pCharset, StandardCharsets.UTF_8));
+    	final byte[] bytes = Objects.requireNonNull(pString, "String")
+    			.getBytes(Objects.notNull(pCharset, UTF_8));
     	return of(bytes);
     }
+	/**
+	 * A reference to {@link StandardCharsets#UTF_8}, which is declared to be non-null.
+	 */
+	public static final @NonNull Charset UTF_8 = Objects.requireNonNull(StandardCharsets.UTF_8);
 
     /**
      * Reads the given {@link IReadable} as a text file, invoking the given consumer for
@@ -782,7 +846,7 @@ public class Streams {
     				pConsumer.accept(i, line);
     			}
     		}
-    	}, Objects.notNull(pCharset, StandardCharsets.UTF_8));
+    	}, Objects.notNull(pCharset, UTF_8));
     }
 
     /** Creates an {@link InputStream}, which returns the contents of the given

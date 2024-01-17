@@ -40,9 +40,9 @@ import com.github.jochenw.afw.core.util.Exceptions;
 /** A helper object for working with JDBC connections.
  */
 public class JdbcHelper {
-	private static final ZoneId UTC = ZoneId.of("GMT");
+	private static final @NonNull ZoneId UTC = Objects.requireNonNull(ZoneId.of("GMT"));
 	private @NonNull ZoneId dbZoneId = UTC;
-	private @NonNull ZoneId appZoneId = ZoneId.systemDefault();
+	private @NonNull ZoneId appZoneId = Objects.requireNonNull(ZoneId.systemDefault());
 
 	/** Returns the database time zone id.
 	 * @return The database time zone id.
@@ -115,7 +115,9 @@ public class JdbcHelper {
 		public @NonNull <O> Callable<O> withResultSet(@NonNull FailableFunction<ResultSet,O,?> pFunction) {
 			final @NonNull FailableFunction<ResultSet,O,?> function = Objects.requireNonNull(pFunction, "Function");
 			return () -> {
-				try (Connection conn = connectionProvider.get();
+				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
+						                                               "The connection provider returned null.");
+					 @SuppressWarnings("null") @NonNull
 					 PreparedStatement stmt = conn.prepareStatement(query)) {
 					helper.setParameters(stmt, parameters);
 					try (ResultSet rs = stmt.executeQuery()) {
@@ -139,8 +141,10 @@ public class JdbcHelper {
 		public @NonNull Runnable withResultSet(@NonNull FailableConsumer<ResultSet,?> pConsumer) {
 			final @NonNull FailableConsumer<ResultSet,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			return () -> {
-				try (Connection conn = connectionProvider.get();
-					 PreparedStatement stmt = conn.prepareStatement(query)) {
+				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
+                        "The connection provider returned null.");
+                     @SuppressWarnings("null") @NonNull
+                     PreparedStatement stmt = conn.prepareStatement(query)) {
 					helper.setParameters(stmt, parameters);
 					try (ResultSet rs = stmt.executeQuery()) {
 						consumer.accept(rs);
@@ -164,8 +168,10 @@ public class JdbcHelper {
 		public @NonNull <O> Callable<O> withRows(@NonNull FailableFunction<Rows,O,?> pFunction) {
 			final @NonNull FailableFunction<Rows,O,?> function = Objects.requireNonNull(pFunction, "Function");
 			return () -> {
-				try (Connection conn = connectionProvider.get();
-					 PreparedStatement stmt = conn.prepareStatement(query)) {
+				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
+                        "The connection provider returned null.");
+                     @SuppressWarnings("null") @NonNull
+                     PreparedStatement stmt = conn.prepareStatement(query)) {
 					helper.setParameters(stmt, parameters);
 					try (ResultSet rs = stmt.executeQuery()) {
 						return function.apply(helper.newRows(rs));
@@ -188,8 +194,10 @@ public class JdbcHelper {
 		public @NonNull Runnable withRows(@NonNull FailableConsumer<Rows,?> pConsumer) {
 			final @NonNull FailableConsumer<Rows,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			return () -> {
-				try (Connection conn = connectionProvider.get();
-					 PreparedStatement stmt = conn.prepareStatement(query)) {
+				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
+                        "The connection provider returned null.");
+                     @SuppressWarnings("null") @NonNull
+                     PreparedStatement stmt = conn.prepareStatement(query)) {
 					helper.setParameters(stmt, parameters);
 					try (ResultSet rs = stmt.executeQuery()) {
 						while (rs.next()) {
@@ -1148,7 +1156,7 @@ public class JdbcHelper {
 		/** Returns the next byte array in the column list.
 		 * @return The next byte array in the column list.
 		 */
-		public @Nullable byte[] nextBytes() {
+		public byte[] nextBytes() {
 			return getBytes(++index);
 		}
 
@@ -1169,7 +1177,7 @@ public class JdbcHelper {
 		 * @return The byte array with the given index in the column list,
 		 *   possibly null.
 		 */
-		public @Nullable byte[] getBytes(int pIndex) {
+		public byte[] getBytes(int pIndex) {
 			try {
 				return rs.getBytes(pIndex);
 			} catch (SQLException e) {

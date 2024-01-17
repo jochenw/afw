@@ -29,6 +29,8 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Objects;
@@ -38,18 +40,20 @@ import com.github.jochenw.afw.core.util.Tupel;
  */
 public class BcKeyHandler implements IKeyHandler {
 	@Override
-	public KeyPair createKeyPair() {
+	public @NonNull KeyPair createKeyPair() {
 		try {
 			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 			keyPairGenerator.initialize(4096, SecureRandom.getInstanceStrong());
-			return keyPairGenerator.generateKeyPair();
+			return Objects.requireNonNull(keyPairGenerator.generateKeyPair());
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
 	}
 
 	@Override
-	public Certificate generateCertificate(String pDn, KeyPair pKeyPair, int pValidity) {
+	public @NonNull Certificate generateCertificate(@NonNull String pDn,
+			                                        @NonNull KeyPair pKeyPair,
+			                                        int pValidity) {
 		try {
 			Provider bcProvider = new BouncyCastleProvider();
 			long now = System.currentTimeMillis();
@@ -66,15 +70,20 @@ public class BcKeyHandler implements IKeyHandler {
 			final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(dnName, serialNumber, startDate, endDate, dnName, pKeyPair.getPublic());
 			BasicConstraints basicConstraints = new BasicConstraints(true);
 			certBuilder.addExtension(new ASN1ObjectIdentifier("2.5.29.19"), true, basicConstraints);
-			return new JcaX509CertificateConverter().setProvider(bcProvider).getCertificate(certBuilder.build(contentSigner));
+			JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider(bcProvider);
+			return Objects.requireNonNull(converter.getCertificate(certBuilder.build(contentSigner)));
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}
 	}
 
 	@Override
-	public KeyStore createKeyStore(PrivateKey pPrivateKey, Certificate pCertificate, String pAlias, String pStoreType,
-			String pStorePass, String pKeyPass) {
+	public @NonNull KeyStore createKeyStore(@NonNull PrivateKey pPrivateKey,
+			                                @NonNull Certificate pCertificate,
+			                                @NonNull String pAlias,
+			                                @Nullable String pStoreType,
+			                                @NonNull String pStorePass,
+			                                @Nullable String pKeyPass) {
 		try {
 			KeyStore keyStore = KeyStore.getInstance(Objects.notNull(pStoreType, "JKS"));
 			keyStore.load(null, pStorePass.toCharArray());
@@ -87,8 +96,13 @@ public class BcKeyHandler implements IKeyHandler {
 	}
 
 	@Override
-	public void createKeyStore(OutputStream pOut, PrivateKey pPrivateKey, Certificate pCertificate, String pAlias,
-			String pStoreType, String pStorePass, String pKeyPass) {
+	public void createKeyStore(@NonNull OutputStream pOut,
+			                   @NonNull PrivateKey pPrivateKey,
+			                   @NonNull Certificate pCertificate,
+			                   @NonNull String pAlias,
+			                   @Nullable String pStoreType,
+			                   @NonNull String pStorePass,
+			                   @Nullable String pKeyPass) {
 		try {
 			final KeyStore keyStore = createKeyStore(pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 			keyStore.store(pOut, pStorePass.toCharArray());
@@ -98,8 +112,10 @@ public class BcKeyHandler implements IKeyHandler {
 	}
 
 	@Override
-	public Tupel<PrivateKey, Certificate> readPrivateKey(InputStream pIn, String pAlias, String pStorePass,
-			String pKeyPass) {
+	public Tupel<PrivateKey, Certificate> readPrivateKey(@NonNull InputStream pIn,
+			                                             @NonNull String pAlias,
+			                                             @NonNull String pStorePass,
+			                                             @Nullable String pKeyPass) {
 		try {
 			final KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(pIn, pStorePass.toCharArray());

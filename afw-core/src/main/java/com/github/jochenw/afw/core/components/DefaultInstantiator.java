@@ -5,6 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Reflection;
@@ -17,7 +20,6 @@ public class DefaultInstantiator implements IInstantiator {
 	 * @param pClassName Name of the class, that is being created.
 	 * @return The created instance.
 	 */
-	@SuppressWarnings("deprecation")
 	protected Object newInstance(ClassLoader pClassLoader, String pClassName) {
 		try {
 			@SuppressWarnings("unchecked")
@@ -64,7 +66,6 @@ public class DefaultInstantiator implements IInstantiator {
 	 *   {@link #asValue(Class, String)} will be invoked to convert
 	 *   the string to a properly typed value.
 	 */
-	@SuppressWarnings("deprecation")
 	protected void setProperty(Object pObject, String pName, String pValue) {
 		final Method setter = Reflection.getPublicSetter(pObject.getClass(), pName);
 		if (setter != null) {
@@ -96,7 +97,7 @@ public class DefaultInstantiator implements IInstantiator {
 	}
 
 	@Override
-	public <O> O newInstance(ClassLoader pClassLoader, String pClassName, Map<String, String> pBeanProperties) {
+	public <O> O newInstance(@NonNull ClassLoader pClassLoader, @NonNull String pClassName, @Nullable Map<String, String> pBeanProperties) {
 		final Object object = newInstance(pClassLoader, pClassName);
 		if (pBeanProperties != null) {
 			for (Map.Entry<String,String> en : pBeanProperties.entrySet()) {
@@ -111,7 +112,7 @@ public class DefaultInstantiator implements IInstantiator {
 	}
 
 	@Override
-	public <O> O newInstance(ClassLoader pClassLoader, String pClassName, String... pBeanProperties) {
+	public <O> O newInstance(@NonNull ClassLoader pClassLoader, @NonNull String pClassName, @Nullable String... pBeanProperties) {
 		final Object object = newInstance(pClassLoader, pClassName);
 		if (pBeanProperties != null) {
 			for (int i = 0;  i < pBeanProperties.length;  i += 2) {

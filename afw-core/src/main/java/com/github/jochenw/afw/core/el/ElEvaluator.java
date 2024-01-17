@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.el.tree.AddExpression;
 import com.github.jochenw.afw.core.el.tree.AndExpression;
 import com.github.jochenw.afw.core.el.tree.ElExpression;
@@ -31,6 +33,7 @@ import com.github.jochenw.afw.core.el.tree.RelationalExpression;
 import com.github.jochenw.afw.core.el.tree.UnaryExpression;
 import com.github.jochenw.afw.core.el.tree.ValueExpression;
 import com.github.jochenw.afw.core.el.tree.VariableReferenceExpression;
+import com.github.jochenw.afw.core.util.Objects;
 
 
 /** An instance of this class may be used to resolve the
@@ -241,7 +244,7 @@ public class ElEvaluator {
 			final MultiplyExpression meLeft = (MultiplyExpression) objects.get(0);
 			Object left = evaluate(meLeft);
 			for (int i = 1;  i < objects.size();  i += 2) {
-				final AddExpression.Op op = (AddExpression.Op) objects.get(i);
+				final AddExpression.@NonNull Op op = Objects.requireNonNull((AddExpression.Op) objects.get(i));
 				final MultiplyExpression meRight = (MultiplyExpression) objects.get(i+1);
 				final Object right = evaluate(meRight);
 				if (left == null) {

@@ -45,7 +45,7 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 */
 	public static ProcessOutputHandler of(@NonNull Writer pWriter, @Nullable Charset pCharset) {
 		final @NonNull Writer w = Objects.requireNonNull(pWriter, "Writer");
-		final @NonNull Charset cs = Objects.notNull(pCharset, null);
+		final @NonNull Charset cs = Objects.notNull(pCharset, Streams.UTF_8);
 		return (in) -> Streams.copy(in, w, cs);
 	}
 	/** Creates an {@link ProcessOutputHandler}, that forwards the external processes output
@@ -59,8 +59,9 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	public static ProcessOutputHandler of(@NonNull FailableSupplier<OutputStream,?> pSupplier) {
 		final @NonNull FailableSupplier<OutputStream,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
 		return (in) -> {
-			final @NonNull OutputStream out = supplier.get();
-			Streams.copy(in, out);
+			@NonNull OutputStream outputStream = Objects.requireNonNull(supplier.get(),
+					                        "The supplier returned a null OutputStream");
+			Streams.copy(in, outputStream);
 		};
 	}
 	/** Creates an {@link ProcessOutputHandler}, that forwards the external processes output
@@ -77,9 +78,10 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	public static ProcessOutputHandler of(@NonNull FailableSupplier<Writer,?> pSupplier,
 			                       @Nullable Charset pCharset) {
 		final @NonNull FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
-		final @NonNull Charset cs = Objects.notNull(pCharset, null);
+		final @NonNull Charset cs = Objects.notNull(pCharset, Streams.UTF_8);
 		return (in) -> {
-			final @NonNull Writer w = supplier.get();
+			final @NonNull Writer w = Objects.requireNonNull(supplier.get(),
+					                      "The supplier returned a null Writer.");
 			Streams.copy(in, w, cs);
 		};
 	}
@@ -120,6 +122,7 @@ public interface ProcessOutputHandler extends FailableConsumer<InputStream,Throw
 	 * @throws NullPointerException The parameter {@code pPath} is null.
 	 */
 	public static ProcessOutputHandler of(@NonNull File pFile, @Nullable Charset pCharset) {
+		@SuppressWarnings("null")
 		final @NonNull Path path = Objects.requireNonNull(pFile, "File").toPath();
 		return of(path, pCharset);
 	}
