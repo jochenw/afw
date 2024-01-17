@@ -18,15 +18,18 @@ package com.github.jochenw.afw.core.util;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /** A wrapper for another object. The wrapped object will be initialized lazily
  * (upon first access).
  * @param <O> Type of the wrapped object.
  */
 public class LazyInitializable<O extends Object> implements Supplier<O> {
-	private final Supplier<O> supplier;
-	private final Consumer<O> initializer;
-	private volatile O instance;
+	private final @NonNull Supplier<@NonNull O> supplier;
+	private final @Nullable Consumer<@NonNull O> initializer;
+	private volatile @Nullable O instance;
 
 	/**
 	 * Creates a new instance.
@@ -35,9 +38,8 @@ public class LazyInitializable<O extends Object> implements Supplier<O> {
 	 *   The wrapped object is not considered to be usable, until the
 	 *   initializer's invocation has finished.
 	 */
-	public LazyInitializable(Supplier<O> pSupplier, Consumer<O> pInitializer) {
-		Objects.requireNonNull(pSupplier, "Supplier");
-		supplier = pSupplier;
+	public LazyInitializable(@NonNull Supplier<@NonNull O> pSupplier, @Nullable Consumer<@NonNull O> pInitializer) {
+		supplier = Objects.requireNonNull(pSupplier, "Supplier");
 		initializer = pInitializer;
 	}
 
@@ -46,19 +48,18 @@ public class LazyInitializable<O extends Object> implements Supplier<O> {
 	 * the supplier, and the initializer.
 	 */
 	@Override
-	public O get() {
-		if (instance == null) {
-			synchronized(this) {
-				if (instance == null) {
-					O o = supplier.get();
-					Objects.requireNonNull(o, "Instance");
-					if (initializer != null) {
-						initializer.accept(o);
-					}
-					instance = o;
+	public @NonNull O get() {
+		synchronized(this) {
+			if (instance == null) {
+				final @NonNull O o = Objects.requireNonNull(supplier.get(),
+						        "The supplier returned a null instance.");
+				if (initializer != null) {
+					final @NonNull Consumer<@NonNull O> init = Objects.requireNonNull(initializer);
+					init.accept(o);
 				}
+				instance = o;
 			}
 		}
-		return instance;
+		return Objects.requireNonNull(instance);
 	}
 }

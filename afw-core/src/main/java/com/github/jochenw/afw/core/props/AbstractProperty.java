@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 
 /**
@@ -27,12 +30,12 @@ import java.util.Map;
  */
 public abstract class AbstractProperty<O> implements IProperty<O>, IPropertyFactory.ChangeListener {
     private final List<ChangeListener<O>> listeners = new ArrayList<>();
-    private final String key;
+    private final @NonNull String key;
     private String strValue;
-    private final O defaultValue;
-    private O value;
+    private final @Nullable O defaultValue;
+    private @Nullable O value;
 
-    AbstractProperty(String pKey, O pDefaultValue) {
+	AbstractProperty(@NonNull String pKey, @Nullable O pDefaultValue) {
         key = pKey;
         defaultValue = pDefaultValue;
     }
@@ -49,12 +52,16 @@ public abstract class AbstractProperty<O> implements IProperty<O>, IPropertyFact
 
     @Override
     public synchronized O getValue() {
-        return value;
+		@SuppressWarnings("null")
+		final O o = value;
+		return o;
     }
 
     @Override
     public O getDefaultValue() {
-        return defaultValue;
+    	@SuppressWarnings("null")
+		final O o = defaultValue;
+    	return o;
     }
 
     @Override
@@ -66,10 +73,13 @@ public abstract class AbstractProperty<O> implements IProperty<O>, IPropertyFact
     public synchronized void valueChanged(IPropertyFactory pFactory, Map<String, String> pOldValue,
             Map<String, String> pNewValue) {
         strValue = pNewValue.get(key);
-        final O oldValue = value;
+        @SuppressWarnings("null")
+		final O oldValue = value;
         value = convert(strValue);
+        @SuppressWarnings("null")
+		final O newValue = value;
         for (ChangeListener<O> listener : listeners) {
-            listener.valueChanged(this, oldValue, value);
+            listener.valueChanged(this, oldValue, newValue);
         }
     }
 

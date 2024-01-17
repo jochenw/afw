@@ -1,7 +1,6 @@
 package com.github.jochenw.afw.core.scripts;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -11,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 import org.codehaus.groovy.ast.ASTNode;
 
 import com.github.jochenw.afw.core.util.Objects;
-
+import com.github.jochenw.afw.core.util.Streams;
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.util.Holder;
 
@@ -45,15 +44,15 @@ public class GroovyScriptEngine implements IScriptEngine {
 		 * @param pParameters The map of parameters.
 		 * @return The created parameter map.
 		 */
-		protected @NonNull Map<String,Object> asParameters(Map<String,Object> pParameters) {
+		protected @NonNull Map<String,Object> asParameters(@Nullable Map<String,Object> pParameters) {
 			if (pParameters == null) {
-				return Collections.emptyMap();
+				return Objects.requireNonNull(Collections.emptyMap());
 			} else {
 				return pParameters;
 			}
 		}
 		@Override
-		public <O> O call(Map<String, Object> pParameters) {
+		public <O> O call(@Nullable Map<String, Object> pParameters) {
 			final @NonNull Map<String,Object> parameters = asParameters(pParameters);
 			gScript.setBinding(new Binding(parameters));
 			@SuppressWarnings("unchecked")
@@ -84,7 +83,7 @@ public class GroovyScriptEngine implements IScriptEngine {
 		}
 
 		@Override
-		public void run(@NonNull Map<String, Object> pParameters) {
+		public void run(@Nullable Map<String, Object> pParameters) {
 			final @NonNull Map<String,Object> parameters = asParameters(pParameters);
 			gScript.setBinding(new Binding(parameters));
 			run();
@@ -101,7 +100,7 @@ public class GroovyScriptEngine implements IScriptEngine {
 	@Override
 	public @NonNull Script getScript(@NonNull IReadable pReadable, @Nullable Charset pCharset) {
 		final IReadable ir = Objects.requireNonNull(pReadable, "IReadable");
-		final Charset charSet = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+		final Charset charSet = Objects.notNull(pCharset, Streams.UTF_8);
 		final Holder<Script> holder = new Holder<Script>();
 		ir.read((r) -> {
 			holder.set(new GroovyScript(gsh.parse(r, pReadable.getName())));

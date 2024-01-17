@@ -3,6 +3,8 @@ package com.github.jochenw.afw.core.scripts;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
@@ -69,7 +71,7 @@ public class DefaultScriptEngineRegisty implements IScriptEngineRegistry {
 	}
 
 	@Override
-	public boolean isScriptFile(IReadable pReadable) {
+	public boolean isScriptFile(@NonNull IReadable pReadable) {
 		final MutableBoolean mb = new MutableBoolean();
 		getScriptEngines().forEach((se) -> {
 			if (se.isScriptable(pReadable)) {

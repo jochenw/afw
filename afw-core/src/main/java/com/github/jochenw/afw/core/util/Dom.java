@@ -119,7 +119,8 @@ public class Dom {
 	 * {@link XMLConstants#NULL_NS_URI null namespace URI}, and the
 	 * given local name. Null, if no such child is present.
 	 */
-	public static @Nullable Element getFirstChild(@NonNull Node pNode, String pLocalName) {
+	public static @Nullable Element getFirstChild(@NonNull Node pNode,
+			                                      @NonNull String pLocalName) {
 		return domHelper.getFirstChild(pNode, pLocalName);
 	}
 
@@ -132,7 +133,9 @@ public class Dom {
 	 * @return The first child element of the given node, which has the given
 	 * namespace URI, and the given local name. Null, if no such child is present.
 	 */
-	public static @Nullable Element getFirstChildNS(@NonNull Node pNode, String pNamespaceURI, String pLocalName) {
+	public static @Nullable Element getFirstChildNS(@NonNull Node pNode,
+			                                        @Nullable String pNamespaceURI,
+			                                        @NonNull String pLocalName) {
 		return domHelper.getFirstChildNS(pNode, pNamespaceURI, pLocalName);
 	}
 
@@ -147,7 +150,8 @@ public class Dom {
 	 * found, throws a {@link LocalizableException}.
 	 * @throws LocalizableException No matching child is present.
 	 */
-	public static @Nullable Element requireFirstChild(@NonNull Node pNode, String pLocalName) throws LocalizableException {
+	public static @Nullable Element requireFirstChild(@NonNull Node pNode,
+			                                          @NonNull String pLocalName) throws LocalizableException {
 		return domHelper.requireFirstChild(pNode, pLocalName);
 	}
 
@@ -162,7 +166,9 @@ public class Dom {
 	 * found, throws a {@link LocalizableException}.
 	 * @throws LocalizableException No matching child is present.
 	 */
-	public static @NonNull Element requireFirstChildNS(@NonNull Node pNode, String pNamespaceURI, String pLocalName)
+	public static @NonNull Element requireFirstChildNS(@NonNull Node pNode,
+			                                           @Nullable String pNamespaceURI,
+			                                           @NonNull String pLocalName)
 	    throws LocalizableException {
 		return domHelper.requireFirstChildNS(pNode, pNamespaceURI, pLocalName);
 	}
@@ -175,7 +181,8 @@ public class Dom {
 	 * or null, if no such attribute is present.
 	 * @throws LocalizableException The given node is not an element.
 	 */
-	public static @Nullable String getAttribute(@NonNull Node pNode, String pName) throws LocalizableException {
+	public static @Nullable String getAttribute(@NonNull Node pNode,
+			                                    @NonNull String pName) throws LocalizableException {
 		return domHelper.getAttribute(pNode, pName);
 	}
 
@@ -187,7 +194,8 @@ public class Dom {
 	 * doesn't have an attribute with the name {@code pName}, or the attribute is
 	 * empty.
 	 */
-	public static @Nullable String requireAttribute(@NonNull Node pNode, String pName) throws LocalizableException {
+	public static @Nullable String requireAttribute(@NonNull Node pNode,
+			                                        @NonNull String pName) throws LocalizableException {
 		return domHelper.requireAttribute(pNode, pName);
 	}
 
@@ -209,7 +217,7 @@ public class Dom {
 	 * @return The boolean value of the attribute {@code pName} in the element {@code pName}.
 	 * @throws LocalizableException The given node is not an element.
 	 */
-	public static @NonNull boolean requireAttribute(@NonNull Node pNode, @NonNull String pName, @NonNull boolean pDefaultValue) throws LocalizableException {
+	public static boolean requireAttribute(@NonNull Node pNode, @NonNull String pName, boolean pDefaultValue) throws LocalizableException {
 		return domHelper.requireAttribute(pNode, pName, pDefaultValue);
 	}
 }

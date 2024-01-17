@@ -73,7 +73,8 @@ public class Exceptions {
         if (pTh == null) {
             throw new NullPointerException("The Throwable must not be null.");
         } else if (pClass.isAssignableFrom(pTh.getClass())) {
-            throw pClass.cast(pTh);
+            final T th = pClass.cast(pTh);
+			throw Objects.requireNonNull(th);
         } else if (pTh instanceof RuntimeException) {
             throw (RuntimeException) pTh;
         } else if (pTh instanceof Error) {
@@ -135,9 +136,13 @@ public class Exceptions {
         if (pTh == null) {
             throw new NullPointerException("The Throwable must not be null.");
         } else if (pClass1.isAssignableFrom(pTh.getClass())) {
-            throw pClass1.cast(pTh);
+            @SuppressWarnings("null")
+			final @NonNull T1 th1 = pClass1.cast(pTh);
+			throw th1;
         } else if (pClass2.isAssignableFrom(pTh.getClass())) {
-            throw pClass2.cast(pTh);
+            @SuppressWarnings("null")
+			final @NonNull T2 th2 = pClass2.cast(pTh);
+			throw th2;
         } else if (pTh instanceof RuntimeException) {
             throw (RuntimeException) pTh;
         } else if (pTh instanceof Error) {

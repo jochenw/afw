@@ -785,7 +785,7 @@ public class Streams {
      * @return A {@link ByteArrayInputStream}, returning the given byte array.
      * @throws NullPointerException The parameter {@code pBytes} is null.
      */
-    public static @NonNull ByteArrayInputStream of(byte[] pBytes) {
+    public static @NonNull ByteArrayInputStream of(byte @NonNull [] pBytes) {
     	return new ByteArrayInputStream(Objects.requireNonNull(pBytes, "Bytes"));
     }
 
@@ -812,8 +812,10 @@ public class Streams {
      * @throws NullPointerException The parameter {@code pBytes} is null.
      */
     public static @NonNull ByteArrayInputStream of(@NonNull String pString, @Nullable Charset pCharset) {
-    	final byte[] bytes = Objects.requireNonNull(pString, "String")
-    			.getBytes(Objects.notNull(pCharset, UTF_8));
+    	final @NonNull String string = Objects.requireNonNull(pString, "String");
+    	final @NonNull Charset charset = Objects.notNull(pCharset, UTF_8);
+		@SuppressWarnings("null")
+		final byte @NonNull [] bytes = string.getBytes(charset);
     	return of(bytes);
     }
 	/**

@@ -15,27 +15,30 @@
  */
 package com.github.jochenw.afw.core.props;
 
+import org.jspecify.annotations.NonNull;
 
 /** Default implementation of an {@link IIntProperty integer property}.
  */
-public class IntProperty extends AbstractProperty<Integer> implements IIntProperty {
+public class IntProperty extends AbstractProperty<@NonNull Integer> implements IIntProperty {
 	/**
 	 * Creates a new instance with the given property key, and default value.
 	 * @param pKey The properties key.
 	 * @param pDefaultValue The properties default value.
 	 */
-    public IntProperty(String pKey, Integer pDefaultValue) {
+    public IntProperty(@NonNull String pKey, @NonNull Integer pDefaultValue) {
         super(pKey, pDefaultValue);
     }
 
     @Override
-    protected Integer convert(String pStrValue) {
+    protected @NonNull Integer convert(String pStrValue) {
         if (pStrValue == null) {
             return getDefaultValue();
         }
         try {
             final int i = Integer.parseInt(pStrValue);
-            return Integer.valueOf(i);
+            @SuppressWarnings("null")
+			final @NonNull Integer v = Integer.valueOf(i);
+            return v;
         } catch (NumberFormatException e) {
             return getDefaultValue();
         }

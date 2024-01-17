@@ -140,15 +140,15 @@ public class DomHelper {
 	 * @param <N> The actual node type.
 	 */
 	public static class NodeChildrenIterable<N extends Node> implements IStreamableIterable<N> {
-		private Node parent;
-		private final Predicate<Node> predicate;
+		private @NonNull Node parent;
+		private final Predicate<@NonNull Node> predicate;
 		/**
 		 * Creates a new instance, which iterates over the given nodes children, that match the
 		 * given predicate.
 		 * @param pParent The parent node, which is being queried for children.
 		 * @param pPredicate The predicate, which the children
 		 */
-		public NodeChildrenIterable(@NonNull Node pParent, @NonNull Predicate<Node> pPredicate) {
+		public NodeChildrenIterable(@NonNull Node pParent, @NonNull Predicate<@NonNull Node> pPredicate) {
 			predicate = pPredicate;
 			parent = pParent;
 		}
@@ -169,7 +169,7 @@ public class DomHelper {
 	}
 
 	private String defaultNamespaceUri = null;
-	private BiFunction<Locator,String,LocalizableException> errorHandler;
+	private BiFunction<Locator,@NonNull String,@NonNull LocalizableException> errorHandler;
 	private Function<Node,Locator> locationProvider;
 
 	/**
@@ -189,14 +189,14 @@ public class DomHelper {
 	/**
 	 * @return the errorHandler
 	 */
-	public BiFunction<Locator, String, LocalizableException> getErrorHandler() {
+	public BiFunction<Locator, @NonNull String, @NonNull LocalizableException> getErrorHandler() {
 		return errorHandler;
 	}
 
 	/**
 	 * @param errorHandler the errorHandler to set
 	 */
-	public void setErrorHandler(BiFunction<Locator, String, LocalizableException> errorHandler) {
+	public void setErrorHandler(BiFunction<Locator, @NonNull String, @NonNull LocalizableException> errorHandler) {
 		this.errorHandler = errorHandler;
 	}
 	
@@ -271,8 +271,9 @@ public class DomHelper {
 	 * @return The parent nodes child elements with the given local name,
 	 *   and the given namespace URI.
 	 */
-	public @NonNull IStreamableIterable<Element> getChildrenNS(@NonNull Node pNode, @Nullable String pNamespaceUri,
-			                                        @NonNull String pLocalName) {
+	public @NonNull IStreamableIterable<Element> getChildrenNS(@NonNull Node pNode,
+			                                                   @Nullable String pNamespaceUri,
+			                                                   @NonNull String pLocalName) {
 		return new NodeChildrenIterable<Element>(pNode, (n) -> isElementNS(n, pNamespaceUri, pLocalName));
 	}
 
@@ -345,12 +346,14 @@ public class DomHelper {
 	 * namespace URI, and the given local name. If the assertion
 	 * fails, throws a {@link LocalizableException}.
 	 * @param pNode The node, which is being tested.
-	 * @param pNamespaceURI The expected namespace URI.
+	 * @param pNamespaceURI The expected namespace URI, or null for the
+	 *   default namespace URI.
 	 * @param pLocalName The expected local name.
 	 * @throws LocalizableException The assertion failed.
 	 * @return The input {@code pNode}, casted to an {@link Element}.
 	 */
-	public Element assertElementNS(@NonNull Node pNode, @NonNull String pNamespaceURI, String pLocalName)
+	public Element assertElementNS(@NonNull Node pNode, @Nullable String pNamespaceURI,
+			                       @NonNull String pLocalName)
 	    throws LocalizableException {
 		if (pNode.getNodeType() == Node.ELEMENT_NODE) {
 			if (!isElementNS(pNode, pNamespaceURI, pLocalName)) {
@@ -372,7 +375,8 @@ public class DomHelper {
 	 * {@link #getDefaultNamespaceUri() default namespace URI}, and the
 	 * given local name. Null, if no such child is present.
 	 */
-	public @Nullable Element getFirstChild(@NonNull Node pNode, String pLocalName) {
+	public @Nullable Element getFirstChild(@NonNull Node pNode,
+			                               @NonNull String pLocalName) {
 		return getFirstChildNS(pNode, getDefaultNamespaceUri(), pLocalName);
 	}
 
@@ -385,7 +389,9 @@ public class DomHelper {
 	 * @return The first child element of the given node, which has the given
 	 * namespace URI, and the given local name. Null, if no such child is present.
 	 */
-	public @Nullable Element getFirstChildNS(@NonNull Node pNode, String pNamespaceURI, String pLocalName) {
+	public @Nullable Element getFirstChildNS(@NonNull Node pNode,
+			                                 @Nullable String pNamespaceURI,
+			                                 @NonNull String pLocalName) {
 		for (Node node = pNode.getFirstChild();  node != null;  node = node.getNextSibling()) {
 			if (isElementNS(node, pNamespaceURI, pLocalName)) {
 				return (Element) node;
@@ -405,7 +411,9 @@ public class DomHelper {
 	 * found, throws a {@link LocalizableException}.
 	 * @throws LocalizableException No matching child is present.
 	 */
-	public @Nullable Element requireFirstChild(@NonNull Node pNode, String pLocalName) throws LocalizableException {
+	public @Nullable Element requireFirstChild(@NonNull Node pNode,
+			                                   @NonNull String pLocalName)
+	        throws LocalizableException {
 		return requireFirstChildNS(pNode, getDefaultNamespaceUri(), pLocalName);
 	}
 
@@ -421,7 +429,9 @@ public class DomHelper {
 	 * found, throws a {@link LocalizableException}.
 	 * @throws LocalizableException No matching child is present.
 	 */
-	public @NonNull Element requireFirstChildNS(@NonNull Node pNode, String pNamespaceURI, String pLocalName)
+	public @NonNull Element requireFirstChildNS(@NonNull Node pNode,
+			                                    @Nullable String pNamespaceURI,
+			                                    @NonNull String pLocalName)
 	    throws LocalizableException {
 		final Element e = getFirstChildNS(pNode, pNamespaceURI, pLocalName);
 		if (e == null) {
@@ -487,7 +497,7 @@ public class DomHelper {
 	 * @return The boolean value of the attribute {@code pName} in the element {@code pName}.
 	 * @throws LocalizableException The given node is not an element.
 	 */
-	public @NonNull boolean requireAttribute(@NonNull Node pNode, @NonNull String pName, @NonNull boolean pDefaultValue) throws LocalizableException {
+	public boolean requireAttribute(@NonNull Node pNode, @NonNull String pName, boolean pDefaultValue) throws LocalizableException {
 		final String value = getAttribute(pNode, pName);
 		if (value == null  ||  value.length() == 0) {
 			return pDefaultValue;
@@ -513,7 +523,7 @@ public class DomHelper {
 	 * @return The attributes value, as a {@link Path} object.
 	 */
 	public @NonNull Path requirePathAttribute(@NonNull Node pNode, @NonNull String pName, @NonNull Predicate<Path> pPredicate,
-			                         @NonNull Supplier<String> pErrorMsgSupplier) {
+			                         @NonNull Supplier<@NonNull String> pErrorMsgSupplier) {
 		final Path path = requirePathAttribute(pNode, pName);
 		if (pPredicate.test(path)) {
 			return path;
@@ -533,7 +543,7 @@ public class DomHelper {
 	 * @see #getPathElement(Node, String, Predicate, Function)
 	 */
 	public Path requirePathElement(@NonNull Node pNode, @NonNull String pName, @NonNull Predicate<Path> pPredicate,
-			Function<String,String> pErrorMsgSupplier) {
+			Function<String,@NonNull String> pErrorMsgSupplier) {
 		final Element element = getFirstChild(pNode, pName);
 		if (element == null) {
 			throw error(pNode, "Expected child element not found: " + pName);
@@ -561,7 +571,7 @@ public class DomHelper {
 	 * @see #requirePathElement(Node, String, Predicate, Function)
 	 */
 	public Path getPathElement(@NonNull Node pNode, @NonNull String pName, @NonNull Predicate<Path> pPredicate,
-			Function<String,String> pErrorMsgSupplier) {
+			Function<String,@NonNull String> pErrorMsgSupplier) {
 		final Element element = getFirstChild(pNode, pName);
 		if (element == null) {
 			return null;

@@ -17,6 +17,8 @@ package com.github.jochenw.afw.core.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
@@ -31,6 +33,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.Function;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.props.DefaultInterpolator;
 import com.github.jochenw.afw.core.props.Interpolator;
@@ -124,7 +129,8 @@ public class FileUtils {
 	 *   which may be contained, and replaced in the copied files.
 	 * @throws UncheckedIOException Copying failed.
 	 */
-	public static void copyDirectory(final Path pSource, final Path pTarget, Function<String,String> pMapper) {
+	public static void copyDirectory(final Path pSource, final Path pTarget,
+			                         @Nullable Function<@NonNull String, @Nullable String> pMapper) {
 		try {
 			java.nio.file.Files.walk(pSource).forEach(a -> {
 				final Path relativePath = pSource.relativize(a);
@@ -133,14 +139,21 @@ public class FileUtils {
 					if (java.nio.file.Files.isDirectory(a)) {
 						java.nio.file.Files.createDirectories(b);
 					} else {
-						final Interpolator interpolator = new DefaultInterpolator(pMapper);
-						final StringWriter sw = new StringWriter();
-						try (Reader reader = java.nio.file.Files.newBufferedReader(a, StandardCharsets.UTF_8)) {
-							Streams.copy(reader, sw);
-						}
-						final String contents = interpolator.interpolate(sw.toString());
-						try (Writer w = java.nio.file.Files.newBufferedWriter(b)) {
-							w.write(contents);
+						if (pMapper == null) {
+							try (InputStream in = Files.newInputStream(a);
+								 OutputStream out = Files.newOutputStream(b)) {
+								Streams.copy(in, out);
+							}
+						} else {
+							final Interpolator interpolator = new DefaultInterpolator(pMapper);
+							final StringWriter sw = new StringWriter();
+							try (Reader reader = java.nio.file.Files.newBufferedReader(a, StandardCharsets.UTF_8)) {
+								Streams.copy(reader, sw);
+							}
+							final String contents = interpolator.interpolate(sw.toString());
+							try (Writer w = java.nio.file.Files.newBufferedWriter(b)) {
+								w.write(contents);
+							}
 						}
 					}
 				} catch (IOException e) {

@@ -15,6 +15,8 @@
  */
 package com.github.jochenw.afw.core.props;
 
+import org.jspecify.annotations.NonNull;
+
 /** Default implementation of a string property.
  */
 public class StringProperty extends AbstractProperty<String> {
@@ -23,7 +25,7 @@ public class StringProperty extends AbstractProperty<String> {
 	 * @param pKey The properties key.
 	 * @param pDefaultValue The properties default value. (May be null.)
 	 */
-    public StringProperty(String pKey, String pDefaultValue) {
+    public StringProperty(@NonNull String pKey, String pDefaultValue) {
         super(pKey, pDefaultValue);
     }
 

@@ -124,11 +124,11 @@ public class Objects {
 	 * @param pDescription Used to construct an error message, if necessary.
 	 * @return The unmodified input array.
 	 */
-	public static @NonNull <T> T[] requireAllNonNull(T[] pValues, String pDescription) {
+	public static <T> T @NonNull [] requireAllNonNull(T[] pValues, String pDescription) {
 		if (pValues == null) {
 			throw new NullPointerException(pDescription + "s");
 		} else {
-			final @NonNull T[] array = pValues;
+			final T @NonNull [] array = pValues;
 			for (int i = 0;  i < array.length;  i++) {
 				if (array[i] == null) {
 					throw new NullPointerException(pDescription + ", element " + i);
@@ -311,7 +311,9 @@ public class Objects {
 			final InputStream in = Objects.requireNonNull(pIn, "InputStream");
 			try {
 				final ObjectInputStream ois = new ObjectInputStream(in);
-				return ois.readObject();
+				@SuppressWarnings("null")
+				final @NonNull Object result = ois.readObject();
+				return result;
 			} catch (ClassNotFoundException e) {
 				throw new UndeclaredThrowableException(e);
 			} catch (IOException e) {
@@ -375,7 +377,7 @@ public class Objects {
 		 * @param <O> Type of the cached object.
 		 * @return The created instance.
 		 */
-		public static <O> CachedObjectManager<O> of(@NonNull Path pCacheFile, FailableSupplier<O,?> pSupplier) {
+		public static <O> CachedObjectManager<O> of(@NonNull Path pCacheFile, @NonNull FailableSupplier<O,?> pSupplier) {
 			return new CachedObjectManager<>(pCacheFile, pSupplier);
 		}
 		/** Returns the cached object, if available.
@@ -386,7 +388,8 @@ public class Objects {
 		public O get() {
 			final Path cf = getCacheFile();
 			if (Files.isRegularFile(cf)) {
-				try (InputStream in = Files.newInputStream(cf)) {
+				try (@SuppressWarnings("null")
+				     @NonNull InputStream in = Files.newInputStream(cf)) {
 					@SuppressWarnings("unchecked")
 					final O o = (O) getSerializer().read(in);
 					return o;
@@ -395,9 +398,11 @@ public class Objects {
 				}
 			} else {
 				try {
-					final O o = supplier.get();
+					final @NonNull O o = Objects.requireNonNull(supplier.get(),
+							  "The supplier returned a null object.");
 					FileUtils.createDirectoryFor(cf);
-					try (OutputStream out = Files.newOutputStream(cf)) {
+					try (@SuppressWarnings("null")
+					     @NonNull OutputStream out = Files.newOutputStream(cf)) {
 						getSerializer().write(o, out);
 					}
 					return o;
@@ -419,7 +424,7 @@ public class Objects {
 	 * @param <O> Type of the cached object.
 	 * @return The cached, or created object.
 	 */
-	public static <O> O getCacheableObject(@NonNull Path pCacheFile, FailableSupplier<O,? > pSupplier) {
+	public static <O> O getCacheableObject(@NonNull Path pCacheFile, @NonNull FailableSupplier<O,? > pSupplier) {
 		return CachedObjectManager.of(pCacheFile, pSupplier).get();
 	}
 }

@@ -15,28 +15,31 @@
  */
 package com.github.jochenw.afw.core.props;
 
+import org.jspecify.annotations.NonNull;
 
 /**
  * Default implementation of {@link ILongProperty}.
  */
-public class LongProperty extends AbstractProperty<Long> implements ILongProperty {
+public class LongProperty extends AbstractProperty<@NonNull Long> implements ILongProperty {
 	/**
 	 * Creates a new instance with the given property key, and default value.
 	 * @param pKey The properties key.
 	 * @param pDefaultValue The properties default value.
 	 */
-    public LongProperty(String pKey, Long pDefaultValue) {
+    public LongProperty(@NonNull String pKey, @NonNull Long pDefaultValue) {
         super(pKey, pDefaultValue);
     }
 
     @Override
-    protected Long convert(String pStrValue) {
+    protected @NonNull Long convert(String pStrValue) {
         if (pStrValue == null) {
             return getDefaultValue();
         }
         try {
             final long l = Long.parseLong(pStrValue);
-            return Long.valueOf(l);
+            @SuppressWarnings("null")
+			final @NonNull Long v = Long.valueOf(l);
+            return v;
         } catch (NumberFormatException e) {
             return getDefaultValue();
         }

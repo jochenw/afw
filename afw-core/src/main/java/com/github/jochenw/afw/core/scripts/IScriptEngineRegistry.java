@@ -1,5 +1,7 @@
 package com.github.jochenw.afw.core.scripts;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.util.Scripts;
@@ -22,7 +24,7 @@ public interface IScriptEngineRegistry {
 	 * that would accept the given {@link IReadable file} as a script
 	 * file. Otherwise false.
 	 */
-	boolean isScriptFile(IReadable pReadable);
+	boolean isScriptFile(@NonNull IReadable pReadable);
 	/** Invokes the given {@link FailableConsumer} for every registered
 	 * script engine.
 	 * @param pConsumer The consumer, that is beig invoked for every

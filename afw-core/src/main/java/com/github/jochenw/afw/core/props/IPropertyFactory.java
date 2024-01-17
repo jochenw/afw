@@ -19,6 +19,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Interface of a property factory.
@@ -51,7 +53,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the default value null.
      */
-    IProperty<String> getProperty(String pKey);
+    IProperty<String> getProperty(@NonNull String pKey);
     /** Returns a string property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -59,7 +61,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IProperty<String> getProperty(String pKey, String pDefaultValue);
+    IProperty<String> getProperty(@NonNull String pKey, String pDefaultValue);
     /** Returns a string property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -68,7 +70,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IProperty<String> getProperty(String pKey, String pDefaultValue, IProperty.ChangeListener<String> pListener);
+    IProperty<String> getProperty(@NonNull String pKey, String pDefaultValue, IProperty.ChangeListener<String> pListener);
     /** Returns an integer property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -76,7 +78,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IIntProperty getIntProperty(String pKey, int pDefaultValue);
+    IIntProperty getIntProperty(@NonNull String pKey, int pDefaultValue);
     /** Returns an integer property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -85,7 +87,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IIntProperty getIntProperty(String pKey, int pDefaultValue, IProperty.ChangeListener<Integer> pListener);
+    IIntProperty getIntProperty(@NonNull String pKey, int pDefaultValue, IProperty.ChangeListener<Integer> pListener);
     /** Returns a long property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -93,7 +95,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    ILongProperty getLongProperty(String pKey, long pDefaultValue);
+    ILongProperty getLongProperty(@NonNull String pKey, long pDefaultValue);
     /** Returns a long property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -102,7 +104,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    ILongProperty getLongProperty(String pKey, long pDefaultValue, IProperty.ChangeListener<Long> pListener);
+    ILongProperty getLongProperty(@NonNull String pKey, long pDefaultValue, IProperty.ChangeListener<Long> pListener);
     /** Returns a boolean property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -110,7 +112,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IBooleanProperty getBooleanProperty(String pKey, boolean pDefaultValue);
+    IBooleanProperty getBooleanProperty(@NonNull String pKey, boolean pDefaultValue);
     /** Returns a boolean property object with the given key,
      * and the given default value.
      * @param pKey The property objects key.
@@ -119,14 +121,14 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IBooleanProperty getBooleanProperty(String pKey, boolean pDefaultValue, IProperty.ChangeListener<Boolean> pListener);
+    IBooleanProperty getBooleanProperty(@NonNull String pKey, boolean pDefaultValue, IProperty.ChangeListener<Boolean> pListener);
     /** Returns a boolean property object with the given key,
      * and the default value false.
      * @param pKey The property objects key.
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IBooleanProperty getBooleanProperty(String pKey);
+    IBooleanProperty getBooleanProperty(@NonNull String pKey);
     /** Returns a boolean property object with the given key,
      * and the default value false.
      * @param pKey The property objects key.
@@ -134,7 +136,7 @@ public interface IPropertyFactory {
      * @return A property object with the given key,
      *   and the given default value.
      */
-    IBooleanProperty getBooleanProperty(String pKey, IProperty.ChangeListener<Boolean> pListener);
+    IBooleanProperty getBooleanProperty(@NonNull String pKey, IProperty.ChangeListener<Boolean> pListener);
     /** Returns an URL property object with the given key, no default value,
      * and no change listener.
      * @param pKey The property objects key.
@@ -150,7 +152,7 @@ public interface IPropertyFactory {
      * @return An URL property object with the given key, no default value,
      *   and no change listener.
      */
-    IURLProperty getUrlProperty(String pKey, URL pDefaultValue);
+    IURLProperty getUrlProperty(@NonNull String pKey, URL pDefaultValue);
     /** Returns an URL property object with the given key, the given default value,
      * and the given change listener.
      * @param pKey The property objects key.
@@ -162,14 +164,14 @@ public interface IPropertyFactory {
      * @return An URL property object with the given key, no default value,
      *   and no change listener.
      */
-    IURLProperty getUrlProperty(String pKey, URL pDefaultValue, IProperty.ChangeListener<URL> pListener);
+    IURLProperty getUrlProperty(@NonNull String pKey, URL pDefaultValue, IProperty.ChangeListener<URL> pListener);
     /** Returns a path property object with the given key, no default value,
      * and no change listener.
      * @param pKey The property objects key.
      * @return A path property object with the given key, no default value,
      * and no change listener.
      */
-    IPathProperty getPathProperty(String pKey);
+    IPathProperty getPathProperty(@NonNull String pKey);
     /** Returns a path property object with the given key, the given default value,
      * and no change listener.
      * @param pKey The property objects key.
@@ -178,7 +180,7 @@ public interface IPropertyFactory {
      * @return A path property object with the given key, no default value,
      *   and no change listener.
      */
-    IPathProperty getPathProperty(String pKey, Path pDefaultValue);
+    IPathProperty getPathProperty(@NonNull String pKey, Path pDefaultValue);
     /** Returns a path property object with the given key, the given default value,
      * and the given change listener.
      * @param pKey The property objects key.
@@ -190,7 +192,7 @@ public interface IPropertyFactory {
      * @return A path property object with the given key, no default value,
      *   and no change listener.
      */
-    IPathProperty getPathProperty(String pKey, Path pDefaultValue, IProperty.ChangeListener<Path> pListener);
+    IPathProperty getPathProperty(@NonNull String pKey, Path pDefaultValue, IProperty.ChangeListener<Path> pListener);
     
     /** Returns the property value with the given key, or null.
      * @return The property value with the given key, or null.

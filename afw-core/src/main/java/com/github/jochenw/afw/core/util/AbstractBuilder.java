@@ -15,38 +15,40 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /** Abstract base class for creating builders.
  * @param <S> Type of the object, that's being created by the builder.
  * @param <T> Actual type of the builder.
  */
 public abstract class AbstractBuilder<S,T extends AbstractBuilder<S,T>> extends AbstractMutable {
-	private S instance;
+	private @Nullable S instance;
 
 	/** Returns this builder.
 	 * @return This builder.
 	 */
-	protected T self() {
+	protected @NonNull T self() {
 		@SuppressWarnings("unchecked")
-		final T t = (T) this;
+		final @NonNull T t = (T) this;
 		return t;
 	}
 
 	/** Creates the instance, that the builder returns.
 	 * @return The created instance, with the builders configuration applied.
 	 */
-	protected abstract S newInstance();
+	protected abstract @NonNull S newInstance();
 
 	/**
 	 * Makes this builder immutable, and returns the created instance.
 	 * @return The created instance
 	 */
-	public S build() {
+	public @NonNull S build() {
 		if (isMutable()) {
-			S s = newInstance();
+			@NonNull S s = newInstance();
 			makeImmutable();
 			instance = s;
 		}
-		return instance;
+		return Objects.requireNonNull(instance);
 	}
 }

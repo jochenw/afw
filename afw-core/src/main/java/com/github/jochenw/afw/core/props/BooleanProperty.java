@@ -15,26 +15,29 @@
  */
 package com.github.jochenw.afw.core.props;
 
+import org.jspecify.annotations.NonNull;
 
-/** Implemantation of a boolean {@link IProperty}.
+/** Implementation of a boolean {@link IProperty}.
  */
-public class BooleanProperty extends AbstractProperty<Boolean> implements IBooleanProperty {
+public class BooleanProperty extends AbstractProperty<@NonNull Boolean> implements IBooleanProperty {
 	/**
 	 * Creates a new instance with the given property key, and default value.
 	 * @param pKey The property key.
 	 * @param pDefaultValue The default value.
 	 */
-    public BooleanProperty(String pKey, Boolean pDefaultValue) {
+    public BooleanProperty(@NonNull String pKey, Boolean pDefaultValue) {
         super(pKey, pDefaultValue);
     }
 
     @Override
-    protected Boolean convert(String pStrValue) {
+    protected @NonNull Boolean convert(String pStrValue) {
         if (pStrValue == null) {
             return getDefaultValue();
         }
         final boolean b = Boolean.parseBoolean(pStrValue);
-        return Boolean.valueOf(b);
+        @SuppressWarnings("null")
+		final @NonNull Boolean v = Boolean.valueOf(b);
+        return v;
     }
 
     @Override

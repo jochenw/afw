@@ -19,6 +19,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 
+import org.jspecify.annotations.NonNull;
+
 
 /** A ClassLoader, which works like an URLClassLoader, except that it
  * implements a parent-last lookup.
@@ -35,7 +37,9 @@ public class ParentLastClassLoader extends ClassLoader {
 	 */
 	public ParentLastClassLoader(ClassLoader pParent, URL... pUrls) {
 		super(null);
-		final ClassLoader parent = Objects.notNull(pParent, Thread.currentThread().getContextClassLoader());
+		@SuppressWarnings("null")
+		final @NonNull ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		final ClassLoader parent = Objects.notNull(pParent, contextClassLoader);
 		urls = Objects.requireNonNull(pUrls, "Urls");
 		delegateWithParent = new URLClassLoader(urls, parent);
 		delegateWithoutParent = new URLClassLoader(urls, null);

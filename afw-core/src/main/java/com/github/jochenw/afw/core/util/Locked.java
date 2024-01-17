@@ -41,13 +41,13 @@ public class Locked<T> {
 		 */
 		public Out call(O pObject) throws Exception;
 	}
-	private T object;
+	private @NonNull T object;
 	private final StampedLock lock = new StampedLock();
 
 	/**Creates a new instance with the given hidden object. 
 	 * @param pObject The hidden object.
 	 */
-	public Locked(T pObject) {
+	public Locked(@NonNull T pObject) {
 		object = pObject;
 	}
 
@@ -56,7 +56,7 @@ public class Locked<T> {
 	 * @param pRunnable The accessor, which will be invoked with the
 	 * hidden object.
 	 */
-	public void runReadLocked(@NonNull Runnable<T> pRunnable) {
+	public void runReadLocked(@NonNull Runnable<@NonNull T> pRunnable) {
 		final long l = lock.readLock();
 		try {
 			pRunnable.run(object);
@@ -91,7 +91,7 @@ public class Locked<T> {
 	 * @return The result object, that has been provided by invoking
 	 * the given callable.
 	 */
-	public <O> O callReadLocked(@NonNull Callable<T,O> pCallable) {
+	public <O> O callReadLocked(@NonNull Callable<@NonNull T,O> pCallable) {
 		final long l = lock.readLock();
 		try {
 			return pCallable.call(object);
@@ -110,7 +110,7 @@ public class Locked<T> {
 	 * @return The result object, that has been provided by invoking
 	 * the given callable.
 	 */
-	public <O> O callWriteLocked(@NonNull Callable<T,O> pCallable) {
+	public <O> O callWriteLocked(@NonNull Callable<@NonNull T,O> pCallable) {
 		final long l = lock.writeLock();
 		try {
 			return pCallable.call(object);
@@ -128,7 +128,7 @@ public class Locked<T> {
 	 * @return The cloned object, which may be accessed without any
 	 * limitations.
 	 */
-	public T get(Callable<T,T> pCloner) {
+	public @NonNull T get(@NonNull Callable<@NonNull T,@NonNull T> pCloner) {
 		return callReadLocked(pCloner);
 	}
 
@@ -136,7 +136,7 @@ public class Locked<T> {
 	 * @param pObject The new object.
 	 * @return The previous hidden object.
 	 */
-	public T set(T pObject) {
+	public @NonNull T set(@NonNull T pObject) {
 		return callWriteLocked((t) -> {
 			object = pObject;
 			return t;

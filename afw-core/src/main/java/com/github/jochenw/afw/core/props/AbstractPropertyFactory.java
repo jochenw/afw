@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Abstract base implementation of {@link IPropertyFactory}.
  */
@@ -39,17 +41,17 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
         });
     }
     @Override
-    public IProperty<String> getProperty(String pKey) {
+    public IProperty<String> getProperty(@NonNull String pKey) {
         return getProperty(pKey, null);
     }
 
     @Override
-    public IProperty<String> getProperty(String pKey, String pDefaultValue) {
+    public IProperty<String> getProperty(@NonNull String pKey, String pDefaultValue) {
         return getProperty(pKey, pDefaultValue, null);
     }
 
     @Override
-    public IProperty<String> getProperty(String pKey, String pDefaultValue, IProperty.ChangeListener<String> pListener) {
+    public IProperty<String> getProperty(@NonNull String pKey, String pDefaultValue, IProperty.ChangeListener<String> pListener) {
         final StringProperty sp = new StringProperty(pKey, pDefaultValue);
         sp.valueChanged(this, null, getPropertyMap());
         if (pListener != null) {
@@ -61,16 +63,18 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
     }
 
     @Override
-    public IIntProperty getIntProperty(String pKey, int pDefaultValue) {
+    public IIntProperty getIntProperty(@NonNull String pKey, int pDefaultValue) {
         return getIntProperty(pKey, pDefaultValue, null);
     }
 
     @Override
-    public IIntProperty getIntProperty(String pKey, int pDefaultValue, IProperty.ChangeListener<Integer> pListener) {
+    public IIntProperty getIntProperty(@NonNull String pKey, int pDefaultValue, IProperty.ChangeListener<Integer> pListener) {
         final IntProperty ip = new IntProperty(pKey, pDefaultValue);
         ip.valueChanged(this, null, getPropertyMap());
         if (pListener != null) {
-            ip.addListener(pListener);
+        	@SuppressWarnings("null")
+			final IProperty.ChangeListener<@NonNull Integer> listener = pListener;
+            ip.addListener(listener);
             pListener.valueChanged(ip, null, ip.getValue());
         }
         addListener(ip);
@@ -78,16 +82,18 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
     }
 
     @Override
-    public ILongProperty getLongProperty(String pKey, long pDefaultValue) {
+    public ILongProperty getLongProperty(@NonNull String pKey, long pDefaultValue) {
         return getLongProperty(pKey, pDefaultValue, null);
     }
 
     @Override
-    public ILongProperty getLongProperty(String pKey, long pDefaultValue, IProperty.ChangeListener<Long> pListener) {
+    public ILongProperty getLongProperty(@NonNull String pKey, long pDefaultValue, IProperty.ChangeListener<Long> pListener) {
         final LongProperty lp = new LongProperty(pKey, pDefaultValue);
         lp.valueChanged(this, null, getPropertyMap());
         if (pListener != null) {
-            lp.addListener(pListener);
+        	@SuppressWarnings("null")
+			final IProperty.ChangeListener<@NonNull Long> listener = pListener;
+            lp.addListener(listener);
             pListener.valueChanged(lp, null, lp.getValue());
         }
         addListener(lp);
@@ -96,26 +102,28 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
 
 
     @Override
-    public IBooleanProperty getBooleanProperty(String pKey) {
+    public IBooleanProperty getBooleanProperty(@NonNull String pKey) {
         return getBooleanProperty(pKey, false);
     }
 
     @Override
-    public IBooleanProperty getBooleanProperty(String pKey, boolean pDefaultValue) {
+    public IBooleanProperty getBooleanProperty(@NonNull String pKey, boolean pDefaultValue) {
         return getBooleanProperty(pKey, pDefaultValue, null);
     }
 
     @Override
-    public IBooleanProperty getBooleanProperty(String pKey, IProperty.ChangeListener<Boolean> pListener) {
+    public IBooleanProperty getBooleanProperty(@NonNull String pKey, IProperty.ChangeListener<Boolean> pListener) {
         return getBooleanProperty(pKey, false, pListener);
     }
 
     @Override
-    public IBooleanProperty getBooleanProperty(String pKey, boolean pDefaultValue, IProperty.ChangeListener<Boolean> pListener) {
+    public IBooleanProperty getBooleanProperty(@NonNull String pKey, boolean pDefaultValue, IProperty.ChangeListener<Boolean> pListener) {
         final BooleanProperty bp = new BooleanProperty(pKey, pDefaultValue);
         bp.valueChanged(this, null, getPropertyMap());
         if (pListener != null) {
-            bp.addListener(pListener);
+        	@SuppressWarnings("null")
+			final IProperty.ChangeListener<@NonNull Boolean> listener = pListener;
+            bp.addListener(listener);
             pListener.valueChanged(bp, null, bp.getValue());
         }
         addListener(bp);
@@ -128,12 +136,12 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
     }
 
 	@Override
-	public IURLProperty getUrlProperty(String pKey, URL pDefaultValue) {
+	public IURLProperty getUrlProperty(@NonNull String pKey, URL pDefaultValue) {
 		return getUrlProperty(pKey, pDefaultValue, null);
 	}
 
 	@Override
-	public IURLProperty getUrlProperty(String pKey, URL pDefaultValue,
+	public IURLProperty getUrlProperty(@NonNull String pKey, URL pDefaultValue,
 			                           IProperty.ChangeListener<URL> pListener) {
 		final UrlProperty up = new UrlProperty(pKey, pDefaultValue);
 		if (pListener != null) {
@@ -143,17 +151,17 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
 	}
 
 	@Override
-	public IPathProperty getPathProperty(String pKey) {
+	public IPathProperty getPathProperty(@NonNull String pKey) {
 		return getPathProperty(pKey, null, null);
 	}
 
 	@Override
-	public IPathProperty getPathProperty(String pKey, Path pDefaultValue) {
+	public IPathProperty getPathProperty(@NonNull String pKey, Path pDefaultValue) {
 		return getPathProperty(pKey, pDefaultValue, null);
 	}
 
 	@Override
-	public IPathProperty getPathProperty(String pKey, Path pDefaultValue,
+	public IPathProperty getPathProperty(@NonNull String pKey, Path pDefaultValue,
 			                             IProperty.ChangeListener<Path> pListener) {
 		final PathProperty pp = new PathProperty(pKey, pDefaultValue);
 		if (pListener != null) {

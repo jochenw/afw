@@ -1,5 +1,8 @@
 package com.github.jochenw.afw.core.util;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 
@@ -109,20 +112,19 @@ public class ContextUtils {
 	 *   is being disposed.
 	 * @return The created context provider.
 	 */
-	public static <C> IContextProvider<C> of(FailableSupplier<C,?> pSupplier, FailableConsumer<C,?> pTerminator) {
-		return new IContextProvider<C>() {
-
+	public static <C> IContextProvider<@NonNull C> of(FailableSupplier<@NonNull C,?> pSupplier, FailableConsumer<C,?> pTerminator) {
+		return new IContextProvider<@NonNull C>() {
 			@Override
-			public void run(IRunnable<C> pRunnable) {
+			public void run(IRunnable<@NonNull C> pRunnable) {
 				call((c) -> { pRunnable.run(c); return null; });
 			}
 
 			@Override
-			public <O> O call(ICallable<C, O> pCallable) {
-				O o = null;
+			public <O> O call(ICallable<@NonNull C, O> pCallable) {
+				@Nullable O o = null;
 				Throwable th = null;
 				boolean close = false;
-				C c = null;
+				@Nullable C c = null;
 				try {
 					c = pSupplier.get();
 					close = true;
@@ -132,7 +134,7 @@ public class ContextUtils {
 				} finally {
 					if (close) {
 						try {
-							pTerminator.accept(c);
+							pTerminator.accept(Objects.requireNonNull(c));
 						} catch (Throwable t) {
 							// In case of more than one Exception: Throw the first.
 							if (th == null) {
@@ -144,7 +146,9 @@ public class ContextUtils {
 				if (th != null) {
 					throw Exceptions.show(th);
 				}
-				return o;
+				@SuppressWarnings("null")
+				final O result = (O) o;
+				return result;
 			}
 		};
 	}

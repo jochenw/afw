@@ -22,10 +22,14 @@ import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.EntityReference;
 import org.w3c.dom.Node;
+import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -71,16 +75,16 @@ public class LocalizableDocument {
 	/** A SAX parser, that is being used to create a {@link LocalizableDocument}.
 	 */
 	public static class Handler implements ContentHandler, LexicalHandler {
-		private final Document nodeFactory;
-		private Node currentNode;
-		private Locator locator;
+		private final @NonNull Document nodeFactory;
+		private @Nullable Node currentNode;
+		private @Nullable Locator locator;
 
 		/** Creates a new instance, that uses the given {@link Document}
 		 * as a {@link Node node} factory.
 		 * @param pDocument A document, that is being used as a as
 		 * {@link Node node} factory.
 		 */
-		public Handler(Document pDocument) {
+		public Handler(@NonNull Document pDocument) {
 			nodeFactory = pDocument;
 		}
 
@@ -89,7 +93,7 @@ public class LocalizableDocument {
 			locator = pLocator;
 		}
 
-		private <N extends Node> N setUserData(N pNode) {
+		private <N extends Node> N setUserData(@NonNull N pNode) {
 			if (locator != null) {
 				pNode.setUserData(KEY, new LocatorImpl(locator), null);
 			}
@@ -122,28 +126,35 @@ public class LocalizableDocument {
 
 		@Override
 		public void startElement(String pUri, String pLocalName, String pQName, Attributes pAttrs) throws SAXException {
-			final Element e = setUserData(nodeFactory.createElementNS(pUri, pQName));
+			@SuppressWarnings("null")
+			final @NonNull Element el = nodeFactory.createElementNS(pUri, pQName);
+			final @NonNull Element e = setUserData(el);
 			if (pAttrs != null) {
 				for (int i = 0;  i < pAttrs.getLength();  i++) {
-					final Attr attr = setUserData(nodeFactory.createAttributeNS(pAttrs.getURI(i), pAttrs.getQName(i)));
+					@SuppressWarnings("null")
+					final @NonNull Attr attrbt = nodeFactory.createAttributeNS(pAttrs.getURI(i), pAttrs.getQName(i));
+					final Attr attr = setUserData(attrbt);
 					attr.setNodeValue(pAttrs.getValue(i));
 					e.setAttributeNodeNS(attr);
 				}
 			}
-			currentNode.appendChild(e);
+			final @NonNull Node cn = Objects.requireNonNull(currentNode);
+			cn.appendChild(e);
 			currentNode = e;
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
-			final Element e = (Element) currentNode;
+			final @NonNull Element e = Objects.requireNonNull((Element) currentNode);
 			currentNode = e.getParentNode();
 		}
 
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
-			final Text text = setUserData(nodeFactory.createTextNode(new String(ch, start, length)));
-			currentNode.appendChild(text);
+			@SuppressWarnings("null")
+			final @NonNull Text txt = nodeFactory.createTextNode(new String(ch, start, length));
+			final Text text = setUserData(txt);
+			Objects.requireNonNull(currentNode).appendChild(text);
 		}
 
 		@Override
@@ -153,12 +164,16 @@ public class LocalizableDocument {
 
 		@Override
 		public void processingInstruction(String target, String data) throws SAXException {
-			currentNode.appendChild(setUserData(nodeFactory.createProcessingInstruction(target, data)));
+			@SuppressWarnings("null")
+			final @NonNull ProcessingInstruction pi = nodeFactory.createProcessingInstruction(target, data);
+			Objects.requireNonNull(currentNode).appendChild(setUserData(pi));
 		}
 
 		@Override
 		public void skippedEntity(String name) throws SAXException {
-			currentNode.appendChild(setUserData(nodeFactory.createEntityReference(name)));
+			@SuppressWarnings("null")
+			final @NonNull EntityReference eRef = nodeFactory.createEntityReference(name);
+			Objects.requireNonNull(currentNode).appendChild(setUserData(eRef));
 		}
 
 		@Override
@@ -193,8 +208,10 @@ public class LocalizableDocument {
 
 		@Override
 		public void comment(char[] ch, int start, int length) throws SAXException {
-			final Text text = setUserData((Text) nodeFactory.createComment(new String(ch, start, length)));
-			currentNode.appendChild(text);
+			@SuppressWarnings("null")
+			final @NonNull Text txt = (Text) nodeFactory.createComment(new String(ch, start, length));
+			final @NonNull Text text = setUserData(txt);
+			Objects.requireNonNull(currentNode).appendChild(text);
 		}
 	}
 
@@ -224,7 +241,8 @@ public class LocalizableDocument {
 			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setValidating(false);
 			dbf.setNamespaceAware(true);
-			final Document doc = dbf.newDocumentBuilder().newDocument();
+			@SuppressWarnings("null")
+			final @NonNull Document doc = dbf.newDocumentBuilder().newDocument();
 			final Handler h = new Handler(doc);
 			Sax.parse(pSource, h);
 			return new LocalizableDocument(doc);

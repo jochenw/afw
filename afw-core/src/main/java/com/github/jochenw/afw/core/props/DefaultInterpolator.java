@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.util.Objects;
 
@@ -33,13 +34,13 @@ import com.github.jochenw.afw.core.util.Objects;
 public class DefaultInterpolator implements Interpolator {
 	private String startToken;
 	private String endToken;
-	private final Function<String,String> propertyProvider;
+	private final Function<@NonNull String, @Nullable String> propertyProvider;
 
 	/**
 	 * Returns a function, that resolves property values.
 	 * @return A function, that resolves property values.
 	 */
-	public Function<String, String> getPropertyProvider() {
+	public Function<@NonNull String, @Nullable String> getPropertyProvider() {
 		return propertyProvider;
 	}
 
@@ -68,7 +69,7 @@ public class DefaultInterpolator implements Interpolator {
 	 * @param pPropertyProvider A function, which is invoked
 	 *   to resolve property values, that are being referenced.
 	 */
-	public DefaultInterpolator(@NonNull Function<String,String> pPropertyProvider) {
+	public DefaultInterpolator(@NonNull Function<@NonNull String, @Nullable String> pPropertyProvider) {
 		propertyProvider = pPropertyProvider;
 	}
 
@@ -126,7 +127,7 @@ public class DefaultInterpolator implements Interpolator {
 	}
 
 	@Override
-	public String interpolate(String pValue) {
+	public String interpolate(@NonNull String pValue) {
 		Objects.requireNonNull(pValue, "Value");
 		final String strtToken = getStartToken();
 		final String ndToken = getEndToken();
@@ -138,7 +139,8 @@ public class DefaultInterpolator implements Interpolator {
 			if (startOffset != -1) {
 				final int endOffset = value.indexOf(ndToken, startOffset+strtToken.length());
 				if (endOffset != -1) {
-					final String key = value.substring(startOffset+strtToken.length(), endOffset);
+					@SuppressWarnings("null")
+					final @NonNull String key = value.substring(startOffset+strtToken.length(), endOffset);
 					value = value.substring(0, startOffset) + getPropertyValue(key) + value.substring(endOffset+ndToken.length());
 					finished = false;
 				}
@@ -152,13 +154,16 @@ public class DefaultInterpolator implements Interpolator {
 		boolean finished = false;
 		while (!finished) {
 			finished = true;
-			final Iterator<Map.Entry<String,String>> iter = pValues.getValues();
+			final Iterator<Map.Entry<@NonNull String, @Nullable String>> iter = pValues.getValues();
 			while (iter.hasNext()) {
-				final Map.Entry<String,String> en = iter.next();
-				final String value = en.getValue();
-				if (isInterpolatable(value)) {
-					en.setValue(interpolate(value));
-					finished = false;
+				final Map.Entry<@NonNull String, @Nullable String> en = iter.next();
+				final @Nullable String value = en.getValue();
+				if (value != null) {
+					final @NonNull String val = value;
+					if (isInterpolatable(val)) {
+						en.setValue(interpolate(val));
+						finished = false;
+					}
 				}
 			}
 		}
@@ -168,7 +173,7 @@ public class DefaultInterpolator implements Interpolator {
 	 * @param pKey The requested variable name.
 	 * @return The requested variables value, possibly null.
 	 */
-	protected String getPropertyValue(String pKey) {
+	protected @Nullable String getPropertyValue(@NonNull String pKey) {
 		return propertyProvider.apply(pKey);
 	}
 }

@@ -3,11 +3,13 @@ package com.github.jochenw.afw.core.props;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.jspecify.annotations.NonNull;
+
 
 /** Implementation of {@link IURLProperty}.
  */
 public class UrlProperty extends AbstractProperty<URL> implements IURLProperty {
-	UrlProperty(String pKey, URL pDefaultValue) {
+	UrlProperty(@NonNull String pKey, URL pDefaultValue) {
 		super(pKey, pDefaultValue);
 	}
 

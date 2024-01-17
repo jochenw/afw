@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Interface of a property filter, which updates property values by interpolation.
@@ -32,19 +35,19 @@ public interface Interpolator extends PropertyFilter {
 		 * Returns an iterator over the full property set.
 		 * @return An iterator over the full property set.
 		 */
-		public Iterator<Map.Entry<String,String>> getValues();
+		public Iterator<Map.Entry<@NonNull String, @Nullable String>> getValues();
 		/**
 		 * Returns the value of the given property.
 		 * @param pKey Key of the property, that is being queried.
 		 * @return Value of the property, that is being queried.
 		 */
-		public String getValue(String pKey);
+		public @Nullable String getValue(@NonNull String pKey);
 		/**
 		 * Sets the value of the given property.
 		 * @param pKey Key of the property, that is being updated.
 		 * @param pValue Value of the property, that is being updated.
 		 */
-		public void setValue(String pKey, String pValue);
+		public void setValue(@NonNull String pKey, @Nullable String pValue);
 	}
 	/**
 	 * Returns, whether the given property value can be interpolated.
@@ -60,7 +63,7 @@ public interface Interpolator extends PropertyFilter {
 	 * @param pValue The property value, that should be interpolated.
 	 * @return The resulting property value, after interpolation.
 	 */
-	public String interpolate(String pValue);
+	public @Nullable String interpolate(@NonNull String pValue);
 	/** Called to interpolate the given property set in-place: The
 	 * original values are lost, if any modifications are done.
 	 * @param pValues The property set, that is being updated.
@@ -73,47 +76,48 @@ public interface Interpolator extends PropertyFilter {
 	public default void interpolate(final Map<Object,Object> pProperties) {
 		final StringSet stringSet = new StringSet() {
 			@Override
-			public Iterator<Entry<String, String>> getValues() {
+			public Iterator<Entry<@NonNull String, @Nullable String>> getValues() {
 				final Iterator<Entry<Object,Object>> iter = pProperties.entrySet().iterator();
-				return new Iterator<Entry<String,String>>(){
+				return new Iterator<Entry<@NonNull String, @Nullable String>>(){
 					@Override
 					public boolean hasNext() {
 						return iter.hasNext();
 					}
 
 					@Override
-					public Entry<String, String> next() {
+					public Entry<@NonNull String, @Nullable String> next() {
 						final Entry<Object,Object> entry = iter.next();
-						return new Entry<String,String>(){
+						return new Entry<@NonNull String, @Nullable String>(){
 							@Override
-							public String getKey() {
-								return (String) entry.getKey();
+							public @NonNull String getKey() {
+								@SuppressWarnings("null")
+								final @NonNull String key = (@NonNull String) entry.getKey();
+								return key;
 							}
 
 							@Override
-							public String getValue() {
-								return (String) entry.getValue();
+							public @Nullable String getValue() {
+								return (@Nullable String) entry.getValue();
 							}
 
 							@Override
-							public String setValue(String pValue) {
+							public String setValue(@Nullable String pValue) {
 								final String value = getValue();
 								entry.setValue(pValue);
 								return value;
 							}
 						};
 					}
-					
 				};
 			}
 
 			@Override
-			public String getValue(String pKey) {
-				return (String) pProperties.get(pKey);
+			public @Nullable String getValue(@NonNull String pKey) {
+				return (@Nullable String) pProperties.get(pKey);
 			}
 
 			@Override
-			public void setValue(String pKey, String pValue) {
+			public void setValue(@NonNull String pKey, @Nullable String pValue) {
 				pProperties.put(pKey, pValue);
 			}
 		};

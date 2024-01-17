@@ -478,7 +478,9 @@ public class Strings {
 		} catch (IOException e) {
 			throw Exceptions.show(e);
 		}
-		return sb.toString();
+		@SuppressWarnings("null")
+		final @NonNull String result = sb.toString();
+		return result;
 	}
 
 	/**
@@ -488,22 +490,34 @@ public class Strings {
 	 * @return The number {@code pItem}, possibly prepended with leading zeroes.
 	 */
 	public static @NonNull String formatLz(int pItem, int pTotal) {
-		Integer item = Integer.valueOf(pItem);
+		@SuppressWarnings("null")
+		@NonNull Integer item = Integer.valueOf(pItem);
 		if (pTotal > 999999) {
 			throw new IllegalArgumentException("The total number of items must be lower than " + (999999 +1));
 		} else if (pTotal > 99999) {
-			return String.format("%06d", item);
+			return format("%06d", item);
 		} else if (pTotal > 9999) {
-			return String.format("%05d", item);
+			return format("%05d", item);
 		} else if (pTotal > 999) {
-			return String.format("%04d", item);
+			return format("%04d", item);
 		} else if (pTotal > 99) {
-			return String.format("%03d", item);
+			return format("%03d", item);
 		} else if (pTotal > 9) {
-			return String.format("%02d", item);
+			return format("%02d", item);
 		} else {
-			return String.format("%d", item);
+			return format("%d", item);
 		}
+	}
+
+	/** Null-safe replacement for {@link String#format(String, Object...)}.
+	 * @param pFmtString The format string.
+	 * @param pParams The parameters, if any.
+	 * @return The formatted string, with the parameters applied.
+	 */
+	public static @NonNull String format(@NonNull String pFmtString, Object... pParams) {
+		@SuppressWarnings("null")
+		final @NonNull String formattedString = String.format(pFmtString, pParams);
+		return formattedString;
 	}
 
 	/** Creates a predicate, which decides, whether an input string matches
@@ -524,12 +538,14 @@ public class Strings {
 	 * @return A predicate, which tests, whether the given description
 	 *   matches it's input string.
 	 */
+	@SuppressWarnings("null")
 	public static @NonNull Predicate<String> matcher(@NonNull String pMatcher) {
 		@NonNull String matcher = Objects.requireNonNull(pMatcher, "Matcher");
 		final boolean excluding;
 		if (matcher.startsWith("!")) {
 			excluding = true;
-			matcher = matcher.substring(1);
+			final @NonNull String match = matcher.substring(1);
+			matcher = match; 
 		} else {
 			excluding = false;
 		}
@@ -616,7 +632,9 @@ public class Strings {
 		for (StringTokenizer st = new StringTokenizer(matchers, separator);  st.hasMoreTokens();  ) {
 			final String matcher = st.nextToken();
 			if (matcher.startsWith("!")) {
-				excludingPredicates.add(matcher(matcher.substring(1)));
+				@SuppressWarnings("null")
+				final @NonNull String invertedMatcher = matcher.substring(1);
+				excludingPredicates.add(matcher(invertedMatcher));
 			} else {
 				includingPredicates.add(matcher(matcher));
 			}

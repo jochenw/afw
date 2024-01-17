@@ -3,11 +3,13 @@ package com.github.jochenw.afw.core.props;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jspecify.annotations.NonNull;
+
 
 /** Implementation of {@link IPathProperty}.
  */
 public class PathProperty extends AbstractProperty<Path> implements IPathProperty {
-	PathProperty(String pKey, Path pDefaultValue) {
+	PathProperty(@NonNull String pKey, Path pDefaultValue) {
 		super(pKey, pDefaultValue);
 	}
 
