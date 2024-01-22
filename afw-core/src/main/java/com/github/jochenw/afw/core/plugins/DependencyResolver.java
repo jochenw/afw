@@ -20,8 +20,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /** The {@link DependencyResolver} works on a graph of nodes, where some of
@@ -39,15 +43,15 @@ public class DependencyResolver {
 	 * @param <T> The node type.
 	 */
 	public static class Node<T extends Object> {
-		private final String id;
-		private final List<String> dependsOn;
-		private final T object;
+		private final @NonNull String id;
+		private final @NonNull List<String> dependsOn;
+		private final @Nullable T object;
 		/** Creates a new instance with an object reference.
 		 * @param pId The nodes id.
 		 * @param pDependsOn List of the node id's, that the created node depends on.
 		 * @param pObject The object, that is referenced by the node.
 		 */
-		public Node(String pId, List<String> pDependsOn, T pObject) {
+		public Node(@NonNull String pId, @NonNull List<String> pDependsOn, @Nullable T pObject) {
 			id = pId;
 			dependsOn = pDependsOn;
 			object = pObject;
@@ -56,7 +60,7 @@ public class DependencyResolver {
 		 * @param pId The nodes id.
 		 * @param pDependsOn List of the node id's, that the created node depends on.
 		 */
-		public Node(String pId, List<String> pDependsOn) {
+		public Node(@NonNull String pId, @NonNull List<String> pDependsOn) {
 			this(pId, pDependsOn, null);
 		}
 		/**
@@ -77,8 +81,22 @@ public class DependencyResolver {
 		 * Returns the referenced object, if any, or null.
 		 * @return The referenced object, if any, or null.
 		 */
-		public T getObject() {
+		public @Nullable T getObject() {
 			return object;
+		}
+		/** Returns the referenced object, if any, or throws a
+		 * {@link NoSuchElementException}.
+		 * @return The referenced object. Never null.
+		 * @throws NoSuchElementException The referenced object is null.
+		 */
+		public @NonNull T requireObject() {
+			final @Nullable T t = getObject();
+			if (t == null) {
+				throw new NoSuchElementException();
+			} else {
+				final @NonNull T result = t;
+				return result;
+			}
 		}
 	}
 

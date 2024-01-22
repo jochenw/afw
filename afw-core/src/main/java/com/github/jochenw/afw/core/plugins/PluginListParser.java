@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -83,7 +84,7 @@ public class PluginListParser {
 	}
 	/** Default return value for {@link PluginListParser.IInitializerSpec#getProperties()}.
 	 */
-	static final Map<String,String> EMPTY_MAP = new HashMap<>();
+	static final @NonNull Map<String,String> EMPTY_MAP = new HashMap<>();
 
 	/** Interface of a listener for initializer specifications.
 	 * The {@link PluginListHandler} requires such a listener to report what it reads.
@@ -206,18 +207,18 @@ public class PluginListParser {
 				  }
 				  final IInitializerSpec spec = new IInitializerSpec() {
 					  @Override
-					  public String getId() {
-						  return id;
+					  public @NonNull String getId() {
+						  return Objects.requireNonNull(id);
 					  }
 
 					  @Override
-					  public List<String> getDependsOn() {
-						  return dependsOnList;
+					  public @NonNull List<String> getDependsOn() {
+						  return Objects.requireNonNull(dependsOnList);
 					  }
 
 					  @Override
-					  public String getClassName() {
-						  return className;
+					  public @NonNull String getClassName() {
+						  return Objects.requireNonNull(className);
 					  }
 				  };
 				  listener.accept(spec);
@@ -263,7 +264,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The unsorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parse(File pFile, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parse(File pFile, @NonNull ClassLoader pClassLoader) {
 		final List<IPluginRegistry.Initializer> list = new ArrayList<>();
 		final PluginListHandler plh = new PluginListHandler(pClassLoader, newListener(pClassLoader, (pi) -> list.add(pi)));
 		Sax.parse(pFile, plh);
@@ -279,7 +280,7 @@ public class PluginListParser {
 	 * construct a new initializer, using the given class loader, and pass
 	 * the created object to the given consumer.
 	 */
-	public static Listener newListener(ClassLoader pClassLoader, Consumer<IPluginRegistry.Initializer> pConsumer) {
+	public static Listener newListener(@NonNull ClassLoader pClassLoader, Consumer<IPluginRegistry.Initializer> pConsumer) {
 		final IInstantiator instantiator = new DefaultInstantiator();
 		return new Listener() {
 			@Override
@@ -305,7 +306,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The unsorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parse(Path pFile, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parse(Path pFile, @NonNull ClassLoader pClassLoader) {
 		final List<IPluginRegistry.Initializer> list = new ArrayList<>();
 		final PluginListHandler plh = new PluginListHandler(pClassLoader, newListener(pClassLoader, (pi) -> list.add(pi)));
 		Sax.parse(pFile, plh);
@@ -318,7 +319,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The unsorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parse(InputSource pSource, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parse(InputSource pSource, @NonNull ClassLoader pClassLoader) {
 		final List<IPluginRegistry.Initializer> list = new ArrayList<>();
 		final PluginListHandler plh = new PluginListHandler(pClassLoader, newListener(pClassLoader, (pi) -> list.add(pi)));
 		Sax.parse(pSource, plh);
@@ -331,7 +332,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The unsorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parse(InputStream pStream, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parse(InputStream pStream, @NonNull ClassLoader pClassLoader) {
 		final List<IPluginRegistry.Initializer> list = new ArrayList<>();
 		final PluginListHandler plh = new PluginListHandler(pClassLoader, newListener(pClassLoader, (pi) -> list.add(pi)));
 		Sax.parse(pStream, plh);
@@ -344,7 +345,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The sorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parseAndSort(File pFile, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parseAndSort(File pFile, @NonNull ClassLoader pClassLoader) {
 		return sort(parse(pFile, pClassLoader));
 	}
 	/** Reads an initializer list from the given input file, initializes the initializers, as specified by
@@ -354,7 +355,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The sorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parseAndSort(Path pFile, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parseAndSort(Path pFile, @NonNull ClassLoader pClassLoader) {
 		return sort(parse(pFile, pClassLoader));
 	}
 	/** Reads an initializer list from the given input source, initializes the initializers, as specified by
@@ -364,7 +365,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The sorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parseAndSort(InputSource pSource, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parseAndSort(InputSource pSource, @NonNull ClassLoader pClassLoader) {
 		return sort(parse(pSource, pClassLoader));
 	}
 	/** Reads an initializer list from the given input stream, initializes the initializers, as specified by
@@ -374,7 +375,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The sorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parseAndSort(InputStream pStream, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parseAndSort(InputStream pStream, @NonNull ClassLoader pClassLoader) {
 		return sort(parse(pStream, pClassLoader));
 	}
 	/** Reads the resource files, as given by the given list of {@link URL urls}, and
@@ -386,7 +387,7 @@ public class PluginListParser {
 	 *    and will be used to instantiate initializers.
 	 * @return The sorted initializer list.
 	 */
-	public static List<IPluginRegistry.Initializer> parseAndSort(List<URL> pUrls, ClassLoader pClassLoader) {
+	public static List<IPluginRegistry.Initializer> parseAndSort(List<URL> pUrls, @NonNull ClassLoader pClassLoader) {
 		final List<IPluginRegistry.Initializer> initializers = new ArrayList<>();
 		for (URL url : pUrls) {
 			try (InputStream in = url.openStream()) {
@@ -433,8 +434,8 @@ public class PluginListParser {
 			return sortedNodeList.stream().map((Function<Node<Initializer>, Initializer>) (n) -> n.getObject()).collect(Collectors.toList());
 		} catch (DuplicateNodeIdException e) {
 			final String id = e.getId();
-			final Initializer initializer0 = (Initializer) e.getNode0().getObject();
-			final Initializer initializer1 = (Initializer) e.getNode1().getObject();
+			final @NonNull Initializer initializer0 = (Initializer) e.getNode0().requireObject();
+			final @NonNull Initializer initializer1 = (Initializer) e.getNode1().requireObject();
 			throw new IllegalStateException("Duplicate plugin id: " + id
 					+ ", used by " + initializer0.getClass().getName()
 					+ ", and " + initializer1.getClass().getName());

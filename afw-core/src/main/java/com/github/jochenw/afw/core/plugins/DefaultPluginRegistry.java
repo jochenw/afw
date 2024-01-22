@@ -77,14 +77,21 @@ public class DefaultPluginRegistry implements IPluginRegistry {
 		private List<O> unmodifiablePlugins = Collections.emptyList();
 
 		@Override
-		public List<O> getPlugins() {
+		public @NonNull List<O> getPlugins() {
 			synchronized(plugins) {
 				if (unmodifiablePlugins == null) {
-					unmodifiablePlugins = Collections.unmodifiableList(plugins);
+					@SuppressWarnings("null")
+					final @NonNull List<O> plugins = Collections.unmodifiableList(this.plugins);
+					unmodifiablePlugins = plugins;
+					return plugins;
+				} else {
+					@SuppressWarnings("null")
+					final @NonNull List<O> plugins = unmodifiablePlugins;
+					return plugins;
 				}
-				return unmodifiablePlugins;
 			}
 		}
+
 		@Override
 		public void addPlugin(O pPlugin) {
 			synchronized(plugins) {
@@ -98,7 +105,7 @@ public class DefaultPluginRegistry implements IPluginRegistry {
 	private final Map<Key,DefaultExtensionPoint<Object>> extensionPoints = new HashMap<>();
 
 	@Override
-	public <O> void addExtensionPoint(Class<O> pType, String pId) {
+	public <O> void addExtensionPoint(@NonNull Class<O> pType, @NonNull String pId) {
 		final Key key = new Key(pType, pId);
 		synchronized(extensionPoints) {
 			if (extensionPoints.containsKey(key)) {
@@ -110,7 +117,7 @@ public class DefaultPluginRegistry implements IPluginRegistry {
 	}
 
 	@Override
-	public <O> IExtensionPoint<O> getExtensionPoint(Class<O> pType, String pId) {
+	public <O> IExtensionPoint<O> getExtensionPoint(@NonNull Class<O> pType, @NonNull String pId) {
 		@SuppressWarnings("unchecked")
 		final IExtensionPoint<O> ep = (IExtensionPoint<O>) extensionPoints.get(new Key(pType, pId));
 		return ep;
