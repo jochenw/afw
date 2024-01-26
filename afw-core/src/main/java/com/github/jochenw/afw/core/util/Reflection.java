@@ -49,7 +49,6 @@ public class Reflection {
      * @param pField The field name being searched for.
      * @param pValue The fields new value.
      */
-    @SuppressWarnings("deprecation")
 	public static void setValue(Object pInstance, String pField, Object pValue) {
     	if (pField == null  ||  pField.length() == 0) {
     		throw new NullPointerException("The field name must not be null, or empty.");
@@ -324,8 +323,9 @@ public class Reflection {
 	 */
 	public static void findFields(@NonNull Class<?> pType, @NonNull FailableConsumer<Field,?> pConsumer,
 			                      @Nullable FailablePredicate<Field,?> pMatcher) {
+		final @NonNull Class<?> type = Objects.requireNonNull(pType, "Type");
 		try {
-			if (pType != null  &&  pType != Object.class) {
+			if (type != Object.class) {
 				Field[] fields = pType.getDeclaredFields();
 				if (fields != null) {
 					for (Field f : fields) {
@@ -334,7 +334,8 @@ public class Reflection {
 						}
 					}
 				}
-				findFields(pType.getSuperclass(), pConsumer, pMatcher);
+				final @NonNull Class<?> parentType = Objects.requireNonNull(pType.getSuperclass());
+				findFields(parentType, pConsumer, pMatcher);
 			}
 		} catch (Throwable t) {
 			throw Exceptions.show(t);

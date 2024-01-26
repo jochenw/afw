@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 /**
@@ -58,14 +59,14 @@ public class BeanWalkerTest {
 		final List<String> list = new ArrayList<>();
 		final BeanWalker.BeanVisitor<TestContext> visitor = new BeanWalker.BeanVisitor<BeanWalkerTest.TestContext>() {
 			@Override
-			public TestContext startWalking(Object pObject) {
+			public @NonNull TestContext startWalking(@NonNull Object pObject) {
 				final TestContext testContext = new TestContext((s) -> { list.add(s); System.out.println(s); });
 				testContext.append("startWalking: " + getName(pObject.getClass()));
 				return testContext;
 			}
 
 			@Override
-			public void endWalking(TestContext pContext, Object pObject) {
+			public void endWalking(@NonNull TestContext pContext, @NonNull Object pObject) {
 				pContext.append("endWalking: " + getName(pObject.getClass()));
 			}
 

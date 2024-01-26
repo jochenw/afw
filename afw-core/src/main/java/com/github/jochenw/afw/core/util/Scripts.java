@@ -53,7 +53,7 @@ public class Scripts {
 	 *   {@link StandardCharsets#UTF_8} is being used as the default.
 	 * @return The compiled script.
 	 */
-	public static Script compile(IReadable pReadable, Charset pCharset) {
+	public static Script compile(@NonNull IReadable pReadable, Charset pCharset) {
 		final MutableBoolean found = new MutableBoolean();
 		final Holder<Script> holder = new Holder<Script>();
 		getScriptEngineRegistry().forEach((se) -> {
@@ -80,7 +80,7 @@ public class Scripts {
 	 * @param pPath The file, which is checked for being a script.
 	 * @return True, if the file can be compiled into a script.
 	 */
-	public static boolean isScriptFile(Path pPath) {
+	public static boolean isScriptFile(@NonNull Path pPath) {
 		return getScriptEngineRegistry().isScriptFile(IReadable.of(pPath));
 	}
 

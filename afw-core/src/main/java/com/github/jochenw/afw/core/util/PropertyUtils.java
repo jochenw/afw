@@ -96,6 +96,7 @@ public class PropertyUtils {
 	 * invoking the given consumer.
 	 * @param pConsumer The consumer, which ought to process the properties.
 	 */
+	@SuppressWarnings("null")
 	public void forEach(@NonNull FailableBiConsumer<String,String,?> pConsumer) {
 		forEach((e) -> Functions.accept(pConsumer, e.getKey(), e.getValue()));
 	}

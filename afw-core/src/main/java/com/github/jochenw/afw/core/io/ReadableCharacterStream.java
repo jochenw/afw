@@ -24,6 +24,8 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.util.Streams;
 
 
@@ -234,7 +236,7 @@ public class ReadableCharacterStream implements AutoCloseable {
 	 *   false.
 	 * @return The created instance.
 	 */
-	public static ReadableCharacterStream of(Reader pReader, boolean pMayCloseStream) {
+	public static ReadableCharacterStream of(@NonNull Reader pReader, boolean pMayCloseStream) {
 		final Reader r;
 		if (pMayCloseStream) {
 			r = pReader;

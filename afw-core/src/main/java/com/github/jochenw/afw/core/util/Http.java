@@ -675,6 +675,7 @@ public class Http {
 	 *   case, that the response consumer has returned null, and a failure, use
 	 *   an error response consumer, that throws an exception.
 	 */
+	@SuppressWarnings("null")
 	protected <O> O executeRequest(Request pRequest, RequestData pRequestData,
 			  FailableBiFunction<Response,InputStream,O,?> pResponseConsumer,
 	          FailableBiConsumer<Response,InputStream,?> pErrorResponseConsumer) {

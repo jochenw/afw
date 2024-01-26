@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 
 
@@ -345,7 +347,13 @@ public class DefaultInstantiatorTest {
 	 */
 	@Test
 	public void testCreateUsingFieldAccessAndMap() {
-		final ABean aBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), ABean.class.getName(),
+		@SuppressWarnings("null")
+		final @NonNull Thread currentThread = Thread.currentThread();
+		@SuppressWarnings("null")
+		final @NonNull ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+		@SuppressWarnings("null")
+		final @NonNull String aBeanClassName = ABean.class.getName();
+		final ABean aBean = new DefaultInstantiator().newInstance(currentClassLoader, aBeanClassName,
 				                                                  getBeanPropertiesAsMap());
 		validate(aBean);
 	}
@@ -356,8 +364,16 @@ public class DefaultInstantiatorTest {
 	 */
 	@Test
 	public void testCreateUsingFieldAccessAndArray() {
-		final ABean aBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), ABean.class.getName(),
-				                                                  getBeanPropertiesAsArray());
+		@SuppressWarnings("null")
+		final @NonNull Thread currentThread = Thread.currentThread();
+		@SuppressWarnings("null")
+		final @NonNull ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+		@SuppressWarnings("null")
+		final @NonNull String aBeanClassName = ABean.class.getName();
+		@SuppressWarnings("null")
+		final @Nullable String[] beanPropertiesAsArray = getBeanPropertiesAsArray();
+		final ABean aBean = new DefaultInstantiator().newInstance(currentClassLoader, aBeanClassName,
+				                                                  beanPropertiesAsArray);
 		validate(aBean);
 	}
 
@@ -366,7 +382,13 @@ public class DefaultInstantiatorTest {
 	 */
 	@Test
 	public void testCreateUsingMethodAccessAndMap() {
-		final BBean bBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), BBean.class.getName(),
+		@SuppressWarnings("null")
+		final @NonNull Thread currentThread = Thread.currentThread();
+		@SuppressWarnings("null")
+		final @NonNull ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+		@SuppressWarnings("null")
+		final @NonNull String bBeanClassName = BBean.class.getName();
+		final BBean bBean = new DefaultInstantiator().newInstance(currentClassLoader, bBeanClassName,
 				                                                  getBeanPropertiesAsMap());
 		validate(bBean);
 		assertEquals(20, bBean.getNumberOfSetterInvocations());
@@ -377,8 +399,16 @@ public class DefaultInstantiatorTest {
 	 */
 	@Test
 	public void testCreateUsingMethodAccessAndArray() {
-		final BBean bBean = new DefaultInstantiator().newInstance(Thread.currentThread().getContextClassLoader(), BBean.class.getName(),
-				                                                  getBeanPropertiesAsArray());
+		@SuppressWarnings("null")
+		final @Nullable String[] beanPropertiesAsArray = getBeanPropertiesAsArray();
+		@SuppressWarnings("null")
+		final @NonNull Thread currentThread = Thread.currentThread();
+		@SuppressWarnings("null")
+		final @NonNull ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+		@SuppressWarnings("null")
+		final @NonNull String bBeanClassName = BBean.class.getName();
+		final BBean bBean = new DefaultInstantiator().newInstance(currentClassLoader, bBeanClassName,
+				                                                  beanPropertiesAsArray);
 		validate(bBean);
 		assertEquals(20, bBean.getNumberOfSetterInvocations());
 	}
@@ -407,16 +437,16 @@ public class DefaultInstantiatorTest {
 		assertEquals("http://127.0.0.1:8080/", pBean.getUrlProperty().toExternalForm());
 	}
 
-	private static final String STR_EXAMPLE = "The quick, brown fox jumps over the lazy dog.";
-	private final String BIGINT_EXAMPLE = String.valueOf(Long.MAX_VALUE) + String.valueOf(Long.MAX_VALUE);
-	private final String BIGDEC_EXAMPLE = BIGINT_EXAMPLE + ".0";
+	private static final @NonNull String STR_EXAMPLE = "The quick, brown fox jumps over the lazy dog.";
+	private final @NonNull String BIGINT_EXAMPLE = String.valueOf(Long.MAX_VALUE) + String.valueOf(Long.MAX_VALUE);
+	private final @NonNull String BIGDEC_EXAMPLE = BIGINT_EXAMPLE + ".0";
 
 	/**
 	 * Returns the expected bean properties as a string array.
 	 * @return The expected set of bean properties.
 	 */
-	protected String[] getBeanPropertiesAsArray() {
-		return new String[]{ "intProperty", "23",
+	protected String [] getBeanPropertiesAsArray() {
+		return new @NonNull String[]{ "intProperty", "23",
 				"intObjProperty", "24", "longProperty", "25",
 				"longObjProperty", "26", "shortProperty", "27",
 				"shortObjProperty", "28", "byteProperty", "48",

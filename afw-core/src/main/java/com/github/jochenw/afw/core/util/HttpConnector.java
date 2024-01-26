@@ -162,7 +162,9 @@ public class HttpConnector {
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid proxy definition: Expected host:portNumber , got " + pProxyDefinition);
 		}
-		setProxy(proxy.substring(0, offset), port);
+		@SuppressWarnings("null")
+		final @NonNull String host = proxy.substring(0, offset);
+		setProxy(host, port);
 	}
 
 	/** Sets the proxy server to use.

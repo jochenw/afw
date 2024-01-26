@@ -221,8 +221,8 @@ public class SimpleTemplateCompiler<M extends Map<String,Object>> {
 							currentBlock = stack.remove(stack.size()-1);
 							currentBlock.add((c) -> {
 								final ElExpression el = ifBlock.getExpression();
-								final Boolean b = evaluate(el, c.getModel());
-								final List<Consumer<Context<M>>> list = ifBlock.getList(b != null  &&  b.booleanValue());
+								final boolean b = evaluate(el, c.getModel());
+								final List<Consumer<Context<M>>> list = ifBlock.getList(b);
 								list.forEach((cons) -> cons.accept(c));
 							});
 						} else if (currentBlock instanceof ForBlock) {

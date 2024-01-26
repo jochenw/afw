@@ -149,7 +149,7 @@ public interface IReadable {
 				holder.set(pFunction.apply(br));
 			}
 		});
-		return holder.get();
+		return holder.require();
 	}
 	/**
 	 * Converts the current {@link IReadable} into a repeatable version.
@@ -169,7 +169,7 @@ public interface IReadable {
 	 *   created {@link IReadable readable's} method {@code IReadable.read(FailableConsumer)}.
 	 * @return A new instance of {@link IReadable}, with the given name, and data stream.
 	 */
-	public static IReadable of(String pName, FailableSupplier<InputStream,?> pSupplier) {
+	public static @NonNull IReadable of(String pName, FailableSupplier<@NonNull InputStream,?> pSupplier) {
 		return new IReadable() {
 			private boolean opened;
 			@Override
@@ -216,7 +216,7 @@ public interface IReadable {
 				} catch (Throwable t) {
 					throw Exceptions.show(t);
 				}
-				return holder.get();
+				return holder.require();
 			}
 
 			@Override
@@ -270,7 +270,7 @@ public interface IReadable {
 	 * @return A new instance of {@link IReadable}, with the given file' name,
 	 *   and the file's contents as a data stream.
 	 */
-	public static IReadable of(Path pPath) {
+	public static @NonNull IReadable of(@NonNull Path pPath) {
 		final Path p = Objects.requireNonNull(pPath, "Path");
 		return of(p.toString(), () -> new BufferedInputStream(Files.newInputStream(p)));
 	}
@@ -282,7 +282,7 @@ public interface IReadable {
 	 * @return A new instance of {@link IReadable}, with the given file' name,
 	 *   and the file's contents as a data stream.
 	 */
-	public static IReadable of(File pFile) {
+	public static @NonNull IReadable of(@NonNull File pFile) {
 		final File f = Objects.requireNonNull(pFile, "File");
 		return of(f.getPath(), () -> new BufferedInputStream(new FileInputStream(f)));
 	}
@@ -294,7 +294,7 @@ public interface IReadable {
 	 * @return A new instance of {@link IReadable}, with the given file' name,
 	 *   and the file's contents as a data stream.
 	 */
-	public static IReadable of(URL pUrl) {
+	public static @NonNull IReadable of(URL pUrl) {
 		final URL u = Objects.requireNonNull(pUrl, "URL");
 		return of(u.toExternalForm(), () -> new BufferedInputStream(u.openStream()));
 	}
@@ -339,7 +339,8 @@ public interface IReadable {
 			try {
 				url = new URL(uri);
 			} catch (MalformedURLException e) {
-				final Path p = Paths.get(uri);
+				@SuppressWarnings("null")
+				final @NonNull Path p = Paths.get(uri);
 				if (Files.isRegularFile(p)) {
 					return of(p);
 				} else {

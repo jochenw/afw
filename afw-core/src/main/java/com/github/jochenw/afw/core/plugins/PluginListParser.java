@@ -428,7 +428,10 @@ public class PluginListParser {
 	 * @return The sorted list. A new list will be created.
 	 */
 	public static List<Initializer> sort(List<Initializer> pList) {
-		final List<Node<Initializer>> unsortedNodeList = pList.stream().map((Function<Initializer, Node<Initializer>>) (p) -> new Node<Initializer>(p.getId(), p.getDependsOn(), p)).collect(Collectors.toList());
+		final List<Node<Initializer>> unsortedNodeList = pList.stream().map((Function<Initializer, Node<Initializer>>) (p) -> {
+			final @NonNull List<String> dependsOn = p.getDependsOn();
+			return new Node<Initializer>(p.getId(), dependsOn, p);
+		}).collect(Collectors.toList());
 		try {
 			final List<Node<Initializer>> sortedNodeList = new DependencyResolver().resolve(unsortedNodeList);
 			return sortedNodeList.stream().map((Function<Node<Initializer>, Initializer>) (n) -> n.getObject()).collect(Collectors.toList());
@@ -441,7 +444,7 @@ public class PluginListParser {
 					+ ", and " + initializer1.getClass().getName());
 		} catch (UnknownNodeIdException e) {
 			final String id = e.getId();
-			final Initializer initializer = (Initializer) e.getNode().getObject();
+			final @NonNull Initializer initializer = (Initializer) e.getNode().requireObject();
 			throw new IllegalStateException("Unknown plugin id: " + id
 					+ ", referenced by plugin with id: " + initializer.getId());
 		} catch (CircularDependencyException e) {

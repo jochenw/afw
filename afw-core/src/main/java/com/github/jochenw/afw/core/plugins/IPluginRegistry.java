@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core.plugins;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
@@ -82,13 +83,13 @@ public interface IPluginRegistry {
 		/** Returns the initializers id.
 		 * @return The initializers id.
 		 */
-		String getId();
+		@NonNull String getId();
 		/** Returns the list of initializer id's, that this one depends on.
 		 * The requirement is, that the initializers with those id's have
 		 * already been executed.
 		 * @return The initializers id.
 		 */
-		List<String> getDependsOn();
+		@NonNull List<String> getDependsOn();
 	}
 	/**
 	 * Abstract base implementation of {@link Initializer}.
@@ -98,8 +99,8 @@ public interface IPluginRegistry {
 		private List<String> dependsOn;
 
 		@Override
-		public String getId() {
-			return id;
+		public @NonNull String getId() {
+			return Objects.requireNonNull(id);
 		}
 		/**
 		 * Sets the initializers id.
@@ -109,8 +110,8 @@ public interface IPluginRegistry {
 			id = pId;
 		}
 		@Override
-		public List<String> getDependsOn() {
-			return dependsOn;
+		public @NonNull List<String> getDependsOn() {
+			return Objects.requireNonNull(dependsOn);
 		}
 		/**
 		 * Sets the id's of the initializers, that this one depends on.
@@ -209,7 +210,7 @@ public interface IPluginRegistry {
 	 * @return The plugins, that have been registered on the given extension point.
 	 * @throws NoSuchElementException No such extension point has been registered.
 	 */
-	public default <O extends Object> List<O> getPlugins(Class<O> pType, String pId) {
+	public default <O extends Object> List<O> getPlugins(@NonNull Class<O> pType, @NonNull String pId) {
 		return requireExtensionPoint(pType, pId).getPlugins();
 	}
 	/**
@@ -220,7 +221,7 @@ public interface IPluginRegistry {
 	 * @return The plugins, that have been registered on the given extension point.
 	 * @throws NoSuchElementException No such extension point has been registered.
 	 */
-	public default <O extends Object> List<O> getPlugins(Class<O> pType) {
+	public default <O extends Object> List<O> getPlugins(@NonNull Class<O> pType) {
 		return requireExtensionPoint(pType).getPlugins();
 	}
 	/**
@@ -231,7 +232,7 @@ public interface IPluginRegistry {
 	 * @param pPlugin The plugin, that is being added.
 	 * @throws NoSuchElementException No such extension point has been registered.
 	 */
-	public default <O extends Object> void addPlugin(Class<O> pType, String pId, O pPlugin) {
+	public default <O extends Object> void addPlugin(@NonNull Class<O> pType, @NonNull String pId, @NonNull O pPlugin) {
 		requireExtensionPoint(pType, pId).addPlugin(pPlugin);
 	}
 	/**
@@ -241,7 +242,7 @@ public interface IPluginRegistry {
 	 * @param pPlugin The plugin, that is being added.
 	 * @throws NoSuchElementException No such extension point has been registered.
 	 */
-	public default <O extends Object> void addPlugin(Class<O> pType, O pPlugin) {
+	public default <O extends Object> void addPlugin(@NonNull Class<O> pType, @NonNull O pPlugin) {
 		requireExtensionPoint(pType).addPlugin(pPlugin);
 	}
 }

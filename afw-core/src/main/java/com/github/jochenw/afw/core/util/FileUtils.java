@@ -150,7 +150,9 @@ public class FileUtils {
 							try (Reader reader = java.nio.file.Files.newBufferedReader(a, StandardCharsets.UTF_8)) {
 								Streams.copy(reader, sw);
 							}
-							final String contents = interpolator.interpolate(sw.toString());
+							@SuppressWarnings("null")
+							@NonNull String string = sw.toString();
+							final String contents = interpolator.interpolate(string);
 							try (Writer w = java.nio.file.Files.newBufferedWriter(b)) {
 								w.write(contents);
 							}
