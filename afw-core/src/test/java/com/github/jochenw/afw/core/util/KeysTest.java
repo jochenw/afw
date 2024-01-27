@@ -69,7 +69,7 @@ public class KeysTest {
 	 */
 	@Test
 	public void testEncryptDecryptUsingKeysNoPassword() throws Exception {
-		final IKeyHandler kh = newKeysHandler();
+		final @NonNull IKeyHandler kh = newKeysHandler();
 		test("keystore2.jks", kh, null);
 	}
 
@@ -88,33 +88,44 @@ public class KeysTest {
 	 * tests for the {@link IKeyHandler}.
 	 * @return The created {@link IKeyHandler}.
 	 */
-	protected IKeyHandler newKeysHandler() {
+	protected @NonNull IKeyHandler newKeysHandler() {
 		return new IKeyHandler() {
 			@Override
-			public KeyPair createKeyPair() {
+			public @NonNull KeyPair createKeyPair() {
 				return Keys.createKeyPair();
 			}
 
 			@Override
-			public Certificate generateCertificate(String pDn, KeyPair pKeyPair, int pValidity) {
+			public @NonNull Certificate generateCertificate(@NonNull String pDn, @NonNull KeyPair pKeyPair, int pValidity) {
 				return Keys.generateCertificate(pDn, pKeyPair, pValidity);
 			}
 
 			@Override
-			public KeyStore createKeyStore(PrivateKey pPrivateKey, Certificate pCertificate, String pAlias,
-					String pStoreType, String pStorePass, String pKeyPass) {
+			public @NonNull KeyStore createKeyStore(@NonNull PrivateKey pPrivateKey,
+					                                @NonNull Certificate pCertificate,
+					                                @NonNull String pAlias,
+					                                @Nullable String pStoreType,
+					                                @NonNull String pStorePass,
+					                                @Nullable String pKeyPass) {
 				return Keys.createKeyStore(pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 			}
 
 			@Override
-			public void createKeyStore(OutputStream pOut, PrivateKey pPrivateKey, Certificate pCertificate,
-					String pAlias, String pStoreType, String pStorePass, String pKeyPass) {
+			public void createKeyStore(@NonNull OutputStream pOut,
+					                   @NonNull PrivateKey pPrivateKey,
+					                   @NonNull Certificate pCertificate,
+					                   @NonNull String pAlias,
+					                   @Nullable String pStoreType,
+					                   @NonNull String pStorePass,
+					                   @Nullable String pKeyPass) {
 				Keys.createKeyStore(pOut, pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 			}
 
 			@Override
-			public Tupel<PrivateKey, Certificate> readPrivateKey(InputStream pIn, String pAlias, String pStorePass,
-					String pKeyPass) {
+			public Tupel<PrivateKey, Certificate> readPrivateKey(@NonNull InputStream pIn,
+					                                             @NonNull String pAlias,
+					                                             @NonNull String pStorePass,
+					                                             @Nullable String pKeyPass) {
 				return Keys.readPrivateKey(pIn, pAlias, pStorePass, pKeyPass);
 			}
 
@@ -148,14 +159,15 @@ public class KeysTest {
 		java.nio.file.Files.deleteIfExists(file);
 		final KeyPair kp = pHandler.createKeyPair();
 		final Certificate cert = pHandler.generateCertificate("CN=Unknown", kp, 9999);
-		final KeyStore ks0 = pHandler.createKeyStore(kp.getPrivate(), cert, "main", null, "654321", pKeyPassword);
+		final @NonNull PrivateKey privateKey = Objects.requireNonNull(kp.getPrivate());
+		final KeyStore ks0 = pHandler.createKeyStore(privateKey, cert, "main", null, "654321", pKeyPassword);
 		try (OutputStream os = Files.newOutputStream(file)) {
 			ks0.store(os, "654321".toCharArray());
 		} catch (Throwable e) {
 			throw Exceptions.show(e);
 		}
 		final Tupel<PrivateKey,Certificate> ks1;
-		try (InputStream in = Files.newInputStream(file)) {
+		try (@NonNull InputStream in = Objects.requireNonNull(Files.newInputStream(file))) {
 			ks1 = pHandler.readPrivateKey(in, "main", "654321", pKeyPassword);
 		} catch (Throwable e) {
 			throw Exceptions.show(e);

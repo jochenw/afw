@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -51,7 +52,7 @@ public class DomHelperTest {
 		assertNull(dh.getErrorHandler());
 		final LocalizableDocument lh = getSampleDocument();
 		assertNotNull(lh.getDomHelper().getErrorHandler());
-		BiFunction<Locator, String, LocalizableException> errorHandler = (l,s) -> new LocalizableException(null, s);
+		@NonNull BiFunction<Locator, @NonNull String, @NonNull LocalizableException> errorHandler = (l,s) -> new LocalizableException(null, s);
 		dh.setErrorHandler(errorHandler);
 		assertSame(errorHandler, dh.getErrorHandler());
 	}
@@ -111,7 +112,8 @@ public class DomHelperTest {
 	public void testGetChildrenNode() {
 		final LocalizableDocument ldoc = getSampleDocument();
 		final DomHelper dh = ldoc.getDomHelper();
-		final Iterable<Element> htmlIterable = dh.getChildren(ldoc.getDocument().getDocumentElement());
+		final @NonNull Element documentElement = getRootElement(ldoc);
+		final Iterable<Element> htmlIterable = dh.getChildren(documentElement);
 		assertNotNull(htmlIterable);
 		final Iterator<Element> htmlIterator = htmlIterable.iterator();
 		assertNotNull(htmlIterator);
@@ -196,7 +198,7 @@ public class DomHelperTest {
 		final LocalizableDocument ldoc = getSampleDocument();
 		final DomHelper dh = ldoc.getDomHelper();
 		dh.setDefaultNamespaceUri(NS);
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final @NonNull Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = dh.requireFirstChildNS(htmlElement, NS, "body");
 		final Iterable<Element> bodyChildren = dh.getChildren(bodyElement, "p");
 		assertNotNull(bodyChildren);
@@ -226,7 +228,7 @@ public class DomHelperTest {
 		final LocalizableDocument ldoc = getSampleDocument();
 		final DomHelper dh = ldoc.getDomHelper();
 		dh.setDefaultNamespaceUri(NS);
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final @NonNull Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = dh.requireFirstChildNS(htmlElement, NS, "body");
 		final Iterable<Element> bodyChildren = dh.getChildrenNS(bodyElement, NS, "p");
 		assertNotNull(bodyChildren);
@@ -256,25 +258,29 @@ public class DomHelperTest {
 		final LocalizableDocument ldoc = getSampleDocument();
 		final DomHelper dh = ldoc.getDomHelper();
 		dh.setDefaultNamespaceUri(NS);
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final @NonNull Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = dh.requireFirstChildNS(htmlElement, NS, "body");
 		final Iterable<Element> bodyChildren = dh.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(dh.isElementNS(p1, NS, "p"));
 		assertFalse(dh.isElementNS(p1, NS, "body"));
 		assertFalse(dh.isElementNS(p1, "foo", "p"));
 		assertFalse(dh.isElementNS(ldoc.getDocument(), NS, "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertFalse(dh.isElementNS(p2, NS, "p"));
 		assertTrue(dh.isElementNS(p2, "foo", "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(dh.isElementNS(p3, NS, "p"));
 		assertFalse(dh.isElementNS(p3, "foo", "p"));
 		assertFalse(bodyChildrenIter.hasNext());
+	}
+
+	private @NonNull Element getRootElement(final LocalizableDocument ldoc) {
+		return Objects.requireNonNull(ldoc.getDocument().getDocumentElement());
 	}
 		
 	/**
@@ -285,20 +291,20 @@ public class DomHelperTest {
 		final LocalizableDocument ldoc = getSampleDocument();
 		final DomHelper dh = ldoc.getDomHelper();
 		dh.setDefaultNamespaceUri(NS);
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final @NonNull Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = dh.requireFirstChildNS(htmlElement, NS, "body");
 		final Iterable<Element> bodyChildren = dh.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(dh.isElement(p1, "p"));
 		assertFalse(dh.isElement(p1, "body"));
 		assertFalse(dh.isElement(ldoc.getDocument(), "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertFalse(dh.isElement(p2, "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(dh.isElement(p3, "p"));
 		assertFalse(bodyChildrenIter.hasNext());
 	}
@@ -312,47 +318,47 @@ public class DomHelperTest {
 		final LocalizableDocument ldoc = getSampleDocument();
 		final DomHelper dh = ldoc.getDomHelper();
 		dh.setDefaultNamespaceUri(NS);
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final @NonNull Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = dh.requireFirstChildNS(htmlElement, NS, "body");
 		final Iterable<Element> bodyChildren = dh.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		dh.assertElement(p1, "p");
 		try {
 			dh.assertElement(p1, "body");
 			fail("Expected Exception");
 		} catch (LocalizableException le) {
 			assertEquals("Expected {" + NS + "}body, got p", le.getMessage());
-			assertTrue(le.getLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
-			assertNull(le.getLocator().getPublicId());
-			assertEquals(3, le.getLocator().getLineNumber());
-			assertEquals(6, le.getLocator().getColumnNumber());
+			assertTrue(le.requireLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
+			assertNull(le.requireLocator().getPublicId());
+			assertEquals(3, le.requireLocator().getLineNumber());
+			assertEquals(6, le.requireLocator().getColumnNumber());
 		}
 		try {
 			dh.assertElement(ldoc.getDocument(), "p");
 			fail("Expected Exception");
 		} catch (LocalizableException le) {
 			assertEquals("Expected element, got " + ldoc.getDocument().getClass().getName(), le.getMessage());
-			assertTrue(le.getLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
-			assertNull(le.getLocator().getPublicId());
-			assertEquals(1, le.getLocator().getLineNumber());
-			assertEquals(1, le.getLocator().getColumnNumber());
+			assertTrue(le.requireLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
+			assertNull(le.requireLocator().getPublicId());
+			assertEquals(1, le.requireLocator().getLineNumber());
+			assertEquals(1, le.requireLocator().getColumnNumber());
 		}
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		try {
 			dh.assertElement(p2, "p");
 			fail("Expected Exception");
 		} catch (LocalizableException le) {
 			assertEquals("Expected {" + NS + "}p, got t:p", le.getMessage());
-			assertTrue(le.getLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
-			assertNull(le.getLocator().getPublicId());
-			assertEquals(4, le.getLocator().getLineNumber());
-			assertEquals(8, le.getLocator().getColumnNumber());
+			assertTrue(le.requireLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
+			assertNull(le.requireLocator().getPublicId());
+			assertEquals(4, le.requireLocator().getLineNumber());
+			assertEquals(8, le.requireLocator().getColumnNumber());
 		}
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		dh.assertElement(p3, "p");
 		assertFalse(bodyChildrenIter.hasNext());
 
@@ -366,48 +372,48 @@ public class DomHelperTest {
 		final LocalizableDocument ldoc = getSampleDocument();
 		final DomHelper dh = ldoc.getDomHelper();
 		dh.setDefaultNamespaceUri(NS);
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final @NonNull Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = dh.requireFirstChildNS(htmlElement, NS, "body");
 		final Iterable<Element> bodyChildren = dh.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		dh.assertElementNS(p1, NS, "p");
 		try {
 			dh.assertElementNS(p1, NS, "body");
 			fail("Expected Exception");
 		} catch (LocalizableException le) {
 			assertEquals("Expected {" + NS + "}body, got p", le.getMessage());
-			assertTrue(le.getLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
-			assertNull(le.getLocator().getPublicId());
-			assertEquals(3, le.getLocator().getLineNumber());
-			assertEquals(6, le.getLocator().getColumnNumber());
+			assertTrue(le.requireLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
+			assertNull(le.requireLocator().getPublicId());
+			assertEquals(3, le.requireLocator().getLineNumber());
+			assertEquals(6, le.requireLocator().getColumnNumber());
 		}
 		try {
 			dh.assertElementNS(p1, "foo", "p");
 			fail("Expected Exception");
 		} catch (LocalizableException le) {
 			assertEquals("Expected {foo}p, got p", le.getMessage());
-			assertTrue(le.getLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
-			assertNull(le.getLocator().getPublicId());
-			assertEquals(3, le.getLocator().getLineNumber());
-			assertEquals(6, le.getLocator().getColumnNumber());
+			assertTrue(le.requireLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
+			assertNull(le.requireLocator().getPublicId());
+			assertEquals(3, le.requireLocator().getLineNumber());
+			assertEquals(6, le.requireLocator().getColumnNumber());
 		}
 		try {
 			dh.assertElementNS(ldoc.getDocument(), NS, "p");
 			fail("Expected Exception");
 		} catch (LocalizableException le) {
 			assertEquals("Expected element, got " + ldoc.getDocument().getClass().getName(), le.getMessage());
-			assertTrue(le.getLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
-			assertNull(le.getLocator().getPublicId());
-			assertEquals(1, le.getLocator().getLineNumber());
-			assertEquals(1, le.getLocator().getColumnNumber());
+			assertTrue(le.requireLocator().getSystemId().endsWith("SAMPLE_DOCUMENT"));
+			assertNull(le.requireLocator().getPublicId());
+			assertEquals(1, le.requireLocator().getLineNumber());
+			assertEquals(1, le.requireLocator().getColumnNumber());
 		}
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		dh.assertElementNS(p2, "foo", "p");
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		dh.assertElementNS(p3, NS, "p");
 		assertFalse(bodyChildrenIter.hasNext());
 	}

@@ -14,7 +14,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,7 +74,7 @@ public class DefaultResourceLoaderTest {
 	public void testExplicitClassLoader() {
 		final ClassLoader cl = newClassLoader();
 		final DefaultResourceLoader drl = new DefaultResourceLoader("foo", "prod");
-		assertResource(drl, cl, URL0.getFile(), "12345");
+		assertResource(drl, cl, Objects.requireNonNull(URL0.getFile()), "12345");
 		drl.setInstanceName(null);
 		assertNoResource(drl, cl, "x/y/Bar.properties");
 		drl.setInstanceName("");
@@ -96,7 +99,7 @@ public class DefaultResourceLoaderTest {
 			tcl = Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
 			final DefaultResourceLoader drl = new DefaultResourceLoader();
-			assertResource(drl, null, URL0.getFile(), "12345");
+			assertResource(drl, null, Objects.requireNonNull(URL0.getFile()), "12345");
 			drl.setInstanceName(null);
 			assertNoResource(drl, null, "x/y/Bar.properties");
 			drl.setInstanceName("");
@@ -138,7 +141,10 @@ public class DefaultResourceLoaderTest {
 	 * @param pUri The URI, that is supposed to be locatable.
 	 * @param pContent The expected resource contents.
 	 */
-	protected void assertResource(DefaultResourceLoader pLoader, ClassLoader pCl, String pUri, String pContent) {
+	protected void assertResource(@NonNull DefaultResourceLoader pLoader,
+			                      @Nullable ClassLoader pCl,
+			                      @NonNull String pUri,
+			                      @Nullable String pContent) {
 		final URL url;
 		if (pCl == null) {
 			url = pLoader.getResource(pUri);
@@ -164,7 +170,9 @@ public class DefaultResourceLoaderTest {
 	 * @param pCl The {@link ClassLoader}, that is backing the {@code pLoader}.
 	 * @param pUri The URI, that is supposed not to be locatable.
 	 */
-	protected void assertNoResource(DefaultResourceLoader pLoader, ClassLoader pCl, String pUri) {
+	protected void assertNoResource(@NonNull DefaultResourceLoader pLoader,
+			                        @Nullable ClassLoader pCl,
+			                        @NonNull String pUri) {
 		final URL url;
 		if (pCl == null) {
 			url = pLoader.getResource(pUri);

@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 
 import javax.xml.XMLConstants;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -49,7 +50,7 @@ public class DomTest {
 	@Test
 	public void testGetChildrenNode() {
 		final LocalizableDocument ldoc = getSampleDocument();
-		final Iterable<Element> htmlIterable = Dom.getChildren(ldoc.getDocument().getDocumentElement());
+		final Iterable<Element> htmlIterable = Dom.getChildren(getRootElement(ldoc));
 		assertNotNull(htmlIterable);
 		final Iterator<Element> htmlIterator = htmlIterable.iterator();
 		assertNotNull(htmlIterator);
@@ -120,7 +121,7 @@ public class DomTest {
 	@Test
 	public void testGetChildrenNodeString() {
 		final LocalizableDocument ldoc = getSampleDocument();
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = Dom.requireFirstChildNS(htmlElement, null, "body");
 		final Iterable<Element> bodyChildren = Dom.getChildren(bodyElement, "p");
 		assertNotNull(bodyChildren);
@@ -148,7 +149,7 @@ public class DomTest {
 	@Test
 	public void testGetChildrenNS() {
 		final LocalizableDocument ldoc = getSampleDocument();
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = Dom.requireFirstChildNS(htmlElement, null, "body");
 		final Iterable<Element> bodyChildren = Dom.getChildrenNS(bodyElement, null, "p");
 		assertNotNull(bodyChildren);
@@ -176,12 +177,12 @@ public class DomTest {
 	@Test
 	public void testIsElementNS() {
 		final LocalizableDocument ldoc = getSampleDocument();
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
+		final Element htmlElement = getRootElement(ldoc);
 		final Element bodyElement = Dom.requireFirstChildNS(htmlElement, null, "body");
 		final Iterable<Element> bodyChildren = Dom.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(Dom.isElementNS(p1, null, "p"));
 		assertTrue(Dom.isElementNS(p1, "", "p"));
 		assertTrue(Dom.isElementNS(p1, XMLConstants.NULL_NS_URI, "p"));
@@ -189,11 +190,11 @@ public class DomTest {
 		assertFalse(Dom.isElementNS(p1, "foo", "p"));
 		assertFalse(Dom.isElementNS(ldoc.getDocument(), null, "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertFalse(Dom.isElementNS(p2, null, "p"));
 		assertTrue(Dom.isElementNS(p2, "foo", "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(Dom.isElementNS(p3, null, "p"));
 		assertFalse(Dom.isElementNS(p3, "foo", "p"));
 		assertFalse(bodyChildrenIter.hasNext());
@@ -205,22 +206,26 @@ public class DomTest {
 	@Test
 	public void testIsElement() {
 		final LocalizableDocument ldoc = getSampleDocument();
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
-		final Element bodyElement = Dom.requireFirstChild(htmlElement, "body");
+		final @NonNull Element htmlElement = getRootElement(ldoc);
+		final @NonNull Element bodyElement = Objects.requireNonNull(Dom.requireFirstChild(htmlElement, "body"));
 		final Iterable<Element> bodyChildren = Dom.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(Dom.isElement(p1, "p"));
 		assertFalse(Dom.isElement(p1, "body"));
 		assertFalse(Dom.isElement(ldoc.getDocument(), "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertFalse(Dom.isElement(p2, "p"));
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		assertTrue(Dom.isElement(p3, "p"));
 		assertFalse(bodyChildrenIter.hasNext());
+	}
+
+	private @NonNull Element getRootElement(final LocalizableDocument ldoc) {
+		return Objects.requireNonNull(ldoc.getDocument().getDocumentElement());
 	}
 
 	/**
@@ -229,12 +234,12 @@ public class DomTest {
 	@Test
 	public void testAssertElement() {
 		final LocalizableDocument ldoc = getSampleDocument();
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
-		final Element bodyElement = Dom.requireFirstChild(htmlElement, "body");
+		final @NonNull Element htmlElement = getRootElement(ldoc);
+		final @NonNull Element bodyElement = Objects.requireNonNull(Dom.requireFirstChild(htmlElement, "body"));
 		final Iterable<Element> bodyChildren = Dom.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		Dom.assertElement(p1, "p");
 		try {
 			Dom.assertElement(p1, "body");
@@ -251,7 +256,7 @@ public class DomTest {
 			assertNull(le.getLocator());
 		}
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		try {
 			Dom.assertElement(p2, "p");
 			fail("Expected Exception");
@@ -260,7 +265,7 @@ public class DomTest {
 			assertNull(le.getLocator());
 		}
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		Dom.assertElement(p3, "p");
 		assertFalse(bodyChildrenIter.hasNext());
 	}
@@ -271,12 +276,12 @@ public class DomTest {
 	@Test
 	public void testAssertElementNS() {
 		final LocalizableDocument ldoc = getSampleDocument();
-		final Element htmlElement = ldoc.getDocument().getDocumentElement();
-		final Element bodyElement = Dom.requireFirstChild(htmlElement, "body");
+		final @NonNull Element htmlElement = getRootElement(ldoc);
+		final @NonNull Element bodyElement = Objects.requireNonNull(Dom.requireFirstChild(htmlElement, "body"));
 		final Iterable<Element> bodyChildren = Dom.getChildren(bodyElement);
 		final Iterator<Element> bodyChildrenIter = bodyChildren.iterator();
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p1 = bodyChildrenIter.next();
+		final @NonNull Element p1 = Objects.requireNonNull(bodyChildrenIter.next());
 		Dom.assertElementNS(p1, null, "p");
 		try {
 			Dom.assertElementNS(p1, null, "body");
@@ -300,10 +305,10 @@ public class DomTest {
 			assertNull(le.getLocator());
 		}
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p2 = bodyChildrenIter.next();
+		final @NonNull Element p2 = Objects.requireNonNull(bodyChildrenIter.next());
 		Dom.assertElementNS(p2, "foo", "p");
 		assertTrue(bodyChildrenIter.hasNext());
-		final Element p3 = bodyChildrenIter.next();
+		final @NonNull Element p3 = Objects.requireNonNull(bodyChildrenIter.next());
 		Dom.assertElementNS(p3, null, "p");
 		assertFalse(bodyChildrenIter.hasNext());
 	}

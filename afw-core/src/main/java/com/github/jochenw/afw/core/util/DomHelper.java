@@ -110,6 +110,17 @@ public class DomHelper {
 				return locator;
 			}
 		}
+		/** Returns the error location. Throws a {@link NullPointerException},
+		 * if no error location is available.
+		 * @return The error location. Never null.
+		 */
+		public @NonNull Locator requireLocator() {
+			final Locator loc = getLocator();
+			if (loc == null) {
+				throw new NullPointerException("No locator is available.");
+			}
+			return loc;
+		}
 
 		/** Returns the system id of the exceptions location.
 		 * @return The system id of the exceptions location.

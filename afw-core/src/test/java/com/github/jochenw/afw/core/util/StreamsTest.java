@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -50,6 +51,7 @@ import java.util.Properties;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -311,7 +313,8 @@ public class StreamsTest {
      */
     @Test
     public void testAcceptPathConsumer() {
-    	final Path path = Paths.get("pom.xml");
+    	@SuppressWarnings("null")
+		final @NonNull Path path = Paths.get("pom.xml");
     	assertTrue(Files.isRegularFile(path));
     	Streams.accept(path, (in)-> Tests.assertSameContent(path, in));
     }
@@ -331,24 +334,28 @@ public class StreamsTest {
     @Test
     public void testLoadUrl() throws Exception {
     	final Properties props = newTestProperties();
-    	final Path path = createTestProperties(props, false);
-    	final Properties got1 = Streams.load(path.toUri().toURL());
+		final @NonNull Path path = createTestProperties(props, false);
+    	final Properties got1 = Streams.load(toUrl(path));
     	assertSameProperties(props, got1);
-    	final Properties got2 = Streams.load(path.toUri().toURL(), false);
+    	final Properties got2 = Streams.load(toUrl(path), false);
     	assertSameProperties(props, got2);
     	final Path path2 = path.getParent().resolve("thisFileDoesntExist");
-    	assertNull(Streams.load(path2.toUri().toURL(), true));
+    	assertNull(Streams.load(toUrl(path2), true));
     	final Path xmlPath = createTestProperties(props, true);
-    	final Properties xmlGot = Streams.load(xmlPath.toUri().toURL());
+    	final Properties xmlGot = Streams.load(toUrl(xmlPath));
     	assertSameProperties(props, xmlGot);
     }
+
+	private @NonNull URL toUrl(final Path path) throws MalformedURLException {
+		return Objects.requireNonNull(path.toUri().toURL());
+	}
 
     /** Test for {@link Streams#load(Path)}.
      */
     @Test
     public void testLoadPath() {
     	final Properties props = newTestProperties();
-    	final Path path = createTestProperties(props, false);
+    	final @NonNull Path path = createTestProperties(props, false);
     	final Properties got1 = Streams.load(path);
     	assertSameProperties(props, got1);
     	final Properties got2 = Streams.load(path, false);
@@ -408,13 +415,13 @@ public class StreamsTest {
      *   XML format. False for the basic property file.
      * @return Path of the created property file.
      */
-    protected Path createTestProperties(Properties pProps, boolean pXml) {
+    protected @NonNull Path createTestProperties(Properties pProps, boolean pXml) {
     	final Path testDir = Paths.get("target");
-    	final Path testFile;
+    	final @NonNull Path testFile;
     	if (pXml) {
-    		testFile = testDir.resolve("test-created.properties.xml");
+    		testFile = Objects.requireNonNull(testDir.resolve("test-created.properties.xml"));
     	} else {
-    		testFile = testDir.resolve("test-created.properties");
+    		testFile = Objects.requireNonNull(testDir.resolve("test-created.properties"));
     	}
     	try {
     		Files.deleteIfExists(testFile);
@@ -450,19 +457,27 @@ public class StreamsTest {
     /** Test case for {@link Streams#of(byte[])}.
      * @throws Exception The test failed.
      */
-    @Test
+    @SuppressWarnings("null")
+	@Test
     public void testOfByteArray() throws Exception {
     	String string = "763209kfegLIZRD$";
-		final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+		@SuppressWarnings("null")
+		final byte @NonNull [] bytes = string.getBytes(StandardCharsets.UTF_8);
     	final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     	Streams.copy(Streams.of(bytes), baos);
     	assertEquals(string, baos.toString(StandardCharsets.UTF_8.name()));
     	try {
-    		Streams.of((byte[]) null);
+    		Streams.of(getNullObject(byte[].class));
     		fail("Expected Exception");
     	} catch (NullPointerException e) {
     		assertEquals("Bytes", e.getMessage());
     	}
+    }
+
+    private <O> O getNullObject(Class<O> pType) {
+    	@SuppressWarnings("null")
+		final O o = (O) null;
+    	return o;
     }
 
     /** Test case for {@link Streams#of(String)}.
@@ -474,7 +489,7 @@ public class StreamsTest {
     	Streams.copy(Streams.of(string), sw);
     	assertEquals(string, sw.toString());
     	try {
-    		Streams.of((String) null);
+    		Streams.of(getNullObject(String.class));
     		fail("Expected Exception");
     	} catch (NullPointerException e) {
     		assertEquals("String", e.getMessage());
@@ -494,7 +509,7 @@ public class StreamsTest {
     	Streams.copy(Streams.of(string, StandardCharsets.ISO_8859_1), baos1);
     	assertEquals(string, baos1.toString(StandardCharsets.ISO_8859_1.name()));
     	try {
-    		Streams.of((String) null, (Charset) null);
+    		Streams.of(getNullObject(String.class), getNullObject(Charset.class));
     		fail("Expected Exception");
     	} catch (NullPointerException e) {
     		assertEquals("String", e.getMessage());

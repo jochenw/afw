@@ -11,9 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
+import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Tests;
 
 /**
@@ -23,7 +25,7 @@ public class DataTest {
 	/** Creates a map object with basic test data.
 	 * @return The created map.
 	 */
-	protected Map<String, Object> getMap() {
+	protected @NonNull Map<String, Object> getMap() {
 		final Map<String, Object> map = new HashMap<>();
 		map.put("foo", "bar");
 		map.put("empty", "");
@@ -36,7 +38,7 @@ public class DataTest {
 	/** Creates a property set with basic test data.
 	 * @return The created property set.
 	 */
-	protected Properties getProperties() {
+	protected @NonNull Properties getProperties() {
 		final Properties props = new Properties();
 		props.putAll(getMap());
 		return props;
@@ -81,7 +83,7 @@ public class DataTest {
 	 */
 	@Test
 	public void testGetStringPropertiesStringString() {
-		final Properties map = getProperties();
+		final @NonNull Properties map = getProperties();
 		assertEquals("bar", Data.getString(map, "foo", "foo"));
 		assertNull(Data.getString(map, "bar", "bar"));
 		try {
@@ -441,8 +443,8 @@ public class DataTest {
 		assertNull(acc.getValue("unknown"));
 		assertEquals("bar", acc.getValue("foo"));
 		assertEquals("", acc.getValue("empty"));
-		assertEquals(42, ((Integer) acc.getValue("answer")).intValue());
-		assertTrue(((Boolean) acc.getValue("test")).booleanValue());
+		assertEquals(42, ((Integer) acc.requireValue("answer")).intValue());
+		assertTrue(((Boolean) acc.requireValue("test")).booleanValue());
 		assertEquals("true", acc.getValue("b"));
 	}
 
@@ -661,10 +663,10 @@ public class DataTest {
 				                                                   "false", "false",
 				                                                   "FALSE", Boolean.FALSE,
 				                                                   "answer", Integer.valueOf(42)));
-		assertTrue(acc.getBoolean("true", "true").booleanValue());
-		assertTrue(acc.getBoolean("TRUE", "TRUE").booleanValue());
-		assertFalse(acc.getBoolean("false", "false").booleanValue());
-		assertFalse(acc.getBoolean("FALSE", "FALSE").booleanValue());
+		assertTrue(acc.requireBoolean("true", "true"));
+		assertTrue(acc.requireBoolean("TRUE", "TRUE"));
+		assertFalse(acc.requireBoolean("false", "false"));
+		assertFalse(acc.requireBoolean("FALSE", "FALSE"));
 		assertNull(acc.getBoolean("noSuchKey", "noSuchKey"));
 		try {
 			acc.getBoolean("answer", "answ");
@@ -679,15 +681,15 @@ public class DataTest {
      */
 	@Test
 	public void testAccessableGetBooleanString() {
-		final Map<String,Object> map = Data.asMap("true", "true",
+		final @NonNull Map<String,Object> map = Data.asMap("true", "true",
 				                                  "TRUE", Boolean.TRUE,
 				                                  "false", "false",
 				                                  "FALSE", Boolean.FALSE,
 				                                  "answer", Integer.valueOf(42));
-		assertTrue(Data.getBoolean(map, "true", "true").booleanValue());
-		assertTrue(Data.getBoolean(map, "TRUE", "TRUE").booleanValue());
-		assertFalse(Data.getBoolean(map, "false", "false").booleanValue());
-		assertFalse(Data.getBoolean(map, "FALSE", "FALSE").booleanValue());
+		assertTrue(Data.requireBoolean(map, "true", "true"));
+		assertTrue(Data.requireBoolean(map, "TRUE", "TRUE"));
+		assertFalse(Data.requireBoolean(map, "false", "false"));
+		assertFalse(Data.requireBoolean(map, "FALSE", "FALSE"));
 		assertNull(Data.getBoolean(map, "noSuchKey", "noSuchKey"));
 		try {
 			Data.getBoolean(map, "answer", "answ");
@@ -709,7 +711,8 @@ public class DataTest {
 		final Data.Accessible acc = Data.Accessible.of(getProperties());
 		assertEquals("bar", acc.getString("foo"));
 		assertEquals("", acc.getString("empty"));
-		assertTrue(acc.getBoolean("test").booleanValue());
+		final @NonNull Boolean b = Objects.requireNonNull(acc.getBoolean("test"));
+		assertTrue(b.booleanValue());
 	}
 
 	/** Test case for {@link Data.Accessible#of(Map)}
@@ -719,7 +722,8 @@ public class DataTest {
 		final Data.Accessible acc = Data.Accessible.of(getMap());
 		assertEquals("bar", acc.getString("foo"));
 		assertEquals("", acc.getString("empty"));
-		assertTrue(acc.getBoolean("test").booleanValue());
+		final @NonNull Boolean b = Objects.requireNonNull(acc.getBoolean("test"));
+		assertTrue(b.booleanValue());
 	}
 
 	/** Test case for {@link Data#requirePath(Map,String)}
@@ -760,7 +764,7 @@ public class DataTest {
 	 */
 	@Test
 	public void testAccessorRequireStringObjectString() {
-		final Map<String,Object> map = getMap();
+		final @NonNull Map<String,Object> map = getMap();
 		assertEquals("bar", Data.MAP_ACCESSOR.requireString(map, "foo", "foo"));
 		try {
 			Data.MAP_ACCESSOR.requireString(map, "empty", "empt");

@@ -98,7 +98,7 @@ public interface IReadable {
 	 * @throws NoLongerReadableException The {@link IReadable} isn't repeatable, and has
 	 *   already been opened.
 	 */
-	public void read(FailableConsumer<InputStream,?> pConsumer) throws NoLongerReadableException;
+	public void read(FailableConsumer<@NonNull InputStream,?> pConsumer) throws NoLongerReadableException;
 	/**
 	 * Opens the underlying object, and invokes the given {@link FailableFunction} for processing the
 	 * data, that's being read from the {@link InputStream input stream}, and returning a
@@ -110,7 +110,7 @@ public interface IReadable {
 	 *   already been opened.
 	 * @return The value, that has been returned by the invoked function.
 	 */
-	public <O> O apply(FailableFunction<InputStream,O,?> pFunction) throws NoLongerReadableException;
+	public <O> O apply(FailableFunction<@NonNull InputStream,O,?> pFunction) throws NoLongerReadableException;
 	/**
 	 * Opens the underlying object, and invokes the given {@link FailableConsumer} for processing the
 	 * data, that's being read from the {@link Reader reader}.
@@ -169,7 +169,7 @@ public interface IReadable {
 	 *   created {@link IReadable readable's} method {@code IReadable.read(FailableConsumer)}.
 	 * @return A new instance of {@link IReadable}, with the given name, and data stream.
 	 */
-	public static @NonNull IReadable of(String pName, FailableSupplier<@NonNull InputStream,?> pSupplier) {
+	public static @NonNull IReadable of(String pName, @NonNull FailableSupplier<@NonNull InputStream,?> pSupplier) {
 		return new IReadable() {
 			private boolean opened;
 			@Override
@@ -186,7 +186,7 @@ public interface IReadable {
 			}
 
 			@Override
-			public void read(FailableConsumer<InputStream, ?> pConsumer) {
+			public void read(FailableConsumer<@NonNull InputStream, ?> pConsumer) {
 				synchronized(this) {
 					if (opened) {
 						throw new NoLongerReadableException("This IReadable has already been read: " + pName);
@@ -194,7 +194,7 @@ public interface IReadable {
 						opened = true;
 					}
 				}
-				try (InputStream in = pSupplier.get()) {
+				try (@NonNull InputStream in = Objects.requireNonNull(pSupplier.get(), "Supplier returned null.")) {
 					pConsumer.accept(in);
 				} catch (Throwable t) {
 					throw Exceptions.show(t);
@@ -202,7 +202,7 @@ public interface IReadable {
 			}
 
 			@Override
-			public <O> O apply(FailableFunction<InputStream, O, ?> pFunction) {
+			public <O> O apply(FailableFunction<@NonNull InputStream, O, ?> pFunction) {
 				synchronized(this) {
 					if (opened) {
 						throw new NoLongerReadableException("This IReadable has already been read: " + pName);
@@ -223,7 +223,7 @@ public interface IReadable {
 			public IReadable repeatable() {
 				final IReadable r = this;
 				final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				r.read((FailableConsumer<InputStream, ?>) (in) -> Streams.copy(in, baos));
+				r.read((FailableConsumer<@NonNull InputStream, ?>) (in) -> Streams.copy(in, baos));
 				final byte[] bytes = baos.toByteArray();
 				return new IReadable() {
 					@Override
@@ -239,7 +239,7 @@ public interface IReadable {
 						return r.getName();
 					}
 					@Override
-					public void read(FailableConsumer<InputStream, ?> pConsumer) throws NoLongerReadableException {
+					public void read(FailableConsumer<@NonNull InputStream, ?> pConsumer) throws NoLongerReadableException {
 						try (InputStream in = new ByteArrayInputStream(bytes)) {
 							pConsumer.accept(in);
 						} catch (Throwable t) {
@@ -247,7 +247,7 @@ public interface IReadable {
 						}
 					}
 					@Override
-					public <O> O apply(FailableFunction<InputStream,O,?> pFunction) throws NoLongerReadableException {
+					public <O> O apply(FailableFunction<@NonNull InputStream,O,?> pFunction) throws NoLongerReadableException {
 						try (InputStream in = new ByteArrayInputStream(bytes)) {
 							return pFunction.apply(in);
 						} catch (Throwable t) {

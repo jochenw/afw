@@ -72,7 +72,7 @@ public class Keys {
 	public static @NonNull KeyStore createKeyStore(@NonNull PrivateKey pPrivateKey,
                                                    @NonNull Certificate pCertificate, @NonNull String pAlias,
                                                    @Nullable String pStoreType, @NonNull String pStorePass,
-                                                   @NonNull String pKeyPass) {
+                                                   @Nullable String pKeyPass) {
 		return getKeyHandler().createKeyStore(pPrivateKey, pCertificate, pAlias, pStoreType, pStorePass, pKeyPass);
 	}
 	/**

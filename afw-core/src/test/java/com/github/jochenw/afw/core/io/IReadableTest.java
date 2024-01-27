@@ -11,11 +11,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable.NoLongerReadableException;
 import com.github.jochenw.afw.core.util.Holder;
+import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Streams;
 
 
@@ -27,7 +29,8 @@ public class IReadableTest {
 	 */
 	@Test
 	public void testPath() throws Exception {
-		final Path p = Paths.get("pom.xml");
+		@SuppressWarnings("null")
+		final @NonNull Path p = Paths.get("pom.xml");
 		assertTrue(Files.isRegularFile(p));
 		final IReadable r1 = IReadable.of(p);
 		validateNonRepeatable(r1, "pom.xml", Files.size(p));
@@ -49,14 +52,14 @@ public class IReadableTest {
 		validateNonRepeatable(r2, xsdFileUrl.toString(), Files.size(Paths.get(xsdFilePath)));
 	}
 
-	private void validateNonRepeatable(final IReadable pReadable, String pName, long pNumBytes) throws IOException {
+	private void validateNonRepeatable(final @NonNull IReadable pReadable, String pName, long pNumBytes) throws IOException {
 		assertNotNull(pReadable);
 		assertEquals(pName, pReadable.getName());
 		assertTrue(pReadable.isReadable());
 		assertFalse(pReadable.isRepeatable());
 		final Holder<String> contentHolder = new Holder<String>();
 		pReadable.read((in) -> contentHolder.set(Streams.read(in, StandardCharsets.UTF_8)));
-		final String contents = contentHolder.get();
+		final @NonNull String contents = Objects.requireNonNull(contentHolder.get());
 		assertEquals(pNumBytes, contents.getBytes(StandardCharsets.UTF_8).length);
 		assertFalse(pReadable.isReadable());
 		assertFalse(pReadable.isRepeatable());
@@ -73,7 +76,8 @@ public class IReadableTest {
 	 */
 	@Test
 	public void testPathRepeatable() throws Exception {
-		final Path p = Paths.get("pom.xml");
+		@SuppressWarnings("null")
+		final @NonNull Path p = Paths.get("pom.xml");
 		assertTrue(Files.isRegularFile(p));
 		final IReadable r1 = IReadable.of(p).repeatable();
 		validateRepeatable(r1, "pom.xml", Files.size(p));
@@ -89,7 +93,7 @@ public class IReadableTest {
 		assertTrue(r1.isRepeatable());
 		final Holder<String> contentHolder = new Holder<String>();
 		r1.read((in) -> contentHolder.set(Streams.read(in, StandardCharsets.UTF_8)));
-		final String contents = contentHolder.get();
+		final @NonNull String contents = Objects.requireNonNull(contentHolder.get());
 		assertEquals(pNumBytes, contents.getBytes(StandardCharsets.UTF_8).length);
 		final String contents2 = r1.apply((in) -> Streams.read(in, StandardCharsets.UTF_8));
 		assertEquals(contents2, contents);
@@ -111,7 +115,7 @@ public class IReadableTest {
 		assertFalse(r1.isRepeatable());
 		final Holder<String> contentHolder = new Holder<String>();
 		r1.read((in) -> contentHolder.set(Streams.read(in, StandardCharsets.UTF_8)));
-		final String contents = contentHolder.get();
+		final @NonNull String contents = Objects.requireNonNull(contentHolder.get());
 		assertEquals(f.length(), contents.getBytes(StandardCharsets.UTF_8).length);
 		assertFalse(r1.isReadable());
 		assertFalse(r1.isRepeatable());

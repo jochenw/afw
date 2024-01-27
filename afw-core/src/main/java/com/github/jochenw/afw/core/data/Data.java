@@ -134,11 +134,15 @@ public class Data {
 					if (s.length() == 0) {
 						throw new IllegalArgumentException("Empty value for parameter " + pDescription);
 					}
-					return Paths.get(s);
+					@SuppressWarnings("null")
+					final @NonNull Path path = Paths.get(s);
+					return path;
 				} else if (value instanceof Path) {
 					return (Path) value;
 				} else if (value instanceof File) {
-					return ((File) value).toPath();
+					@SuppressWarnings("null")
+					final @NonNull Path path = ((File) value).toPath();
+					return path;
 				} else {
 					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
 							                        + ": Expected path, got " + value.getClass().getName());
@@ -264,6 +268,20 @@ public class Data {
 			final String key = Objects.requireNonNull(pKey, "Key");
 			return function.apply(key);
 		}
+		/** Extracts a non-null value from the given data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The value, which has been retrieved. Never null.
+		 * @throws NullPointerException The parameter {@code pKey} is null,
+		 *   or the extracted value is null.
+		 */
+		public @NonNull Object requireValue(@NonNull String pKey) {
+			final String key = Objects.requireNonNull(pKey, "Key");
+			final Object value = function.apply(key);
+			if (value == null) {
+				throw new NullPointerException("Missing value for parameter: " + pKey);
+			}
+			return value;
+		}
 		/** Extracts a string from the given data store.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @param pDescription Short description of the expected value, for use in error messages.
@@ -350,11 +368,15 @@ public class Data {
 					if (s.length() == 0) {
 						throw new IllegalArgumentException("Empty value for parameter " + pDescription);
 					}
-					return Paths.get(s);
+					@SuppressWarnings("null")
+					final @NonNull Path path = Paths.get(s);
+					return path;
 				} else if (value instanceof Path) {
 					return (Path) value;
 				} else if (value instanceof File) {
-					return ((File) value).toPath();
+					@SuppressWarnings("null")
+					final @NonNull Path path = ((File) value).toPath();
+					return path;
 				} else {
 					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
 							                        + ": Expected path, got " + value.getClass().getName());
@@ -421,6 +443,28 @@ public class Data {
 				} else {
 					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
 							+ ": Expected string, or boolean, got " + value.getClass().getName());
+				}
+			}
+		}
+
+		/** Extracts a boolean value from the data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDefaultValue The default value, which is being used,
+		 *   if the extracted value is null, or otherwise invalid.
+		 * @return The boolean value, which has been retrieved.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public boolean requireBoolean(@NonNull String pKey, @NonNull String pDefaultValue) {
+			final Object value = getValue(pKey);
+			if (value == null) {
+				return Boolean.valueOf(pDefaultValue).booleanValue();
+			} else {
+				if (value instanceof Boolean) {
+					return ((Boolean) value).booleanValue();
+				} else if (value instanceof String) {
+					return Boolean.valueOf((String) value).booleanValue();
+				} else {
+					return Boolean.valueOf(pDefaultValue).booleanValue();
 				}
 			}
 		}
@@ -672,6 +716,26 @@ public class Data {
 	/** Extracts a boolean value from the given map.
 	 * @param pMap The map, from which a value is being extracted.
 	 * @param pKey The key, which is being queried in the data store.
+	 * @param pDefaultValue Default value, which is being used,
+	 *   if the extracted value is null, or otherwise invalid.
+	 * @return The string, which has been retrieved.
+	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+	 *   is not a string.
+	 */
+	public static boolean requireBoolean(@NonNull Map<String,Object> pMap,
+			                             @NonNull String pKey,
+			                             @NonNull String pDefaultValue) {
+		final Boolean b = MAP_ACCESSOR.getBoolean(pMap, pKey, pKey);
+		if (b == null) {
+			return Boolean.valueOf(pDefaultValue).booleanValue();
+		} else {
+			return b.booleanValue();
+		}
+	}
+
+	/** Extracts a boolean value from the given map.
+	 * @param pMap The map, from which a value is being extracted.
+	 * @param pKey The key, which is being queried in the data store.
 	 * @return The string, which has been retrieved.
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
@@ -708,7 +772,7 @@ public class Data {
 	 *   (a string) is a key, and the successor (odd element) is a value. 
 	 * @return The created map.
 	 */
-	public static Map<String,Object> asMap(Object... pValues) {
+	public static @NonNull Map<String,Object> asMap(Object... pValues) {
 		final Map<String,Object> map = new HashMap<>();
 		if (pValues != null) {
 			for (int i = 0;  i < pValues.length;  i += 2) {

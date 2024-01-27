@@ -2,6 +2,7 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.*;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 
@@ -18,8 +19,10 @@ public class AbstractBuilderTest {
 		}
 
 		@Override
-		protected Integer newInstance() {
-			return Integer.valueOf(num);
+		protected @NonNull Integer newInstance() {
+			@SuppressWarnings("null")
+			final @NonNull Integer i = Integer.valueOf(num);
+			return i;
 		}
 	}
 

@@ -215,14 +215,14 @@ public class LocalizableDocument {
 		}
 	}
 
-	private final Document document;
-	private final DomHelper domHelper = new DomHelper();
+	private final @NonNull Document document;
+	private final @NonNull DomHelper domHelper = new DomHelper();
 
 	/**
 	 * Creates a new instance with the given {@link Document}.
 	 * @param pDocument A {@link Document}, that has been parsed.
 	 */
-	public LocalizableDocument(Document pDocument) {
+	public LocalizableDocument(@NonNull Document pDocument) {
 		document = pDocument;
 		domHelper.setDefaultNamespaceUri(pDocument.getDocumentElement().getNamespaceURI());
 		domHelper.setLocationProvider((node) -> getLocator(node));
@@ -319,7 +319,7 @@ public class LocalizableDocument {
 	 * location information.
 	 * @return The document, that has been parsed.
 	 */
-	public Document getDocument() {
+	public @NonNull Document getDocument() {
 		return document;
 	}
 
