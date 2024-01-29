@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
@@ -78,14 +79,14 @@ public interface IAppLog {
      * @param pLevel The messages logging level.
      * @param pMsg The message being logged.
      */
-    public void log(Level pLevel, String pMsg);
+    public void log(@NonNull Level pLevel, String pMsg);
 
     /** Logs the given message with the given arguments.
      * @param pLevel The messages logging level.
      * @param pMsg The message being logged.
      * @param pArgs The message arguments.
      */
-    public default void log(Level pLevel, String pMsg, Object... pArgs) {
+    public default void log(@NonNull Level pLevel, @NonNull String pMsg, @Nullable Object... pArgs) {
     	if (isEnabled(pLevel)) {
     		final String msg = Strings.formatCb(pMsg, pArgs);
     		log(pLevel, msg);
@@ -97,7 +98,7 @@ public interface IAppLog {
      * @param pMsg The message being logged.
      * @param pTh The exception being logged.
      */
-    public default void log(Level pLevel, String pMsg, Throwable pTh) {
+    public default void log(@NonNull Level pLevel, @NonNull String pMsg, @NonNull Throwable pTh) {
     	if (isEnabled(pLevel)) {
     		final FailableConsumer<OutputStream,IOException> consumer = (out) -> {
     			final PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, Charset.defaultCharset()));
@@ -112,7 +113,7 @@ public interface IAppLog {
      * @param pLevel The messages logging level.
      * @param pTh The exception being logged.
      */
-    public default void log(Level pLevel, Throwable pTh) {
+    public default void log(@NonNull Level pLevel, @NonNull Throwable pTh) {
     	final String msg = pTh.getClass().getName() + ": " + pTh.getMessage();
     	log(pLevel, msg, pTh);
     }
@@ -122,7 +123,7 @@ public interface IAppLog {
      * @param pMsgSupplier A supplier for a message, which is being logged.
      *   This supplier is only invoked, if the message is actually logged.
      */
-    public default void log(Level pLevel, Supplier<String> pMsgSupplier) {
+    public default void log(@NonNull Level pLevel, Supplier<@NonNull String> pMsgSupplier) {
     	if (isEnabled(pLevel)) {
     		log(pLevel, pMsgSupplier.get());
     	}
@@ -135,7 +136,7 @@ public interface IAppLog {
      *   This supplier is only invoked, if the message is actually logged.
      *   The {@link InputStream} is <em>not</em> being closed.
      */
-    public default void log(Level pLevel, String pMsg, FailableSupplier<InputStream,IOException> pStreamSupplier) {
+    public default void log(@NonNull Level pLevel, String pMsg, FailableSupplier<InputStream,IOException> pStreamSupplier) {
     	if (isEnabled(pLevel)) {
     		final FailableConsumer<OutputStream,IOException> consumer = (out) -> {
     			Streams.copy(pStreamSupplier.get(), out);
@@ -152,7 +153,7 @@ public interface IAppLog {
      *   this message is enabled. The consumer will only be invoked, if that is the
      *   case.
      */
-    public void log(Level pLevel, String pMsg, FailableConsumer<OutputStream,IOException> pStreamConsumer);
+    public void log(@NonNull Level pLevel, String pMsg, FailableConsumer<OutputStream,IOException> pStreamConsumer);
 
     /**
      * Logs a message with level {@link Level#TRACE}.
@@ -160,7 +161,7 @@ public interface IAppLog {
      *   Will only be invoked, if the message is actually logged (if {@code isEnabled(Level.TRACE)}
      *   returns true.
      */
-    public default void trace(Supplier<String> pMsgSupplier) {
+    public default void trace(Supplier<@NonNull String> pMsgSupplier) {
     	log(Level.TRACE, pMsgSupplier);
     }
 
@@ -170,7 +171,7 @@ public interface IAppLog {
      *   Will only be invoked, if the message is actually logged (if {@code isEnabled(Level.DEBUG)}
      *   returns true.
      */
-    public default void debug(Supplier<String> pMsgSupplier) {
+    public default void debug(Supplier<@NonNull String> pMsgSupplier) {
     	log(Level.DEBUG, pMsgSupplier);
     }
 
@@ -180,7 +181,7 @@ public interface IAppLog {
      *   Will only be invoked, if the message is actually logged (if {@code isEnabled(Level.INFO)}
      *   returns true.
      */
-    public default void info(Supplier<String> pMsgSupplier) {
+    public default void info(Supplier<@NonNull String> pMsgSupplier) {
     	log(Level.INFO, pMsgSupplier);
     }
 
@@ -190,7 +191,7 @@ public interface IAppLog {
      *   Will only be invoked, if the message is actually logged (if {@code isEnabled(Level.WARN)}
      *   returns true.
      */
-    public default void warn(Supplier<String> pMsgSupplier) {
+    public default void warn(Supplier<@NonNull String> pMsgSupplier) {
     	log(Level.WARN, pMsgSupplier);
     }
 
@@ -200,7 +201,7 @@ public interface IAppLog {
      *   Will only be invoked, if the message is actually logged (if {@code isEnabled(Level.ERROR)}
      *   returns true.
      */
-    public default void error(Supplier<String> pMsgSupplier) {
+    public default void error(Supplier<@NonNull String> pMsgSupplier) {
     	log(Level.ERROR, pMsgSupplier);
     }
 
@@ -210,7 +211,7 @@ public interface IAppLog {
      *   Will only be invoked, if the message is actually logged (if {@code isEnabled(Level.FATAL)}
      *   returns true.
      */
-    public default void fatal(Supplier<String> pMsgSupplier) {
+    public default void fatal(Supplier<@NonNull String> pMsgSupplier) {
     	log(Level.FATAL, pMsgSupplier);
     }
 
@@ -268,7 +269,7 @@ public interface IAppLog {
      * @param pMsg The message to log.
      * @param pArgs The message arguments.
      */
-    public default void trace(String pMsg, Object... pArgs) {
+    public default void trace(@NonNull String pMsg, @Nullable Object... pArgs) {
     	log(Level.TRACE, pMsg, pArgs);
     }
 
@@ -277,7 +278,7 @@ public interface IAppLog {
      * @param pMsg The message to log.
      * @param pArgs The message arguments.
      */
-    public default void debug(String pMsg, Object... pArgs) {
+    public default void debug(@NonNull String pMsg, @Nullable Object... pArgs) {
     	log(Level.DEBUG, pMsg, pArgs);
     }
 
@@ -286,7 +287,7 @@ public interface IAppLog {
      * @param pMsg The message to log.
      * @param pArgs The message arguments.
      */
-    public default void info(String pMsg, Object... pArgs) {
+    public default void info(@NonNull String pMsg, @Nullable Object... pArgs) {
     	log(Level.INFO, pMsg, pArgs);
     }
 
@@ -295,7 +296,7 @@ public interface IAppLog {
      * @param pMsg The message to log.
      * @param pArgs The message arguments.
      */
-    public default void warn(String pMsg, Object... pArgs) {
+    public default void warn(@NonNull String pMsg, @Nullable Object... pArgs) {
     	log(Level.WARN, pMsg, pArgs);
     }
 
@@ -304,7 +305,7 @@ public interface IAppLog {
      * @param pMsg The message to log.
      * @param pArgs The message arguments.
      */
-    public default void error(String pMsg, Object... pArgs) {
+    public default void error(@NonNull String pMsg, @Nullable Object... pArgs) {
     	log(Level.ERROR, pMsg, pArgs);
     }
 
@@ -313,28 +314,28 @@ public interface IAppLog {
      * @param pMsg The message to log.
      * @param pArgs The message arguments.
      */
-    public default void fatal(String pMsg, Object... pArgs) {
+    public default void fatal(@NonNull String pMsg, @Nullable Object... pArgs) {
     	log(Level.FATAL, pMsg, pArgs);
     }
 
     /** Logs the given exception with level {@link Level#WARN}.
      * @param pTh The exception to log.
      */
-    public default void warn(Throwable pTh) {
+    public default void warn(@NonNull Throwable pTh) {
     	log(Level.WARN, pTh);
     }
 
     /** Logs the given exception with level {@link Level#ERROR}.
      * @param pTh The exception to log.
      */
-    public default void error(Throwable pTh) {
+    public default void error(@NonNull Throwable pTh) {
     	log(Level.ERROR, pTh);
     }
 
     /** Logs the given exception with level {@link Level#FATAL}.
      * @param pTh The exception to log.
      */
-    public default void fatal(Throwable pTh) {
+    public default void fatal(@NonNull Throwable pTh) {
     	log(Level.FATAL, pTh);
     }
 
@@ -342,7 +343,7 @@ public interface IAppLog {
      * @param pMsg The message to log
      * @param pTh The exception to log.
      */
-    public default void warn(String pMsg, Throwable pTh) {
+    public default void warn(@NonNull String pMsg, @NonNull Throwable pTh) {
     	log(Level.WARN, pMsg, pTh);
     }
 
@@ -350,7 +351,7 @@ public interface IAppLog {
      * @param pMsg The message to log
      * @param pTh The exception to log.
      */
-    public default void error(String pMsg, Throwable pTh) {
+    public default void error(@NonNull String pMsg, @NonNull Throwable pTh) {
     	log(Level.ERROR, pMsg, pTh);
     }
 
@@ -358,7 +359,7 @@ public interface IAppLog {
      * @param pMsg The message to log
      * @param pTh The exception to log.
      */
-    public default void fatal(String pMsg, Throwable pTh) {
+    public default void fatal(@NonNull String pMsg, @NonNull Throwable pTh) {
     	log(Level.FATAL, pMsg, pTh);
     }
 
@@ -380,7 +381,9 @@ public interface IAppLog {
     		return soal;
     	} else {
     		try {
-    			final DefaultAppLog dal = new DefaultAppLog(Files.newOutputStream(pFile));
+    			@SuppressWarnings("null")
+				final @NonNull OutputStream os = Files.newOutputStream(pFile);
+				final DefaultAppLog dal = new DefaultAppLog(os);
     			dal.setLevel(lvl);
     			return dal;
     		} catch (IOException e) {

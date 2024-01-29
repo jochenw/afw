@@ -6,6 +6,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.props.BooleanProperty;
@@ -36,7 +38,10 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 	}
 
 	@Override
-	protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId, String pDefaultValue,
+	protected Object getProperty(@NonNull IComponentFactory pFactory,
+			                     @NonNull Class<?> pType,
+			                     @NonNull String pId,
+			                     @NonNull String pDefaultValue,
 			                     boolean pNullable) {
 		if (pType == String.class) {
 			return pFactory.requireInstance(IPropertyFactory.class).getPropertyValue(pId);

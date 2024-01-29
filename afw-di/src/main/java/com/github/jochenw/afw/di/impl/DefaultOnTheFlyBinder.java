@@ -12,6 +12,8 @@ import java.util.function.Function;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.ILifecycleController;
@@ -118,7 +120,7 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	 *   null, after applying a potential default value. 
 	 * @return The created property instance.
 	 */
-	protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId, String pDefaultValue,
+	protected Object getProperty(@NonNull IComponentFactory pFactory, @NonNull Class<?> pType, @NonNull String pId, @NonNull String pDefaultValue,
 			                     boolean pNullable) {
 		return null;
 	}

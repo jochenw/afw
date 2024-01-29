@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Streams;
 
 /** Default implementation of {@link IAppLog}, writing to an {@link OutputStream}.
  */
@@ -50,8 +51,8 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 	 * and the line separator {@link System#lineSeparator()}.
 	 * @param pOut The output stream to write to.
 	 */
-	public DefaultAppLog(OutputStream pOut) {
-		this(Level.INFO, StandardCharsets.UTF_8, System.lineSeparator(), pOut);
+	public DefaultAppLog(@NonNull OutputStream pOut) {
+		this(Level.INFO, Streams.UTF_8, Streams.LINE_SEPARATOR, pOut);
 	}
 
 	/** Writes the given message, followed by a line terminator.
@@ -64,7 +65,7 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 	}
 
 	@Override
-	public void log(Level pLevel, String pMsg) {
+	public void log(@NonNull Level pLevel, String pMsg) {
 		runWriteLocked(() -> {
 			if (isEnabledLocked(pLevel)) {
 				writeLine(pMsg);
@@ -73,12 +74,12 @@ public class DefaultAppLog extends AbstractAppLog implements AutoCloseable {
 	}
 
 	@Override
-	public void log(Level pLevel, String pMsg, FailableConsumer<OutputStream, IOException> pStreamConsumer) {
+	public void log(@NonNull Level pLevel, String pMsg, FailableConsumer<OutputStream, IOException> pStreamConsumer) {
 		runWriteLocked(() -> {
 			if (isEnabledLocked(pLevel)) {
 				writeLine(pMsg);
 				pStreamConsumer.accept(out);
-				writer.newLine();
+				writer.write(lineSeparator);
 			}
 		});
 	}

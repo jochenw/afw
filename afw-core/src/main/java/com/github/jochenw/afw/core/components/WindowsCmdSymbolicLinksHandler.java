@@ -55,14 +55,14 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	}
 
 	@Override
-	protected void createSymbolicFileLink(Path pTarget, Path pLink) {
+	protected void createSymbolicFileLink(@NonNull Path pTarget, @NonNull Path pLink) {
 		final String[] command = { "mkdir", pLink.toString(),
                 pTarget.toString() };
 		run(null, command);
 	}
 
 	@Override
-	protected Path checkSymbolicLink(Path pPath) {
+	protected Path checkSymbolicLink(@NonNull Path pPath) {
 		try {
 			if (Files.exists(pPath)) {
 				final BasicFileAttributes bfa = Files.readAttributes(pPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
@@ -80,7 +80,7 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	}
 
 	@Override
-	protected void removeSymbolicLink(Path pPath) {
+	protected void removeSymbolicLink(@NonNull Path pPath) {
 		try {
 			Files.delete(pPath);
 		} catch (Throwable t) {

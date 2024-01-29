@@ -3,7 +3,6 @@ package com.github.jochenw.afw.core.io;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;

@@ -221,7 +221,7 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
 	public static ILogFactory of(@Nullable PrintStream pOut, @Nullable Level pLogLevel) {
-		final SimpleLogFactory slf = new SimpleLogFactory(Objects.notNull(pOut, System.out));
+		final SimpleLogFactory slf = new SimpleLogFactory(Objects.notNull(pOut, Objects.requireNonNull(System.out)));
 		slf.setLevel(Objects.notNull(pLogLevel, Level.INFO));
 		return slf;
 	}

@@ -224,7 +224,7 @@ public class JdbcHelper {
 		public @NonNull <O> Callable<O> singleObject() {
 			return () -> {
 				try (Connection conn = connectionProvider.get();
-					 PreparedStatement stmt = conn.prepareStatement(query)) {
+					 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
 					helper.setParameters(stmt, parameters);
 					try (ResultSet rs = stmt.executeQuery()) {
 						if (!rs.next()) {
@@ -247,7 +247,7 @@ public class JdbcHelper {
 		 */
 		public int affectedRows() {
 			try (Connection conn = connectionProvider.get();
-					PreparedStatement stmt = conn.prepareStatement(query)) {
+				 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
 				helper.setParameters(stmt, parameters);
 				return stmt.executeUpdate();
 			} catch (Throwable t) {
@@ -1332,7 +1332,6 @@ public class JdbcHelper {
 	public Date asDate(LocalDate pLocalDateValue) {
 		return Date.valueOf(pLocalDateValue);
 	}
-	private static final LocalTime ZERO_TIME = LocalTime.of(0, 0, 0, 0);
 
 	/** Converts a database date into a local date value in the
 	 * {@link #getAppZoneId() applications time zone}.

@@ -127,7 +127,6 @@ public class ZipFileResourceRepository implements IResourceRepository {
 		final IResource resource = Objects.requireNonNull(pResource, "Resource");
 		if (resource instanceof ZipFileResource) {
 			final ZipFileResource zfr = (ZipFileResource) resource;
-			@SuppressWarnings("resource")
 			ZipFile zf = null;
 			try {
 				zf = new ZipFile(zfr.zipFile.toFile());
@@ -162,32 +161,29 @@ public class ZipFileResourceRepository implements IResourceRepository {
 	 * @throws UncheckedIOException The resource is valid, but opening the resource failed anyways.
 	 */
 	public static InputStream openResource(IResource pResource) {
-		try {
-			final IResource resource = Objects.requireNonNull(pResource, "Resource");
-			if (resource instanceof ZipFileResource) {
-				final ZipFileResource zfr = (ZipFileResource) resource;
-				@SuppressWarnings("resource")
-				ZipFile zf = new ZipFile(zfr.zipFile.toFile());
-				try {
-					final ZipEntry ze = zf.getEntry(zfr.getUri());
-					return new FilterInputStream(zf.getInputStream(ze)) {
-						@Override
-						public void close() throws IOException {
-							super.close();
-							zf.close();
-						}
-					};
-				} catch (Throwable t) {
-					if (zf != null) {
-						try { zf.close(); } catch (Throwable th) { /* Ignore this, throw the cause. */ }
+		final IResource resource = Objects.requireNonNull(pResource, "Resource");
+		if (resource instanceof ZipFileResource) {
+			final ZipFileResource zfr = (ZipFileResource) resource;
+			ZipFile zf = null;
+			try {
+				zf = new ZipFile(zfr.zipFile.toFile());
+				final ZipEntry ze = zf.getEntry(zfr.getUri());
+				final ZipFile zFile = zf;
+				return new FilterInputStream(zf.getInputStream(ze)) {
+					@Override
+					public void close() throws IOException {
+						super.close();
+						zFile.close();
 					}
-					throw Exceptions.show(t);
+				};
+			} catch (Throwable t) {
+				if (zf != null) {
+					try { zf.close(); } catch (Throwable th) { /* Ignore this, throw the cause. */ }
 				}
-			} else {
-				throw new IllegalArgumentException("Invalid resource type: " + resource.getClass().getName());
+				throw Exceptions.show(t);
 			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+		} else {
+			throw new IllegalArgumentException("Invalid resource type: " + resource.getClass().getName());
 		}
 	}
 

@@ -548,7 +548,7 @@ public class Cli<B> {
 	 * @param pOption The created option.
 	 * @return The same option.
 	 */
-	protected <O extends Option<?,B>> O option(O pOption) {
+	protected <O extends Option<?,B>> O option(@NonNull O pOption) {
 		final Predicate<String> existingOptionTest = (s) -> {
 			for (Option<?,B> opt : options.values()) {
 				if (s.equals(opt.getPrimaryName())) {

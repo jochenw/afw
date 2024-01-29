@@ -78,20 +78,20 @@ public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHand
          * @param pLink Path of the link, that is being created.
          */
 	@Override
-	public void createFileLink(Path pTarget, Path pLink) throws UnsupportedOperationException {
+	public void createFileLink(@NonNull Path pTarget, @NonNull Path pLink) throws UnsupportedOperationException {
 		assertFile(pTarget);
 		createSymbolicFileLink(pTarget, pLink);
 	}
 
         
 	@Override
-	public Path checkLink(Path pPath) {
-		final Path path = Objects.requireNonNull(pPath, "The path must not be null.");
+	public Path checkLink(@NonNull Path pPath) {
+		final @NonNull Path path = Objects.requireNonNull(pPath, "The path must not be null.");
 		return checkSymbolicLink(path);
 	}
 
 	@Override
-	public void removeLink(Path pPath) {
+	public void removeLink(@NonNull Path pPath) {
 		final Path path = Objects.requireNonNull(pPath, "The path must not be null.");
 		removeSymbolicLink(path);
 	}

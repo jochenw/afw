@@ -414,7 +414,7 @@ i     */
      */
     public ExecutorBuilder stdErr(FailableSupplier<Writer,?> pSupplier, Charset pCharset) {
     	final FailableSupplier<Writer,?> supplier = Objects.requireNonNull(pSupplier, "Supplier");
-    	final Charset cs = Objects.notNull(pCharset, StandardCharsets.UTF_8);
+    	final Charset cs = Objects.notNull(pCharset, Streams.UTF_8);
     	final ProcessOutputHandler stdErrHandler = (in) -> {
     		final Writer w = Objects.requireNonNull(supplier.get(), "Writer");
     		Streams.copy(in, w, cs);

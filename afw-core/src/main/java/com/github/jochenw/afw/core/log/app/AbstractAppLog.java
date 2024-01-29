@@ -35,7 +35,9 @@ public abstract class AbstractAppLog implements IAppLog {
 	 *   {@link FailableCallable callable}.
 	 */
 	protected <O> O callReadLocked(FailableCallable<O,?> pCallable) {
-		return getLockable().callReadLocked(pCallable);
+		@SuppressWarnings("null")
+		final O o = (O) getLockable().callReadLocked(pCallable);
+		return o;
 	}
 
 	/** Calls the given {@link FailableCallable callable} to compute a result object, while
@@ -46,7 +48,9 @@ public abstract class AbstractAppLog implements IAppLog {
 	 *   {@link FailableCallable callable}.
 	 */
 	protected <O> O callWriteLocked(FailableCallable<O,?> pCallable) {
-		return getLockable().callWriteLocked(pCallable);
+		@SuppressWarnings("null")
+		final O o = (O) getLockable().callWriteLocked(pCallable);
+		return o;
 	}
 
 	/** Calls the given {@link FailableRunnable runnable} to execute an action, while holding a shared
@@ -70,13 +74,14 @@ public abstract class AbstractAppLog implements IAppLog {
 	/** Returns the {@link Lockable lock}, that is used to obtain shared, or exclusive locks.
 	 * @return The object, that provides shared, or exclusive locks.
 	 */
-	protected Lockable getLockable() {
+	protected @NonNull Lockable getLockable() {
 		return lockable;
 	}
 	
 	@Override
 	public @NonNull Level getLevel() {
-		return callReadLocked(() -> level);
+		final FailableCallable<@NonNull Level,?> callable = () -> level;
+		return callReadLocked(callable);
 	}
 
 	@Override
@@ -87,7 +92,7 @@ public abstract class AbstractAppLog implements IAppLog {
 
 	@Override
 	public boolean isEnabled(@NonNull Level pLevel) {
-		if (pLevel == null) {
+		if (Objects.isNull(pLevel)) {
 			return false;
 		} else {
 			final FailableCallable<Boolean,?> callable = () -> {
@@ -103,7 +108,7 @@ public abstract class AbstractAppLog implements IAppLog {
 	 * @return True, if the given logging level is enabled.
 	 */
 	protected boolean isEnabledLocked(@NonNull Level pLevel) {
-		if (pLevel == null) {
+		if (Objects.isNull(pLevel)) {
 			return false;
 		} else {
 			return pLevel.ordinal() >= level.ordinal();

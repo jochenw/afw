@@ -71,13 +71,13 @@ public class ExtProperties {
 		public String[] getComments() { return comments; }
 	}
 
-	private final Map<@NonNull String, ExtProperty> entries;
+	private final @NonNull Map<@NonNull String, @NonNull ExtProperty> entries;
 
 	/** Creates a new instance with an explicit order of keys, as specified by the given
 	 * {@link Comparator}.
 	 * @param pEntries A mutable map, that is destined to hold the entries of the property set.
 	 */
-	ExtProperties(Map<@NonNull String, ExtProperty> pEntries) {
+	ExtProperties(@NonNull Map<@NonNull String, @NonNull ExtProperty> pEntries) {
 		entries = pEntries;
 	}
 
@@ -108,7 +108,7 @@ public class ExtProperties {
 	public @NonNull ExtProperty requireProperty(@NonNull String pKey) throws NoSuchElementException, NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final @Nullable ExtProperty ep = entries.get(key);
-		if (ep == null) {
+		if (java.util.Objects.isNull(ep)) {
 			throw new NoSuchElementException("No property with this key exists: " + pKey);
 		}
 		return ep;
@@ -122,8 +122,8 @@ public class ExtProperties {
 	 */
 	public @Nullable String getValue(@NonNull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
-		final ExtProperty ep = entries.get(key);
-		if (ep == null) {
+		final @Nullable ExtProperty ep = entries.get(key);
+		if (java.util.Objects.isNull(ep)) {
 			return null;
 		} else {
 			return ep.getValue();
@@ -141,8 +141,8 @@ public class ExtProperties {
 	 */
 	public String[] getComment(@NonNull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
-		final ExtProperty ep = entries.get(key);
-		if (ep == null) {
+		final @Nullable ExtProperty ep = entries.get(key);
+		if (java.util.Objects.isNull(ep)) {
 			return null;
 		} else {
 			return ep.getComments();
@@ -176,7 +176,7 @@ public class ExtProperties {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final String value = Objects.requireNonNull(pValue, "Value");
 		entries.compute(key, (k, ep) -> {
-			if (ep == null) {
+			if (java.util.Objects.isNull(ep)) {
 				return new ExtProperty(k, value, null);
 			} else {
 				if (value.equals(ep.getValue())) {
@@ -201,7 +201,7 @@ public class ExtProperties {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		entries.compute(key, (k, ep) -> {
 			final @NonNull String propertyKey = Objects.requireNonNull(pKey);
-			if (ep == null) {
+			if (java.util.Objects.isNull(ep)) {
 				return new ExtProperty(propertyKey, "", pComments);
 			} else {
 				final String[] comments = ep.getComments();
@@ -285,7 +285,7 @@ public class ExtProperties {
 	 * thus package private.
 	 * @return The internal Map of extended properties.
 	 */
-	Map<String,ExtProperty> getEntries() { return entries; }
+	@NonNull Map<@NonNull String,@NonNull ExtProperty> getEntries() { return entries; }
 
 	/** Creates a new instance of {@link IExtPropertiesWriter},
 	 * with the {@link StandardCharsets#UTF_8 UTF8 character set},
@@ -333,7 +333,7 @@ public class ExtProperties {
 	 * @return The created property set.
 	 */
 	public static ExtProperties create(Comparator<String> pComparator) {
-		final Map<@NonNull String, @NonNull ExtProperty> entries;
+		final @NonNull Map<@NonNull String, @NonNull ExtProperty> entries;
 		if (pComparator == null) {
 			entries = new LinkedHashMap<@NonNull String, @NonNull ExtProperty>();
 		} else {
@@ -361,18 +361,20 @@ public class ExtProperties {
 	 *   {@link #create(Comparator)}.
 	 */
 	public static ExtProperties createSynchronized(ExtProperties pProperties) {
-		final Map<@NonNull String,ExtProperty> entries = pProperties.entries;
-		final Map<@NonNull String,ExtProperty> entries2;
+		final Map<@NonNull String, @NonNull ExtProperty> entries = pProperties.entries;
+		final Map<@NonNull String, @NonNull ExtProperty> entries2;
 		if (entries instanceof LinkedHashMap) {
-			entries2 = new LinkedHashMap<@NonNull String, ExtProperty>(entries);
+			entries2 = new LinkedHashMap<>(entries);
 		} else if (entries instanceof TreeMap) {
 			final TreeMap<@NonNull String,ExtProperty> tm = (TreeMap<@NonNull String,ExtProperty>) entries;
-			entries2 = new TreeMap<@NonNull String,ExtProperty>(tm.comparator());
+			entries2 = new TreeMap<>(tm.comparator());
 			entries2.putAll(entries);
 		} else {
 			throw new IllegalStateException("Unable to clone an instance of " + entries.getClass().getName());
 		}
-		return new ExtProperties(Collections.synchronizedMap(entries2));
+		@SuppressWarnings("null")
+		final @NonNull Map<@NonNull String, @NonNull ExtProperty> synchronizedMap = Collections.synchronizedMap(entries2);
+		return new ExtProperties(synchronizedMap);
 	}
 
 	/** Creates a set of properties by splitting the given list of strings into key/value/comment triplets.

@@ -6,6 +6,8 @@ package com.github.jochenw.afw.core.components;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.util.Exceptions;
 
 /** Simple implementation of the {@link ISymbolicLinksHandler}, based on the
@@ -14,7 +16,7 @@ import com.github.jochenw.afw.core.util.Exceptions;
  */
 public class JavaNioSymbolicLinksHandler implements ISymbolicLinksHandler {
 	@Override
-	public void createDirectoryLink(Path pTarget, Path pLink) {
+	public void createDirectoryLink(@NonNull Path pTarget, @NonNull Path pLink) {
 		try {
 			Files.createSymbolicLink(pLink, pTarget.toAbsolutePath());
 		} catch (Throwable t) {
@@ -23,7 +25,7 @@ public class JavaNioSymbolicLinksHandler implements ISymbolicLinksHandler {
 	}
 
 	@Override
-	public void createFileLink(Path pTarget, Path pLink) throws UnsupportedOperationException {
+	public void createFileLink(@NonNull Path pTarget, @NonNull Path pLink) throws UnsupportedOperationException {
 		try {
 			Files.createSymbolicLink(pLink, pTarget.toAbsolutePath());
 		} catch (Throwable t) {
@@ -32,7 +34,7 @@ public class JavaNioSymbolicLinksHandler implements ISymbolicLinksHandler {
 	}
 
 	@Override
-	public Path checkLink(Path pPath) {
+	public Path checkLink(@NonNull Path pPath) {
 		try {
 			if (Files.isSymbolicLink(pPath)) {
 				return Files.readSymbolicLink(pPath);
@@ -45,7 +47,7 @@ public class JavaNioSymbolicLinksHandler implements ISymbolicLinksHandler {
 	}
 
 	@Override
-	public void removeLink(Path pPath) {
+	public void removeLink(@NonNull Path pPath) {
 		try {
 			Files.delete(pPath);
 		} catch (Throwable t) {

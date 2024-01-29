@@ -823,6 +823,11 @@ public class Streams {
 	 */
 	public static final @NonNull Charset UTF_8 = Objects.requireNonNull(StandardCharsets.UTF_8);
 
+	/**
+	 * A reference to the systems line separator, which is declared zto be non-null.
+	 */
+	public static final @NonNull String LINE_SEPARATOR = Objects.requireNonNull(System.lineSeparator());
+
     /**
      * Reads the given {@link IReadable} as a text file, invoking the given consumer for
      * every line.

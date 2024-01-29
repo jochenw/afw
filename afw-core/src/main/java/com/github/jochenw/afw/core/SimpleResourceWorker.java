@@ -178,7 +178,7 @@ public class SimpleResourceWorker {
 			tracker.close();
 			tracker = null;
 		} catch (Throwable t) {
-			th = null;
+			th = t;
 		} finally {
 			if (tracker != null) {
 				try {
@@ -208,13 +208,13 @@ public class SimpleResourceWorker {
 		Objects.requireNonNull(pCallable, "Callable");
 		SimpleResourceTracker tracker = newTracker();
 		Throwable th = null;
-		T res = null;
+		Object res = null;
 		try {
 			res = pCallable.call(tracker);
 			tracker.close();
 			tracker = null;
 		} catch (Throwable t) {
-			th = null;
+			th = t;
 		} finally {
 			if (tracker != null) {
 				try {
@@ -229,6 +229,8 @@ public class SimpleResourceWorker {
 		if (th != null) {
 			throw Exceptions.show(th);
 		}
-		return res;
+		@SuppressWarnings("unchecked")
+		final T result = (T) res;
+		return result;
 	}
 }

@@ -5,6 +5,8 @@ package com.github.jochenw.afw.core.components;
 
 import java.nio.file.Path;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.util.Systems;
 
 
@@ -17,22 +19,22 @@ public class DefaultSymbolicLinksHandler extends AbstractSymbolicLinksHandler {
 			new WindowsCmdSymbolicLinksHandler() : new JavaNioSymbolicLinksHandler();
 
 	@Override
-	protected void createSymbolicDirLink(Path pTarget, Path pLink) {
+	protected void createSymbolicDirLink(@NonNull Path pTarget, @NonNull Path pLink) {
 		handler.createDirectoryLink(pTarget, pLink);
 	}
 
 	@Override
-	protected void createSymbolicFileLink(Path pTarget, Path pLink) {
+	protected void createSymbolicFileLink(@NonNull Path pTarget, @NonNull Path pLink) {
 		handler.createFileLink(pTarget, pLink);
 	}
 
 	@Override
-	protected Path checkSymbolicLink(Path pPath) {
+	protected Path checkSymbolicLink(@NonNull Path pPath) {
 		return handler.checkLink(pPath);
 	}
 
 	@Override
-	protected void removeSymbolicLink(Path pPath) {
+	protected void removeSymbolicLink(@NonNull Path pPath) {
 		handler.removeLink(pPath);
 	}
 }

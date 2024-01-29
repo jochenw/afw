@@ -82,7 +82,7 @@ public abstract class ResourceLocator {
 	 * @throws NoSuchElementException The resource wasn't found.
 	 * @see #requireResource(String)
 	 */
-	public URL requireResource(String pUri) throws NoSuchElementException {
+	public URL requireResource(@NonNull String pUri) throws NoSuchElementException {
 		final URL url = getResource(pUri);
 		if (url == null) {
 			throw new NoSuchElementException("Unable to locate resource: " + pUri);
@@ -113,8 +113,8 @@ public abstract class ResourceLocator {
 	 * @see #getResource(ClassLoader, String)
 	 * @see #getResource(String)
 	 */
-	public URL requireResource(ClassLoader pClassLoader, String pUri) {
-		final URL url = getResource(pUri);
+	public URL requireResource(ClassLoader pClassLoader, @NonNull String pUri) {
+		final URL url = getResource(pClassLoader, pUri);
 		if (url == null) {
 			throw new NoSuchElementException("Unable to locate resource: " + pUri
 					+ " via ClassLoader " + pClassLoader.toString());

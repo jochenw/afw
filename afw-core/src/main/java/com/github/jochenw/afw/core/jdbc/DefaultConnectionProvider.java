@@ -65,7 +65,7 @@ public class DefaultConnectionProvider implements ConnectionProvider {
 	}
 
 	@Override
-	public String getDialectId() {
+	public @NonNull String getDialectId() {
 		return getProperty("dialect");
 	}
 
@@ -75,7 +75,7 @@ public class DefaultConnectionProvider implements ConnectionProvider {
 	 * @throws NullPointerException No property value has been configured.
 	 * @throws IllegalArgumentException The configured property value is empty.
 	 */
-	protected String getProperty(String pProperty) {
+	protected @NonNull String getProperty(String pProperty) {
 		final String prop = getPrefix() + "." + pProperty;
 		final String value = propertyFactory.getPropertyValue(prop);
 		if (value == null) {

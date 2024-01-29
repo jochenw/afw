@@ -257,7 +257,7 @@ public class Locks {
 	/** Creates a new {@link Lockable}.
 	 * @return A new {@link Lockable}.
 	 */
-	public static Lockable newLockable() {
+	public static @NonNull Lockable newLockable() {
 		return new Lockable();
 	}
 }

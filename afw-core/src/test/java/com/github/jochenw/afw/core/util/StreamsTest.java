@@ -360,11 +360,11 @@ public class StreamsTest {
     	assertSameProperties(props, got1);
     	final Properties got2 = Streams.load(path, false);
     	assertSameProperties(props, got2);
-    	final Properties got3 = Streams.load(false, new Object[] {path});
+    	final Properties got3 = Streams.load(false, new @NonNull Object[] {path});
     	assertSameProperties(props, got3);
-    	final Path path2 = path.getParent().resolve("thisFileDoesntExist");
+    	final @NonNull Path path2 = Objects.requireNonNull(path.getParent().resolve("thisFileDoesntExist"));
     	assertNull(Streams.load(path2, true));
-    	final Properties got4 = Streams.load(true, new Object[] {path2}); 
+    	final Properties got4 = Streams.load(true, new @NonNull Object[] {path2}); 
     	assertNotNull(got4);
     	assertTrue(got4.isEmpty());
     	final Path xmlPath = createTestProperties(props, true);
@@ -377,20 +377,21 @@ public class StreamsTest {
     @Test
     public void testLoadFile() {
     	final Properties props = newTestProperties();
-    	final File file = createTestProperties(props, false).toFile();
+    	@SuppressWarnings("null")
+		final @NonNull File file = createTestProperties(props, false).toFile();
     	final Properties got1 = Streams.load(file);
     	assertSameProperties(props, got1);
     	final Properties got2 = Streams.load(file, false);
     	assertSameProperties(props, got2);
-    	final Properties got3 = Streams.load(false, new Object[] {file});
+    	final Properties got3 = Streams.load(false, new @NonNull Object[] {file});
     	assertSameProperties(props, got3);
     	final File file2 = new File(file.getParentFile(), "thisFileDoesntExist");
     	assertNull(Streams.load(file2, true));
-    	final Properties got4 = Streams.load(true, new Object[] {file2});
+    	final Properties got4 = Streams.load(true, new @NonNull Object[] {file2});
 		assertNotNull(got4);
 		assertTrue(got4.isEmpty());
-    	final Path xmlPath = createTestProperties(props, true);
-    	final Properties xmlGot = Streams.load(xmlPath.toFile());
+    	final @NonNull Path xmlPath = createTestProperties(props, true);
+    	final Properties xmlGot = Streams.load(Objects.requireNonNull(xmlPath.toFile()));
     	assertSameProperties(props, xmlGot);
     }
 
@@ -461,7 +462,6 @@ public class StreamsTest {
 	@Test
     public void testOfByteArray() throws Exception {
     	String string = "763209kfegLIZRD$";
-		@SuppressWarnings("null")
 		final byte @NonNull [] bytes = string.getBytes(StandardCharsets.UTF_8);
     	final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     	Streams.copy(Streams.of(bytes), baos);
