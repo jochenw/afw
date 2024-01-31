@@ -84,7 +84,7 @@ public class ExtProperties {
 	/** Returns an immutable map of all properties, that constitute the property set.
 	 * @return An immutable map of all the entries in the property set.
 	 */
-	public Map<@NonNull String, ExtProperty> getPropertyMap() { return Collections.unmodifiableMap(entries); } 
+	public Map<@NonNull String, @NonNull ExtProperty> getPropertyMap() { return Collections.unmodifiableMap(entries); } 
 
 	/** Returns the property with the given key.
 	 * @param pKey The requested properties key.

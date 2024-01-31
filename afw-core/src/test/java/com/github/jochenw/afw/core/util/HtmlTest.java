@@ -1,7 +1,5 @@
 package com.github.jochenw.afw.core.util;
 
-import static org.junit.Assert.*;
-
 import java.util.function.BiConsumer;
 
 import org.junit.Assert;

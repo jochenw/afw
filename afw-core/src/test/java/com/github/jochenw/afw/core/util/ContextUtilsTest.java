@@ -7,10 +7,10 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.function.Functions;
@@ -205,8 +205,8 @@ public class ContextUtilsTest {
 	 */
 	@Test
 	public void testOfSupplierConsumer1() {
-		final Map<String,Object> map = new HashMap<>();
-		final IContextProvider<Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
+		final @NonNull Map<String,Object> map = new HashMap<>();
+		final IContextProvider<@NonNull Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
 		assertNull(map.get("closed"));
 		assertNull(map.get("used"));
 		cp.run((c) -> {
@@ -222,8 +222,8 @@ public class ContextUtilsTest {
 	 */
 	@Test
 	public void testOfSupplierConsumer2() {
-		final Map<String,Object> map = new HashMap<>();
-		final IContextProvider<Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
+		final @NonNull Map<String,Object> map = new HashMap<>();
+		final IContextProvider<@NonNull Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
 		assertNull(map.get("closed"));
 		assertNull(map.get("used"));
 		final Boolean b = cp.call((mp) -> {
@@ -241,8 +241,8 @@ public class ContextUtilsTest {
 	 */
 	@Test
 	public void testOfSupplierConsumer3() {
-		final Map<String,Object> map = new HashMap<>();
-		final IContextProvider<Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
+		final @NonNull Map<String,Object> map = new HashMap<>();
+		final IContextProvider<@NonNull Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
 		assertNull(map.get("closed"));
 		assertNull(map.get("used"));
 		final Boolean b = cp.call((mp) -> {
@@ -260,8 +260,8 @@ public class ContextUtilsTest {
 	 */
 	@Test
 	public void testOfSupplierConsumer4() {
-		final Map<String,Object> map = new HashMap<>();
-		final IContextProvider<Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
+		final @NonNull Map<String,Object> map = new HashMap<>();
+		final IContextProvider<@NonNull Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
 		assertNull(map.get("closed"));
 		assertNull(map.get("used"));
 		final RuntimeException rte = new RuntimeException();
@@ -283,8 +283,8 @@ public class ContextUtilsTest {
 	 */
 	@Test
 	public void testOfSupplierConsumer5() {
-		final Map<String,Object> map = new HashMap<>();
-		final IContextProvider<Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
+		final @NonNull Map<String,Object> map = new HashMap<>();
+		final IContextProvider<@NonNull Map<String,Object>> cp = ContextUtils.of(() -> map, MAP_TERMINATOR);
 		assertNull(map.get("closed"));
 		assertNull(map.get("used"));
 		final IOException ioe = new IOException();
@@ -310,8 +310,8 @@ public class ContextUtilsTest {
 	@Test
 	public void testOfSupplierConsumer6() {
 		final NullPointerException npe = new NullPointerException();
-		final Map<String,Object> map = new HashMap<>();
-		final IContextProvider<Map<String,Object>> cp = ContextUtils.of(() -> map,
+		final @NonNull Map<String,Object> map = new HashMap<>();
+		final IContextProvider<@NonNull Map<String,Object>> cp = ContextUtils.of(() -> map,
 				(c) -> { map.put("closed", Boolean.TRUE); throw npe; });
 		assertNull(map.get("closed"));
 		assertNull(map.get("used"));
@@ -334,8 +334,8 @@ public class ContextUtilsTest {
 	@Test
 	public void testOfSupplierConsumer7() {
 		final NullPointerException npe = new NullPointerException();
-		final Map<String,Object> map = new HashMap<>();
-		final IContextProvider<Map<String,Object>> cp = ContextUtils.of(() -> map,
+		final @NonNull Map<String,Object> map = new HashMap<>();
+		final IContextProvider<@NonNull Map<String,Object>> cp = ContextUtils.of(() -> map,
 				(c) -> { map.put("closed", Boolean.TRUE); throw npe; });
 		final RuntimeException rte = new RuntimeException();
 		assertNull(map.get("closed"));

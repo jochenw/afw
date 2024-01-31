@@ -15,10 +15,12 @@
  */
 package com.github.jochenw.afw.core.io;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +36,9 @@ public class DirectoryScannerTest {
 	@Test
 	public void testAllFiles() {
 		final Set<String> files = new HashSet<>();
-		ds.scan(Paths.get("src"), null, null, (c) -> {
+		@SuppressWarnings("null")
+		final @NonNull Path srcPath = Paths.get("src");
+		ds.scan(srcPath, null, null, (c) -> {
 			Assert.assertTrue(files.add(c.getUri()));
 		});
 		Assert.assertTrue(files.contains("main/java/com/github/jochenw/afw/core/util/Sax.java"));
@@ -52,7 +56,9 @@ public class DirectoryScannerTest {
 		final IMatcher[] includes = new IMatcher[] {
 			new DefaultMatcher("main/**/*")
 		};
-		ds.scan(Paths.get("src"), includes, null, (c) -> {
+		@SuppressWarnings("null")
+		final @NonNull Path srcPath = Paths.get("src");
+		ds.scan(srcPath, includes, null, (c) -> {
 			Assert.assertTrue(files.add(c.getUri()));
 		});
 		Assert.assertTrue(files.contains("main/java/com/github/jochenw/afw/core/util/Sax.java"));

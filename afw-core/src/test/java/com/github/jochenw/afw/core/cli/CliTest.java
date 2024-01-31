@@ -6,12 +6,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.MutableBoolean;
+import com.github.jochenw.afw.core.util.Objects;
 
 
 /** Test suite for the {@link Cli} class.
@@ -39,7 +41,7 @@ public class CliTest {
 			    .handler((c,p) -> c.getBean().helperFile = p).end()
 			.booleanOption("verbose", "v")
 			    .handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
-			.parse(new String[]{"--inputFile", "pom.xml", "-of", "target/test/output.xml", "-verbose"});
+			.parse(new @NonNull String[]{"--inputFile", "pom.xml", "-of", "target/test/output.xml", "-verbose"});
 		assertNotNull(options);
 		assertEquals(options.inputFile.toString(), "pom.xml");
 		assertEquals(options.outputFile.toString().replace('\\', '/'), "target/test/output.xml");
@@ -95,7 +97,7 @@ public class CliTest {
 					.handler((c,p) -> c.getBean().helperFile = p).end()
 					.booleanOption("verbose", "v")
 					.handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
-					.parse(new String[]{"-of", "target/test/output.xml", "-verbose"});
+					.parse(new @NonNull String[]{"-of", "target/test/output.xml", "-verbose"});
 			fail("Expected Exception");
 		} catch (UsageException e) {
 			assertEquals("Required option missing: inputFile", e.getMessage());
@@ -115,7 +117,7 @@ public class CliTest {
 				    .handler((c,p) -> c.getBean().helperFile = p).end()
 				.booleanOption("verbose", "v")
 				    .handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
-				.parse(new String[]{"--inputFile=pom.xml", "-of", "target/test/output.xml", "-verbose=true"});
+				.parse(new @NonNull String[]{"--inputFile=pom.xml", "-of", "target/test/output.xml", "-verbose=true"});
 			assertNotNull(options);
 			assertEquals(options.inputFile.toString(), "pom.xml");
 			assertEquals(options.outputFile.toString().replace('\\', '/'), "target/test/output.xml");
@@ -138,7 +140,7 @@ public class CliTest {
 				.booleanOption("verbose", "v")
 				    .handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
 				.beanValidator((b) -> {validated.set(); return null;})
-				.parse(new String[]{"--inputFile=pom.xml", "-of", "target/test/output.xml", "-verbose=true"});
+				.parse(new @NonNull String[]{"--inputFile=pom.xml", "-of", "target/test/output.xml", "-verbose=true"});
 			assertNotNull(options);
 			assertEquals(options.inputFile.toString(), "pom.xml");
 			assertEquals(options.outputFile.toString().replace('\\', '/'), "target/test/output.xml");
@@ -155,7 +157,7 @@ public class CliTest {
 				.stringOption("outputFile", "of").required().handler((c,s) -> c.getBean().outputFile = Paths.get(s)).end()
 				.errorHandler((s) -> new IllegalStateException(s));
 		try {
-			cli.parse(new String[]{ "-if=pom.xml", "-of=/var/lib/of.log", "-h"});
+			cli.parse(new @NonNull String[]{ "-if=pom.xml", "-of=/var/lib/of.log", "-h"});
 		} catch (IllegalStateException e) {
 			assertNull(e.getMessage());
 		}
@@ -168,16 +170,25 @@ public class CliTest {
 		final FailableBiConsumer<Context<OptionsBean>, String, ?> ofHandler = (c,s) -> {
 			c.getBean().outputFile = Paths.get(s);
 		};
-		final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
-				.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
-				.stringOption("outputFile", "of").required().handler(ofHandler).end()
+		@SuppressWarnings("null")
+		final @NonNull Cli<@NonNull OptionsBean> cli = Cli.of(new OptionsBean())
+				.stringOption("inputFile", "if")
+				    .required()
+				    .handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
+				.stringOption("outputFile", "of")
+				    .required()
+				    .handler(ofHandler).end()
 				.errorHandler((s) -> new IllegalStateException(s));
-		final String[] args1 = new String[] {"-if=pom.xml", "-of=/var/lib/of.log"};
+		final @NonNull String @NonNull [] args1 = new @NonNull String[] {
+			"-if=pom.xml", "-of=/var/lib/of.log"
+		};
 		final OptionsBean ob1 = cli.parse(args1);
 		assertNotNull(ob1);
 		assertEquals("pom.xml", ob1.inputFile.toString());
 		assertEquals("/var/lib/of.log", ob1.outputFile.toString().replace('\\', '/'));
-		final String[] args2 = new String[] {"-if", "pom.xml", "-of", "/var/lib/of.log"};
+		final @NonNull String[] args2 = new @NonNull String[] {
+			"-if", "pom.xml", "-of", "/var/lib/of.log"
+		};
 		final OptionsBean ob2 = cli.parse(args2);
 		assertNotNull(ob2);
 		assertEquals("pom.xml", ob2.inputFile.toString());
@@ -189,13 +200,13 @@ public class CliTest {
 	 */
 	@Test
 	public void testCliClass() {
-		final FailableBiConsumer<Context<OptionsBean>, String, ?> ofHandler = (c,s) -> {
+		final @NonNull FailableBiConsumer<@NonNull Context<@NonNull OptionsBean>, String, ?> ofHandler = (c,s) -> {
 			c.getBean().outputFile = Paths.get(s);
 		};
 		final MutableBoolean configured = new MutableBoolean();
 		final Function<String,RuntimeException> errorHandler = (s) -> new IllegalStateException(s);
 		assertNull(TestCliClass.options);
-		Cli.main(TestCliClass.class, OptionsBean.class, new String[] {
+		Cli.main(TestCliClass.class, OptionsBean.class, new @NonNull String[] {
 			"-if", "pom.xml", "-of", "./logs/of.log"
 		}, (cli) -> {
 			configured.set();
@@ -214,13 +225,18 @@ public class CliTest {
 	public static class TestCliClass implements Cli.CliClass<OptionsBean> {
 		private static OptionsBean options;
 
+		/** Runs the Cli with the given options bean.
+		 */
 		@Override
 		public void run(OptionsBean pOptionsBean) {
 			options = pOptionsBean;
 		}
 
+		/**
+		 * @return The optionś bean.
+		 */
 		public OptionsBean getOptions() {
-			return options;
+			return Objects.requireNonNull(options);
 		}
 	}
 

@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.junit.Assert;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.extprop.ExtProperties.ExtProperty;
+import com.github.jochenw.afw.core.util.Objects;
 
 
 /** Test suite for the {@link ExtProperties} class.
@@ -25,14 +26,14 @@ import com.github.jochenw.afw.core.extprop.ExtProperties.ExtProperty;
 public class ExtPropertiesTest {
 	private static final String[] ONE_PROPERTY =
 		{"foo", "bar", "The foo property with value bar."};
-	private static final String[] TWO_PROPERTIES =
+	private static final @Nullable String[] TWO_PROPERTIES =
 		{"foo", "bar", "The foo property with value bar.",
          "answer", "42", null};
-	private static final String[] THREE_PROPERTIES =
+	private static final @Nullable String[] THREE_PROPERTIES =
 		{"foo", "bar", "The foo property with value bar.",
          "answer", "42", null,
          "Whatever", "works", "The property Whatever (works"};
-	private static final String[] THREE_PROPERTIES_SORTED =
+	private static final @Nullable String[] THREE_PROPERTIES_SORTED =
 		{"answer", "42", null,
 		 "foo", "bar", "The foo property with value bar.",
          "Whatever", "works", "The property Whatever (works"};
@@ -111,7 +112,7 @@ public class ExtPropertiesTest {
 		final ExtProperties ep = ExtProperties.of(values);
 		assertValues(ep, values);
 		// Change an existing property.
-		ep.setComments("foo", new String[]{"Property foo"});
+		ep.setComments("foo", new @Nullable String[]{"Property foo"});
 		assertValues(ep, "foo", "bar", "Property foo");
 		// Create a new property without comment.
 		ep.setComments("answer", null);
@@ -122,10 +123,10 @@ public class ExtPropertiesTest {
 		assertNotNull(ep1);
 		ep.setComments("answer", null);
 		assertSame(ep1, ep.getProperty("answer"));
-		ep.setComments("answer", new String[]{"*The* answer"});
+		ep.setComments("answer", new @Nullable String[]{"*The* answer"});
 		final ExtProperty ep2 = ep.getProperty("answer");
 		assertNotSame(ep1, ep2);
-		ep.setComments("answer", new String[]{"*The* answer"});
+		ep.setComments("answer", new @Nullable String[]{"*The* answer"});
 		assertSame(ep2, ep.getProperty("answer"));
 	}
 
@@ -138,8 +139,10 @@ public class ExtPropertiesTest {
 		assertValues(ep, String::compareToIgnoreCase, THREE_PROPERTIES_SORTED);
 		final ExtProperties epSorted = ExtProperties.create(String::compareToIgnoreCase);
 		for (int i = 0;  i < THREE_PROPERTIES.length;  i += 3) {
-			epSorted.setProperty(THREE_PROPERTIES[i],
-					             THREE_PROPERTIES[i+1],
+			final @NonNull String key = Objects.requireNonNull(THREE_PROPERTIES[i]);
+			final @NonNull String value = Objects.requireNonNull(THREE_PROPERTIES[i+1]);
+			epSorted.setProperty(key,
+					             value,
 					             new String[] {THREE_PROPERTIES[i+2]});
 		}
 		assertValues(epSorted, THREE_PROPERTIES_SORTED);
@@ -152,16 +155,17 @@ public class ExtPropertiesTest {
 	public void testGetPropertyMap() {
 		final Consumer<String[]> tester = (arr) -> {
 			final ExtProperties ep = ExtProperties.of(arr);
-			final Map<String,ExtProperty> map = ep.getPropertyMap();
+			final Map<@NonNull String, @NonNull ExtProperty> map = ep.getPropertyMap();
 			assertTrue(arr.length % 3 == 0);
 			assertEquals(arr.length/3, map.size());
 			for (int i = 0;  i < arr.length;  i += 3) {
-				final String key = arr[i];
-				final String value = arr[i+1];
+				final String key = Objects.requireNonNull(arr[i]);
+				final String value = Objects.requireNonNull(arr[i+1]);
 				final String comment = arr[i+2];
 				assertNotNull(key);
 				assertNotNull(value);
-				final ExtProperty ep1 = map.get(key);
+				@SuppressWarnings("null")
+				final @NonNull ExtProperty ep1 = map.get(key);
 				assertNotNull(ep1);
 				assertEquals(key, ep1.getKey());
 				assertEquals(value, ep1.getValue());
@@ -189,9 +193,11 @@ public class ExtPropertiesTest {
 	@Test
 	public void testRequireProperty() {
 		final ExtProperties epr = ExtProperties.of(ONE_PROPERTY);
-		final ExtProperty ep1 = epr.requireProperty(ONE_PROPERTY[0]);
-		assertEqual(ep1, ONE_PROPERTY[0], ONE_PROPERTY[1], ONE_PROPERTY[2]);
-		final ExtProperty ep2 = epr.getProperty(ONE_PROPERTY[0]);
+		@SuppressWarnings("null")
+		final @NonNull String key = ONE_PROPERTY[0];
+		final ExtProperty ep1 = epr.requireProperty(key);
+		assertEqual(ep1, key, ONE_PROPERTY[1], ONE_PROPERTY[2]);
+		final ExtProperty ep2 = epr.getProperty(key);
 		assertSame(ep1, ep2);
 		try {
 			epr.requireProperty("$$");
@@ -206,7 +212,9 @@ public class ExtPropertiesTest {
 	@Test
 	public void testGetValue() {
 		final ExtProperties epr = ExtProperties.of(ONE_PROPERTY);
-		assertEquals(ONE_PROPERTY[1], epr.getValue(ONE_PROPERTY[0]));
+		@SuppressWarnings("null")
+		final @NonNull String key = ONE_PROPERTY[0];
+		assertEquals(ONE_PROPERTY[1], epr.getValue(key));
 		assertNull(epr.getValue("$$"));
 	}
 
@@ -215,10 +223,12 @@ public class ExtPropertiesTest {
 	@Test
 	public void testGetComment() {
 		final ExtProperties epr = ExtProperties.of(TWO_PROPERTIES);
-		final String[] fooComment = epr.getComment(TWO_PROPERTIES[0]);
+		final @NonNull String key = Objects.requireNonNull(TWO_PROPERTIES[0]);
+		final String[] fooComment = epr.getComment(key);
 		assertEquals(TWO_PROPERTIES[2], fooComment[0]);
 		assertNull(epr.getComment("$$"));
-		String[] answerComment = epr.getComment(TWO_PROPERTIES[3]);
+		final @NonNull String answerKey = Objects.requireNonNull(TWO_PROPERTIES[3]);
+		String[] answerComment = epr.getComment(answerKey);
 		assertNull(answerComment[0]);
 	}
 
@@ -231,8 +241,8 @@ public class ExtPropertiesTest {
 			assertNotNull(epSync);
 			final String[] values = getValues(ep, null);
 			assertValues(epSync, values);
-			final Map<String,ExtProperty> entries = ep.getEntries();
-			final Map<String,ExtProperty> entriesSync = epSync.getEntries();
+			final Map<@NonNull String, @NonNull ExtProperty> entries = ep.getEntries();
+			final Map<@NonNull String, @NonNull ExtProperty> entriesSync = epSync.getEntries();
 			assertNotSame(entries, entriesSync);
 			assertTrue(entries instanceof LinkedHashMap  ||  entries instanceof TreeMap);
 			assertFalse(entriesSync instanceof LinkedHashMap);
@@ -242,7 +252,7 @@ public class ExtPropertiesTest {
 		tester.accept(ExtProperties.of(THREE_PROPERTIES));
 		tester.accept(ExtProperties.of(String::compareToIgnoreCase, THREE_PROPERTIES)); 
 		try {
-			final Map<String,ExtProperty> map = new HashMap<>();
+			final Map<@NonNull String, @NonNull ExtProperty> map = new HashMap<>();
 			final ExtProperties ep = new ExtProperties(map);
 			ExtProperties.createSynchronized(ep);
 		} catch (IllegalStateException e) {

@@ -134,9 +134,11 @@ public class ReflectionTest {
 	private static class C {
 		private final String value;
 		private final Integer number;
+		@SuppressWarnings("unused")
 		C(RuntimeException pException) {
 			throw pException;
 		}
+		@SuppressWarnings("unused")
 		C(String pValue, Integer pNumber) {
 			value = pValue;
 			number = pNumber;

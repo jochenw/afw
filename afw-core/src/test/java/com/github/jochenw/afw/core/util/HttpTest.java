@@ -12,7 +12,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -20,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -49,7 +47,7 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.data.Data;
-import com.github.jochenw.afw.core.io.IReadable;
+
 
 /** Test suite for the {@link Http} class.
  */

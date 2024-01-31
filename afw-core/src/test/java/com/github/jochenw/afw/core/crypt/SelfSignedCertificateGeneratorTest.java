@@ -19,6 +19,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.Set;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 
@@ -55,7 +56,9 @@ public class SelfSignedCertificateGeneratorTest {
 		assertFalse(Files.isRegularFile(keyStorePath));
 		pGenerator.setAlias("selfsigned");
 		pGenerator.setCountry("DE");
-		pGenerator.setFileName(keyStorePath.toString());
+		@SuppressWarnings("null")
+		final @NonNull String keyStorePathStr = keyStorePath.toString();
+		pGenerator.setFileName(keyStorePathStr);
 		pGenerator.setLocation("The Net");
 		pGenerator.setName("127.0.0.1");
 		pGenerator.setOrganization("Organized? Me?");

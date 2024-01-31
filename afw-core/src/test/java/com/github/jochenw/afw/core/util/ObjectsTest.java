@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,7 +42,8 @@ public class ObjectsTest {
 		};
 		final Path testDir = Tests.requireTestDirectory(ObjectsTest.class);
 		Files.createDirectories(testDir);
-		final Path cacheFile = Files.createTempFile("cache", ".file");
+		@SuppressWarnings("null")
+		final @NonNull Path cacheFile = Files.createTempFile("cache", ".file");
 		Files.deleteIfExists(cacheFile);
 		Assert.assertFalse(invoked.getValue());
 		Assert.assertFalse(Files.isRegularFile(cacheFile));

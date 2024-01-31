@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -59,22 +60,22 @@ public class SymbolicLinksHandlerTest {
 	public void testSymbolicLinks() throws Exception {
 		final ISymbolicLinksHandler h = new ISymbolicLinksHandler() {
 			@Override
-			public void removeLink(Path pPath) {
+			public void removeLink(@NonNull Path pPath) {
 				SymbolicLinks.removeLink(pPath);
 			}
 			
 			@Override
-			public void createFileLink(Path pTarget, Path pLink) throws UnsupportedOperationException {
+			public void createFileLink(@NonNull Path pTarget, @NonNull Path pLink) throws UnsupportedOperationException {
 				SymbolicLinks.createFileLink(pTarget, pLink);
 			}
 			
 			@Override
-			public void createDirectoryLink(Path pTarget, Path pLink) {
+			public void createDirectoryLink(@NonNull Path pTarget, @NonNull Path pLink) {
 				SymbolicLinks.createDirectoryLink(pTarget, pLink);
 			}
 			
 			@Override
-			public Path checkLink(Path pPath) {
+			public Path checkLink(@NonNull Path pPath) {
 				return SymbolicLinks.checkLink(pPath);
 			}
 		};
@@ -88,9 +89,11 @@ public class SymbolicLinksHandlerTest {
 	protected void runCreateDirectoryTest(ISymbolicLinksHandler pHandler) throws IOException {
 		final Path testDir = Paths.get("target/unit-tests/SymbolicLinksHandlerTest");
 		Files.createDirectories(testDir);
-		final Path targetDir = Files.createTempDirectory(testDir, "src");
+		@SuppressWarnings("null")
+		final @NonNull Path targetDir = Files.createTempDirectory(testDir, "src");
 		Files.createDirectories(targetDir);
-		final Path linkDir = Files.createTempDirectory(testDir, "trgt");
+		@SuppressWarnings("null")
+		final @NonNull Path linkDir = Files.createTempDirectory(testDir, "trgt");
 		Files.deleteIfExists(linkDir);
 		pHandler.createDirectoryLink(targetDir, linkDir);
 		final Path targetFile = targetDir.resolve("pom.xml");

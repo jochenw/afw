@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -108,7 +109,7 @@ public class StringsTest {
     		Assert.assertEquals("Invalid version string, ends with '.': 2.3.0.", e.getMessage());
     	}
     }
-   
+
     /** Test for {@link Strings#formatCb(Appendable, String, Object...)}.
      * @throws Exception The test failed.
      */
@@ -124,7 +125,7 @@ public class StringsTest {
     		assertEquals("Format string requires at least 0 arguments, but only 0 are given.", e.getMessage());
     	}
     	try {
-    		Strings.formatCb(formatStr, (Object[]) null);
+    		Strings.formatCb(formatStr, Objects.fakeNonNull());
     		fail("Expected exception");
     	} catch (IllegalArgumentException e) {
     		assertEquals("Format string requires at least one argument, but none are given.", e.getMessage());
@@ -371,16 +372,16 @@ public class StringsTest {
     		name = pName;
     	}
     	public String getName() { return name; }
-    	public static Person of(String pName) {
+    	public static @NonNull Person of(@NonNull String pName) {
     		return new Person(pName);
     	}
-    	public static Person[] SOME_PERSONS = new Person[] {
+    	public static @NonNull Person[] SOME_PERSONS = new @NonNull Person[] {
         	of("Dennis Ritchie"),
         	of("Ken Thompson"),
     		of("Linus Torvalds"),
     		of("Michael Widenius")
     	};
-    	public static String SOME_PERSONS_STRING =
+    	public static @NonNull String SOME_PERSONS_STRING =
     		"Dennis Ritchie, Ken Thompson, Linus Torvalds, Michael Widenius";
     }
 

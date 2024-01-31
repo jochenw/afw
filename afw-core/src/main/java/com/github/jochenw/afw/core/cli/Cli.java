@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
@@ -72,7 +74,7 @@ public class Cli<B> {
 		 * Returns the option bean, that is being configured.
 		 * @return The option bean, that is being configured.
 		 */
-		public O getBean();
+		public @NonNull O getBean();
 		/** Returns the current options primary name.
 		 * @return The current options primary name.
 		 */
@@ -103,12 +105,12 @@ public class Cli<B> {
 	 * @param <O> The option beans type.
 	 */
 	public abstract static class Option<T,O> {
-		private final Cli<O> cli;
-		private final String primaryName;
-		private final String[] secondaryNames;
+		private final @NonNull Cli<O> cli;
+		private final @NonNull String primaryName;
+		private final @NonNull String @Nullable[] secondaryNames;
 		private String defaultValue;
 		private FailableFunction<T,String,?> validator;
-		private FailableBiConsumer<Context<O>,T,?> handler;
+		private FailableBiConsumer<@NonNull Context<@NonNull O>,T,?> handler;
 		private boolean required, repeatable, present;
 
 		/** Creates a new instance with the given {@link Cli cli}.
@@ -117,13 +119,15 @@ public class Cli<B> {
 		 * @param pPrimaryName The options primary name.
 		 * @param pSecondaryNames The options secondary names.
 		 */
-		public Option(Cli<O> pCli, String pPrimaryName, String[] pSecondaryNames) {
+		public Option(@NonNull Cli<O> pCli,
+				      @NonNull String pPrimaryName,
+				      @NonNull String @Nullable[] pSecondaryNames) {
 			cli = pCli;
 			primaryName = pPrimaryName;
 			if (pSecondaryNames == null) {
-				secondaryNames = new String[0];
+				secondaryNames = new @NonNull String[0];
 			} else {
-				secondaryNames = new String[ pSecondaryNames.length];
+				secondaryNames = new @NonNull String[ pSecondaryNames.length];
 				System.arraycopy(pSecondaryNames, 0, secondaryNames, 0, pSecondaryNames.length);
 			}
 		}
@@ -131,7 +135,7 @@ public class Cli<B> {
 		/** Returns the {@link Cli cli}, that created this option.
 		 * @return The {@link Cli cli}, that created this option.
 		 */
-		public Cli<O> end() { return cli; }
+		public @NonNull Cli<O> end() { return cli; }
 
 		/** Converts the string value, that has been supplied by the user
 		 * into an instance of the expected type.
@@ -152,7 +156,7 @@ public class Cli<B> {
 		 * @param pHandler The handler.
 		 * @return This option.
 		 */
-		public Option<T,O> handler(FailableBiConsumer<Context<O>,T,?> pHandler) {
+		public @NonNull Option<T,O> handler(@NonNull FailableBiConsumer<@NonNull Context<@NonNull O>,T,?> pHandler) {
 			handler = pHandler;
 			return this;
 		}
@@ -168,14 +172,14 @@ public class Cli<B> {
 		 * <pre>required(true)</pre>.
 		 * @return This option.
 		 */
-		public Option<T,O> required() {
+		public @NonNull Option<T,O> required() {
 			return required(true);
 		}
 		/** Sets, whether this option is required.
 		 * @param pRequired True, if this option is required, otherwise false.
 		 * @return This option.
 		 */
-		public Option<T,O> required(boolean pRequired) {
+		public @NonNull Option<T,O> required(boolean pRequired) {
 			required = pRequired;
 			return this;
 		}
@@ -183,14 +187,14 @@ public class Cli<B> {
 		 * <pre>repeatable(true)</pre>.
 		 * @return This option.
 		 */
-		public Option<T,O> repeatable() {
+		public @NonNull Option<T,O> repeatable() {
 			return repeatable(true);
 		}
 		/** Sets, whether this option is repeatable.
 		 * @param pRepeatable True, if this option is repeatable, otherwise false.
 		 * @return This option.
 		 */
-		public Option<T,O> repeatable(boolean pRepeatable) {
+		public @NonNull Option<T,O> repeatable(boolean pRepeatable) {
 			repeatable = pRepeatable;
 			return this;
 		}
@@ -203,7 +207,7 @@ public class Cli<B> {
 		/** Returns the handler.
 		 * @return The handler.
 		 */
-		public FailableBiConsumer<Context<O>,T,?> getHandler() {
+		public @Nullable FailableBiConsumer<@NonNull Context<@NonNull O>,T,?> getHandler() {
 			return handler;
 		}
 		/** Returns, whether this option is required.
@@ -229,25 +233,29 @@ public class Cli<B> {
 		/** Returns this options default value.
 		 * @return The default value.
 		 */
-		public String getDefaultValue() {
+		public @Nullable String getDefaultValue() {
 			return defaultValue;
 		}
 
 		/** Returns the options primary name.
 		 * @return The options primary name.
 		 */
-		public String getPrimaryName() {
+		public @NonNull String getPrimaryName() {
 			return primaryName;
 		}
 
 		/** Returns the options secondary names.
 		 * @return The options secndary names.
 		 */
-		public List<String> getSecondaryNames() {
+		public @NonNull List<@NonNull String> getSecondaryNames() {
 			if (secondaryNames == null) {
-				return Collections.emptyList();
+				@SuppressWarnings("null")
+				final @NonNull List<@NonNull String> list = Collections.emptyList();
+				return list;
 			} else {
-				return Arrays.asList(secondaryNames);
+				@SuppressWarnings("null")
+				final @NonNull List<@NonNull String> list = Arrays.asList(secondaryNames);
+				return list;
 			}
 		}
 	}
@@ -261,7 +269,8 @@ public class Cli<B> {
 		 * @param pPrimaryName The options primary name.
 		 * @param pSecondaryNames The options secondary names, if any, or null.
 		 */
-		public BooleanOption(Cli<O> pCli, String pPrimaryName, String[] pSecondaryNames) {
+		public BooleanOption(@NonNull Cli<O> pCli, @NonNull String pPrimaryName,
+				             @NonNull String @Nullable [] pSecondaryNames) {
 			super(pCli, pPrimaryName, pSecondaryNames);
 		}
 
@@ -280,7 +289,8 @@ public class Cli<B> {
 		 * @param pPrimaryName The options primary name.
 		 * @param pSecondaryNames The options secondary names, if any, or null.
 		 */
-		public StringOption(Cli<O> pCli, String pPrimaryName, String[] pSecondaryNames) {
+		public StringOption(@NonNull Cli<O> pCli, @NonNull String pPrimaryName,
+				            @NonNull String @Nullable[] pSecondaryNames) {
 			super(pCli, pPrimaryName, pSecondaryNames);
 		}
 
@@ -301,7 +311,8 @@ public class Cli<B> {
 		 * @param pPrimaryName The options primary name.
 		 * @param pSecondaryNames The options secondary names, if any, or null.
 		 */
-		public PathOption(Cli<O> pCli, String pPrimaryName, String[] pSecondaryNames) {
+		public PathOption(@NonNull Cli<O> pCli, @NonNull String pPrimaryName,
+				          @NonNull String @Nullable [] pSecondaryNames) {
 			super(pCli, pPrimaryName, pSecondaryNames);
 		}
 
@@ -442,7 +453,7 @@ public class Cli<B> {
 	 */
 	public static class EnumOption<O,T extends Enum<T>> extends Option<T,O>
 	{
-		private final Class<T> type;
+		private final @NonNull Class<T> type;
 	
 		/** Creates a new instance with the given cli.
 		 * @param pCli The builder, that creates this option.
@@ -450,7 +461,8 @@ public class Cli<B> {
 		 * @param pPrimaryName The options primary name.
 		 * @param pSecondaryNames The options secondary names, if any, or null.
 		 */
-		public EnumOption(Cli<O> pCli, Class<T> pType, String pPrimaryName, String[] pSecondaryNames) {
+		public EnumOption(@NonNull Cli<O> pCli, @NonNull Class<T> pType, @NonNull String pPrimaryName,
+				          @NonNull String @Nullable [] pSecondaryNames) {
 			super(pCli, pPrimaryName, pSecondaryNames);
 			type = pType;
 		}
@@ -471,25 +483,25 @@ public class Cli<B> {
 		}
 
 		@Override
-		public EnumOption<O, T> required() {
+		public @NonNull EnumOption<O, T> required() {
 			super.required();
 			return this;
 		}
 
 		@Override
-		public EnumOption<O, T> required(boolean pRequired) {
+		public @NonNull EnumOption<O, T> required(boolean pRequired) {
 			super.required(pRequired);
 			return this;
 		}
 
 		@Override
-		public EnumOption<O, T> repeatable() {
+		public @NonNull EnumOption<O, T> repeatable() {
 			super.repeatable();
 			return this;
 		}
 
 		@Override
-		public EnumOption<O, T> repeatable(boolean pRepeatable) {
+		public @NonNull EnumOption<O, T> repeatable(boolean pRepeatable) {
 			super.repeatable(pRepeatable);
 			return this;
 		}
@@ -497,20 +509,20 @@ public class Cli<B> {
 		/** Returns the Enum parameters type.
 		 * @return The Enum parameters type.
 		 */
-		public Class<T> getType() {
+		public @NonNull Class<T> getType() {
 			return type;
 		}
 	}
 
-	private final B bean;
-	private final Map<String,Option<?,B>> options = new HashMap<>();
+	private final @NonNull B bean;
+	private final Map<@NonNull String,@NonNull Option<?,B>> options = new HashMap<>();
 	private Function<String,RuntimeException> errorHandler;
-	private FailableFunction<B,String,?> validator;
+	private FailableFunction<@NonNull B,String,?> validator;
 
 	/** Creates  new instance, which configures the given bean.
 	 * @param pBean The options bean, that is being configured.
 	 */
-	public Cli(B pBean) {
+	public Cli(@NonNull B pBean) {
 		bean = pBean;
 	}
 
@@ -531,7 +543,7 @@ public class Cli<B> {
 	 * @param pErrorHandler The error handler.
 	 * @return This {@link Cli cli}.
 	 */
-	public Cli<B> errorHandler(Function<String,RuntimeException> pErrorHandler) {
+	public @NonNull Cli<B> errorHandler(Function<String,RuntimeException> pErrorHandler) {
 		errorHandler = pErrorHandler;
 		return this;
 	}
@@ -548,13 +560,13 @@ public class Cli<B> {
 	 * @param pOption The created option.
 	 * @return The same option.
 	 */
-	protected <O extends Option<?,B>> O option(@NonNull O pOption) {
+	protected <O extends Option<?,B>> @NonNull O option(@NonNull O pOption) {
 		final Predicate<String> existingOptionTest = (s) -> {
 			for (Option<?,B> opt : options.values()) {
 				if (s.equals(opt.getPrimaryName())) {
 					return true;
 				}
-				final List<String> secondaryNames = opt.getSecondaryNames();
+				final List<@NonNull String> secondaryNames = opt.getSecondaryNames();
 				for (String sn : secondaryNames) {
 					if (s.equals(sn)) {
 						return true;
@@ -568,7 +580,7 @@ public class Cli<B> {
 			duplicateName = pOption.getPrimaryName();
 		}
 		if (duplicateName == null) {
-			final List<String> secondaryNames = pOption.getSecondaryNames();
+			final List<@NonNull String> secondaryNames = pOption.getSecondaryNames();
 			for (String sn : secondaryNames) {
 				if (existingOptionTest.test(sn)) {
 					duplicateName = sn;
@@ -588,7 +600,8 @@ public class Cli<B> {
 	 * @param pSecondaryNames The options secondary names.
 	 * @return The created option builder.
 	 */
-	public PathOption<B> pathOption(String pPrimaryName, String... pSecondaryNames) {
+	public PathOption<B> pathOption(@NonNull String pPrimaryName,
+			                        @NonNull String @Nullable... pSecondaryNames) {
 		return option(new PathOption<>(this, pPrimaryName, pSecondaryNames));
 	}
 
@@ -599,9 +612,11 @@ public class Cli<B> {
 	 * @return The created option builder.
 	 * @param <T> Type of the Enum parameter.
 	 */
-	public <T extends Enum<T>> EnumOption<B,T> enumOption(Class<T> pType, String pPrimaryName,
-			String... pSecondaryNames) {
-		return option(new EnumOption<B,T>(this, pType, pPrimaryName, pSecondaryNames));
+	public <T extends Enum<T>> EnumOption<@NonNull B,T> enumOption(@NonNull Class<T> pType,
+			@NonNull String pPrimaryName, @NonNull String @Nullable... pSecondaryNames) {
+		@SuppressWarnings("null")
+		final @NonNull Cli<@NonNull B> thisCli = this;
+		return option(new EnumOption<@NonNull B,T>(thisCli, pType, pPrimaryName, pSecondaryNames));
 	}
 	
 	/** Creates an option builder, that takes a boolean value.
@@ -609,7 +624,8 @@ public class Cli<B> {
 	 * @param pSecondaryNames The options secondary names.
 	 * @return The created option builder.
 	 */
-	public BooleanOption<B> booleanOption(String pPrimaryName, String... pSecondaryNames) {
+	public BooleanOption<B> booleanOption(@NonNull String pPrimaryName,
+			                              @NonNull String @Nullable... pSecondaryNames) {
 		return option(new BooleanOption<>(this, pPrimaryName, pSecondaryNames));
 	}
 
@@ -619,16 +635,17 @@ public class Cli<B> {
 	 * @param pSecondaryNames The options secondary names.
 	 * @return The created option builder.
 	 */
-	public StringOption<B> stringOption(String pPrimaryName, String... pSecondaryNames) {
+	public @NonNull StringOption<B> stringOption(@NonNull String pPrimaryName,
+			                                     @NonNull String @Nullable ... pSecondaryNames) {
 		return option(new StringOption<>(this, pPrimaryName, pSecondaryNames));
 	}
 
 	
 	/** Sets the bean validator.
 	 * @param pBeanValidator The bean validator.
-	 * @return This Cli.
+	 * @return This instance.
 	 */
-	public Cli<B> beanValidator(FailableFunction<B,String,?> pBeanValidator) {
+	public Cli<B> beanValidator(@NonNull FailableFunction<@NonNull B,@Nullable String,?> pBeanValidator) {
 		validator = pBeanValidator;
 		return this;
 	}
@@ -646,7 +663,7 @@ public class Cli<B> {
 	 * @param pArgs The command line arguments, specifying the option values.
 	 * @return The successfully configured bean.
 	 */
-	public B parse(String[] pArgs) {
+	public B parse(@NonNull String @NonNull [] pArgs) {
 		final String[] argsArray = Objects.requireNonNull(pArgs, "Args");
 		final List<String> args = new ArrayList<String>(Arrays.asList(argsArray));
 		final Map<String,String> optionValues = new HashMap<>();
@@ -696,8 +713,10 @@ public class Cli<B> {
 			optionValues.put(o.getPrimaryName(), value);
 		}
 		options.entrySet().forEach((en) -> {
-			final String optionName = en.getKey();
-			final Option<?,B> opt = en.getValue();
+			@SuppressWarnings("null")
+			final @NonNull String optionName = en.getKey();
+			@SuppressWarnings("null")
+			final @NonNull Option<?, @NonNull B> opt = en.getValue();
 			final String defaultValue = opt.getDefaultValue();
 			if (defaultValue != null  &&  !optionValues.containsKey(optionName)) {
 				optionValues.put(optionName, defaultValue);
@@ -718,11 +737,9 @@ public class Cli<B> {
 			if (pOptName.equals(o.getPrimaryName())) {
 				return o;
 			}
-			if (o.getSecondaryNames() != null) {
-				for (String s : o.getSecondaryNames()) {
-					if (s.equals(pOptName)) {
-						return o;
-					}
+			for (String s : o.getSecondaryNames()) {
+				if (s.equals(pOptName)) {
+					return o;
 				}
 			}
 		}
@@ -760,11 +777,11 @@ public class Cli<B> {
 					throw error(errorMsg);
 				}
 			}
-			final FailableBiConsumer<Context<B>,Object,?> handler = option.getHandler();
+			final FailableBiConsumer<@NonNull Context<@NonNull B>, Object, ?> handler = option.getHandler();
 			if (handler != null) {
 				final Context<B> context = new Context<B>() {
 					@Override
-					public B getBean() {
+					public @NonNull B getBean() {
 						return bean;
 					}
 
@@ -790,8 +807,10 @@ public class Cli<B> {
 	/** Validates the option bean, after all options have been processed.
 	 * @param pBean The option bean, with the option values applied.
 	 */
-	protected void validate(B pBean) {
-		for (Option<?,B> opt : options.values()) {
+	protected void validate(@NonNull B pBean) {
+		@SuppressWarnings("null")
+		final @NonNull Collection<@NonNull Option<?, @NonNull B>> allOptions = options.values();
+		for (@NonNull Option<?,@NonNull B> opt : allOptions) {
 			if (opt.isRequired()  &&  !opt.isPresent()) {
 				throw error("Required option missing: " + opt.getPrimaryName());
 			}
@@ -809,7 +828,7 @@ public class Cli<B> {
 	 * @param pBean The instances bean, that is being configured.
 	 * @return The created instance.
 	 */
-	public static <T> Cli<T> of(T pBean) {
+	public static <T> @NonNull Cli<T> of(@NonNull T pBean) {
 		return new Cli<T>(pBean);
 	}
 
@@ -826,15 +845,20 @@ public class Cli<B> {
 	 * @param pErrorHandler  The error handler, a function, which converts an error message
 	 *   into a RuntimeException, that is being thrown by the caller.
 	 */
-	public static <B> void main(Class<? extends CliClass<B>> pCliClass, Class<B> pBeanClass, String[] pArgs,
-			                    Consumer<Cli<B>> pOptionsConfigurator,
+	public static <B> void main(@NonNull Class<? extends CliClass<B>> pCliClass,
+			                    @NonNull Class<B> pBeanClass,
+			                    @NonNull String @NonNull[] pArgs,
+			                    @Nullable Consumer<@NonNull Cli<B>> pOptionsConfigurator,
 			                    Function<String,RuntimeException> pErrorHandler) {
 		try {
 			@SuppressWarnings("null")
 			final @NonNull CliClass<B> cliObject = pCliClass.getConstructor().newInstance();
-			final B bean = pBeanClass.getConstructor().newInstance();
+			@SuppressWarnings("null")
+			final @NonNull B bean = pBeanClass.getConstructor().newInstance();
 			final Cli<B> cli = Cli.of(bean);
-			pOptionsConfigurator.accept(cli);
+			if (pOptionsConfigurator != null) {
+				pOptionsConfigurator.accept(cli);
+			}
 			cli.errorHandler(pErrorHandler);
 			cliObject.run(cli.parse(pArgs));
 		} catch (Throwable t) {

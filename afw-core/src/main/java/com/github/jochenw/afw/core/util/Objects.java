@@ -427,4 +427,18 @@ public class Objects {
 	public static <O> O getCacheableObject(@NonNull Path pCacheFile, @NonNull FailableSupplier<O,? > pSupplier) {
 		return CachedObjectManager.of(pCacheFile, pSupplier).get();
 	}
+
+	/** For testing only: Returns a value, which is assumed to be non-null,
+	 * but is actually null. (In practice, this is used to test the correct behavior
+	 * for methods, that are supposed to throw an {@link NullPointerException}
+	 * in case of invalid null values.
+	 * @param <O> The expected object type.
+	 * @return The faked non-null value.
+	 */
+	@SuppressWarnings("null")
+	public static <O> @NonNull O fakeNonNull() {
+		final O nullO = (O) null;
+		final @NonNull O o = (@NonNull O) nullO;
+		return o;
+	}
 }
