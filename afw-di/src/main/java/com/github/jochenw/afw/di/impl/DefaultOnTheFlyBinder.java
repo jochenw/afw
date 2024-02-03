@@ -140,7 +140,7 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	 *   annotation {@code pAnnotation} is an element in the array.
 	 * @return The created injectable value.
 	 */
-	protected Object getInjectableValue(IComponentFactory pComponentFactory,
+	protected Object getInjectableValue(@NonNull IComponentFactory pComponentFactory,
 										Member pMember,
 										Annotation pAnnotation,
 			                            Annotation[] pAllAnnotations) {
@@ -164,15 +164,19 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	 *   must be injected.
 	 * @return The created injectable value.
 	 */
-	protected Object getInjectableProperty(IComponentFactory pComponentFactory, Member pMember, final PropInject pPropInject) {
-		final String id;
+	protected Object getInjectableProperty(@NonNull IComponentFactory pComponentFactory, Member pMember, final PropInject pPropInject) {
+		final @NonNull String id;
 		if (pPropInject.id().length() == 0) {
 			id = pMember.getDeclaringClass().getCanonicalName() + "." + pMember.getName();
 		} else {
-			id = pPropInject.id();
+			@SuppressWarnings("null")
+			final @NonNull String injectId = pPropInject.id();
+			id = injectId;
 		}
-		final Class<?> type = getInjectableValueType(pMember);
-		final Object property = getProperty(pComponentFactory, type, id, pPropInject.defaultValue(), pPropInject.nullable());
+		final @NonNull Class<?> type = getInjectableValueType(pMember);
+		@SuppressWarnings("null")
+		final @NonNull String defaultValue = pPropInject.defaultValue();
+		final Object property = getProperty(pComponentFactory, type, id, defaultValue, pPropInject.nullable());
 		if (property == null) {
 			if (!pPropInject.nullable()) {
 				throw new IllegalStateException("No property value is available with id " + id
@@ -215,17 +219,21 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	 *   then the fields type. For a method, returns the
 	 *   type of the first parameter.
 	 */
-	protected Class<?> getInjectableValueType(Member pMember) {
-		final Class<?> type;
+	protected @NonNull Class<?> getInjectableValueType(Member pMember) {
+		final @NonNull Class<?> type;
 		if (pMember instanceof Field) {
-			type = ((Field) pMember).getType();
+			@SuppressWarnings("null")
+			final @NonNull Class<?> tp = ((Field) pMember).getType();
+			type = tp;
 		} else if (pMember instanceof Method) {
 			final Method mth = (Method) pMember;
 			if (mth.getReturnType() == Void.TYPE  || mth.getReturnType() == Void.class
 					||  mth.getReturnType() == null) {
 				final Class<?>[] parameterTypes = mth.getParameterTypes();
 				if (parameterTypes.length != 1) {
-					type = parameterTypes[0];
+					@SuppressWarnings("null")
+					final @NonNull Class<?> tp = parameterTypes[0];
+					type = tp;
 				} else {
 					throw new IllegalStateException("Method " + mth + " is annotated with @LogInject, "
 							+ " but is not a setter, because it takes " + parameterTypes.length	
@@ -242,7 +250,7 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 	}
 
 	@Override
-	protected BiConsumer<IComponentFactory, Object> getInjector(Field pField) {
+	protected BiConsumer<@NonNull IComponentFactory, Object> getInjector(Field pField) {
 		Annotation[] annotations = pField.getAnnotations();
 		for (Annotation annotation : annotations) {
 			if (isAnnotationInjectable(pField, annotation, annotations)) {
@@ -254,6 +262,11 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 			}
 		}
 		return null;
+	}
+
+	private <A extends Annotation> boolean hasAnnotation(@NonNull Method pMethod, @NonNull Class<A> pAnnotationType) {
+		final A annotation = pMethod.getAnnotation(pAnnotationType);
+		return annotation != null;
 	}
 
 	@Override
@@ -271,11 +284,11 @@ public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
 			};
 		} else {
 			final boolean postConstructPresent =
-					pMethod.getAnnotation(PostConstruct.class) != null
-					||  pMethod.getAnnotation(jakarta.annotation.PostConstruct.class) != null;
+					hasAnnotation(pMethod, PostConstruct.class)
+					||  hasAnnotation(pMethod, jakarta.annotation.PostConstruct.class);
 			final boolean preDestroyPresent =
-					pMethod.getAnnotation(PreDestroy.class) != null
-					||  pMethod.getAnnotation(jakarta.annotation.PreDestroy.class) != null;
+					hasAnnotation(pMethod, PreDestroy.class)
+					||  hasAnnotation(pMethod, jakarta.annotation.PreDestroy.class);
 			if (!postConstructPresent  &&  !preDestroyPresent) {
 				throw new IllegalStateException("Invalid method: " + pMethod
 						+ ", it isn't annotated with @PostConstruct, or @PreDestroy.");

@@ -18,7 +18,6 @@ package com.github.jochenw.afw.di.impl.limited;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.Test;
@@ -36,7 +34,11 @@ import com.github.jochenw.afw.di.impl.limited.LimitedComponentFactory.Key;
 import com.github.jochenw.afw.di.impl.limited.LimitedComponentFactory.IComponent;
 import com.github.jochenw.afw.di.impl.limited.LimitedComponentFactory.IModule;
 
+/** Test suite for the {@link LimitedComponentFactory}.
+ */
 public class LimitedComponentFactoryTest {
+	/** Example of a component, that needs initialization.
+	 */
 	public static class Initializable implements LimitedComponentFactory.IComponent {
 		private LimitedComponentFactory componentFactory;
 		private Map<String,Object> map1, hash, linked;
@@ -280,7 +282,6 @@ public class LimitedComponentFactoryTest {
 	public void testSupplierFailure() {
 		final RuntimeException rte = new RuntimeException();
 		final OutOfMemoryError oome = new OutOfMemoryError();
-		final IOException ioe = new IOException();
 		final LimitedComponentFactory lcf = LimitedComponentFactory.of((b) -> {
 			b.bindToSupplier(Object.class, () -> new Object());
 			b.bindToSupplier(Object.class, "rte", (Supplier<Object>) () -> { throw rte; });

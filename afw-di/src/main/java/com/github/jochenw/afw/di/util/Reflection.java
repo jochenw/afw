@@ -74,7 +74,6 @@ public class Reflection {
 	 * to change the status.
 	 * @param pAccessibleObject The object, that is being tested.
 	 */
-	@SuppressWarnings("deprecation")
 	public static void makeAccessible(AccessibleObject pAccessibleObject) {
 		if (!pAccessibleObject.isAccessible()) {
 			pAccessibleObject.setAccessible(true);

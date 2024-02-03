@@ -5,6 +5,8 @@ import java.lang.reflect.Constructor;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.api.AnnotatableBindingBuilder;
 import com.github.jochenw.afw.di.api.Key;
 import com.github.jochenw.afw.di.api.LinkableBindingBuilder;
@@ -17,7 +19,7 @@ import com.github.jochenw.afw.di.api.Scopes;
  * @param <T> Type of the object, that is being injected by the binding.
  */
 public abstract class BindingBuilder<T> implements LinkableBindingBuilder<T>, AnnotatableBindingBuilder<T> {
-	private final Key<T> key;
+	private final @NonNull Key<T> key;
 	private Key<T> annotatedKey;
 	private Scope scope = Scopes.NO_SCOPE;
 	private Class<? extends Annotation> annotationType;
@@ -114,7 +116,7 @@ public abstract class BindingBuilder<T> implements LinkableBindingBuilder<T>, An
 	 * @return The bindings key, excluding optional annotations.
 	 * @see #getAnnotatedKey()
 	 */
-	public Key<T> getKey() {
+	public @NonNull Key<T> getKey() {
 		return key;
 	}
 

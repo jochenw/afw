@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
@@ -43,21 +45,23 @@ public class BindingRegistry implements IComponentFactoryAware {
 	 */
 	protected void initBindings(IComponentFactory pFactory, List<BindingBuilder<Object>> pBindingBuilders) {
 		for (BindingBuilder<Object> bb : pBindingBuilders) {
-			final Key<Object> key = bb.getKey();
-			final Type type = key.getType();
+			final @NonNull Key<Object> key = bb.getKey();
+			final @NonNull Type type = key.getType();
 			final BindingSet bindingSet = bindings.computeIfAbsent(type, (tp) -> {
 				return new BindingSet(tp);
 			});
 			final Binding binding = asBinding(bb);
 			final Key<Object> k;
-			if (bb.getAnnotation() == null) {
-				if (bb.getAnnotationType() == null) {
+			final Annotation annotation = bb.getAnnotation();
+			if (annotation == null) {
+				final Class<? extends Annotation> annotationType = bb.getAnnotationType();
+				if (annotationType == null) {
 					k = Key.of(type);
 				} else {
-					k = Key.of(type, bb.getAnnotationType());
+					k = Key.of(type, annotationType);
 				}
 			} else {
-				k = Key.of(type, bb.getAnnotation());
+				k = Key.of(type, annotation);
 			}
 			bindingSet.register(k, binding);
 		}

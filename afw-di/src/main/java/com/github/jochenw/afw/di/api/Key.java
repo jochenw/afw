@@ -73,7 +73,7 @@ public class Key<O extends Object> {
 	/** Returns the type, to which the keys binding is applicable.
 	 * @return The type, to which the keys binding is applicable.
 	 */
-	public Type getType() {
+	public @NonNull Type getType() {
 		return type;
 	}
 
@@ -170,7 +170,9 @@ public class Key<O extends Object> {
 			sb.append(", annotationClass=");
 			sb.append(annoClass.getName());
 		}
-		return sb.toString();
+		@SuppressWarnings("null")
+		final @NonNull String description = sb.toString();
+		return description;
 	}
 
 	@Override
@@ -184,7 +186,7 @@ public class Key<O extends Object> {
 	 * @param pType The type, to which the keys binding is applicable.
 	 * @return The created instance.
 	 */
-	public static <O> Key<O> of(Type pType) {
+	public static <O> @NonNull Key<O> of(@NonNull Type pType) {
 		return new Key<O>(pType);
 	}
 
@@ -196,7 +198,7 @@ public class Key<O extends Object> {
 	 * the keys binding applicable.
 	 * @return The created instance.
 	 */
-	public static <O> Key<O> of(Type pType, Annotation pAnnotation) {
+	public static <O> @NonNull Key<O> of(@NonNull Type pType, @NonNull Annotation pAnnotation) {
 		return new Key<O>(pType, pAnnotation);
 	}
 
@@ -208,7 +210,7 @@ public class Key<O extends Object> {
 	 *   present to make the keys binding applicable.
 	 * @return The created instance.
 	 */
-	public static <O> Key<O> of(Type pType, Class<? extends Annotation> pAnnotationClass) {
+	public static <O> Key<O> of(@NonNull Type pType, @NonNull Class<? extends Annotation> pAnnotationClass) {
 		return new Key<O>(pType, pAnnotationClass);
 	}
 }

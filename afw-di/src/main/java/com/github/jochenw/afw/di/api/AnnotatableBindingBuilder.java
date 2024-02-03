@@ -2,6 +2,8 @@ package com.github.jochenw.afw.di.api;
 
 import java.lang.annotation.Annotation;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.impl.BindingBuilder;
 
 
@@ -33,5 +35,5 @@ public interface AnnotatableBindingBuilder<T> extends LinkableBindingBuilder<T> 
 	 * @return A {@link BindingBuilder} without scope, and supplier, which is no
 	 *   longer restrictable, based on annotations.
 	 */
-	LinkableBindingBuilder<T> named(String pValue);
+	LinkableBindingBuilder<T> named(@NonNull String pValue);
 }

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
 import com.github.jochenw.afw.di.api.LogInject;
@@ -44,7 +46,7 @@ public abstract class AbstractOnTheFlyBinder implements IOnTheFlyBinder {
 	 * @return An injector, which injects a value into the given
 	 * field.
 	 */
-	protected abstract BiConsumer<IComponentFactory,Object> getInjector(Field pField);
+	protected abstract BiConsumer<@NonNull IComponentFactory,Object> getInjector(Field pField);
 	/** If {@link #isInjectable(Method)} returns true, then
 	 * this method will be invoked, to create an actual injector.
 	 * @param pMethod The method, on which the created injector

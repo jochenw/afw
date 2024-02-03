@@ -69,7 +69,8 @@ public interface IAnnotationProvider {
 	default @NonNull Annotation newNamed(@NonNull String pValue) {
 		final Class<?>[] interfaces = (Class<?>[]) Array.newInstance(Class.class, 1);
 		interfaces[0] = getNamedClass();
-		return (Annotation) Proxy.newProxyInstance(Annotations.class.getClassLoader(), interfaces, new InvocationHandler() {
+		@SuppressWarnings("null")
+		final @NonNull Annotation annotation = (Annotation) Proxy.newProxyInstance(Annotations.class.getClassLoader(), interfaces, new InvocationHandler() {
 			@Override
 			public Object invoke(Object pProxy, Method pMethod, Object[] pArgs) throws Throwable {
 				if ("equals".equals(pMethod.getName())) {
@@ -97,5 +98,6 @@ public interface IAnnotationProvider {
 				throw new IllegalStateException("Not implemented: " + pMethod);
 			}
 		});
+		return annotation;
 	}
 }

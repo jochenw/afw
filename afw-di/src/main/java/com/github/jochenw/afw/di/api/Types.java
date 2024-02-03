@@ -64,7 +64,9 @@ public class Types {
 			if (rt instanceof ParameterizedType) {
 				final ParameterizedType ptype = (ParameterizedType) rt;
 				final java.lang.reflect.Type[] typeArgs = ptype.getActualTypeArguments();
-				rawType = typeArgs[0];
+				@SuppressWarnings("null")
+				final java.lang.reflect.@NonNull Type rType = typeArgs[0];
+				rawType = rType;
 			} else {
 				throw new IllegalStateException("Unsupported type: " + rt);
 			}

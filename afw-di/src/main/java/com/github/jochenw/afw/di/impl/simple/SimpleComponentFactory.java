@@ -21,6 +21,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.api.Annotations;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
@@ -55,7 +56,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public <O> O getInstance(Key<O> pKey) {
+	public <O> @Nullable O getInstance(Key<O> pKey) {
 		@SuppressWarnings("unchecked")
 		final Key<Object> key = (Key<Object>) Objects.requireNonNull(pKey, "Key");
 		final Binding binding = bindings.find(key);

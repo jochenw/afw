@@ -28,7 +28,7 @@ import com.github.jochenw.afw.di.util.Exceptions;
  */
 public class ComponentFactoryBuilder {
 	private @NonNull List<Module> modules = new ArrayList<>();
-	private @NonNull Supplier<AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
+	private @NonNull Supplier<@NonNull AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
 	private @Nullable IComponentFactory instance;
 	private @NonNull IAnnotationProvider annotationProvider = Annotations.getDefaultProvider();
 	private IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
@@ -133,7 +133,9 @@ public class ComponentFactoryBuilder {
 	public ComponentFactoryBuilder modules(@Nullable Module... pModules) {
 		if (pModules != null) {
 			for (Module m : pModules) {
-				module(m);
+				if (m != null) {
+					module(m);
+				}
 			}
 		}
 		return this;
@@ -150,7 +152,9 @@ public class ComponentFactoryBuilder {
 	public ComponentFactoryBuilder modules(@Nullable Iterable<Module> pModules) {
 		if (pModules != null) {
 			for (Module m : pModules) {
-				module(m);
+				if (m != null) {
+					module(m);
+				}
 			}
 		}
 		return this;
@@ -163,15 +167,13 @@ public class ComponentFactoryBuilder {
 	 */
 	public @NonNull IComponentFactory build() {
 		if (instance == null) {
-			final AbstractComponentFactory inst = supplier.get();
-			if (inst == null) {
-				throw new NullPointerException("Supplier created a null object.");
-			}
+			final @NonNull AbstractComponentFactory inst = Objects.requireNonNull(supplier.get(),
+					"The instance supplier returned null.");
 			configure(inst);
 			instance = inst;
 			return inst;
 		} else {
-			return instance;
+			return Objects.requireNonNull((IComponentFactory) instance);
 		}
 	}
 
@@ -184,24 +186,24 @@ public class ComponentFactoryBuilder {
 	 * @param pComponentFactory The configured instance, which is now
 	 *   ready to use.
 	 */
-	protected void configure(AbstractComponentFactory pComponentFactory) {
+	protected void configure(@NonNull AbstractComponentFactory pComponentFactory) {
 		final List<BindingBuilder<Object>> builders = new ArrayList<>();
 		final Set<Class<?>> staticInjectionClasses = new HashSet<>();
-		final List<Consumer<IComponentFactory>> finalizers = new ArrayList<>();
+		final List<@NonNull Consumer<@NonNull IComponentFactory>> finalizers = new ArrayList<>();
 		final FinalizableBinder binder = new FinalizableBinder() {
 			private BindingBuilder<Object> currentBb;
 
 			@Override
-			public <T> LinkableBindingBuilder<T> bind(Key<T> pKey) {
+			public <T> LinkableBindingBuilder<T> bind(@NonNull Key<T> pKey) {
 				@SuppressWarnings("unchecked")
 				final Key<Object> key = (Key<Object>) pKey;
 				return register(key);
 			}
 
-			protected <T> BindingBuilder<T> register(final Key<Object> key) {
+			protected <T> BindingBuilder<T> register(final @NonNull Key<Object> key) {
 				final BindingBuilder<Object> bb = new BindingBuilder<Object>(key) {
 					@Override
-					public LinkableBindingBuilder<Object> named(String pValue) {
+					public LinkableBindingBuilder<Object> named(@NonNull String pValue) {
 						return annotatedWith(getAnnotations().newNamed(pValue));
 					}
 				};
@@ -247,31 +249,31 @@ public class ComponentFactoryBuilder {
 			}
 
 			@Override
-			public <T> AnnotatableBindingBuilder<T> bind(Type<T> pType) {
+			public <T> AnnotatableBindingBuilder<T> bind(@NonNull Type<T> pType) {
 				final java.lang.reflect.Type reflectType = pType.getRawType();
-				final Key<Object> key = Key.of(reflectType);
+				final @NonNull Key<Object> key = Key.of(reflectType);
 				return register(key);
 			}
 
 			@Override
-			public <T> LinkableBindingBuilder<T> bind(Type<T> pType, String pName) {
+			public <T> LinkableBindingBuilder<T> bind(@NonNull Type<T> pType, @NonNull String pName) {
 				return bind(pType).named(pName);
 			}
 
 			@Override
-			public <T> AnnotatableBindingBuilder<T> bind(Class<T> pType) {
+			public <T> AnnotatableBindingBuilder<T> bind(@NonNull Class<T> pType) {
 				final java.lang.reflect.Type reflectType = pType;
 				final Key<Object> key = Key.of(reflectType);
 				return register(key);
 			}
 
 			@Override
-			public <T> LinkableBindingBuilder<T> bind(Class<T> pType, String pName) {
+			public <T> LinkableBindingBuilder<T> bind(@NonNull Class<T> pType, @NonNull String pName) {
 				return bind(pType).named(pName);
 			}
 
 			@Override
-			public void requestStaticInjection(Class<?>... pTypes) {
+			public void requestStaticInjection(@NonNull Class<?>... pTypes) {
 				if (pTypes != null) {
 					for (Class<?> cl : pTypes) {
 						staticInjectionClasses.add(cl);
@@ -280,8 +282,8 @@ public class ComponentFactoryBuilder {
 			}
 
 			@Override
-			public void addFinalizer(Consumer<IComponentFactory> pFinalizer) {
-				final Consumer<IComponentFactory> finalizer = Objects.requireNonNull(pFinalizer, "Finalizer");
+			public void addFinalizer(@NonNull Consumer<@NonNull IComponentFactory> pFinalizer) {
+				final @NonNull Consumer<@NonNull IComponentFactory> finalizer = Objects.requireNonNull(pFinalizer, "Finalizer");
 				finalizers.add(finalizer);
 			}
 		};
@@ -292,7 +294,7 @@ public class ComponentFactoryBuilder {
 		binder.bind(IComponentFactory.class).toInstance(icf);
 		binder.finished();
 		pComponentFactory.configure(getAnnotations(), onTheFlyBinder, builders, staticInjectionClasses);
-		for (Consumer<IComponentFactory> finalizer : finalizers) {
+		for (@NonNull Consumer<@NonNull IComponentFactory> finalizer : finalizers) {
 			finalizer.accept(pComponentFactory);
 		}
 	}
@@ -301,12 +303,14 @@ public class ComponentFactoryBuilder {
 	 * @param pType The component factories type.
 	 * @return The created supplier.
 	 */
-	protected Supplier<AbstractComponentFactory> newSupplier(Class<? extends AbstractComponentFactory> pType) {
+	protected @NonNull Supplier<@NonNull AbstractComponentFactory> newSupplier(Class<? extends AbstractComponentFactory> pType) {
 		return () -> {
 			try {
 				@SuppressWarnings("unchecked")
 				final Constructor<AbstractComponentFactory> constructor = (Constructor<AbstractComponentFactory>) pType.getConstructor();
-				return constructor.newInstance();
+				@SuppressWarnings("null")
+				final @NonNull AbstractComponentFactory acf = constructor.newInstance();
+				return acf;
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
 			}
@@ -329,7 +333,7 @@ public class ComponentFactoryBuilder {
 	 *   built.
 	 * @return This builder.
 	 */
-	public ComponentFactoryBuilder type(Supplier<AbstractComponentFactory> pSupplier) {
+	public ComponentFactoryBuilder type(@NonNull Supplier<@NonNull AbstractComponentFactory> pSupplier) {
 		supplier = pSupplier;
 		return this;
 	}

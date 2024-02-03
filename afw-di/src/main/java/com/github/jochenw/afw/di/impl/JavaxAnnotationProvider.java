@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 
 import javax.inject.Provider;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.impl.simple.Binding;
 import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
@@ -14,22 +16,22 @@ import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
  */
 public class JavaxAnnotationProvider implements IAnnotationProvider {
 	@Override
-	public Class<? extends Annotation> getInjectClass() {
+	public @NonNull Class<? extends Annotation> getInjectClass() {
 		return javax.inject.Inject.class;
 	}
 
 	@Override
-	public Class<? extends Annotation> getNamedClass() {
+	public @NonNull Class<? extends Annotation> getNamedClass() {
 		return javax.inject.Named.class;
 	}
 
 	@Override
-	public Class<?> getProviderClass() {
+	public @NonNull Class<?> getProviderClass() {
 		return Provider.class;
 	}
 
 	@Override
-	public Binding getProvider(Binding pBinding) {
+	public @NonNull Binding getProvider(Binding pBinding) {
 		return new Binding() {
 			@Override
 			public Object apply(SimpleComponentFactory pCf) {
@@ -44,7 +46,7 @@ public class JavaxAnnotationProvider implements IAnnotationProvider {
 	}
 
 	@Override
-	public String getNamedValue(Annotation pAnnotation) {
+	public String getNamedValue(@NonNull Annotation pAnnotation) {
 		if (pAnnotation instanceof javax.inject.Named) {
 			return ((javax.inject.Named) pAnnotation).value();
 		}
@@ -52,7 +54,7 @@ public class JavaxAnnotationProvider implements IAnnotationProvider {
 	}
 
 	@Override
-	public String getId() {
+	public @NonNull String getId() {
 		return "javax.inject";
 	}
 }

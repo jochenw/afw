@@ -47,11 +47,17 @@ public interface IComponentFactory {
 	 *   and the given name. The key can be used for registration, or
 	 *   retrieval of dependencies.
 	 */
-	public default <O> Key<O> asKey(@NonNull Type pType, @NonNull String pName) {
-		if (pName == null  ||  pName.length() == 0) {
+	public default <O> @NonNull Key<O> asKey(@NonNull Type pType, @Nullable String pName) {
+		final @NonNull String name;
+		if (pName == null) {
+			name = "";
+		} else {
+			name = pName;
+		}
+		if (name.length() == 0) {
 			return Key.of(pType);
 		} else {
-			return Key.of(pType, getAnnotations().newNamed(pName));
+			return Key.of(pType, getAnnotations().newNamed(name));
 		}
 	}
 	/**
@@ -129,7 +135,7 @@ public interface IComponentFactory {
 	 * @throws NoSuchElementException No such dependency has been registered.
 	 */
 	public default @NonNull <O> O requireInstance(Key<O> pKey) throws NoSuchElementException {
-		final O o = getInstance(pKey);
+		final @Nullable O o = getInstance(pKey);
 		if (o == null) {
 			throw new NoSuchElementException("No such instance: " + pKey.getDescription());
 		}
@@ -194,7 +200,7 @@ public interface IComponentFactory {
 	 * @return The newly created instance. May be null, if no
 	 *   such binding has been registered.
 	 */
-	public default <O> O getInstance(@NonNull Type pType) {
+	public default <O> @Nullable O getInstance(@NonNull Type pType) {
 		final Key<O> key = Key.of(pType);
 		return getInstance(key);
 	}
@@ -214,7 +220,7 @@ public interface IComponentFactory {
 	 * @return The newly created instance. May be null, if no
 	 *   such binding has been registered.
 	 */
-	public default <O> O getInstance(Types.@NonNull Type<O> pType) {
+	public default <O> @Nullable O getInstance(Types.@NonNull Type<O> pType) {
 		final Key<O> key = Key.of(pType.getRawType());
 		return getInstance(key);
 	}

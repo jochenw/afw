@@ -6,6 +6,8 @@ import java.lang.reflect.Constructor;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.impl.DefaultLifecycleController;
 import com.github.jochenw.afw.di.util.Exceptions;
 
@@ -17,7 +19,7 @@ public class Application {
 	/** Interface of an object, that provides the applications component factory.
 	 */
 	public interface ComponentFactorySupplier extends Supplier<IComponentFactory> {}
-	private final Supplier<Module> moduleSupplier;
+	private final Supplier<@NonNull Module> moduleSupplier;
 	private final Supplier<IComponentFactory> componentFactoryProvider;
 	private IComponentFactory componentFactory;
 
@@ -26,7 +28,7 @@ public class Application {
 	 * the given supplier.
 	 * @param pModuleSupplier The modules supplier.
 	 */
-	protected Application(Supplier<Module> pModuleSupplier) {
+	protected Application(Supplier<@NonNull Module> pModuleSupplier) {
 		moduleSupplier = Objects.requireNonNull(pModuleSupplier, "Supplier");
 		componentFactoryProvider = null;
 	}
@@ -68,12 +70,10 @@ public class Application {
 	 */
 	protected IComponentFactory newComponentFactory() {
 		if (componentFactoryProvider == null) {
-			final Module mInner = Objects.requireNonNull(moduleSupplier.get(),
+			final @NonNull Module mInner = Objects.requireNonNull(moduleSupplier.get(),
 					"Module supplier returned a null object.");
 			final Module mOuter = (b) -> {
-				if (mInner != null) {
-					mInner.configure(b);
-				}
+				mInner.configure(b);
 				b.bind(ILifecycleController.class).to(DefaultLifecycleController.class).in(Scopes.SINGLETON);
 				b.bind(Application.class).toInstance(Application.this);
 				b.addFinalizer((cf) -> {

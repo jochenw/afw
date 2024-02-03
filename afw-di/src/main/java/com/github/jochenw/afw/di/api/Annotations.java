@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.impl.GoogleAnnotationProvider;
 import com.github.jochenw.afw.di.impl.JakartaAnnotationProvider;
 import com.github.jochenw.afw.di.impl.JavaxAnnotationProvider;
@@ -30,35 +32,31 @@ import com.github.jochenw.afw.di.impl.JavaxAnnotationProvider;
  * providers.
  */
 public class Annotations {
-	private static final IAnnotationProvider[] annotationProviders = initAnnotationProviders();
+	private static final @NonNull IAnnotationProvider @NonNull[] annotationProviders = initAnnotationProviders();
 
-	private static IAnnotationProvider[] initAnnotationProviders() {
-		final List<IAnnotationProvider> list = new ArrayList<>();
+	private static @NonNull IAnnotationProvider @NonNull[] initAnnotationProviders() {
+		final List<@NonNull IAnnotationProvider> list = new ArrayList<>();
 		try {
-			final IAnnotationProvider ap = new JavaxAnnotationProvider();
-			if (ap.getInjectClass() != null) {
-				list.add(ap);
-			}
+			final @NonNull IAnnotationProvider ap = new JavaxAnnotationProvider();
+			list.add(ap);
 		} catch (Throwable t) {
 			// Ignore this,
 		}
 		try {
-			final IAnnotationProvider ap = new JakartaAnnotationProvider();
-			if (ap.getInjectClass() != null) {
-				list.add(ap);
-			}
+			final @NonNull IAnnotationProvider ap = new JakartaAnnotationProvider();
+			list.add(ap);
 		} catch (Throwable t) {
 			// Ignore this,
 		}
 		try {
-			final IAnnotationProvider ap = new GoogleAnnotationProvider();
-			if (ap.getInjectClass() != null) {
-				list.add(ap);
-			}
+			final @NonNull IAnnotationProvider ap = new GoogleAnnotationProvider();
+			list.add(ap);
 		} catch (Throwable t) {
 			// Ignore this,
 		}
-		return list.toArray(new IAnnotationProvider[list.size()]);
+		@SuppressWarnings("null")
+		final @NonNull IAnnotationProvider @NonNull[] array = list.toArray(new IAnnotationProvider[list.size()]);
+		return array;
 	}
 
 	/** If the given annotation is in instance of the frameworks
@@ -68,7 +66,7 @@ public class Annotations {
 	 *   Named annotation.
 	 * @return The Named annotations value, or null.
 	 */
-	public static String getNamedValue(Annotation pAnnotation) {
+	public static String getNamedValue(@NonNull Annotation pAnnotation) {
 		for (IAnnotationProvider annotationProvider : annotationProviders) {
 			final String value = annotationProvider.getNamedValue(pAnnotation);
 			if (value != null) {
@@ -97,7 +95,7 @@ public class Annotations {
 	 * {@link JakartaAnnotationProvider}.
 	 * @return The default annotation provider
 	 */
-	public static IAnnotationProvider getDefaultProvider() {
+	public static @NonNull IAnnotationProvider getDefaultProvider() {
 		return annotationProviders[0];
 	}
 

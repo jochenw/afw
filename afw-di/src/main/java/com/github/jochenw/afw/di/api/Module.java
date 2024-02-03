@@ -44,14 +44,16 @@ public interface Module {
 	 * @return A new module, which works by internally calling the
 	 *   current module, and then the given (in that order).
 	 */
-	public default Module extend(@Nullable Module... pModules) {
+	public default Module extend(@Nullable Module @Nullable... pModules) {
 		if (pModules == null) {
 			return this;
 		}
 		return (b) -> {
 			configure(b);
 			for (Module m : pModules) {
-				m.configure(b);
+				if (m != null) {
+					m.configure(b);
+				}
 			}
 		};
 	}
