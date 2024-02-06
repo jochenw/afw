@@ -34,6 +34,13 @@ public class ListsTest {
 		return Lists.of(STR_ARRAY);
 	}
 
+	/** Test case for presence of public defult constructor.
+	 */
+	@Test
+	public void testDefaultConstructor() {
+		assertNotNull(new Lists());
+	}
+
 	/** Test case for {@link Lists#of(java.util.function.Function, List)}.
 	 */
 	@Test
