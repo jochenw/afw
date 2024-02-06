@@ -50,7 +50,7 @@ public class DataTest {
 	 */
 	@Test
 	public void testGetStringMapOfStringObjectStringString() {
-		final Map<String, Object> map = getMap();
+		final @NonNull Map<String, Object> map = getMap();
 		assertEquals("bar", Data.getString(map, "foo", "foo"));
 		assertNull(Data.getString(map, "bar", "bar"));
 		try {

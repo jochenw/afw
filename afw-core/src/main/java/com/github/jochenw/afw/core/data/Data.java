@@ -232,6 +232,33 @@ public class Data {
 			}
 		}
 
+		/** Extracts a non-null boolean value from the given map.
+		 * @param pData The data store, from which a value is being extracted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @return The string, which has been retrieved.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is not a string.
+		 * @throws NullPointerException The extracted value is null.
+		 */
+		public @NonNull Boolean requireBoolean(@NonNull O pData, @NonNull String pKey, @NonNull String pDescription) {
+			final Object value = getValue(pData, pKey);
+			if (value == null) {
+				throw new NullPointerException("Missing value for parameter " + pDescription);
+			} else {
+				if (value instanceof Boolean) {
+					return (Boolean) value;
+				} else if (value instanceof String) {
+					@SuppressWarnings("null")
+					final @NonNull Boolean valueOf = Boolean.valueOf((String) value);
+					return valueOf;
+				} else {
+					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+							+ ": Expected string, or boolean, got " + value.getClass().getName());
+				}
+			}
+		}
+
 		/** Extracts a boolean value from the given map.
 		 * @param pData The data store, from which a value is being extracted.
 		 * @param pKey The key, which is being queried in the data store.
@@ -267,20 +294,6 @@ public class Data {
 		public @Nullable Object getValue(@NonNull String pKey) {
 			final String key = Objects.requireNonNull(pKey, "Key");
 			return function.apply(key);
-		}
-		/** Extracts a non-null value from the given data store.
-		 * @param pKey The key, which is being queried in the data store.
-		 * @return The value, which has been retrieved. Never null.
-		 * @throws NullPointerException The parameter {@code pKey} is null,
-		 *   or the extracted value is null.
-		 */
-		public @NonNull Object requireValue(@NonNull String pKey) {
-			final String key = Objects.requireNonNull(pKey, "Key");
-			final Object value = function.apply(key);
-			if (value == null) {
-				throw new NullPointerException("Missing value for parameter: " + pKey);
-			}
-			return value;
 		}
 		/** Extracts a string from the given data store.
 		 * @param pKey The key, which is being queried in the data store.
@@ -357,6 +370,7 @@ public class Data {
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
+		@SuppressWarnings("null")
 		public @NonNull Path requirePath(@NonNull String pKey,
 				                         @NonNull String pDescription) {
 			Object value = getValue(pKey);
@@ -368,13 +382,11 @@ public class Data {
 					if (s.length() == 0) {
 						throw new IllegalArgumentException("Empty value for parameter " + pDescription);
 					}
-					@SuppressWarnings("null")
 					final @NonNull Path path = Paths.get(s);
 					return path;
 				} else if (value instanceof Path) {
 					return (Path) value;
 				} else if (value instanceof File) {
-					@SuppressWarnings("null")
 					final @NonNull Path path = ((File) value).toPath();
 					return path;
 				} else {
@@ -479,6 +491,17 @@ public class Data {
 			return getBoolean(pKey, pKey);
 		}
 
+		/** Extracts a non-null boolean value from the data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The string, which has been retrieved.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is not a string.
+		 * @throws NullPointerException The extracted string value is null.
+		 */
+		public @NonNull Boolean requireBoolean(@NonNull String pKey) {
+			return requireBoolean(pKey, pKey);
+		}
+
 		/** Creates a new {@link Accessible}, which accesses the given map.
 		 * This is equivalent to {@code new Data.Accessable((k) -> pMap.get(k)}.
 		 * @param pMap The map, that is being accessed.
@@ -510,6 +533,21 @@ public class Data {
 		public static Accessible of(Function<String,Object> pAccessor) {
 			final Function<String,Object> acc = Objects.requireNonNull(pAccessor, "Accessor");
 			return new Accessible(acc);
+		}
+
+		/** Extracts a non-null value from the data store.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The value, which has been retrieved.
+		 * @param <O> Type of the retrieved value.
+		 */
+		public <O> @NonNull O requireValue(@NonNull String pKey) {
+			@SuppressWarnings("unchecked")
+			final @Nullable O o = (O) getValue(pKey);
+			if (o == null) {
+				throw new NullPointerException(pKey);
+			}
+			final @NonNull O o2 = o;
+			return o2;
 		}
 	}
 
@@ -713,24 +751,17 @@ public class Data {
 		return MAP_ACCESSOR.getBoolean(pMap, pKey, pDescription);
 	}
 
-	/** Extracts a boolean value from the given map.
+	/** Extracts a non-null boolean value from the given map.
 	 * @param pMap The map, from which a value is being extracted.
 	 * @param pKey The key, which is being queried in the data store.
-	 * @param pDefaultValue Default value, which is being used,
-	 *   if the extracted value is null, or otherwise invalid.
+	 * @param pDescription Short description of the expected value, for use in error messages.
 	 * @return The string, which has been retrieved.
 	 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 	 *   is not a string.
+	 * @throws NullPointerException The extracted value is null.
 	 */
-	public static boolean requireBoolean(@NonNull Map<String,Object> pMap,
-			                             @NonNull String pKey,
-			                             @NonNull String pDefaultValue) {
-		final Boolean b = MAP_ACCESSOR.getBoolean(pMap, pKey, pKey);
-		if (b == null) {
-			return Boolean.valueOf(pDefaultValue).booleanValue();
-		} else {
-			return b.booleanValue();
-		}
+	public static @NonNull Boolean requireBoolean(@NonNull Map<String,Object> pMap, @NonNull String pKey, @NonNull String pDescription) {
+		return MAP_ACCESSOR.requireBoolean(pMap, pKey, pDescription);
 	}
 
 	/** Extracts a boolean value from the given map.
