@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,6 +29,7 @@ import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
 import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Reflection;
 
 
 /** Test for the {@link Functions} class.
@@ -175,10 +177,9 @@ public class FunctionsTest {
      */
 	@Test
     public void testCreate() throws Exception {
-    	final Constructor<Functions> constructor = Functions.class.getDeclaredConstructor();
-    	if (!constructor.isAccessible()) {
-    		constructor.setAccessible(true);
-    	}
+    	@SuppressWarnings("null")
+		final @NonNull Constructor<Functions> constructor = Functions.class.getDeclaredConstructor();
+    	Reflection.makeAcccessible(constructor);
     	final Functions functions = constructor.newInstance();
     	assertNotNull(functions);
     }

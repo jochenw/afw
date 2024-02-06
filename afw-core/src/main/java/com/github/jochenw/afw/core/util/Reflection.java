@@ -16,6 +16,7 @@
 package com.github.jochenw.afw.core.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -60,15 +61,23 @@ public class Reflection {
                 throw new NoSuchFieldError("Field not found: "
                         + pInstance.getClass().getName() + "." + pField);
             }
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
+            makeAcccessible(field);
             field.set(pInstance, pValue);
         } catch (Throwable t) {
             throw Exceptions.show(t);
         }
     }
 
+	/** Ensures, that the given method, or field, is accessible.
+	 * @param pField The method, or field, which is being made accessible.
+	 */
+	@SuppressWarnings("deprecation")
+	public static void makeAcccessible(AccessibleObject pField) {
+		if (!pField.isAccessible()) {
+			pField.setAccessible(true);
+		}
+	}
+	
     private static Field findField(Class<?> pClass, String pFieldName) {
         final List<String> cache = new ArrayList<String>();
         return findField(cache, pClass, pFieldName);

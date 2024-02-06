@@ -441,4 +441,12 @@ public class Objects {
 		final @NonNull O o = (@NonNull O) nullO;
 		return o;
 	}
+
+	/** Returns, whether the given object reference is null.
+	 * @param pObject The object reference, which is being tested.
+	 * @return True, if the object reference is null, otherwise false.
+	 */
+	public static boolean isNull(Object pObject) {
+		return pObject == null;
+	}
 }

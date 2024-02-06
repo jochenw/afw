@@ -108,8 +108,8 @@ public class ExtProperties {
 	public @NonNull ExtProperty requireProperty(@NonNull String pKey) throws NoSuchElementException, NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final @Nullable ExtProperty ep = entries.get(key);
-		if (java.util.Objects.isNull(ep)) {
-			throw new NoSuchElementException("No property with this key exists: " + pKey);
+		if (Objects.isNull(ep)) {
+			throw new NoSuchElementException("No property with this key exists: " + key);
 		}
 		return ep;
 	}
@@ -123,7 +123,7 @@ public class ExtProperties {
 	public @Nullable String getValue(@NonNull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final @Nullable ExtProperty ep = entries.get(key);
-		if (java.util.Objects.isNull(ep)) {
+		if (Objects.isNull(ep)) {
 			return null;
 		} else {
 			return ep.getValue();
@@ -142,7 +142,7 @@ public class ExtProperties {
 	public String[] getComment(@NonNull String pKey) throws NullPointerException {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final @Nullable ExtProperty ep = entries.get(key);
-		if (java.util.Objects.isNull(ep)) {
+		if (Objects.isNull(ep)) {
 			return null;
 		} else {
 			return ep.getComments();
@@ -176,7 +176,7 @@ public class ExtProperties {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		final String value = Objects.requireNonNull(pValue, "Value");
 		entries.compute(key, (k, ep) -> {
-			if (java.util.Objects.isNull(ep)) {
+			if (Objects.isNull(ep)) {
 				return new ExtProperty(k, value, null);
 			} else {
 				if (value.equals(ep.getValue())) {
@@ -201,7 +201,7 @@ public class ExtProperties {
 		final String key = Objects.requireNonNull(pKey, "Key");
 		entries.compute(key, (k, ep) -> {
 			final @NonNull String propertyKey = Objects.requireNonNull(pKey);
-			if (java.util.Objects.isNull(ep)) {
+			if (Objects.isNull(ep)) {
 				return new ExtProperty(propertyKey, "", pComments);
 			} else {
 				final String[] comments = ep.getComments();

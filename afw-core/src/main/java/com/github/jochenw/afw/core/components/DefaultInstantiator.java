@@ -36,9 +36,7 @@ public class DefaultInstantiator implements IInstantiator {
 			try {
 				// For Java 9, or later, this should work.
 				final Constructor<Object> cons = cl.getDeclaredConstructor();
-				if (!cons.isAccessible()) {
-					cons.setAccessible(true);
-				}
+				Reflection.makeAcccessible(cons);
 				return cons.newInstance();
 			} catch (Throwable t) {
 				th9 = t;
@@ -72,9 +70,7 @@ public class DefaultInstantiator implements IInstantiator {
 			final Class<?> type = setter.getParameterTypes()[0];
 			final Object value = asValue(type, pValue);
 			try {
-				if (!setter.isAccessible()) {
-					setter.setAccessible(true);
-				}
+				Reflection.makeAcccessible(setter);
 				setter.invoke(pObject, value);
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
@@ -85,9 +81,7 @@ public class DefaultInstantiator implements IInstantiator {
 				final Class<?> type = field.getType();
 				final Object value = asValue(type, pValue);
 				try {
-					if (!field.isAccessible()) {
-						field.setAccessible(true);
-					}
+					Reflection.makeAcccessible(field);
 					field.set(pObject, value);
 				} catch (Throwable t) {
 					throw Exceptions.show(t);

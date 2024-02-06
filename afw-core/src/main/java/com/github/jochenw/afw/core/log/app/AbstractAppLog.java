@@ -92,7 +92,7 @@ public abstract class AbstractAppLog implements IAppLog {
 
 	@Override
 	public boolean isEnabled(@NonNull Level pLevel) {
-		if (Objects.isNull(pLevel)) {
+		if (com.github.jochenw.afw.core.util.Objects.isNull(pLevel)) {
 			return false;
 		} else {
 			final FailableCallable<Boolean,?> callable = () -> {
@@ -108,7 +108,7 @@ public abstract class AbstractAppLog implements IAppLog {
 	 * @return True, if the given logging level is enabled.
 	 */
 	protected boolean isEnabledLocked(@NonNull Level pLevel) {
-		if (Objects.isNull(pLevel)) {
+		if (com.github.jochenw.afw.core.util.Objects.isNull(pLevel)) {
 			return false;
 		} else {
 			return pLevel.ordinal() >= level.ordinal();

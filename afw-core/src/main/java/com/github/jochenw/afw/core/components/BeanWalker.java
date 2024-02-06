@@ -162,9 +162,7 @@ public class BeanWalker {
 	 */
 	protected void setFieldValue(Object pBean, Field pField, Object pValue) {
 		try {
-			if (!pField.isAccessible()) {
-				pField.setAccessible(true);
-			}
+			Reflection.makeAcccessible(pField);
 			pField.set(pBean, pValue);
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
@@ -178,9 +176,7 @@ public class BeanWalker {
 	 */
 	protected Object getFieldValue(Object pBean, Field pField) {
 		try {
-			if (!pField.isAccessible()) {
-				pField.setAccessible(true);
-			}
+			Reflection.makeAcccessible(pField);
 			return pField.get(pBean);
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
