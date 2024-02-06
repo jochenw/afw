@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
@@ -59,10 +61,10 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 	}
 
 	@Override
-	public void configure(IAnnotationProvider pAnnotationProvider,
-			              IOnTheFlyBinder pOnTheFlyBinder,
-			              List<BindingBuilder<Object>> pBuilders,
-			              Set<Class<?>> pStaticInjectionClasses) {
+	public void configure(@NonNull IAnnotationProvider pAnnotationProvider,
+			              @NonNull IOnTheFlyBinder pOnTheFlyBinder,
+			              @NonNull List<BindingBuilder<Object>> pBuilders,
+			              @NonNull Set<Class<?>> pStaticInjectionClasses) {
 		setAnnotationProvider(pAnnotationProvider);
 		// Eliminate duplicate bindings.
 		final Map<Key<Object>,BindingBuilder<Object>> bindingsByKey = new HashMap<>();
@@ -73,9 +75,7 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 		com.google.inject.Module module = new com.google.inject.Module() {
 			@Override
 			public void configure(Binder pBinder) {
-				if (pOnTheFlyBinder != null) {
-					pBinder.bindListener(Matchers.any(), new GuiceComponentFactoryTypeListener(GuiceComponentFactory.this, pOnTheFlyBinder));
-				}
+				pBinder.bindListener(Matchers.any(), new GuiceComponentFactoryTypeListener(GuiceComponentFactory.this, pOnTheFlyBinder));
 				for (Class<?> cl : pStaticInjectionClasses) {
 					pBinder.requestStaticInjection(cl);
 				}

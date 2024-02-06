@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -24,19 +25,28 @@ import java.util.function.Function;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+
 /** Utility methods for working with lists.
  */
 public class Lists {
 	/** Converts the given parameter array into a list.
+	 * Compared to {@link Arrays#asList(Object...)}, this
+	 * method has the advantage, that the created list is
+	 * mutable.
 	 * @param <O> Element type of the parameter array, and the generated list.
 	 * @param pArgs The parameter array, which is being converted.
 	 * @return The created list.
 	 */
 	public static <O> @NonNull List<O> of(@SuppressWarnings("unchecked") O... pArgs) {
 		if (pArgs == null) {
-			return Objects.requireNonNull(Collections.emptyList());
+			return new ArrayList<>();
+		} else {
+			final List<O> list = new ArrayList<>(pArgs.length);
+			for (O o : pArgs) {
+				list.add(o);
+			}
+			return list;
 		}
-		return Objects.requireNonNull(Arrays.asList(pArgs));
 	}
 
 	/** Converts the given list into another list by
@@ -53,7 +63,7 @@ public class Lists {
 	 * @param <I> Element type of the input list.
 	 * @param <O> Element type of the output list.
 	 */
-	public static <I,O> @NonNull List<O> of(@NonNull Function<I,O> pMapper, @Nullable List<I> pList) {
+	public static <I,O> @NonNull List<O> of(@NonNull Function<I,O> pMapper, @Nullable Collection<I> pList) {
 		if (pList == null) {
 			return Objects.requireNonNull(Collections.emptyList());
 		}

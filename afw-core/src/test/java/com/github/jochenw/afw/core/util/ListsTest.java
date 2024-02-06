@@ -2,12 +2,13 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.Test;
+
 
 /** Test suite for the {@link Lists} class.
  */
@@ -41,7 +42,7 @@ public class ListsTest {
 		assertNotNull(new Lists());
 	}
 
-	/** Test case for {@link Lists#of(java.util.function.Function, List)}.
+	/** Test case for {@link Lists#of(java.util.function.Function, Collection)}.
 	 */
 	@Test
 	public void testOfFunctionOfIOListOfI() {

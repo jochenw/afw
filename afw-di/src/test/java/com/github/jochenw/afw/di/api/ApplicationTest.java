@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.di.api.Application.ComponentFactorySupplier;
@@ -26,7 +27,7 @@ public class ApplicationTest {
 		 * @param pModuleSupplier The module supplier, which will be
 		 *   used to create the {@link IComponentFactory}.
 		 */
-		public MyApplication(Supplier<Module> pModuleSupplier) {
+		public MyApplication(Supplier<@NonNull Module> pModuleSupplier) {
 			super(pModuleSupplier);
 		}
 		/** Creates a new instance with the given component factory.
@@ -48,7 +49,7 @@ public class ApplicationTest {
 		 *   which is being invoked to acquire a
 		 *   {@link IComponentFactory component factory}.
 		 */
-		protected InvalidApplicationClass(Supplier<Module> pModuleSupplier) {
+		protected InvalidApplicationClass(Supplier<@NonNull Module> pModuleSupplier) {
 			super(pModuleSupplier);
 			throw new IllegalStateException("Not implemented");
 		}

@@ -23,6 +23,9 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /** A super-simple, and limited variant of the
  * {@link com.github.jochenw.afw.di.api.IComponentFactory}:
@@ -321,7 +324,7 @@ public class LimitedComponentFactory {
 	 * @return The requested instance, if a suitable binding is
 	 *   available, or null.
 	 */
-	public <O> O getInstance(Class<?> pType, String pName) {
+	public <O> @Nullable O getInstance(Class<?> pType, String pName) {
 		final Key key = new Key(pType, pName);
 		final Binding binding = bindings.get(key);
 		if (binding == null) {
@@ -342,7 +345,7 @@ public class LimitedComponentFactory {
 	 * @return The requested instance, if a suitable binding is
 	 *   available, or null.
 	 */
-	public <O> O getInstance(Class<?> pType) {
+	public <O> @Nullable O getInstance(Class<?> pType) {
 		return getInstance(pType, "");
 	}
 
@@ -357,7 +360,7 @@ public class LimitedComponentFactory {
 	 * @throws NoSuchElementException No binding with the
 	 * given type, and name has been registered.
 	 */
-	public <O> O requireInstance(Class<O> pType, String pName) {
+	public <O> @NonNull O requireInstance(Class<O> pType, String pName) {
 		final Key key = new Key(pType, pName);
 		final Binding binding = bindings.get(key);
 		if (binding == null) {
@@ -366,6 +369,10 @@ public class LimitedComponentFactory {
 		} else {
 			@SuppressWarnings("unchecked")
 			final O o = (O) binding.get(this);
+			if (o == null) {
+				throw new IllegalStateException("Instance supplier has returned null "
+						+ " for type=" + pType.getName() + ", and name=" + pName);
+			}
 			return o;
 		}
 	}
@@ -380,7 +387,7 @@ public class LimitedComponentFactory {
 	 * @throws NoSuchElementException No binding with the
 	 * given type, and name has been registered.
 	 */
-	public <O> O requireInstance(Class<O> pType) {
+	public <O> @NonNull O requireInstance(Class<O> pType) {
 		return requireInstance(pType, "");
 	}
 }

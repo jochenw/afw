@@ -25,7 +25,7 @@ public interface Module {
 	 * @return A new module, which works by internally calling the
 	 *   current module, and then the given (in that order).
 	 */
-	public default Module extend(@Nullable Module pModule) {
+	public default @NonNull Module extend(@Nullable Module pModule) {
 		if (pModule == null) {
 			return this;
 		}
@@ -44,8 +44,8 @@ public interface Module {
 	 * @return A new module, which works by internally calling the
 	 *   current module, and then the given (in that order).
 	 */
-	public default Module extend(@Nullable Module @Nullable... pModules) {
-		if (pModules == null) {
+	public default @NonNull Module extend(@Nullable Module @Nullable... pModules) {
+		if (pModules == null  ||  pModules.length == 0) {
 			return this;
 		}
 		return (b) -> {
@@ -67,7 +67,7 @@ public interface Module {
 	 * @return A new module, which works by internally calling the
 	 *   current module, and then the given (in that order).
 	 */
-	public default Module extend(@Nullable Iterable<Module> pModules) {
+	public default @NonNull Module extend(@Nullable Iterable<Module> pModules) {
 		if (pModules == null) {
 			return this;
 		}

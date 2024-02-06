@@ -31,13 +31,13 @@ public class ComponentFactoryBuilder {
 	private @NonNull Supplier<@NonNull AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
 	private @Nullable IComponentFactory instance;
 	private @NonNull IAnnotationProvider annotationProvider = Annotations.getDefaultProvider();
-	private IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
+	private @NonNull IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
 
 	/** Returns the {@link IAnnotationProvider}, which is being used by
 	 * this builder, and the component factory, that it creates.
 	 * @return This builders {@link IAnnotationProvider}.
 	 */
-	public IAnnotationProvider getAnnotations() {
+	public @NonNull IAnnotationProvider getAnnotations() {
 		return annotationProvider;
 	}
 
@@ -46,7 +46,7 @@ public class ComponentFactoryBuilder {
 	 * @param pAnnotations This builders {@link IAnnotationProvider}.
 	 * @return This builder.
 	 */
-	public ComponentFactoryBuilder annotations(IAnnotationProvider pAnnotations) {
+	public ComponentFactoryBuilder annotations(@NonNull IAnnotationProvider pAnnotations) {
 		annotationProvider = Objects.requireNonNull(pAnnotations, "Annotations");
 		return this;
 	}
@@ -342,7 +342,7 @@ public class ComponentFactoryBuilder {
 	 * @param pBinder The {@link IOnTheFlyBinder}, that is being used.
 	 * @return This builder.
 	 */
-	public ComponentFactoryBuilder onTheFlyBinder(IOnTheFlyBinder pBinder) {
+	public @NonNull ComponentFactoryBuilder onTheFlyBinder(@NonNull IOnTheFlyBinder pBinder) {
 		onTheFlyBinder = Objects.requireNonNull(pBinder);
 		return this;
 	}
@@ -350,7 +350,7 @@ public class ComponentFactoryBuilder {
 	/** Returns the {@link IOnTheFlyBinder}, that is being used.
 	 * @return The {@link IOnTheFlyBinder}, that is being used
 	 */
-	public IOnTheFlyBinder onTheFlyBinder() {
+	public @NonNull IOnTheFlyBinder getOnTheFlyBinder() {
 		return onTheFlyBinder;
 	}
 }

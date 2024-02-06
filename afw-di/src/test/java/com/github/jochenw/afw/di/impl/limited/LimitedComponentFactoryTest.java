@@ -28,6 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.di.impl.limited.LimitedComponentFactory.Key;
@@ -82,14 +83,15 @@ public class LimitedComponentFactoryTest {
 	 */
 	@Test
 	public void testBasicFunction() {
-		final Integer answer = Integer.valueOf(42);
+		@SuppressWarnings("null")
+		final @NonNull Integer answer = Integer.valueOf(42);
 		final Map<String,Object> map1 = new HashMap<>();
 		IModule module = (b) -> {
 			b.bind(Map.class, "map1", map1);
 			b.bind(Map.class, "hash", HashMap.class);
 			b.bind(Map.class, "linked", LinkedHashMap.class);
 			b.bind(String.class, "jdbc.user", "myUser");
-			final Supplier<String> supplier = () -> "myPassword";
+			final Supplier<@NonNull String> supplier = () -> "myPassword";
 			b.bindToSupplier(String.class, "jdbc.password", supplier);
 			b.bind(Initializable.class);
 			b.bind(List.class, ArrayList.class);
@@ -127,7 +129,7 @@ public class LimitedComponentFactoryTest {
 				assertEquals("No binding has been registered"
 					     + " with type=java.util.Map, and name=", e.getMessage());
 			}
-			final Initializable initializable = cf.requireInstance(Initializable.class);
+			final @NonNull Initializable initializable = cf.requireInstance(Initializable.class);
 			assertSame(map1, initializable.map1);
 			assertNotNull(initializable.hash);
 			assertNotNull(initializable.linked);
@@ -147,7 +149,7 @@ public class LimitedComponentFactoryTest {
 	public void testCircularDependency() {
 		final LimitedComponentFactory lcf = LimitedComponentFactory.of((b) -> {
 			b.bind(Reference.class, "a", new Reference("b"));
-			final Supplier<Reference> supplier = () -> new Reference("c");
+			final Supplier<@NonNull Reference> supplier = () -> new Reference("c");
 			b.bindToSupplier(Reference.class, "b", supplier);
 			b.bindToSupplier(Reference.class, supplier);
 			b.bind(Reference.class, "c", new Reference("a"));
@@ -165,12 +167,15 @@ public class LimitedComponentFactoryTest {
 	 */
 	@Test
 	public void testModuleExtension() {
-		final Integer answer = Integer.valueOf(42);
+		@SuppressWarnings("null")
+		final @NonNull Integer answer = Integer.valueOf(42);
 		final IModule module1 = (b) -> {
 			b.bind(Number.class, "42", answer);
 		};
 		final IModule module2 = module1.extend((b) -> {
-			b.bind(Boolean.class, "true", Boolean.TRUE);
+			@SuppressWarnings("null")
+			final @NonNull Boolean booleanTrue = Boolean.TRUE;
+			b.bind(Boolean.class, "true", booleanTrue);
 		});
 		assertNotSame(module1, module2);
 		assertSame(module1, module1.extend(null));
@@ -207,13 +212,20 @@ public class LimitedComponentFactoryTest {
 		assertFalse(key1.equals(null));
 	}
 
+	@SuppressWarnings("null")
+	private static <O> @NonNull O fakeNonNull() {
+		final O nullO = (O) null;
+		final @NonNull O o = (@NonNull O) nullO;
+		return o;
+	}
+
 	/** Test for null values.
 	 */
 	@Test
 	public void testNullValues() {
 		final LimitedComponentFactory lcf = LimitedComponentFactory.of((b) -> {
 			@SuppressWarnings("rawtypes")
-			final Supplier<Map> supplier = () -> null;
+			final Supplier<@NonNull Map> supplier = () -> fakeNonNull();
 			b.bindToSupplier(Map.class, supplier);
 		});
 		try {
@@ -284,8 +296,8 @@ public class LimitedComponentFactoryTest {
 		final OutOfMemoryError oome = new OutOfMemoryError();
 		final LimitedComponentFactory lcf = LimitedComponentFactory.of((b) -> {
 			b.bindToSupplier(Object.class, () -> new Object());
-			b.bindToSupplier(Object.class, "rte", (Supplier<Object>) () -> { throw rte; });
-			b.bindToSupplier(Object.class, "oome", (Supplier<Object>) () -> { throw oome; });
+			b.bindToSupplier(Object.class, "rte", (Supplier<@NonNull Object>) () -> { throw rte; });
+			b.bindToSupplier(Object.class, "oome", (Supplier<@NonNull Object>) () -> { throw oome; });
 		});
 		assertNotNull(lcf.requireInstance(Object.class));
 		try {

@@ -33,6 +33,8 @@ import org.atinject.tck.auto.Tire;
 import org.atinject.tck.auto.V8Engine;
 import org.atinject.tck.auto.accessories.Cupholder;
 import org.atinject.tck.auto.accessories.SpareTire;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.api.Binder;
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
@@ -97,7 +99,7 @@ public class ComponentFactoryTests {
 		assertNotNull(emptyMapCf1);
 		final Map<String,Object> emptyMapCf2 = cf.getInstance(Map.class, "empty");
 		assertNotSame(emptyMapCf1, emptyMapCf2);
-		final CreateJavaxMapsObject cmo = cf.getInstance(CreateJavaxMapsObject.class);
+		final @NonNull CreateJavaxMapsObject cmo = cf.requireInstance(CreateJavaxMapsObject.class);
 		assertSame(hashMap, cmo.hashMap1);
 		assertSame(hashMap, cmo.hashMap2);
 		assertNotNull(cmo.linkedMap1);
@@ -160,7 +162,7 @@ public class ComponentFactoryTests {
 		assertNotNull(emptyMapCf1);
 		final Map<String,Object> emptyMapCf2 = cf.getInstance(Map.class, "empty");
 		assertNotSame(emptyMapCf1, emptyMapCf2);
-		final CreateJakartaMapsObject cmo = cf.getInstance(CreateJakartaMapsObject.class);
+		final CreateJakartaMapsObject cmo = cf.requireInstance(CreateJakartaMapsObject.class);
 		assertSame(hashMap, cmo.hashMap1);
 		assertSame(hashMap, cmo.hashMap2);
 		assertNotNull(cmo.linkedMap1);
@@ -228,7 +230,7 @@ public class ComponentFactoryTests {
 	private static void testTck(Class<? extends AbstractComponentFactory> pType, boolean pStaticInjection) {
 		final Module module = new Module() {
 			@Override
-			public void configure(Binder pBinder) {
+			public void configure(@NonNull Binder pBinder) {
 				pBinder.bind(Car.class).to(Convertible.class);
 				pBinder.bind(Seat.class).in(Scopes.SINGLETON);
 				pBinder.bind(Seat.class).annotatedWith(Drivers.class).to(DriversSeat.class);
@@ -359,8 +361,8 @@ public class ComponentFactoryTests {
 					}
 
 					@Override
-					protected Object getProperty(IComponentFactory pFactory, Class<?> pType, String pId,
-							                     String pDefaultValue, boolean pNullable) {
+					protected Object getProperty(@NonNull IComponentFactory pFactory, @NonNull Class<?> pType, @NonNull String pId,
+							                     @NonNull String pDefaultValue, boolean pNullable) {
 						assertSame(String.class, pType);
 						switch(pId) {
 						  case "myProperty": return "myPropertyValue";
@@ -401,7 +403,7 @@ public class ComponentFactoryTests {
 		assertSame(module0, module0.extend((Iterable<Module>) null));
 		final IComponentFactory cf0 = IComponentFactory.builder().module(module0)
 				.type(pComponentFactoryType).build();
-		final Consumer<Module> validator = (m) -> {
+		final Consumer<@NonNull Module> validator = (m) -> {
 			final IComponentFactory cf = IComponentFactory.builder().type(pComponentFactoryType).module(m).build();
 			assertSame(hashMap, cf0.requireInstance(Map.class));
 			assertSame(hashMap, cf.requireInstance(Map.class));
@@ -409,7 +411,7 @@ public class ComponentFactoryTests {
 			assertSame(hashMap, cf.requireInstance(Map.class, "hash"));
 		};
 		validator.accept(module0.extend(module1));
-		validator.accept(module0.extend(new Module[] {module1}));
+		validator.accept(module0.extend(new @Nullable Module @Nullable [] {module1}));
 		validator.accept(module0.extend(Arrays.asList(module1)));
 	}
 }
