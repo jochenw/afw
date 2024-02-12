@@ -13,7 +13,7 @@ a Java application. It includes
 
 ## License
 
- Copyright 2018-2023 Jochen Wiedmann
+ Copyright 2018-2024 Jochen Wiedmann
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
