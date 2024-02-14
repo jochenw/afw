@@ -34,6 +34,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.InputSource;
@@ -43,6 +44,7 @@ import org.xml.sax.SAXParseException;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.AbstractInitializer;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.IExtensionPoint;
 import com.github.jochenw.afw.core.plugins.IPluginRegistry.Initializer;
+import com.github.jochenw.afw.core.util.Objects;
 
 
 /** Test for the {@link PluginListParser}.
@@ -74,7 +76,7 @@ public class PluginListParserTest {
 			// Okay, nothing to do
 		}
 		try {
-			PluginListParser.parse(newInputSource(xmlEmptyList100), Thread.currentThread().getContextClassLoader());
+			PluginListParser.parse(newInputSource(xmlEmptyList100), getContextClassLoader());
 		} catch (UndeclaredThrowableException se) {
 			final Throwable cause = se.getCause();
 			Assert.assertNotNull(cause);
@@ -83,7 +85,7 @@ public class PluginListParserTest {
 			Assert.assertEquals("Expected at least one plugin definition", spe.getMessage());
 		}
 		try {
-			PluginListParser.parse(newInputSource(xmlEmptyList100), Thread.currentThread().getContextClassLoader());
+			PluginListParser.parse(newInputSource(xmlEmptyList100), getContextClassLoader());
 		} catch (UndeclaredThrowableException se) {
 			final Throwable cause = se.getCause();
 			Assert.assertNotNull(cause);
@@ -91,6 +93,10 @@ public class PluginListParserTest {
 			final SAXParseException spe = (SAXParseException) cause;
 			Assert.assertEquals("Expected at least one plugin definition", spe.getMessage());
 		}
+	}
+
+	private @NonNull ClassLoader getContextClassLoader() {
+		return Objects.requireNonNull(Thread.currentThread().getContextClassLoader());
 	}
 
 	private Schema newSchema(String pVersion) throws SAXException, IOException {
@@ -133,8 +139,8 @@ public class PluginListParserTest {
 	public static class BPlugin extends AbstractInitializer {
 		@Override
 		public void accept(IPluginRegistry pRegistry) {
-			@SuppressWarnings("rawtypes")
-			final Map map = Collections.emptyMap();
+			@SuppressWarnings({ "rawtypes", "null" })
+			final @NonNull Map map = Collections.emptyMap();
 			pRegistry.addPlugin(Map.class, map);
 		}
 	}
@@ -155,13 +161,13 @@ public class PluginListParserTest {
 		System.out.println(xmlSinglePlugin100);
 		{
 			schema.newValidator().validate(newSource(xmlSinglePlugin100));
-			final List<IPluginRegistry.Initializer> plugins = PluginListParser.parse(newInputSource(XML_SINGLE_PLUGIN), Thread.currentThread().getContextClassLoader());
+			final List<IPluginRegistry.Initializer> plugins = PluginListParser.parse(newInputSource(XML_SINGLE_PLUGIN), getContextClassLoader());
 			Assert.assertEquals(1, plugins.size());
 			assertPlugin(plugins, 0, MyPlugin.class, "MyPlugin");
 		}
 		{
 			newSchema("101").newValidator().validate(newSource(xmlSinglePlugin101));
-			final List<IPluginRegistry.Initializer> plugins = PluginListParser.parse(newInputSource(XML_SINGLE_PLUGIN), Thread.currentThread().getContextClassLoader());
+			final List<IPluginRegistry.Initializer> plugins = PluginListParser.parse(newInputSource(XML_SINGLE_PLUGIN), getContextClassLoader());
 			Assert.assertEquals(1, plugins.size());
 			assertPlugin(plugins, 0, MyPlugin.class, "MyPlugin");
 		}
@@ -190,12 +196,12 @@ public class PluginListParserTest {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-			final List<IPluginRegistry.Initializer> plugins = PluginListParser.parse(newInputSource(s), Thread.currentThread().getContextClassLoader());
+			final List<IPluginRegistry.Initializer> plugins = PluginListParser.parse(newInputSource(s), getContextClassLoader());
 			Assert.assertEquals(3, plugins.size());
 			assertPlugin(plugins, 0, APlugin.class, "APlugin", "MyPlugin");
 			assertPlugin(plugins, 1, BPlugin.class, "BPlugin", "APlugin", "MyPlugin");
 			assertPlugin(plugins, 2, MyPlugin.class, "MyPlugin");
-			final List<IPluginRegistry.Initializer> sortedPlugins = PluginListParser.parseAndSort(newInputSource(s), Thread.currentThread().getContextClassLoader());
+			final List<IPluginRegistry.Initializer> sortedPlugins = PluginListParser.parseAndSort(newInputSource(s), getContextClassLoader());
 			Assert.assertEquals(3, sortedPlugins.size());
 			assertPlugin(sortedPlugins, 0, MyPlugin.class, "MyPlugin");
 			assertPlugin(sortedPlugins, 1, APlugin.class, "APlugin", "MyPlugin");
@@ -205,17 +211,19 @@ public class PluginListParserTest {
 			sortedPlugins.forEach((p) -> 
 			{ p.accept(registry); });
 			@SuppressWarnings("rawtypes")
-			final IExtensionPoint<Map> epMap = (IExtensionPoint<Map>) registry.getExtensionPoint(Map.class);
+			final IExtensionPoint<@NonNull Map> epMap = (IExtensionPoint<@NonNull Map>) registry.getExtensionPoint(Map.class);
 			Assert.assertNotNull(epMap);
 			@SuppressWarnings("rawtypes")
-			final IExtensionPoint<List> epList = (IExtensionPoint<List>) registry.getExtensionPoint(List.class);
+			final IExtensionPoint<@NonNull List> epList = (IExtensionPoint<@NonNull List>) registry.getExtensionPoint(List.class);
 			Assert.assertNotNull(epList);
 			Assert.assertNull(registry.getExtensionPoint(Collection.class));
 			@SuppressWarnings("rawtypes")
-			List<Map> mapPlugins = epMap.getPlugins();
+			List<@NonNull Map> mapPlugins = epMap.getPlugins();
 			Assert.assertEquals(2, mapPlugins.size());
 			Assert.assertTrue(mapPlugins.get(0) != null  &&  mapPlugins.get(0) instanceof HashMap);
-			Assert.assertTrue(mapPlugins.get(1) != null  &&  mapPlugins.get(1).getClass().getName().equals("java.util.Collections$EmptyMap"));
+			@SuppressWarnings("rawtypes")
+			@NonNull Map map1 = Objects.requireNonNull(mapPlugins.get(1));
+			Assert.assertTrue(map1 != null  &&  map1.getClass().getName().equals("java.util.Collections$EmptyMap"));
 		};
 		tester.accept(xmlPluginDependencies100, "100");
 		tester.accept(xmlPluginDependencies101, "101");
@@ -241,7 +249,7 @@ public class PluginListParserTest {
 		Assert.assertEquals(pId, initializer.getId());
 		final List<String> dependsOn = initializer.getDependsOn();
 		if (pDependsOn == null  ||  pDependsOn.length == 0) {
-			Assert.assertTrue(dependsOn == null  ||  dependsOn.size() == 0);
+			Assert.assertTrue(dependsOn.size() == 0);
 		} else {
 			Assert.assertEquals(pDependsOn.length, dependsOn.size());
 		}

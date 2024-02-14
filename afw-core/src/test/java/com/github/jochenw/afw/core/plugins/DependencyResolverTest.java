@@ -18,6 +18,7 @@ package com.github.jochenw.afw.core.plugins;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,6 +26,7 @@ import com.github.jochenw.afw.core.plugins.DependencyResolver.CircularDependency
 import com.github.jochenw.afw.core.plugins.DependencyResolver.DuplicateNodeIdException;
 import com.github.jochenw.afw.core.plugins.DependencyResolver.Node;
 import com.github.jochenw.afw.core.plugins.DependencyResolver.UnknownNodeIdException;
+import com.github.jochenw.afw.core.util.Objects;
 
 
 /** Test for the {@link DependencyResolver}.
@@ -37,9 +39,11 @@ public class DependencyResolverTest {
 		final Object object0 = new Object();
 		final Object object1 = new Object();
 		final Object object2 = new Object();
-		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
-		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
-		final Node<Object> node2 = new Node<Object>("a", Arrays.asList(), object2);
+		final @NonNull List<String> list0 = Objects.requireNonNull(Arrays.asList());
+		final Node<Object> node0 = new Node<Object>("a", list0, object0);
+		final @NonNull List<String> list1 = Objects.requireNonNull(Arrays.asList("a"));
+		final Node<Object> node1 = new Node<Object>("b", list1, object1);
+		final Node<Object> node2 = new Node<Object>("a", list0, object2);
 		try {
 			new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
 			Assert.fail("Expected Exception");
@@ -57,9 +61,12 @@ public class DependencyResolverTest {
 		final Object object0 = new Object();
 		final Object object1 = new Object();
 		final Object object2 = new Object();
-		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
-		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("d"), object1);
-		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		final @NonNull List<String> list0 = Objects.requireNonNull(Arrays.asList());
+		final Node<Object> node0 = new Node<Object>("a", list0, object0);
+		final @NonNull List<String> list1 = Objects.requireNonNull(Arrays.asList("d"));
+		final Node<Object> node1 = new Node<Object>("b", list1, object1);
+		final @NonNull List<String> list2 = Objects.requireNonNull(Arrays.asList("b"));
+		final Node<Object> node2 = new Node<Object>("c", list2, object2);
 		try {
 			new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
 			Assert.fail("Expected Exception");
@@ -69,6 +76,11 @@ public class DependencyResolverTest {
 		}
 	}
 
+	@SafeVarargs
+	private static final <O> @NonNull List<O> asList(O... pElements) {
+		return Objects.requireNonNull(Arrays.asList(pElements));
+	}
+
 	/** Test case for detecting a circular dependency.
 	 */
 	@Test
@@ -76,9 +88,9 @@ public class DependencyResolverTest {
 		final Object object0 = new Object();
 		final Object object1 = new Object();
 		final Object object2 = new Object();
-		final Node<Object> node0 = new Node<Object>("a", Arrays.asList("c"), object0);
-		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
-		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		final Node<Object> node0 = new Node<Object>("a", asList("c"), object0);
+		final Node<Object> node1 = new Node<Object>("b", asList("a"), object1);
+		final Node<Object> node2 = new Node<Object>("c", asList("b"), object2);
 		try {
 			new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
 			Assert.fail("Expected Exception");
@@ -98,9 +110,9 @@ public class DependencyResolverTest {
 		final Object object0 = new Object();
 		final Object object1 = new Object();
 		final Object object2 = new Object();
-		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
-		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
-		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		final Node<Object> node0 = new Node<Object>("a", asList(), object0);
+		final Node<Object> node1 = new Node<Object>("b", asList("a"), object1);
+		final Node<Object> node2 = new Node<Object>("c", asList("b"), object2);
 		final List<Node<Object>> nodes;
 		nodes = new DependencyResolver().resolve(Arrays.asList(node0, node1, node2));
 		Assert.assertEquals(3, nodes.size());
@@ -116,9 +128,9 @@ public class DependencyResolverTest {
 		final Object object0 = new Object();
 		final Object object1 = new Object();
 		final Object object2 = new Object();
-		final Node<Object> node0 = new Node<Object>("a", Arrays.asList(), object0);
-		final Node<Object> node1 = new Node<Object>("b", Arrays.asList("a"), object1);
-		final Node<Object> node2 = new Node<Object>("c", Arrays.asList("b"), object2);
+		final Node<Object> node0 = new Node<Object>("a", asList(), object0);
+		final Node<Object> node1 = new Node<Object>("b", asList("a"), object1);
+		final Node<Object> node2 = new Node<Object>("c", asList("b"), object2);
 		final List<Node<Object>> nodes;
 		nodes = new DependencyResolver().resolve(Arrays.asList(node2, node1, node0));
 		Assert.assertEquals(3, nodes.size());

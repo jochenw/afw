@@ -8,7 +8,6 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,6 +16,7 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.log.app.IAppLog.Level;
+import com.github.jochenw.afw.core.util.Streams;
 
 /**
  * @author jwi
@@ -55,7 +55,7 @@ public class DefaultAppLogTest {
 		}
 		{
 			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			try (DefaultAppLog dal = new DefaultAppLog(Level.DEBUG, StandardCharsets.UTF_8, "\n", baos)) {
+			try (DefaultAppLog dal = new DefaultAppLog(Level.DEBUG, Streams.UTF_8, "\n", baos)) {
 				dal.info("This is a log message.");
 				dal.debug("This is another log message.");
 				dal.error("This is the third log message.");
@@ -67,7 +67,7 @@ public class DefaultAppLogTest {
 		}
 		{
 			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			try (DefaultAppLog dal = new DefaultAppLog(Level.INFO, StandardCharsets.UTF_8, "\r\n", baos)) {
+			try (DefaultAppLog dal = new DefaultAppLog(Level.INFO, Streams.UTF_8, "\r\n", baos)) {
 				dal.info("This is a log message.");
 				dal.debug("This is another log message.");
 				dal.error("This is the third log message.");

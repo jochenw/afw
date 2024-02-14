@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Properties;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.log.ILogFactory;
@@ -22,6 +23,7 @@ import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
 import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
 import com.github.jochenw.afw.core.props.IPropertyFactory;
 import com.github.jochenw.afw.core.util.MutableBoolean;
+import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Streams;
 import com.github.jochenw.afw.di.api.Application;
 import com.github.jochenw.afw.di.api.Module;
@@ -31,12 +33,15 @@ import com.github.jochenw.afw.di.api.Scopes;
 /** Test suite for the {@link JdbcHelper}.
  */
 public class JdbcHelperTest {
+	private static final @NonNull ZoneId ZONEID_EUROPE_BERLIN = Objects.requireNonNull(ZoneId.of("Europe/Berlin"));
+	private static final @NonNull ZoneId ZONEID_GMT = Objects.requireNonNull(ZoneId.of("GMT"));
+
 	private Application getApplication(Module pModule) {
 		return Application.of((b) -> {
 			b.bind(JdbcHelper.class).in(Scopes.SINGLETON);
 			b.bind(Worker.class).in(Scopes.SINGLETON);
-			b.bind(ZoneId.class).toInstance(ZoneId.of("Europe/Berlin"));
-			b.bind(ZoneId.class, "db").toInstance(ZoneId.of("GMT"));
+			b.bind(ZoneId.class).toInstance(ZONEID_EUROPE_BERLIN);
+			b.bind(ZoneId.class, "db").toInstance(ZONEID_GMT);
 			b.bind(Dialect.class, "h2").to(H2Dialect.class);
 			b.bind(ConnectionProvider.class).to(DefaultConnectionProvider.class).in(Scopes.SINGLETON);
 			if (pModule != null) {
