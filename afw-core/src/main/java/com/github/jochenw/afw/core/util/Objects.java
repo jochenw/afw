@@ -22,6 +22,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -30,12 +36,14 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
+import com.github.jochenw.afw.di.util.Reflection;
 
 
 /** Utility class for working with objects. (Working with objects is
@@ -448,5 +456,76 @@ public class Objects {
 	 */
 	public static boolean isNull(Object pObject) {
 		return pObject == null;
+	}
+
+	/** Returns an array of all the values in the given Enumeration class.
+	 * Basically equivalent to invoking the static method {@code values()}
+	 * in the enumeration class.
+	 * @param <E> The Enumeration class, which is being queried for instances.
+	 * @param pType The Enumeration class, which is being queried for instances.
+	 * @return An array of all instances in the Enumeration class.
+	 */
+	public static <E extends Enum<E>> @NonNull E[] enumValues(@NonNull Class<E> pType) {
+		final Class<E> type = Objects.requireNonNull(pType, "Type");
+		final Lookup lookup = MethodHandles.lookup();
+		final Class<?> enumArrayType = Array.newInstance(type, 0).getClass();
+		MethodType valuesMethodType = MethodType.methodType(enumArrayType, new Class<?>[0]);
+		try {
+			final MethodHandle valuesMethodHandle = lookup.findStatic(type, "values", valuesMethodType);
+			final @NonNull E[] values = (@NonNull E[]) valuesMethodHandle.invoke();
+			return values;
+		} catch (Throwable t) {
+			throw Exceptions.show(t);
+		}
+	}
+
+	/** Returns a string with all the names in the given Enumeration class.
+	 * Basically equivalent to invoking the static method {@code values()}
+	 * in the enumeration class, and then joining the names 
+	 * @param <E> The Enumeration class, which is being queried for instances.
+	 * @param pType The Enumeration class, which is being queried for instances.
+	 * @param pSeparator An optional separator, that is used two separate
+	 *   consecutive names.
+	 * @return An array of all instances in the Enumeration class.
+	 */
+	public static <E extends Enum<E>> @NonNull String enumNamesAsString(@NonNull Class<E> pType, String pSeparator) {
+		final E[] values = enumValues(pType);
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0;  i < values.length;  i++) {
+			if (i > 0  &&  pSeparator != null) {
+				sb.append(pSeparator);
+			}
+			sb.append(values[i].name());
+		}
+		return sb.toString();
+	}
+
+	/** Searches for an instance of the given enumeration type with the given name.
+	 * Same as {@link Enum#valueOf(Class, String)}, except that this one is case
+	 * insensitive.
+	 * @param <E> The enumeration type.
+	 * @param pType The enumeration type
+	 * @param pName Name of the instance, that is being returned.
+	 * @return The requested instance. Never null, an {@link IllegalArgumentException}
+	 * is thrown in case of an invalid name.
+	 * @throws NullPointerException Either of the arguments is null.
+	 * @throws IllegalArgumentException The {@code pName} is invalid,
+	 *   and no matching instance was found.
+	 */
+	public static <E extends Enum<E>> E valueOf(@NonNull Class<E> pType, @NonNull String pName) {
+		final @NonNull Class<E> type = requireNonNull(pType, "Enum Type");
+		final @NonNull String name = requireNonNull(pName, "Enum Name");
+		try {
+			return Enum.valueOf(type, name);
+		} catch (IllegalArgumentException e) {
+			for (E instance : enumValues(pType)) {
+				if (pName.equalsIgnoreCase(instance.name())) {
+					return instance;
+				}
+			}
+			throw new IllegalArgumentException("Invalid name for an instance of "
+					+ type.getName() + ": Expected "
+					+ enumNamesAsString(type, "|") + ", got " + name);
+		}
 	}
 }

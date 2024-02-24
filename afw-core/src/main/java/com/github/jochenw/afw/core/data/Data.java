@@ -14,6 +14,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
+import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.Objects;
 
 /** Utility class for working with data objects.
@@ -269,7 +270,44 @@ public class Data {
 		public @Nullable Boolean getBoolean(@NonNull O pData, @NonNull String pKey) {
 			return getBoolean(pData, pKey, "Map key " + pKey);
 		}
+
+		/** Extracts an enumeration value from the given data store.
+		 * @param pData The data store, from which a value is being extracted.
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The extracted value, if available, or null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 */
+		public @Nullable <E extends Enum<E>> O getEnum(@NonNull O pData,
+				                                       @NonNull Class<E> pType,
+				                                       @NonNull String pKey,
+				                                       @Nullable String pDescription) {
+			final Object value = getValue(pData, pKey);
+			try {
+				return Data.convert(pType, value);
+			} catch (IllegalArgumentException e) {
+				final String enumValues = Objects.enumNamesAsString(pType, "|");
+				throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+						+ ": Expected " + enumValues + ", got " + value);
+			}
+		}
 	}
+
+	private static <E extends Enum<E>> E convert(@NonNull Class<E> pType, String pValue) {
+		if (pValue == null) {
+			return null;
+		} else if (pValue instanceof String) {
+			final String s = (String) pValue;
+			try {
+				return Enum.valueOf(pType, pValue);
+			} catch (IllegalArgumentException e) {
+				return Objects.valueOf(pType, pValue, true);
+			}
+		}
+	}
+
 	/**
 	 * Same as {@link Data.Accessor}, except that the data store
 	 * is embedded, and not supplied as a parameter. In other

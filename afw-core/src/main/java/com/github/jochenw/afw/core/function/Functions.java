@@ -26,6 +26,8 @@ import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
@@ -1034,6 +1036,33 @@ public class Functions {
 				} catch (Throwable t) {
 					throw Exceptions.show(th);
 				}
+			}
+		}
+	}
+
+	/** Asserts, that a {@link FailableRunnable} throws an expected Exception.
+	 * @param pErrorType Type of the expected Exception.
+	 * @param pErrorMessage Expected error message.
+	 * @param pRunnable The piece of code, that is being executed.
+	 * @throws IllegalStateException The {@code pRunnable} was executed
+	 *   without errors, or the error message was unexpected.
+	 * @throws RuntimeException An unexpected error occurred, while executing the
+	 *   {@code pRunnable}, and is being rethrown.
+	 */
+	public static <T extends Throwable> void assertFail(Class<T> pErrorType,
+			                                            String pErrorMessage,
+			                                            FailableRunnable<?> pRunnable) {
+		try {
+			pRunnable.run();
+			throw new IllegalStateException("Expected Exception was not thrown.");
+		} catch (Throwable th) {
+			if (pErrorType == th.getClass()) {
+				if (pErrorMessage != null  &&  !pErrorMessage.equals(th.getMessage())) {
+					throw new IllegalStateException("Expected error message to be"
+							+ "'" + pErrorMessage + "', got '" + th.getMessage() + "'");
+				}
+			} else {
+				throw Exceptions.show(th);
 			}
 		}
 	}
