@@ -9,12 +9,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.data.Data.Accessible;
 import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
+import com.github.jochenw.afw.core.data.Data.InvalidDataTypeException;
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Tests;
 
@@ -32,6 +37,10 @@ public class DataTest {
 		map.put("answer", Integer.valueOf(42));
 		map.put("test", Boolean.TRUE);
 		map.put("b", "true");
+		map.put("level0", "DEBUG");
+		map.put("level1", "Trace");
+		map.put("level2", Level.INFO);
+		map.put("level3", Objects.fakeNonNull());
 		return map;
 	}
 
@@ -40,7 +49,11 @@ public class DataTest {
 	 */
 	protected @NonNull Properties getProperties() {
 		final Properties props = new Properties();
-		props.putAll(getMap());
+		getMap().forEach((k,v) -> {
+			if (v != null) {
+				props.put(k, v);
+			}
+		});
 		return props;
 	}
 
@@ -772,5 +785,166 @@ public class DataTest {
 		} catch (IllegalArgumentException e) {
 			assertEquals("Empty value for parameter empt", e.getMessage());
 		}
+	}
+
+	/** Test case for {@link Data.Accessor#getEnum(Object, Class, String, String)}.
+	 */
+	@Test
+	public void testAccessorGetEnumObjectClassStringString() {
+		final @NonNull Map<String,Object> map = getMap();
+		assertSame(Level.DEBUG, Data.MAP_ACCESSOR.getEnum(map, Level.class, "level0", "level0"));
+		assertSame(Level.TRACE, Data.MAP_ACCESSOR.getEnum(map, Level.class, "level1", "level1"));
+		assertSame(Level.INFO, Data.MAP_ACCESSOR.getEnum(map, Level.class, "level2", "level2"));
+		assertNull(Data.MAP_ACCESSOR.getEnum(map, Level.class, "level3", "level3"));		
+		Functions.assertFail(NullPointerException.class, "Data",
+				() -> Data.MAP_ACCESSOR.getEnum(Objects.fakeNonNull(), Level.class, "level0", "level0"));
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> Data.MAP_ACCESSOR.getEnum(map, Objects.fakeNonNull(), "level0", "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> Data.MAP_ACCESSOR.getEnum(map, Level.class, Objects.fakeNonNull(), "level0"));
+		assertSame(Level.DEBUG, Data.MAP_ACCESSOR.getEnum(map, Level.class, "level0", null));
+		Functions.assertFail(IllegalArgumentException.class,
+	             "Invalid value for parameter foo: Expected "
+	             + Objects.enumNamesAsString(Level.class, "|")
+	             + ", got bar",
+	             () -> Data.MAP_ACCESSOR.getEnum(map, Level.class, "foo", "foo"));
+		Functions.assertFail(InvalidDataTypeException.class,
+	             "Invalid value for parameter answer: Expected "
+	             + Level.class.getName()
+	             + ", got java.lang.Integer, 42",
+	             () -> Data.MAP_ACCESSOR.getEnum(map, Level.class, "answer", "answer"));
+	}
+
+	/** Test case for {@link Data.Accessor#getEnum(Object, Class, String)}.
+	 */
+	@Test
+	public void testAccessorGetEnumObjectClassString() {
+		final @NonNull Map<String,Object> map = getMap();
+		assertSame(Level.DEBUG, Data.MAP_ACCESSOR.getEnum(map, Level.class, "level0"));
+		assertSame(Level.TRACE, Data.MAP_ACCESSOR.getEnum(map, Level.class, "level1"));
+		assertSame(Level.INFO, Data.MAP_ACCESSOR.getEnum(map, Level.class, "level2"));
+		assertNull(Data.MAP_ACCESSOR.getEnum(map, Level.class, "level3"));		
+		Functions.assertFail(NullPointerException.class, "Data",
+				() -> Data.MAP_ACCESSOR.getEnum(Objects.fakeNonNull(), Level.class, "level0"));
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> Data.MAP_ACCESSOR.getEnum(map, Objects.fakeNonNull(), "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> Data.MAP_ACCESSOR.getEnum(map, Level.class, Objects.fakeNonNull()));
+	}
+
+	/** Test case for {@link Data.Accessor#requireEnum(Object, Class, String, String)}.
+	 */
+	@Test
+	public void testAccessorRequireEnumObjectClassStringString() {
+		final @NonNull Map<String,Object> map = getMap();
+		assertSame(Level.DEBUG, Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level0", "level0"));
+		assertSame(Level.TRACE, Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level1", "level1"));
+		assertSame(Level.INFO, Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level2", "level2"));
+		Functions.assertFail(NoSuchElementException.class,
+				"Missing value for parameter level3",
+				() -> Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level3", "level3"));
+		Functions.assertFail(NullPointerException.class, "Data",
+				() -> Data.MAP_ACCESSOR.requireEnum(Objects.fakeNonNull(), Level.class, "level0", "level0"));
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> Data.MAP_ACCESSOR.requireEnum(map, Objects.fakeNonNull(), "level0", "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> Data.MAP_ACCESSOR.requireEnum(map, Level.class, Objects.fakeNonNull(), "level0"));
+	}
+
+	/** Test case for {@link Data.Accessor#requireEnum(Object, Class, String)}.
+	 */
+	@Test
+	public void testAccessorRequireEnumObjectClassString() {
+		final @NonNull Map<String,Object> map = getMap();
+		assertSame(Level.DEBUG, Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level0"));
+		assertSame(Level.TRACE, Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level1"));
+		assertSame(Level.INFO, Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level2"));
+		Functions.assertFail(NoSuchElementException.class,
+				"Missing value for parameter level3",
+				() -> Data.MAP_ACCESSOR.requireEnum(map, Level.class, "level3"));
+		Functions.assertFail(NullPointerException.class, "Data",
+				() -> Data.MAP_ACCESSOR.requireEnum(Objects.fakeNonNull(), Level.class, "level0"));
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> Data.MAP_ACCESSOR.requireEnum(map, Objects.fakeNonNull(), "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> Data.MAP_ACCESSOR.requireEnum(map, Level.class, Objects.fakeNonNull()));
+	}
+
+	/** Test case for {@link Data.Accessible#getEnum(Class, String, String)}.
+	 */
+	@Test
+	public void testAccessibleGetEnumClassStringString() {
+		final @NonNull Map<String,Object> map = getMap();
+		final Accessible acc = new Accessible(map::get);
+		assertSame(Level.DEBUG, acc.getEnum(Level.class, "level0", "level0"));
+		assertSame(Level.TRACE, acc.getEnum(Level.class, "level1", "level1"));
+		assertSame(Level.INFO, acc.getEnum(Level.class, "level2", "level2"));
+		assertNull(acc.getEnum(Level.class, "level3", "level3"));		
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> acc.getEnum(Objects.fakeNonNull(), "level0", "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> acc.getEnum(Level.class, Objects.fakeNonNull(), "level0"));
+		assertSame(Level.DEBUG, acc.getEnum(Level.class, "level0", null));
+		Functions.assertFail(IllegalArgumentException.class,
+	             "Invalid value for parameter foo: Expected "
+	             + Objects.enumNamesAsString(Level.class, "|")
+	             + ", got bar",
+	             () -> acc.getEnum(Level.class, "foo", "foo"));
+		Functions.assertFail(InvalidDataTypeException.class,
+	             "Invalid value for parameter answer: Expected "
+	             + Level.class.getName()
+	             + ", got java.lang.Integer, 42",
+	             () -> acc.getEnum(Level.class, "answer", "answer"));
+	}
+
+	/** Test case for {@link Data.Accessible#getEnum(Class, String)}.
+	 */
+	@Test
+	public void testAccessibleGetEnumClassString() {
+		final @NonNull Map<String,Object> map = getMap();
+		final Accessible acc = new Accessible(map::get);
+		assertSame(Level.DEBUG, acc.getEnum(Level.class, "level0"));
+		assertSame(Level.TRACE, acc.getEnum(Level.class, "level1"));
+		assertSame(Level.INFO, acc.getEnum(Level.class, "level2"));
+		assertNull(acc.getEnum(Level.class, "level3"));		
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> acc.getEnum(Objects.fakeNonNull(), "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> acc.getEnum(Level.class, Objects.fakeNonNull()));
+	}
+
+	/** Test case for {@link Data.Accessible#requireEnum(Class, String, String)}.
+	 */
+	@Test
+	public void testAccessibleRequireEnumClassStringString() {
+		final @NonNull Map<String,Object> map = getMap();
+		final Accessible acc = new Accessible(map::get);
+		assertSame(Level.DEBUG, acc.requireEnum(Level.class, "level0", "level0"));
+		assertSame(Level.TRACE, acc.requireEnum(Level.class, "level1", "level1"));
+		assertSame(Level.INFO, acc.requireEnum(Level.class, "level2", "level2"));
+		Functions.assertFail(NoSuchElementException.class,
+				"Missing value for parameter level3",
+				() -> acc.requireEnum(Level.class, "level3", "level3"));
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> acc.requireEnum(Objects.fakeNonNull(), "level0", "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> acc.requireEnum(Level.class, Objects.fakeNonNull(), "level0"));
+	}
+	/** Test case for {@link Data.Accessible#requireEnum(Class, String)}.
+	 */
+	@Test
+	public void testAccessibleRequireEnumClassString() {
+		final @NonNull Map<String,Object> map = getMap();
+		final Accessible acc = new Accessible(map::get);
+		assertSame(Level.DEBUG, acc.requireEnum(Level.class, "level0"));
+		assertSame(Level.TRACE, acc.requireEnum(Level.class, "level1"));
+		assertSame(Level.INFO, acc.requireEnum(Level.class, "level2"));
+		Functions.assertFail(NoSuchElementException.class,
+				"Missing value for parameter level3",
+				() -> acc.requireEnum(Level.class, "level3"));
+		Functions.assertFail(NullPointerException.class, "Type",
+				() -> acc.requireEnum(Objects.fakeNonNull(), "level0"));
+		Functions.assertFail(NullPointerException.class, "Key",
+				() -> acc.requireEnum(Level.class, Objects.fakeNonNull()));
 	}
 }

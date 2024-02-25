@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -14,8 +15,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
-import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.Objects;
+
 
 /** Utility class for working with data objects.
  */
@@ -40,7 +41,7 @@ public class Data {
 		 * @return The value, which has been retrieved.
 		 */
 		public @Nullable Object getValue(@NonNull O pData, @NonNull String pKey) {
-			final O object = Objects.requireNonNull(pData, "Object");
+			final O object = Objects.requireNonNull(pData, "Data");
 			final String key = Objects.requireNonNull(pKey, "Key");
 			return function.apply(object, key);
 		}
@@ -276,35 +277,156 @@ public class Data {
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Description of the requested parameter.
+		 *   May be null, in which case the {@code pKey} is being used.
 		 * @return The extracted value, if available, or null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
 		 *   into the enumeration type.
 		 */
-		public @Nullable <E extends Enum<E>> O getEnum(@NonNull O pData,
+		public @Nullable <E extends Enum<E>> E getEnum(@NonNull O pData,
 				                                       @NonNull Class<E> pType,
 				                                       @NonNull String pKey,
 				                                       @Nullable String pDescription) {
+			Objects.requireNonNull(pType, "Type");
 			final Object value = getValue(pData, pKey);
 			try {
-				return Data.convert(pType, value);
+				@SuppressWarnings("null")
+				final E v = (E) Data.convert(pType, value, Objects.notNull(pDescription, pKey));
+				return v;
+			} catch (InvalidDataTypeException e) {
+				throw e;
 			} catch (IllegalArgumentException e) {
 				final String enumValues = Objects.enumNamesAsString(pType, "|");
 				throw new IllegalArgumentException("Invalid value for parameter " + pDescription
 						+ ": Expected " + enumValues + ", got " + value);
 			}
 		}
+	
+		/** Extracts an enumeration value from the given data store.
+		 * This is equivalent to calling
+		 * <pre>
+		 *   getEnum(pData, pType, pKey, pKey);
+		 * </pre>
+		 * @param pData The data store, from which a value is being extracted.
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The extracted value, if available, or null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 */
+		public @Nullable <E extends Enum<E>> E getEnum(@NonNull O pData,
+				                                       @NonNull Class<E> pType,
+				                                       @NonNull String pKey) {
+			return getEnum(pData, pType, pKey, pKey);
+		}
+
+		/** Extracts a non-null enumeration value from the given data store.
+		 * @param pData The data store, from which a value is being extracted.
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Description of the requested parameter.
+		 *   May be null, in which case the {@code pKey} is being used.
+		 * @return The extracted value, if available. Never null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 * @throws NoSuchElementException The requested value is null,
+		 *   or missing.
+		 * @throws NullPointerException Either of the required parameters
+		 * ({@code pData}, {@code pType}, or {@code pKey}) is null
+		 */
+		public @NonNull <E extends Enum<E>> E requireEnum(@NonNull O pData,
+				                                          @NonNull Class<E> pType,
+				                                          @NonNull String pKey,
+				                                          @Nullable String pDescription)
+				throws NoSuchElementException, IllegalArgumentException,
+		               NullPointerException {
+			final @Nullable E e = getEnum(pData, pType, pKey, pDescription);
+			if (e == null) {
+				throw new NoSuchElementException("Missing value for parameter " + pDescription);
+			}
+			final @NonNull E result = e;
+			return result;
+		}
+	
+		/** Extracts a non-null enumeration value from the given data store.
+		 * This is equivalent to
+		 * <pre>
+		 *   requireEnum(pData, pType, pKey, pKey)
+		 * </pre>
+		 * @param pData The data store, from which a value is being extracted.
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The extracted value, if available. Never null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 * @throws NoSuchElementException The requested value is null,
+		 *   or missing.
+		 * @throws NullPointerException Either of the required parameters
+		 * ({@code pData}, {@code pType}, or {@code pKey}) is null
+		 */
+		public @NonNull <E extends Enum<E>> E requireEnum(@NonNull O pData,
+				                                          @NonNull Class<E> pType,
+				                                          @NonNull String pKey)
+				throws NoSuchElementException, IllegalArgumentException,
+		               NullPointerException {
+			return requireEnum(pData, pType, pKey, pKey);
+		}
 	}
 
-	private static <E extends Enum<E>> E convert(@NonNull Class<E> pType, String pValue) {
+	public static class InvalidDataTypeException extends IllegalArgumentException {
+		private static final long serialVersionUID = -504168013115790559L;
+
+		/** Creates a new instance without error message, and cause.
+		 */
+		public InvalidDataTypeException() {
+			super();
+		}
+
+		/** Creates a new instance with the given error message,
+		 * and cause.
+		 * @param pMessage The error message.
+		 * @param pCause The exceptions cause.
+		 */
+		public InvalidDataTypeException(String pMessage, Throwable pCause) {
+			super(pMessage, pCause);
+		}
+
+		/** Creates a new instance with the given error message,
+		 * but without cause.
+		 * @param pMessage The error message.
+		 */
+		public InvalidDataTypeException(String pMessage) {
+			super(pMessage);
+		}
+
+		/** Creates a new instance with the given cause.
+		 * @param pCause The exceptions cause.
+		 */
+		public InvalidDataTypeException(Throwable pCause) {
+			super(pCause);
+		}
+	}
+	
+	private static <E extends Enum<E>> @Nullable E convert(@NonNull Class<E> pType,
+			                                     Object pValue, @NonNull String pDescription) {
 		if (pValue == null) {
 			return null;
 		} else if (pValue instanceof String) {
 			final String s = (String) pValue;
 			try {
-				return Enum.valueOf(pType, pValue);
+				return Enum.valueOf(pType, s);
 			} catch (IllegalArgumentException e) {
-				return Objects.valueOf(pType, pValue, true);
+				return Objects.valueOf(pType, s);
 			}
+		} else if (pType.isAssignableFrom(pValue.getClass())) {
+			return pType.cast(pValue);
+		} else {
+			throw new InvalidDataTypeException("Invalid value for parameter "
+					+ pDescription + ": Expected " + pType.getName() + ", got "
+					+ pValue.getClass().getName() + ", " + pValue);
 		}
 	}
 
@@ -586,6 +708,101 @@ public class Data {
 			}
 			final @NonNull O o2 = o;
 			return o2;
+		}
+	
+		/** Extracts an enumeration value from the data store.
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Description of the requested parameter.
+		 *   May be null, in which case the {@code pKey} is being used.
+		 * @return The extracted value, if available, or null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 */
+		public @Nullable <E extends Enum<E>> E getEnum(@NonNull Class<E> pType,
+				                                       @NonNull String pKey,
+				                                       @Nullable String pDescription) {
+			Objects.requireNonNull(pType, "Type");
+			final Object value = getValue(pKey);
+			try {
+				@SuppressWarnings("null")
+				final E v = (E) Data.convert(pType, value, Objects.notNull(pDescription, pKey));
+				return v;
+			} catch (InvalidDataTypeException e) {
+				throw e;
+			} catch (IllegalArgumentException e) {
+				final String enumValues = Objects.enumNamesAsString(pType, "|");
+				throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+						+ ": Expected " + enumValues + ", got " + value);
+			}
+		}
+	
+		/** Extracts an enumeration value from the data store.
+		 * This is equivalent to calling
+		 * <pre>
+		 *   getEnum(pType, pKey, pKey);
+		 * </pre>
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The extracted value, if available, or null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 */
+		public @Nullable <E extends Enum<E>> E getEnum(@NonNull Class<E> pType,
+				                                       @NonNull String pKey) {
+			return getEnum(pType, pKey, pKey);
+		}
+
+		/** Extracts a non-null enumeration value from the data store.
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Description of the requested parameter.
+		 *   May be null, in which case the {@code pKey} is being used.
+		 * @return The extracted value, if available, or null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 * @throws NullPointerException Either of the required parameters
+		 * ({@code pType}, or {@code pKey}) is null.
+		 * @throws NoSuchElementException The requested value is
+		 *    missing, or null.
+		 */
+		public <E extends Enum<E>> @NonNull E requireEnum(@NonNull Class<E> pType,
+				                                          @NonNull String pKey,
+				                                          @Nullable String pDescription)
+		        throws IllegalArgumentException, NullPointerException,
+		               NoSuchElementException {
+			final @Nullable E e = getEnum(pType, pKey, pDescription);
+			if (e == null) {
+				throw new NoSuchElementException("Missing value for parameter " + pDescription);
+			} else {
+				return e;
+			}
+		}
+
+		/** Extracts a non-null enumeration value from the data store.
+		 * This is equivalent to
+		 * <pre>
+		 *   requireEnum(pType, pKey, pKey)
+		 * </pre>
+		 * @param pType The enumeration type, to which the extracted value must
+		 *   be converted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @return The extracted value, if available. Never null.
+		 * @throws IllegalArgumentException The extracted value cannot be converted
+		 *   into the enumeration type.
+		 * @throws NoSuchElementException The requested value is null,
+		 *   or missing.
+		 * @throws NullPointerException Either of the required parameters
+		 * ({@code pData}, {@code pType}, or {@code pKey}) is null
+		 */
+		public <E extends Enum<E>> @NonNull E requireEnum(@NonNull Class<E> pType,
+				                                          @NonNull String pKey)
+				throws NoSuchElementException, IllegalArgumentException,
+		               NullPointerException {
+			return requireEnum(pType, pKey, pKey);
 		}
 	}
 
