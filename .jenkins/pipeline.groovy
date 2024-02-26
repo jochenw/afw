@@ -27,15 +27,19 @@ pipeline {
                 }
             }
         }
-		stage ('collect profiler data') {
-		    steps {
-                step( [ $class: 'JacocoPublisher' ] )
-			}
-		}
-		stage ('Collect JavaDocs') {
-		    steps {
-		        javadoc(javadocDir: './afw-core/target/site/apidocs', keepAll: false)
-		    }
-		}
+	stage ('collect profiler data') {
+	    steps {
+                # step( [ $class: 'JacocoPublisher' ] )
+		jacoco(execPattern: '**/*.exec',
+		       classPattern: '**/target/classes/**',
+		       exclusionPattern: '**/com/github/jochenw/afw/core/el/jcc/*.class')
+	    }
+	}
+	stage ('Collect JavaDocs') {
+	    steps {
+		javadoc(javadocDir: './afw-core/target/site/apidocs',
+			keepAll: false)
+	    }
+	}
     }
 }
