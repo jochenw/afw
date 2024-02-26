@@ -226,9 +226,9 @@
         <scope>provided</scope>
     </dependency>
     <dependency>
-    	<groupId>com.github.jochenw.afw</groupId>
+    	<groupId>${project.groupId}</groupId>
     	<artifactId>afw-di</artifactId>
-    	<version>0.8.1-SNAPSHOT</version>
+    	<version>${project.version}</version>
     </dependency>
     <dependency>
         <groupId>org.apache.httpcomponents.core5</groupId>

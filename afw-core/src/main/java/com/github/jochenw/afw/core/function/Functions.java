@@ -26,8 +26,6 @@ import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import org.jspecify.annotations.NonNull;
-
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
@@ -1042,6 +1040,7 @@ public class Functions {
 
 	/** Asserts, that a {@link FailableRunnable} throws an expected Exception.
 	 * @param pErrorType Type of the expected Exception.
+	 * @param <T> Type of the expected Exception.
 	 * @param pErrorMessage Expected error message.
 	 * @param pRunnable The piece of code, that is being executed.
 	 * @throws IllegalStateException The {@code pRunnable} was executed

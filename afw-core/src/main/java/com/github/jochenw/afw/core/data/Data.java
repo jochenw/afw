@@ -274,6 +274,8 @@ public class Data {
 
 		/** Extracts an enumeration value from the given data store.
 		 * @param pData The data store, from which a value is being extracted.
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
@@ -281,7 +283,11 @@ public class Data {
 		 *   May be null, in which case the {@code pKey} is being used.
 		 * @return The extracted value, if available, or null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
+		 * @throws NullPointerException Either of the required parameters
+		 *   ({@code pData}, {@code pType}, or {@code pKey}) is null
 		 */
 		public @Nullable <E extends Enum<E>> E getEnum(@NonNull O pData,
 				                                       @NonNull Class<E> pType,
@@ -308,12 +314,18 @@ public class Data {
 		 *   getEnum(pData, pType, pKey, pKey);
 		 * </pre>
 		 * @param pData The data store, from which a value is being extracted.
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The extracted value, if available, or null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
+		 * @throws NullPointerException Either of the required parameters
+		 *   ({@code pData}, {@code pType}, or {@code pKey}) is null
 		 */
 		public @Nullable <E extends Enum<E>> E getEnum(@NonNull O pData,
 				                                       @NonNull Class<E> pType,
@@ -323,6 +335,8 @@ public class Data {
 
 		/** Extracts a non-null enumeration value from the given data store.
 		 * @param pData The data store, from which a value is being extracted.
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
@@ -330,11 +344,13 @@ public class Data {
 		 *   May be null, in which case the {@code pKey} is being used.
 		 * @return The extracted value, if available. Never null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
 		 * @throws NoSuchElementException The requested value is null,
 		 *   or missing.
 		 * @throws NullPointerException Either of the required parameters
-		 * ({@code pData}, {@code pType}, or {@code pKey}) is null
+		 *   ({@code pData}, {@code pType}, or {@code pKey}) is null
 		 */
 		public @NonNull <E extends Enum<E>> E requireEnum(@NonNull O pData,
 				                                          @NonNull Class<E> pType,
@@ -356,16 +372,20 @@ public class Data {
 		 *   requireEnum(pData, pType, pKey, pKey)
 		 * </pre>
 		 * @param pData The data store, from which a value is being extracted.
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The extracted value, if available. Never null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
 		 * @throws NoSuchElementException The requested value is null,
 		 *   or missing.
 		 * @throws NullPointerException Either of the required parameters
-		 * ({@code pData}, {@code pType}, or {@code pKey}) is null
+		 *   ({@code pData}, {@code pType}, or {@code pKey}) is null
 		 */
 		public @NonNull <E extends Enum<E>> E requireEnum(@NonNull O pData,
 				                                          @NonNull Class<E> pType,
@@ -376,6 +396,19 @@ public class Data {
 		}
 	}
 
+	/** Exception class, which is thrown by the data methods for requesting
+	 * an enumeration instance. These include, in particular:
+	 * <ul>
+	 *   <li>{@link Data.Accessible#getEnum(Class, String)}</li>
+	 *   <li>{@link Data.Accessible#getEnum(Class, String, String)}</li>
+	 *   <li>{@link Data.Accessible#requireEnum(Class, String)}</li>
+	 *   <li>{@link Data.Accessible#requireEnum(Class, String, String)}</li>
+	 *   <li>{@link Data.Accessor#getEnum(Object, Class, String)}</li>
+	 *   <li>{@link Data.Accessor#getEnum(Object, Class, String, String)}</li>
+	 *   <li>{@link Data.Accessor#requireEnum(Object, Class, String)}</li>
+	 *   <li>{@link Data.Accessor#requireEnum(Object, Class, String, String)}</li>
+	 * </ul>
+	 */
 	public static class InvalidDataTypeException extends IllegalArgumentException {
 		private static final long serialVersionUID = -504168013115790559L;
 
@@ -711,6 +744,8 @@ public class Data {
 		}
 	
 		/** Extracts an enumeration value from the data store.
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
@@ -718,7 +753,11 @@ public class Data {
 		 *   May be null, in which case the {@code pKey} is being used.
 		 * @return The extracted value, if available, or null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
+		 * @throws NullPointerException Either of the required parameters
+		 *   ({@code pType}, or {@code pKey}) is null
 		 */
 		public @Nullable <E extends Enum<E>> E getEnum(@NonNull Class<E> pType,
 				                                       @NonNull String pKey,
@@ -743,12 +782,18 @@ public class Data {
 		 * <pre>
 		 *   getEnum(pType, pKey, pKey);
 		 * </pre>
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The extracted value, if available, or null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
+		 * @throws NullPointerException Either of the required parameters
+		 *   ({@code pType}, or {@code pKey}) is null
 		 */
 		public @Nullable <E extends Enum<E>> E getEnum(@NonNull Class<E> pType,
 				                                       @NonNull String pKey) {
@@ -756,6 +801,8 @@ public class Data {
 		}
 
 		/** Extracts a non-null enumeration value from the data store.
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
@@ -763,11 +810,15 @@ public class Data {
 		 *   May be null, in which case the {@code pKey} is being used.
 		 * @return The extracted value, if available, or null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
 		 * @throws NullPointerException Either of the required parameters
 		 * ({@code pType}, or {@code pKey}) is null.
 		 * @throws NoSuchElementException The requested value is
 		 *    missing, or null.
+		 * @throws NullPointerException Either of the required parameters
+		 *    ({@code pType}, or {@code pKey}) is null
 		 */
 		public <E extends Enum<E>> @NonNull E requireEnum(@NonNull Class<E> pType,
 				                                          @NonNull String pKey,
@@ -787,16 +838,20 @@ public class Data {
 		 * <pre>
 		 *   requireEnum(pType, pKey, pKey)
 		 * </pre>
+		 * @param <E> The enumeration type, to which the extracted value must
+		 *   be converted.
 		 * @param pType The enumeration type, to which the extracted value must
 		 *   be converted.
 		 * @param pKey The key, which is being queried in the data store.
 		 * @return The extracted value, if available. Never null.
 		 * @throws IllegalArgumentException The extracted value cannot be converted
-		 *   into the enumeration type.
+		 *   into the enumeration type, because it has an invalid string value.
+		 * @throws InvalidDataTypeException The extracted value cannot be converted
+		 *   into the enumeration type, because it has an invalid data type.
 		 * @throws NoSuchElementException The requested value is null,
 		 *   or missing.
 		 * @throws NullPointerException Either of the required parameters
-		 * ({@code pData}, {@code pType}, or {@code pKey}) is null
+		 *   ({@code pType}, or {@code pKey}) is null
 		 */
 		public <E extends Enum<E>> @NonNull E requireEnum(@NonNull Class<E> pType,
 				                                          @NonNull String pKey)
