@@ -27,9 +27,9 @@ pipeline {
                 }
             }
         }
-	stage ('collect profiler data') {
+	stage ('Collect Profiler Data') {
 	    steps {
-                # step( [ $class: 'JacocoPublisher' ] )
+                // step( [ $class: 'JacocoPublisher' ] )
 		jacoco(execPattern: '**/*.exec',
 		       classPattern: '**/target/classes/**',
 		       exclusionPattern: '**/com/github/jochenw/afw/core/el/jcc/*.class')
