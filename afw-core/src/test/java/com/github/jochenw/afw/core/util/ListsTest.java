@@ -138,7 +138,7 @@ public class ListsTest {
 		// Invalid element must trigger a ClassCastException
 		Functions.assertFail(ClassCastException.class, "List[2]: " + Boolean.class.getName(), () -> {
 			@SuppressWarnings("null")
-			final @NonNull List<Object> invalidList = List.of("a", "b", Boolean.TRUE);
+			final @NonNull List<Object> invalidList = Arrays.asList("a", "b", Boolean.TRUE);
 			Lists.toArray(invalidList, String.class);
 		});
 	}
