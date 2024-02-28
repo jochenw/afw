@@ -2,12 +2,16 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
+
+import com.github.jochenw.afw.core.function.Functions;
 
 
 /** Test suite for the {@link Lists} class.
@@ -105,4 +109,37 @@ public class ListsTest {
 		assertTrue(emptyList.isEmpty());
 	}
 
+	/** Test case for {@link Lists#toArray(Collection, Class)}.
+	 */
+	@Test
+	public void testToArray() {
+		final BiConsumer<Object[],Object[]> arrayComparator = (expect, actual) -> {
+			assertEquals(expect.length, actual.length);
+			for (int i = 0;  i < expect.length;  i++) {
+				final Object e = expect[i];
+				final Object a = actual[i];
+				if (e == null) {
+					assertNull(a);
+				} else {
+					assertEquals(e, a);
+				}
+			}
+		};
+		final Object[] expect = new Object[] {"a", "b", null};
+		@SuppressWarnings("null")
+		final @NonNull List<Object> list = Arrays.asList(expect);
+		final String[] array = Lists.toArray(list, String.class);
+		arrayComparator.accept(expect, array);
+
+		// Parameters must not be null.
+		Functions.assertFail(NullPointerException.class, "Type", () -> { Lists.toArray(list, Objects.fakeNonNull()); });
+		Functions.assertFail(NullPointerException.class, "List", () -> Lists.toArray(Objects.fakeNonNull(), String.class));
+
+		// Invalid element must trigger a ClassCastException
+		Functions.assertFail(ClassCastException.class, "List[2]: " + Boolean.class.getName(), () -> {
+			@SuppressWarnings("null")
+			final @NonNull List<Object> invalidList = List.of("a", "b", Boolean.TRUE);
+			Lists.toArray(invalidList, String.class);
+		});
+	}
 }

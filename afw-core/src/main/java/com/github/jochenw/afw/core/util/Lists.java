@@ -15,6 +15,7 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -97,5 +98,31 @@ public class Lists {
 			outputList.add(mapper.apply(pArgs[i]));
 		}
 		return outputList;
+	}
+
+	/** Converts the given list, or collection, into an array with the given element type.
+	 *  @param pList The list, which is being converted.
+	 *  @param pType The element type.
+	 *  @param <O> The element type.
+	 *  @return The result array.
+	 */
+	public static <O> O[] toArray(@NonNull Collection<?> pList, @NonNull Class<O> pType) {
+		final @NonNull Collection<?> list = Objects.requireNonNull(pList, "List");
+		final @NonNull Class<O> type = Objects.requireNonNull(pType, "Type");
+		@SuppressWarnings("unchecked")
+		final O[] array = (O[]) Array.newInstance(type, list.size());
+		int index = 0;
+		for (Object object : list) {
+			if (object == null) {
+				array[index++] = Objects.fakeNonNull();
+			} else {
+				if (pType.isAssignableFrom(object.getClass())) {
+					array[index++] = pType.cast(object);
+				} else {
+					throw new ClassCastException("List[" + index + "]: " + object.getClass().getName());
+				}
+			}
+		}
+		return array;
 	}
 }
