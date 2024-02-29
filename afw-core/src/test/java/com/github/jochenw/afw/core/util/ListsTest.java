@@ -2,6 +2,7 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -141,5 +142,26 @@ public class ListsTest {
 			final @NonNull List<Object> invalidList = Arrays.asList("a", "b", Boolean.TRUE);
 			Lists.toArray(invalidList, String.class);
 		});
+	}
+
+	/** Test case for {@link Lists#map(List, Function)}.
+	 */
+	@Test
+	public void testMap() {
+		final Function<Boolean,String> mapper = (b) -> b.toString();
+		Functions.assertFail(NullPointerException.class, "List",
+				() -> Lists.map(Objects.fakeNonNull(), mapper));
+		Functions.assertFail(NullPointerException.class, "Mapper",
+				() -> Lists.map(new ArrayList<Boolean>(), Objects.fakeNonNull()));
+		@SuppressWarnings("null")
+		final @NonNull List<Boolean> list = Arrays.asList(Boolean.TRUE, Boolean.FALSE,
+				Boolean.TRUE, Boolean.FALSE);
+		final List<String> result = Lists.map(list, mapper);
+		assertNotNull(result);
+		assertEquals(list.size(), result.size());
+		assertTrue(result instanceof ArrayList);
+		for (int i = 0;  i < list.size(); i++) {
+			assertEquals(list.get(i).toString(), result.get(i));
+		}
 	}
 }

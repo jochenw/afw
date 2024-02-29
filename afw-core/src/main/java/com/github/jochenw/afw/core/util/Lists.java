@@ -125,4 +125,22 @@ public class Lists {
 		}
 		return array;
 	}
+
+	/** Maps the given list to another list by mapping the element.
+	 * @param <I> Element type of the input list.
+	 * @param <O> Element type of the output list.
+	 * @param pList The input list.
+	 * @param pMapper A mapping function, which converts a single element
+	 * of the input list into a single element of the output list.
+	 * @return The created list.
+	 */
+	public static <I,O> List<O> map(@NonNull List<I> pList, @NonNull Function<I,O> pMapper) {
+		final List<I> list = Objects.requireNonNull(pList, "List");
+		final Function<I,O> mapper = Objects.requireNonNull(pMapper, "Mapper");
+		final List<O> result = new ArrayList<>(list.size());
+		for (I i : list) {
+			result.add(mapper.apply(i));
+		}
+		return result;
+	}
 }
