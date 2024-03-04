@@ -191,4 +191,46 @@ public class ProgressMonitor {
 		}
 		silent = true;
 	}
+
+	/** Creates a synchronized version of this {@link ProgressMonitor},
+	 * with the count reset to 0.
+	 * @return A synchronized version of this {@link ProgressMonitor},
+	 * with the count reset to 0.
+	 */
+	public ProgressMonitor synchrnzd() {
+		return new ProgressMonitor(getTotal(), getInterval(), listener) {
+			@Override
+			public synchronized void inc() {
+				super.inc();
+			}
+
+			@Override
+			public synchronized void inc(int pNumber) {
+				// TODO Auto-generated method stub
+				super.inc(pNumber);
+			}
+
+			@Override
+			public synchronized long getInterval() {
+				// TODO Auto-generated method stub
+				return super.getInterval();
+			}
+
+			@Override
+			public synchronized long getCount() {
+				// TODO Auto-generated method stub
+				return super.getCount();
+			}
+
+			@Override
+			public synchronized long getTotal() {
+				return super.getTotal();
+			}
+
+			@Override
+			public synchronized void finish() {
+				super.finish();
+			}
+		};
+	}
 }

@@ -43,6 +43,10 @@ public class ProgressMonitorTest {
 	public void testProgressMonitorLongConsumer() {
 		final Listener1 listener = new Listener1();
 		final ProgressMonitor pm = ProgressMonitor.of(5, listener);
+		runTestProgressMonitorLongConsumer(listener, pm);
+	}
+
+	private void runTestProgressMonitorLongConsumer(final Listener1 listener, final ProgressMonitor pm) {
 		for (int i = 0;  i < 9;  i++) {
 			pm.inc();
 		}
@@ -61,11 +65,15 @@ public class ProgressMonitorTest {
 	public void testProgressMonitorLongLongConsumer() {
 		final Listener1 listener = new Listener1();
 		final ProgressMonitor pm = ProgressMonitor.of(10, 3, listener);
+		runTestProgressMonitorLongLongConsumer(listener, pm);
+	}
+
+	private void runTestProgressMonitorLongLongConsumer(final Listener1 pListener, final ProgressMonitor pMonitor) {
 		for (int i = 0;  i < 9;  i++) {
-			pm.inc();
+			pMonitor.inc();
 		}
-		pm.inc();
-		final List<Object> reports = listener.reports;
+		pMonitor.inc();
+		final List<Object> reports = pListener.reports;
 		assertEquals(8, reports.size());
 		assertEquals(Integer.valueOf(1), reports.get(0));
 		assertEquals("3/10 30.00%: ", reports.get(1));
@@ -83,6 +91,10 @@ public class ProgressMonitorTest {
 	public void testProgressMonitorLongBiConsumer() {
 		final Listener2 listener = new Listener2();
 		final ProgressMonitor pm = ProgressMonitor.of(5, listener);
+		runTestProgressMonitorLongBiConsumer(listener, pm);
+	}
+
+	private void runTestProgressMonitorLongBiConsumer(final Listener2 listener, final ProgressMonitor pm) {
 		for (int i = 0;  i < 9;  i++) {
 			pm.inc();
 		}
@@ -115,10 +127,15 @@ public class ProgressMonitorTest {
 	public void testProgressMonitorLongLongBiConsumer() {
 		final Listener2 listener = new Listener2();
 		final ProgressMonitor pm = ProgressMonitor.of(10, 3, listener);
+		runTestProgressMonitorLongLongBiConsumer(listener, pm);
+		
+	}
+
+	private void runTestProgressMonitorLongLongBiConsumer(final Listener2 pListener, final ProgressMonitor pMonitor) {
 		for (int i = 0;  i < 10;  i++) {
-			pm.inc();
+			pMonitor.inc();
 		}
-		final List<Object> reports = listener.reports;
+		final List<Object> reports = pListener.reports;
 		assertEquals(16, reports.size());
 		assertEquals(Long.valueOf(3), reports.get(0));
 		assertEquals(Long.valueOf(10), reports.get(1));
@@ -136,6 +153,27 @@ public class ProgressMonitorTest {
 		assertEquals(Long.valueOf(10), reports.get(13));
 		assertEquals(Long.valueOf(3), reports.get(14));
 		assertEquals("10/10 100.00%: ", reports.get(15));
-		
+	}
+
+	/** Test case for {@link ProgressMonitor#synchrnzd()}.
+	 */
+	@Test
+	public void testSynchronzd() {
+		final Listener1 listener = new Listener1();
+		final ProgressMonitor pm = ProgressMonitor.of(5, listener).synchrnzd();
+		runTestProgressMonitorLongConsumer(listener, pm);
+
+		final Listener1 listener2 = new Listener1();
+		final ProgressMonitor pm2 = ProgressMonitor.of(10, 3, listener2).synchrnzd();
+		runTestProgressMonitorLongLongConsumer(listener2, pm2);
+
+		final Listener2 listener3 = new Listener2();
+		final ProgressMonitor pm3 = ProgressMonitor.of(5, listener3);
+		runTestProgressMonitorLongBiConsumer(listener3, pm3);
+
+		final Listener2 listener4 = new Listener2();
+		final ProgressMonitor pm4 = ProgressMonitor.of(10, 3, listener4);
+		runTestProgressMonitorLongLongBiConsumer(listener4, pm4);
+
 	}
 }
