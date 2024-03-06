@@ -112,7 +112,7 @@ public class ProgressMonitor {
 	 * total are reached.
 	 * @param pNumber The counters increment
 	 */
-	public void inc(int pNumber) {
+	public void inc(long pNumber) {
 		count += pNumber;
 		intervalCount += pNumber;
 		if (!silent) {
@@ -205,20 +205,17 @@ public class ProgressMonitor {
 			}
 
 			@Override
-			public synchronized void inc(int pNumber) {
-				// TODO Auto-generated method stub
+			public synchronized void inc(long pNumber) {
 				super.inc(pNumber);
 			}
 
 			@Override
 			public synchronized long getInterval() {
-				// TODO Auto-generated method stub
 				return super.getInterval();
 			}
 
 			@Override
 			public synchronized long getCount() {
-				// TODO Auto-generated method stub
 				return super.getCount();
 			}
 
