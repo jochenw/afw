@@ -7,12 +7,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.util.Lists.Collector;
 
 
 /** Test suite for the {@link Lists} class.
@@ -163,5 +166,111 @@ public class ListsTest {
 		for (int i = 0;  i < list.size(); i++) {
 			assertEquals(list.get(i).toString(), result.get(i));
 		}
+	}
+
+	/** Test case for {@link Lists.Collector#toList()}.
+	 */
+	@Test
+	public void testCollectorToList() {
+		final Collector<String> collector = Lists.collect();
+		assertNotNull(collector);
+		final List<String> list = collector.add("foo").add("bar").add("baz").toList();
+		assertNotNull(list);
+		assertEquals(3, list.size());
+		assertEquals("foo", list.get(0));
+		assertEquals("bar", list.get(1));
+		assertEquals("baz", list.get(2));
+		Functions.assertFail(UnsupportedOperationException.class, null, () -> list.add(null));
+		Functions.assertFail(IllegalStateException.class, "The element type is null.", () -> collector.toArray());
+	}
+
+	/** Test case for {@link Lists.Collector#toMutableList()}.
+	 */
+	@Test
+	public void testCollectorToMutableList() {
+		final Collector<String> collector = Lists.collect();
+		assertNotNull(collector);
+		final List<String> list = collector.add("foo").add("bar").add("baz").toMutableList();
+		assertNotNull(list);
+		assertEquals(3, list.size());
+		assertEquals("foo", list.get(0));
+		assertEquals("bar", list.get(1));
+		assertEquals("baz", list.get(2));
+		list.add(null);
+		assertEquals(4, list.size());
+		Functions.assertFail(IllegalStateException.class, "The element type is null.", () -> collector.toArray());
+	}
+
+	/** Test case for {@link Lists.Collector#toArray()}.
+	 */
+	@Test
+	public void testCollectorToArray() {
+		@SuppressWarnings("null")
+		final @NonNull Collector<String> collector = Lists.collect(String.class);
+		assertNotNull(collector);
+		final String[] array = collector.add("foo").add("bar").add("baz").toArray();
+		assertNotNull(array);
+		assertEquals(3, array.length);
+		assertEquals("foo", array[0]);
+		assertEquals("bar", array[1]);
+		assertEquals("baz", array[2]);
+	}
+
+	/** Test case for {@link Lists.Collector#forEach(Consumer)}.
+	 */
+	@Test
+	public void testCollectorForEachConsumer() {
+		@SuppressWarnings("null")
+		final @NonNull Collector<String> collector = Lists.collect(String.class).add("foo").add("bar").add("baz");
+		assertNotNull(collector);
+		final List<String> list = new ArrayList<String>();
+		collector.forEach((Consumer<String>) list::add);
+		assertEquals(3, list.size());
+		assertEquals("foo", list.get(0));
+		assertEquals("bar", list.get(1));
+		assertEquals("baz", list.get(2));
+		list.clear();
+		assertEquals(0, list.size());
+		final IllegalArgumentException iae = new IllegalArgumentException();
+		final Consumer<String> consumer = (s) -> {
+			if ("baz".equals(s)) {
+				throw iae;
+			} else {
+				list.add(s);
+			}
+		};
+		Functions.assertFail(IllegalArgumentException.class, null, () -> collector.forEach(consumer));
+		assertEquals(2, list.size());
+		assertEquals("foo", list.get(0));
+		assertEquals("bar", list.get(1));
+	}
+
+	/** Test case for {@link Lists.Collector#forEach(Functions.FailableConsumer)}.
+	 */
+	@Test
+	public void testCollectorForEachFailableConsumer() {
+		@SuppressWarnings("null")
+		final @NonNull Collector<String> collector = Lists.collect(String.class).add("foo", "bar", "baz").add((String[]) null);
+		assertNotNull(collector);
+		final List<String> list = new ArrayList<String>();
+		collector.forEach((FailableConsumer<String,RuntimeException>) list::add);
+		assertEquals(3, list.size());
+		assertEquals("foo", list.get(0));
+		assertEquals("bar", list.get(1));
+		assertEquals("baz", list.get(2));
+		list.clear();
+		assertEquals(0, list.size());
+		final IllegalArgumentException iae = new IllegalArgumentException();
+		final FailableConsumer<String,RuntimeException> consumer = (s) -> {
+			if ("baz".equals(s)) {
+				throw iae;
+			} else {
+				list.add(s);
+			}
+		};
+		Functions.assertFail(IllegalArgumentException.class, null, () -> collector.forEach(consumer));
+		assertEquals(2, list.size());
+		assertEquals("foo", list.get(0));
+		assertEquals("bar", list.get(1));
 	}
 }

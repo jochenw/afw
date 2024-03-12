@@ -285,6 +285,21 @@ public class Objects {
 		return pValues;
 	}
 
+	/** Creates an array of the given type with the given number of
+	 * null elements.
+	 * @param pType The array element type.
+	 * @param <O> The arrays element type.
+	 * @param pNumberOfElements The created arrays length.
+	 * @return The created array
+	 */
+	public static @NonNull <O> O[] arrayOf(@NonNull Class<O> pType, int pNumberOfElements) {
+		@SuppressWarnings("null")
+		final @NonNull Object[] objectArray = (Object[]) Array.newInstance(pType, pNumberOfElements);
+		@SuppressWarnings({ "unchecked", "null" })
+		final @NonNull O[] array = (O[]) objectArray;
+		return array;
+	}
+
 	/** This class is being used by the {@link CachedObjectManager} for
 	 * serialization, and deserialization. The purpose is the ability
 	 * to use different mechanism for serialization, and deserialization,

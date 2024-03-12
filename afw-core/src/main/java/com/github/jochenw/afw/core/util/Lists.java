@@ -21,10 +21,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 
 
 /** Utility methods for working with lists.
@@ -142,5 +145,108 @@ public class Lists {
 			result.add(mapper.apply(i));
 		}
 		return result;
+	}
+
+	/** A collector is basically a builder for lists.
+	 */
+	public static class Collector<O> {
+		private final Class<O> type;
+		private final List<O> list = new ArrayList<>();
+		/** Creates a new collector.
+		 * @param pType The element type. May be null, if using
+		 * {@link #toList()}, and {@link #toMutableList()} is sufficient.
+		 * Must be non-null, if you intend to use {@link #toArray()}.
+		 */
+		Collector(Class<O> pType) {
+			type = pType;
+		}
+		/** Adds a new element to the list, which is being created.
+		 * @param pElement The element, which is being added.
+		 * @return This collector.
+		 */
+		public Collector<O> add(O pElement) {
+			list.add(pElement);
+			return this;
+		}
+		/** Adds new elements to the list, which is being created.
+		 * @param pElements The elements, which are being added.
+		 * @return This collector.
+		 */
+		public Collector<O> add(@SuppressWarnings("unchecked") O... pElements) {
+			if (pElements != null) {
+				for(O element : pElements) {
+					add(element);
+				}
+			}
+			return this;
+		}
+		/** Converts the collected elements into an
+		 * immutable list.
+		 * @return The created list.
+		 */
+		public List<O> toList() {
+			return Collections.unmodifiableList(list);
+		}
+		/** Converts the collected elements into a
+		 * mutable list.
+		 * @return The created list.
+		 */
+		public List<O> toMutableList() {
+			return new ArrayList<>(list);
+		}
+		/** Converts the collected elements into an
+		 * array.
+		 * @return The created array.
+		 */
+		public O[] toArray() {
+			if (type == null) {
+				throw new IllegalStateException("The element type is null.");
+			}
+			@SuppressWarnings("unchecked")
+			final O[] array = (O[]) Array.newInstance(type, list.size());
+			return list.toArray(array);
+		}
+		/** Invokes the given consumer for every collected element.
+		 * @param pConsumer The consumer, which is being invoked
+		 *   for every element.
+	     * @throws NullPointerException The parameter is null.
+		 */
+		public void forEach(Consumer<O> pConsumer) {
+			final Consumer<O> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+			list.forEach(consumer);
+		}
+		/** Invokes the given consumer for every collected element.
+		 * @param pConsumer The consumer, which is being invoked
+		 *   for every element.
+	     * @throws NullPointerException The parameter is null.
+		 */
+		public <T extends Throwable> void forEach(FailableConsumer<O,T> pConsumer) throws T {
+			final FailableConsumer<O,T> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+			for (O o : list) {
+				consumer.accept(o);
+			}
+		}
+	}
+
+	/** Creates a new {@link Collector}. The method
+	 * {@link Collector#toArray()} won't work for the created
+	 * collector.
+	 * @param <O> The collectors element type.
+	 * @return The created collector.
+	 */
+	public static <O> Collector<O> collect() {
+		return new Collector<>(null);
+	}
+
+	/** Creates a new {@link Collector}. The method
+	 * {@link Collector#toArray()} will be supported
+	 * by the created collector.
+	 * @param pType The collectors element type. Must not be null.
+	 * @param <O> The collectors element type.
+	 * @return The created collector.
+	 * @throws NullPointerException The element type parameter is null.
+	 */
+	public static <O> Collector<O> collect(Class<O> pType) {
+		return new Collector<>(Objects.requireNonNull(pType, "Type"));
 	}
 }
