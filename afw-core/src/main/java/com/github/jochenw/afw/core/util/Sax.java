@@ -17,23 +17,49 @@ package com.github.jochenw.afw.core.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.annotation.Nullable;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
 
+import org.jspecify.annotations.NonNull;
+import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.LocatorImpl;
 
+import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 
 
@@ -365,4 +391,466 @@ public class Sax {
 		}
 	}
 
+	/** Creates a {@link SaxWriter SAX Writer}, an object for writing XML via the SAX API.
+	 * @return The created {@link SaxWriter}.
+	 */
+	public static SaxWriter creator() {
+		return new SaxWriter();
+	}
+
+	/** A {@link SaxWriter SAX writer} is an object, which allows
+	 * to create XML documents via an API, that is SAX aware
+	 * (in fact, it is based completely based on SAX), thus
+	 * guaranteed to produce well formed output.
+	 */
+	public static class SaxWriter {
+		private boolean indenting;
+		private boolean omittingXmlDeclaration;
+		private String encoding;
+		private String prefix, namespaceUri;
+		private DateTimeFormatter dateTimeFormatter;
+		private boolean immutable = false;
+		private TransformerHandler transformerHandler;
+
+		/** Returns, whether this {@link SaxWriter SAX writer} is
+		 * indenting, aka pretty printing.
+		 * @return True, if pretty printing is activated, otherwise
+		 *   false (default).
+		 * @see #withIndentation(boolean)
+		 * @see #withIndentation()
+		 */
+		public boolean isIndenting() { return indenting; }
+
+		/** Returns the encoding, which this {@link SaxWriter SAX writer}
+		 * is using.
+		 * @return The configured encoding, or null ({@code UTF-8} is being
+		 *   used),
+		 * @see #withEncoding(String)
+		 */
+		public String getEncoding() { return encoding; }
+	
+		/** Returns the default prefix, which this {@link SaxWriter SAX writer}
+		 * is using.
+		 * @return The configured default prefix, or
+		 * {@link XMLConstants#DEFAULT_NS_PREFIX}.
+		 * @see #withPrefix(String)
+		 */
+		public String getPrefix() { return prefix; }
+
+		/** Returns the default namespace URI, which this
+		 * {@link SaxWriter SAX writer} is using.
+		 * @return The configured default prefix, or
+		 * {@link XMLConstants#NULL_NS_URI}.
+		 * @see #withPrefix(String)
+		 */
+		public String getNamespaceUri() { return namespaceUri; }
+
+		/** Returns the {@link DateTimeFormatter}, which is being used to
+		 * convert temporal attribute values to strings.
+		 * 
+		 * @return The {@link DateTimeFormatter}, which
+		 *   is being used, or null, if the default ({@link DateTimeFormatter#ISO_DATE_TIME})
+		 *   is.
+		 */
+		public DateTimeFormatter getDateTimeFormatter() { return dateTimeFormatter; }
+
+		/** Returns the {@link TransformerHandler}, which is
+		 * used internally.
+		 * @return The internally used {@link TransformerHandler}.
+		 */
+		public TransformerHandler getTransformerHandler() { return transformerHandler; }
+
+		/** Sets, whether to activate pretty print.
+		 * 
+		 * @param pIndentation True, if the generated XML should be indented,
+		 *   or not. The default value is false.
+		 * @return This {@link SaxWriter}.
+		 */
+		public SaxWriter withIndentation(boolean pIndentation) {
+			assertMutable();
+			indenting = pIndentation;
+			return this;
+		}
+
+		/** Sets the {@link DateTimeFormatter}, which is being used to
+		 * convert temporal attribute values to strings.
+		 * 
+		 * @param pDateTimeFormatter The {@link DateTimeFormatter}, which
+		 *   is being used. Defaults to {@link DateTimeFormatter#ISO_DATE_TIME}.
+		 * @return This {@link SaxWriter}.
+		 */
+		public SaxWriter withDateTimeFormatter(DateTimeFormatter pDateTimeFormatter) {
+			dateTimeFormatter = pDateTimeFormatter;
+			return this;
+		}
+
+		/** Ensures, that the XML prolog is not yet written.
+		 * (If the XML prolog has been written, then configuration
+		 * changes are no longer applicable.)
+		 */
+		protected void assertMutable() {
+			if (immutable) {
+				throw new IllegalStateException("The XML prolog has been written, and the SAX writer is no longer mutable.");
+			}
+		}
+
+		/** Activates pretty print. Equivalent to
+		 * <pre>withIndentation(true)</pre>.
+		 * 
+		 * @return This {@link SaxWriter}.
+		 */
+		public SaxWriter withIndentation() {
+			return withIndentation(true);
+		}
+
+		/** Sets the Sax writers default namespace URI. The default
+		 * value is {@link XMLConstants#NULL_NS_URI}.
+		 * @param pNamespaceUri The default namespace Uri.
+		 * @return This {@link SaxWriter}.
+		 */
+		public SaxWriter withNamespaceUri(String pNamespaceUri) {
+			assertMutable();
+			namespaceUri = pNamespaceUri;
+			return this;
+		}
+
+		/** Sets the Sax writers default prefix. The default
+		 * value is {@link XMLConstants#DEFAULT_NS_PREFIX}.
+		 * @param pPrefix The default prefix.
+		 * @return This {@link SaxWriter}.
+		 */
+		public SaxWriter withPrefix(String pPrefix) {
+			assertMutable();
+			prefix = pPrefix;
+			return this;
+		}
+
+		/** Sets the Sax writers encoding to the name of
+		 * the given character set. Equivalent to
+		 * <pre>withEncoding(pCharset.name())</pre>.
+		 * The default encoding is
+		 * {@code UTF-8}.
+		 * @param pCharset The character set.
+		 * @return This {@link SaxWriter}.
+		 */
+		public SaxWriter withCharset(Charset pCharset) {
+			if (pCharset == null) {
+				return withEncoding(null);
+			} else {
+				return withEncoding(pCharset.name());
+			}
+		}
+
+		/** Sets the Sax writers encoding. The default
+		 * encoding is {@code UTF-8}.
+		 * @param pEncoding The encoding.
+		 * @return This {@link SaxWriter}.
+		 */
+		public SaxWriter withEncoding(String pEncoding) {
+			assertMutable();
+			encoding = pEncoding;
+			return null;
+		}
+
+		/** Returns, whether an XML declaration should be omitted.
+		 * @return True, if an XML declaration should be omitted, if possible.
+		 *   Otherwise false, which is the default.
+		 */
+		public boolean isOmittingXmlDeclaration() {
+			return omittingXmlDeclaration;
+		}
+		
+		/** Requests, that no XML declaration should be written.
+		 * Equivalent to <pre>withoutXmlDeclaration(true)</pre>.
+		 * @return This {@link SaxWriter SAX writer}.
+		 */
+		public SaxWriter withoutXmlDeclaration() {
+			return withoutXmlDeclaration(true);
+		}
+
+		/** Sets, whether an XML declaration should be written.
+		 * @param pOmitXmlDeclaration True, if an XML declaration should be omitted, if possible.
+		 *   Otherwise false, which is the default.
+		 * @return This {@link SaxWriter SAX writer}.
+		 */
+		public SaxWriter withoutXmlDeclaration(boolean pOmitXmlDeclaration) {
+			assertMutable();
+			omittingXmlDeclaration = pOmitXmlDeclaration;
+			return this; 
+		}
+
+		/** Writes an XML document to the given {@link OutputStream},
+		 * applying the configured values for
+		 * {@link #withIndentation(boolean) indentation},
+		 * {@link #withEncoding(String) encoding},
+		 * {@link #withNamespaceUri(String) namespace URI}, and
+		 * {@link #withPrefix(String)} prefix.
+		 * @param pOut The output stream, to which the XML document is
+		 *   being written.
+		 * @param pConsumer A consumer, which is being invoked to create
+		 *   the XML documents content by using methods like
+		 *   {@link #writeElement(String, Functions.FailableConsumer, Object...)}, etc.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public void write(OutputStream pOut, FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			final StreamResult sr = new StreamResult(Objects.requireNonNull(pOut, "OutputStream"));
+			write(sr, pConsumer);
+		}
+
+		/** Writes an XML document to the given {@link Writer},
+		 * applying the configured values for
+		 * {@link #withIndentation(boolean) indentation},
+		 * {@link #withEncoding(String) encoding},
+		 * {@link #withNamespaceUri(String) namespace URI}, and
+		 * {@link #withPrefix(String)} prefix.
+		 * @param pOut The writer, to which the XML document is
+		 *   being written.
+		 * @param pConsumer A consumer, which is being invoked to create
+		 *   the XML documents content by using methods like
+		 *   {@link #writeElement(String, Functions.FailableConsumer, Object...)}, etc.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public void write(Writer pOut, FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			final StreamResult sr = new StreamResult(Objects.requireNonNull(pOut, "OutputStream"));
+			write(sr, pConsumer);
+		}
+
+		/** Writes an XML document to the given {@link Path file},
+		 * applying the configured values for
+		 * {@link #withIndentation(boolean) indentation},
+		 * {@link #withEncoding(String) encoding},
+		 * {@link #withNamespaceUri(String) namespace URI}, and
+		 * {@link #withPrefix(String)} prefix.
+		 * @param pOut The writer, to which the XML document is
+		 *   being written.
+		 * @param pConsumer A consumer, which is being invoked to create
+		 *   the XML documents content by using methods like
+		 *   {@link #writeElement(String, Functions.FailableConsumer, Object...)}, etc.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public void write(Path pOut, FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			final Path file = Objects.requireNonNull(pOut, "Path");
+			try (OutputStream out = Files.newOutputStream(file)) {
+				write(out, pConsumer);
+			} catch (IOException e) {
+				throw Exceptions.show(e);
+			}
+		}
+
+		/** Writes an XML document to the given {@link File file},
+		 * applying the configured values for
+		 * {@link #withIndentation(boolean) indentation},
+		 * {@link #withEncoding(String) encoding},
+		 * {@link #withNamespaceUri(String) namespace URI}, and
+		 * {@link #withPrefix(String)} prefix.
+		 * @param pOut The writer, to which the XML document is
+		 *   being written.
+		 * @param pConsumer A consumer, which is being invoked to create
+		 *   the XML documents content by using methods like
+		 *   {@link #writeElement(String, Functions.FailableConsumer, Object...)}, etc.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public void write(File pOut, FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			final File file = Objects.requireNonNull(pOut, "File");
+			try (OutputStream out = new FileOutputStream(file)) {
+				write(out, pConsumer);
+			} catch (IOException e) {
+				throw Exceptions.show(e);
+			}
+		}
+
+		/** Writes an XML document to the given {@link Result},
+		 * applying the configured values for
+		 * {@link #withIndentation(boolean) indentation},
+		 * {@link #withEncoding(String) encoding},
+		 * {@link #withNamespaceUri(String) namespace URI}, and
+		 * {@link #withPrefix(String)} prefix.
+		 * @param pResult The transformer {@link Result result}.
+		 * @param pConsumer A consumer, which is being invoked to create
+		 *   the XML documents content by using methods like
+		 *   {@link #writeElement(String, Functions.FailableConsumer, Object...)}, etc.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public void write(Result pResult, FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			final Result result = Objects.requireNonNull(pResult, "Result");
+			final FailableConsumer<SaxWriter,SAXException> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+			immutable = true;
+			try {
+				final SAXTransformerFactory stf = (SAXTransformerFactory) TransformerFactory.newInstance();
+				transformerHandler = stf.newTransformerHandler();
+				final Transformer transformer = transformerHandler.getTransformer();
+				if (isIndenting()) {
+					transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+				}
+				final String encoding = getEncoding();
+				if (encoding != null) {
+					transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+				}
+				if (isOmittingXmlDeclaration()) {
+					transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+				}
+				transformerHandler.setResult(result);
+				transformerHandler.startDocument();
+				consumer.accept(this);
+				transformerHandler.endDocument();
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		}
+
+		private static final @NonNull Attributes NO_ATTRS = new AttributesImpl();
+
+		/** Writes an atomic element with the given local name, the
+		 * {@link #withNamespaceUri(String) default namespace uri},
+		 * and the given attributes. 
+		 * @param pElementName The elements local name.
+		 * @param pBody The elements content creator.
+		 * May be null, in which case an empty element is being written.
+		 * @param pAttributes The elements attributes, as a list of
+		 * key/value pairs. The keys must be strings, the values will
+		 * be converted to strings by invoking #toAttributeValue(Object).
+		 */
+		public void writeElement(String pElementName, String pBody, Object... pAttributes) {
+			writeElement(pElementName, (sw) -> {
+				writeText(pBody);
+			}, pAttributes);
+		}
+
+		/** Writes a text value to the body of the XML document.
+		 * @param pText The text value, which is being written.
+		 */
+		public void writeText(String pText) {
+			final TransformerHandler th = getTransformerHandler();
+			final char[] chars = pText.toCharArray();
+			try {
+				th.characters(chars, 0, chars.length);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		}
+		
+		/** Writes an XML element with the given local name, the
+		 * {@link #withNamespaceUri(String) default namespace uri},
+		 * and the given attributes.
+		 * @param pElementName The elements local name.
+		 * @param pBodyCreator The elements content creator.
+		 * May be null, in which case an empty element is being written.
+		 * @param pAttributes The elements attributes, as a list of
+		 * key/value pairs. The keys must be strings, the values will
+		 * be converted to strings by invoking #toAttributeValue(Object).
+		 */
+		public void writeElement(String pElementName, FailableConsumer<SaxWriter,SAXException> pBodyCreator,
+				                 Object... pAttributes) {
+			try {
+				final Attributes attrs;
+				if (pAttributes == null  ||  pAttributes.length == 0) {
+					attrs = NO_ATTRS;
+				} else {
+					if ((pAttributes.length % 2) != 0) {
+						throw new IllegalArgumentException("The attributes are supposed to"
+								+ " be a list of key/value pairs, so the number of objects should be even.");
+					}
+					final AttributesImpl atts = new AttributesImpl();
+					for (int i = 0;  i < pAttributes.length;  ) {
+						final Object keyObj = pAttributes[i++];
+						final Object valueObj = pAttributes[i++];
+						if (valueObj != null) {
+							if (keyObj == null) {
+								throw new IllegalArgumentException("The attributes are supposed to"
+										+ " be a list of key/value pairs, with non-null keys.");
+							}
+							final String key = keyObj.toString();
+							final String value = toAttributeValue(valueObj);
+							atts.addAttribute(XMLConstants.NULL_NS_URI, key, key, "CDATA", value);
+						}
+					}
+					attrs = atts;
+				}
+				writeElement(pElementName, pBodyCreator, attrs);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		}
+
+		/** Converts the given attribute value object to a string. The conversion
+		 * depends on the type of the value object;
+		 * <ol>
+		 *   <li>Strings are returned as-is.</li>
+		 *   <li>Instances of {@link BigDecimal} are being converted using {@link BigDecimal#toPlainString()}.
+		 *   <li>[@link Object#toString()} is used for other numbers, and booleans.</li>
+		 *   <li>The {@link #getDateTimeFormatter() default date/time formatter} is being used for
+		 *     {@link TemporalAccessor temporal values}, like {@link ZonedDateTime}, {@link LocalDateTime},
+		 *     {@link LocalDate}, and {@link LocalTime}.</li>
+		 *   <li>An {@link IllegalArgumentException} is thrown for other object types.
+		 * </ol>
+		 * @param pValue The attribute value, which is being converted.
+		 * @return The converted value.
+		 * 
+		 */
+		public @NonNull String toAttributeValue(@NonNull Object pValue) {
+			if (pValue instanceof String) {
+				return (String) pValue;
+			} else if (pValue instanceof BigDecimal) {
+				@SuppressWarnings("null")
+				final @NonNull String plainString = ((BigDecimal) pValue).toPlainString();
+				return plainString;
+			} else if (pValue instanceof Number  ||  pValue instanceof Boolean) {
+				@SuppressWarnings("null")
+				final @NonNull String v = pValue.toString();
+				return v;
+			} else if (pValue instanceof Calendar) {
+				final @NonNull Calendar calendar = (Calendar) pValue;
+				@SuppressWarnings("null")
+				final @NonNull LocalDateTime localDateTime = LocalDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());
+				return toAttributeValue(localDateTime);
+			} else if (pValue instanceof Date) {
+				final @NonNull Date date = (Date) pValue;
+				@SuppressWarnings("null")
+				final @NonNull LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+				return toAttributeValue(localDateTime);
+			} else if (pValue instanceof TemporalAccessor) {
+				final DateTimeFormatter dtf = Objects.notNull(getDateTimeFormatter(), () -> DateTimeFormatter.ISO_DATE_TIME);
+				@SuppressWarnings("null")
+				final @NonNull String v = dtf.format((TemporalAccessor) pValue);
+				return v;
+			} else {
+				throw new IllegalArgumentException("Expected String, Number, Boolean, or TemporalAccessor as attribute value, got " + pValue.getClass().getName());
+			}
+		}
+
+		/** Writes an XML element with the given local name, the
+		 * {@link #withNamespaceUri(String) default namespace uri},
+		 * and the given attributes.
+		 * @param pElementName The elements local name.
+		 * @param pBodyCreator The elements body creator.
+		 * May be null, in which case an empty element is being written.
+		 * @param pAttributes The elements attributes, as a list of
+		 * SAX attributes.
+		 */
+		public void writeElement(String pElementName, FailableConsumer<SaxWriter,SAXException> pBodyCreator,
+				Attributes pAttributes) {
+			final String localName = Objects.requireNonNull(pElementName, "Element Name");
+			final Attributes attrs = Objects.notNull(pAttributes, NO_ATTRS);
+			final String namespaceUri = Objects.notNull(getNamespaceUri(), XMLConstants.NULL_NS_URI);
+			final String prefix = getPrefix();
+			final String qName;
+			if (prefix == null  ||  prefix.length() == 0) {
+				qName = localName;
+			} else {
+				qName = prefix + ":" + localName;
+			}
+			final TransformerHandler th = getTransformerHandler();
+			try {
+				th.startElement(namespaceUri, localName, qName, attrs);
+				if (pBodyCreator != null) {
+					pBodyCreator.accept(this);
+				}
+				th.endElement(namespaceUri, localName, qName);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		}
+
+
+	}
 }
