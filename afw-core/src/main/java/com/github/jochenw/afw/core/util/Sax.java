@@ -15,12 +15,14 @@
  */
 package com.github.jochenw.afw.core.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -597,6 +599,43 @@ public class Sax {
 			write(sr, pConsumer);
 		}
 
+		/** Writes an XML document to a byte array, applying the
+		 * configured values for
+		 * {@link #withIndentation(boolean) indentation},
+		 * {@link #withEncoding(String) encoding},
+		 * {@link #withNamespaceUri(String) namespace URI}, and
+		 * {@link #withPrefix(String)} prefix.
+		 * @param pConsumer A consumer, which is being invoked to create
+		 *   the XML documents content by using methods like
+		 *   {@link #writeElement(String, Functions.FailableConsumer, Object...)}, etc.
+		 * @return The created XML document, as a byte array.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public byte[] writeBytes(FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			write(baos, pConsumer);
+			return baos.toByteArray();
+		}
+
+		/** Writes an XML document to a string, applying the
+		 * configured values for
+		 * {@link #withIndentation(boolean) indentation},
+		 * {@link #withEncoding(String) encoding},
+		 * {@link #withNamespaceUri(String) namespace URI}, and
+		 * {@link #withPrefix(String)} prefix.
+		 * @param pConsumer A consumer, which is being invoked to create
+		 *   the XML documents content by using methods like
+		 *   {@link #writeElement(String, Functions.FailableConsumer, Object...)}, etc.
+		 * @return The created XML document, as a string.
+		 * @throws NullPointerException Either of the parameters is null.
+		 */
+		public String writeString(FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			final StringWriter sw = new StringWriter();
+			write(sw, pConsumer);
+			return sw.toString();
+		}
+
+		
 		/** Writes an XML document to the given {@link Writer},
 		 * applying the configured values for
 		 * {@link #withIndentation(boolean) indentation},
@@ -672,6 +711,9 @@ public class Sax {
 		 * @throws NullPointerException Either of the parameters is null.
 		 */
 		public void write(Result pResult, FailableConsumer<SaxWriter,SAXException> pConsumer) {
+			if (getPrefix() != null  &&  getPrefix().length() > 0  &&  getNamespaceUri() == null) {
+				throw new IllegalStateException("A default prefix has been specified, but no namespace URI.");
+			}
 			final Result result = Objects.requireNonNull(pResult, "Result");
 			final FailableConsumer<SaxWriter,SAXException> consumer = Objects.requireNonNull(pConsumer, "Consumer");
 			immutable = true;
@@ -851,6 +893,14 @@ public class Sax {
 			}
 		}
 
-
+		/** Returns, whether this {@link SaxWriter SAX writer} is
+		 * immutable. Such is the case, if the XML prolog has been
+		 * written.
+		 * @return True, if this object is immutable, otherwise
+		 *   false. (Default)
+		 */
+		public boolean isImmutable() {
+			return immutable;
+		}
 	}
 }
