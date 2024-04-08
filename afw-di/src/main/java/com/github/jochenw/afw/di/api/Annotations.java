@@ -38,18 +38,24 @@ public class Annotations {
 		final List<@NonNull IAnnotationProvider> list = new ArrayList<>();
 		try {
 			final @NonNull IAnnotationProvider ap = new JavaxAnnotationProvider();
+			// Check, whether the provider works.
+			ap.getInjectClass();
 			list.add(ap);
 		} catch (Throwable t) {
 			// Ignore this,
 		}
 		try {
 			final @NonNull IAnnotationProvider ap = new JakartaAnnotationProvider();
+			// Check, whether the provider works.
+			ap.getInjectClass();
 			list.add(ap);
 		} catch (Throwable t) {
 			// Ignore this,
 		}
 		try {
 			final @NonNull IAnnotationProvider ap = new GoogleAnnotationProvider();
+			// Check, whether the provider works.
+			ap.getInjectClass();
 			list.add(ap);
 		} catch (Throwable t) {
 			// Ignore this,
