@@ -119,22 +119,22 @@ public class Data {
 		/** Extracts a path from the given data store.
 		 * @param pData The data store, from which a value is being extracted.
 		 * @param pKey The key, which is being queried in the data store.
-		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @param dirExists Short description of the expected value, for use in error messages.
 		 * @return The string, which has been retrieved.
 		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
 		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
 		 *   is empty, or not a string.
 		 */
 		public @NonNull Path requirePath(@NonNull O pData, @NonNull String pKey,
-				                         @NonNull String pDescription) {
+				                         PathCriterion dirExists) {
 			Object value = getValue(pData, pKey);
 			if (value == null) {
-				throw new NullPointerException("Missing value for parameter " + pDescription);
+				throw new NullPointerException("Missing value for parameter " + dirExists);
 			} else {
 				if (value instanceof String) {
 					final String s = (String) value;
 					if (s.length() == 0) {
-						throw new IllegalArgumentException("Empty value for parameter " + pDescription);
+						throw new IllegalArgumentException("Empty value for parameter " + dirExists);
 					}
 					@SuppressWarnings("null")
 					final @NonNull Path path = Paths.get(s);
@@ -146,7 +146,7 @@ public class Data {
 					final @NonNull Path path = ((File) value).toPath();
 					return path;
 				} else {
-					throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+					throw new IllegalArgumentException("Invalid value for parameter " + dirExists
 							                        + ": Expected path, got " + value.getClass().getName());
 				}
 			}

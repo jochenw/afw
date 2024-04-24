@@ -1065,4 +1065,38 @@ public class Functions {
 			}
 		}
 	}
+
+	/** Asserts, that a {@link FailableRunnable} throws an expected Exception.
+	 * @param pErrorType Type of the expected Exception.
+	 * @param <T> Type of the expected Exception.
+	 * @param pErrorValidator A function, which validates the error, and the
+	 *   error message. If the validator returns null, then the error is
+	 *   being ignored. Otherwise, an {@link IllegalStateException}
+	 *   is thrown, and the validators result will be used as the
+	 *   exceptions error message.
+	 * @param pRunnable The piece of code, that is being executed.
+	 * @throws IllegalStateException The {@code pRunnable} was executed
+	 *   without errors, or the error message was unexpected.
+	 * @throws RuntimeException An unexpected error occurred, while executing the
+	 *   {@code pRunnable}, and is being rethrown.
+	 */
+	public static <T extends Throwable> void assertFail(Class<T> pErrorType,
+			                                            BiFunction<T,String,String> pErrorValidator,
+			                                            FailableRunnable<?> pRunnable) {
+		try {
+			pRunnable.run();
+			throw new IllegalStateException("Expected Exception was not thrown.");
+		} catch (Throwable th) {
+			if (pErrorType == th.getClass()) {
+				final String errorMessage = pErrorValidator.apply(pErrorType.cast(th), th.getMessage());
+				if (errorMessage == null) {
+					return;
+				} else {
+					throw new IllegalStateException(errorMessage);
+				}
+			} else {
+				throw Exceptions.show(th);
+			}
+		}
+	}
 }

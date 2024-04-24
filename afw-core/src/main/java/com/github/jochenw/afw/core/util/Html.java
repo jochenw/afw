@@ -1,5 +1,6 @@
 package com.github.jochenw.afw.core.util;
 
+import java.util.function.Supplier;
 
 /** Utility class for working with Html, or Jsp files.
  */
@@ -12,6 +13,44 @@ public class Html {
 	 */
 	public static String escapeHtml(String pValue) {
 		return escape(pValue, Html::escapeHtmlChar);
+	}
+
+	/**
+	 * If the given string is non-empty: Escape it into a format, that can be embedded into an
+	 * HTML element. Otherwise, return the string "&nbsp;".
+	 * @param pValue The string, which is being escaped.
+	 * @return The unmodified input parameter {@code pValue}, if it is non-empty,
+	 *   and no escaping is necessary. If the input parameter is non-empty, and
+	 *   escaping is necessary, returns it, with escaping applied. Otherwise
+	 *   (the input parameter is null, or empty) the string "&nbsp;".
+	 */
+	public static String escapeOrNbsp(String pValue) {
+		if (pValue == null  ||  pValue.length() == 0) {
+			return "&nbsp";
+		} else {
+			return escapeHtml(pValue);
+		}
+	}
+
+	/**
+	 * If the given boolean value is true: Invoke the given supplier, and convert the
+	 * returned string into a format, that can be embedded into an
+	 * HTML element. Otherwise, return the string "&nbsp;".
+	 * @param pEmpty True, if invoking the string supplier is supposed to
+	 *   return an empty value. Otherwise false.
+	 * @param pValueSupplier The supplier, which returns the string value, that
+	 *   is being escaped.
+	 */
+	public static String escapeOrNbspIf(boolean pEmpty, Supplier<String> pValueSupplier) {
+		if (pEmpty) {
+			final String value = pValueSupplier.get();
+			if (value == null  ||  value.length() == 0) {
+				return "&nbsp;";
+			} else {
+				return escapeHtml(value);
+			}
+		}
+		return "&nbsp;";
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.core.util;
 
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,4 +48,27 @@ public class HtmlTest {
 		tester.accept("&abcdef", "&amp;abcdef");
 	}
 
+	/** Test case for {@link Html#escapeOrNbsp(String)}.
+	 */
+	@Test
+	public void testEscapeOrNbsp() {
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbsp(null));
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbsp(""));
+		Assert.assertEquals(" ", Html.escapeOrNbsp(" "));
+		Assert.assertEquals("abc&lt;def", Html.escapeOrNbsp("abc<def"));
+	}
+
+	/** Test case for {@link Html#escapeOrNbspIf(boolean, Supplier)}.
+	 */
+	@Test
+	public void testEscapeOrNbspIf() {
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(false, () -> null));
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(false, () -> ""));
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(false, () -> " "));
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(false, () -> " "));
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(true, () -> "abc<def"));
+		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(true, () -> ""));
+		Assert.assertEquals(" ", Html.escapeOrNbspIf(true, () -> " "));
+		Assert.assertEquals("abc&lt;def", Html.escapeOrNbsp("abc<def"));
+	}
 }

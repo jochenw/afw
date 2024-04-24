@@ -180,7 +180,7 @@ public class ListsTest {
 		assertEquals("foo", list.get(0));
 		assertEquals("bar", list.get(1));
 		assertEquals("baz", list.get(2));
-		Functions.assertFail(UnsupportedOperationException.class, null, () -> list.add(null));
+		Functions.assertFail(UnsupportedOperationException.class, (String) null, () -> list.add(null));
 		Functions.assertFail(IllegalStateException.class, "The element type is null.", () -> collector.toArray());
 	}
 
@@ -239,7 +239,7 @@ public class ListsTest {
 				list.add(s);
 			}
 		};
-		Functions.assertFail(IllegalArgumentException.class, null, () -> collector.forEach(consumer));
+		Functions.assertFail(IllegalArgumentException.class, (String) null, () -> collector.forEach(consumer));
 		assertEquals(2, list.size());
 		assertEquals("foo", list.get(0));
 		assertEquals("bar", list.get(1));
@@ -268,7 +268,7 @@ public class ListsTest {
 				list.add(s);
 			}
 		};
-		Functions.assertFail(IllegalArgumentException.class, null, () -> collector.forEach(consumer));
+		Functions.assertFail(IllegalArgumentException.class, (String) null, () -> collector.forEach(consumer));
 		assertEquals(2, list.size());
 		assertEquals("foo", list.get(0));
 		assertEquals("bar", list.get(1));
