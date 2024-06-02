@@ -28,7 +28,7 @@ import com.github.jochenw.afw.core.util.Streams;
  * Test case for the {@link DefaultResourceLoader}.
  */
 public class DefaultResourceLoaderTest {
-	private URL URL0, URL1;
+	private @Nullable URL URL0, URL1;
 
 	/** Called to initialize the URL fields, before the tests are actually running.
 	 * @throws Exception An error occurred.
@@ -37,7 +37,7 @@ public class DefaultResourceLoaderTest {
 	public void initUrls() throws Exception {
 		final URLStreamHandler ush = new URLStreamHandler() {
 			@Override
-			protected URLConnection openConnection(URL pUrl) throws IOException {
+			protected URLConnection openConnection(@Nullable URL pUrl) throws IOException {
 				return new URLConnection(pUrl) {
 					@Override
 					public void connect() throws IOException {
@@ -46,8 +46,9 @@ public class DefaultResourceLoaderTest {
 
 					@Override
 					public InputStream getInputStream() throws IOException {
+						final @NonNull URL url = Objects.requireNonNull(pUrl);
 						final String content;
-						if ("x/y/Foo.properties".equals(pUrl.getFile())) {
+						if ("x/y/Foo.properties".equals(url.getFile())) {
 							content = "12345";
 						} else if ("prod/x/y/Bar.properties".equals(pUrl.getFile())) {
 							content = "012345";
@@ -72,9 +73,10 @@ public class DefaultResourceLoaderTest {
 	 */
 	@Test
 	public void testExplicitClassLoader() {
+		final @NonNull URL url0 = Objects.requireNonNull(URL0);
 		final ClassLoader cl = newClassLoader();
 		final DefaultResourceLoader drl = new DefaultResourceLoader("foo", "prod");
-		assertResource(drl, cl, Objects.requireNonNull(URL0.getFile()), "12345");
+		assertResource(drl, cl, Objects.requireNonNull(url0.getFile()), "12345");
 		drl.setInstanceName(null);
 		assertNoResource(drl, cl, "x/y/Bar.properties");
 		drl.setInstanceName("");
@@ -93,13 +95,14 @@ public class DefaultResourceLoaderTest {
 	 */
 	@Test
 	public void testImplicitClassLoader() {
+		final @NonNull URL url0 = Objects.requireNonNull(URL0);
 		final ClassLoader cl = newClassLoader();
 		ClassLoader tcl = null;
 		try {
 			tcl = Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
 			final DefaultResourceLoader drl = new DefaultResourceLoader();
-			assertResource(drl, null, Objects.requireNonNull(URL0.getFile()), "12345");
+			assertResource(drl, null, Objects.requireNonNull(url0.getFile()), "12345");
 			drl.setInstanceName(null);
 			assertNoResource(drl, null, "x/y/Bar.properties");
 			drl.setInstanceName("");
@@ -122,13 +125,17 @@ public class DefaultResourceLoaderTest {
 	protected ClassLoader newClassLoader() {
 		final ClassLoader cl = new ClassLoader() {
 			@Override
-			public URL getResource(String pName) {
-				if (URL0.getFile().equals(pName)) {
-					return URL0;
-				} else if (URL1.getFile().equals(pName)) {
-					return URL1;
+			public @Nullable URL getResource(@Nullable String pName) {
+				final @NonNull URL url0 = Objects.requireNonNull(URL0);
+				if (url0.getFile().equals(pName)) {
+					return url0;
+				} else {
+					final @NonNull URL url1 = Objects.requireNonNull(URL1);
+					if (url1.getFile().equals(pName)) {
+						return url1;
+					}
+					return null;
 				}
-				return null;
 			}
 		};
 		return cl;
@@ -141,9 +148,9 @@ public class DefaultResourceLoaderTest {
 	 * @param pUri The URI, that is supposed to be locatable.
 	 * @param pContent The expected resource contents.
 	 */
-	protected void assertResource(@NonNull DefaultResourceLoader pLoader,
+	protected void assertResource(DefaultResourceLoader pLoader,
 			                      @Nullable ClassLoader pCl,
-			                      @NonNull String pUri,
+			                      String pUri,
 			                      @Nullable String pContent) {
 		final URL url;
 		if (pCl == null) {
@@ -170,9 +177,9 @@ public class DefaultResourceLoaderTest {
 	 * @param pCl The {@link ClassLoader}, that is backing the {@code pLoader}.
 	 * @param pUri The URI, that is supposed not to be locatable.
 	 */
-	protected void assertNoResource(@NonNull DefaultResourceLoader pLoader,
+	protected void assertNoResource(DefaultResourceLoader pLoader,
 			                        @Nullable ClassLoader pCl,
-			                        @NonNull String pUri) {
+			                        String pUri) {
 		final URL url;
 		if (pCl == null) {
 			url = pLoader.getResource(pUri);

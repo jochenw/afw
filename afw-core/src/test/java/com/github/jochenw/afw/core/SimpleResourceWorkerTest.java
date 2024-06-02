@@ -17,6 +17,7 @@ package com.github.jochenw.afw.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import org.junit.Test;
@@ -24,6 +25,7 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.SimpleResourceWorker.ResRunnable;
 import com.github.jochenw.afw.core.SimpleResourceWorker.SimpleResourceTracker;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.Assert;
 
 
@@ -32,7 +34,7 @@ import org.junit.Assert;
  */
 public class SimpleResourceWorkerTest {
 	private static final class SimpleResource implements AutoCloseable {
-		private Long closingTime;
+		private @Nullable Long closingTime;
 
 		@Override
 		public void close() {
@@ -42,7 +44,8 @@ public class SimpleResourceWorkerTest {
 			return closingTime != null;
 		}
 		public long getClosingTime() {
-			return closingTime.longValue();
+			final Long clTime = Objects.requireNonNull(closingTime, "ClosingTime");
+			return clTime.longValue();
 		}
 	}
 

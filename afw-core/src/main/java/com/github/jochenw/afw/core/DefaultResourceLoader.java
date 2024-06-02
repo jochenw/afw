@@ -17,7 +17,7 @@ package com.github.jochenw.afw.core;
 
 import java.net.URL;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 
@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * Default implementation of the {@link ResourceLocator}.
  */
 public class DefaultResourceLoader extends ResourceLocator {
-	String resourcePrefix;
+	@Nullable String resourcePrefix;
 
 	/**
 	 * Creates a new instance with application name = null, and instance name = null,
