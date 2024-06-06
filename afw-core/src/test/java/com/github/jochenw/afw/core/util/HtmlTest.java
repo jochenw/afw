@@ -66,7 +66,7 @@ public class HtmlTest {
 		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(false, () -> ""));
 		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(false, () -> " "));
 		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(false, () -> " "));
-		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(true, () -> "abc<def"));
+		Assert.assertEquals("abc&lt;def", Html.escapeOrNbspIf(true, () -> "abc<def"));
 		Assert.assertEquals("&nbsp;", Html.escapeOrNbspIf(true, () -> ""));
 		Assert.assertEquals(" ", Html.escapeOrNbspIf(true, () -> " "));
 		Assert.assertEquals("abc&lt;def", Html.escapeOrNbsp("abc<def"));

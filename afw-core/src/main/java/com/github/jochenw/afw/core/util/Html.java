@@ -26,7 +26,7 @@ public class Html {
 	 */
 	public static String escapeOrNbsp(String pValue) {
 		if (pValue == null  ||  pValue.length() == 0) {
-			return "&nbsp";
+			return "&nbsp;";
 		} else {
 			return escapeHtml(pValue);
 		}
