@@ -79,7 +79,7 @@ public interface IAnnotationProvider {
 						return false;
 					}
 					if (pOther instanceof Annotation) {
-						final String value = getNamedValue((Annotation) pOther);
+						final String value = Annotations.getNamedValue((Annotation) pOther);
 						if (value == null) {
 							return false;
 						} else {
