@@ -27,7 +27,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -36,14 +35,12 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
-import com.github.jochenw.afw.di.util.Reflection;
 
 
 /** Utility class for working with objects. (Working with objects is
@@ -512,7 +509,9 @@ public class Objects {
 			}
 			sb.append(values[i].name());
 		}
-		return sb.toString();
+		@SuppressWarnings("null")
+		final @NonNull String result = sb.toString();
+		return result;
 	}
 
 	/** Searches for an instance of the given enumeration type with the given name.
@@ -542,5 +541,17 @@ public class Objects {
 					+ type.getName() + ": Expected "
 					+ enumNamesAsString(type, "|") + ", got " + name);
 		}
+	}
+
+	/** Performs a cast to the expected object type.
+	 * @param pObject The object, which is being casted.
+	 * @param <O> The expected object type.
+	 * @return The input object, which is now declared to have the expected
+	 * object type.
+	 */
+	public static <O> O cast(Object pObject) {
+		@SuppressWarnings("unchecked")
+		final O o = (O) pObject;
+		return o;
 	}
 }

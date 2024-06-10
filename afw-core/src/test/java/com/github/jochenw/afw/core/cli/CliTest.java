@@ -4,7 +4,8 @@ import static org.junit.Assert.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
@@ -13,7 +14,6 @@ import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.util.MutableBoolean;
-import com.github.jochenw.afw.core.util.Objects;
 
 
 /** Test suite for the {@link Cli} class.
@@ -39,7 +39,7 @@ public class CliTest {
 				.handler((c,p) -> c.getBean().outputFile = p).end()
 			.pathOption("helperFile", "hf")
 			    .handler((c,p) -> c.getBean().helperFile = p).end()
-			.booleanOption("verbose", "v")
+			.boolOption("verbose", "v")
 			    .handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
 			.parse(new @NonNull String[]{"--inputFile", "pom.xml", "-of", "target/test/output.xml", "-verbose"});
 		assertNotNull(options);
@@ -95,7 +95,7 @@ public class CliTest {
 					.handler((c,p) -> c.getBean().outputFile = p).end()
 					.pathOption("helperFile", "hf")
 					.handler((c,p) -> c.getBean().helperFile = p).end()
-					.booleanOption("verbose", "v")
+					.boolOption("verbose", "v")
 					.handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
 					.parse(new @NonNull String[]{"-of", "target/test/output.xml", "-verbose"});
 			fail("Expected Exception");
@@ -115,7 +115,7 @@ public class CliTest {
 					.handler((c,p) -> c.getBean().outputFile = p).end()
 				.pathOption("helperFile", "hf")
 				    .handler((c,p) -> c.getBean().helperFile = p).end()
-				.booleanOption("verbose", "v")
+				.boolOption("verbose", "v")
 				    .handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
 				.parse(new @NonNull String[]{"--inputFile=pom.xml", "-of", "target/test/output.xml", "-verbose=true"});
 			assertNotNull(options);
@@ -137,9 +137,9 @@ public class CliTest {
 					.handler((c,p) -> c.getBean().outputFile = p).end()
 				.pathOption("helperFile", "hf")
 				    .handler((c,p) -> c.getBean().helperFile = p).end()
-				.booleanOption("verbose", "v")
+				.boolOption("verbose", "v")
 				    .handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
-				.beanValidator((b) -> {validated.set(); return null;})
+				.validator((b) -> {validated.set(); return null;})
 				.parse(new @NonNull String[]{"--inputFile=pom.xml", "-of", "target/test/output.xml", "-verbose=true"});
 			assertNotNull(options);
 			assertEquals(options.inputFile.toString(), "pom.xml");
@@ -151,11 +151,11 @@ public class CliTest {
 	/** Test case for the error handler.
 	 */
 	@Test
-	public void testErrorHandler() {
+	public void testUsageHandler() {
 		final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
 				.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
 				.stringOption("outputFile", "of").required().handler((c,s) -> c.getBean().outputFile = Paths.get(s)).end()
-				.errorHandler((s) -> new IllegalStateException(s));
+				.usageHandler((s) -> new IllegalStateException(s));
 		try {
 			cli.parse(new @NonNull String[]{ "-if=pom.xml", "-of=/var/lib/of.log", "-h"});
 		} catch (IllegalStateException e) {
@@ -178,7 +178,7 @@ public class CliTest {
 				.stringOption("outputFile", "of")
 				    .required()
 				    .handler(ofHandler).end()
-				.errorHandler((s) -> new IllegalStateException(s));
+				.usageHandler((s) -> new IllegalStateException(s));
 		final @NonNull String @NonNull [] args1 = new @NonNull String[] {
 			"-if=pom.xml", "-of=/var/lib/of.log"
 		};
@@ -193,51 +193,62 @@ public class CliTest {
 		assertNotNull(ob2);
 		assertEquals("pom.xml", ob2.inputFile.toString());
 		assertEquals("/var/lib/of.log", ob2.outputFile.toString().replace('\\', '/'));
+	}
+
+	private static class DnfOptions {
+		private String command;
+		// For command = "check"
+		private boolean dependencies, duplicates;
+		// For command = "search"
+		private boolean all;
+		private List<String> keywords = new ArrayList<>();
+	}
+
+	@Test
+	public void testActions() {
+		final DnfOptions checkOptions = testActions("check", "--duplicates");
+		assertNotNull(checkOptions);
+		assertEquals("check", checkOptions.command);
+		assertTrue(checkOptions.duplicates);
+		assertFalse(checkOptions.dependencies);
+		assertFalse(checkOptions.all);
+		assertTrue(checkOptions.keywords.isEmpty());
+		final DnfOptions searchOptions = testActions("search", "--all", "kernel");
+		assertNotNull(searchOptions);
 		
 	}
 
-	/** Test for implementing a {@link Cli.CliClass}.
+	/** Parses the argument string into an instance of {@link DnfOptions}.
+	 * @param pArgs The argument string
+	 * @return The configured instance of {@link DnfOptions}.
 	 */
-	@Test
-	public void testCliClass() {
-		final @NonNull FailableBiConsumer<@NonNull Context<@NonNull OptionsBean>, String, ?> ofHandler = (c,s) -> {
-			c.getBean().outputFile = Paths.get(s);
-		};
-		final MutableBoolean configured = new MutableBoolean();
-		final Function<String,RuntimeException> errorHandler = (s) -> new IllegalStateException(s);
-		assertNull(TestCliClass.options);
-		Cli.main(TestCliClass.class, OptionsBean.class, new @NonNull String[] {
-			"-if", "pom.xml", "-of", "./logs/of.log"
-		}, (cli) -> {
-			configured.set();
-			cli.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
-			   .stringOption("outputFile", "of").required().handler(ofHandler).end();
-		}, errorHandler);
-		assertTrue(configured.isSet());
-		final OptionsBean ob = TestCliClass.options; 
-		assertNotNull(ob);
-		assertEquals("pom.xml", ob.inputFile.toString());
-		assertEquals("./logs/of.log", ob.outputFile.toString().replace('\\', '/'));
+	protected DnfOptions testActions(String... pArgs) {
+		final DnfOptions opts = new DnfOptions();
+		final FailableBiConsumer<Context<DnfOptions>,Boolean,?> depsHandler =
+				(ct,b) -> opts.dependencies = b.booleanValue();
+		final FailableBiConsumer<Context<DnfOptions>,Boolean,?> dupsHandler =
+				(ct,b) -> opts.duplicates = b.booleanValue();
+		final FailableBiConsumer<Context<DnfOptions>,Boolean,?> allHandler =
+				(ct,b) -> opts.all = b.booleanValue();
+		return Cli.of(opts)
+		   .extraArgsHandler((ctx, cmd) -> {
+			   if (opts.command == null) {
+				   switch (cmd) {
+				   case "check":
+					   ctx.boolOption("dependencies", "deps").handler(depsHandler).end()
+					      .boolOption("duplicates", "dups").handler(dupsHandler).end();
+					   break;
+				   case "search":
+					   ctx.boolOption("all", "a").handler(allHandler).end()
+					      .extraArgsHandler((ct,s) -> opts.keywords.add(s));
+					   break;
+				   default:
+					   throw ctx.error("Invalid command: Expected check|search, got " + cmd);
+				   }
+				   opts.command = cmd;
+			   } else {
+				   throw ctx.error("Command may be given only once.");
+			   }
+		   }).parse(pArgs);
 	}
-
-	/** Test class for the {@link Cli.CliClass}.
-	 */
-	public static class TestCliClass implements Cli.CliClass<OptionsBean> {
-		private static OptionsBean options;
-
-		/** Runs the Cli with the given options bean.
-		 */
-		@Override
-		public void run(OptionsBean pOptionsBean) {
-			options = pOptionsBean;
-		}
-
-		/**
-		 * @return The optionś bean.
-		 */
-		public OptionsBean getOptions() {
-			return Objects.requireNonNull(options);
-		}
-	}
-
 }

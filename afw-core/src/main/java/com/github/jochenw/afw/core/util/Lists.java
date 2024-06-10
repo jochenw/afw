@@ -249,4 +249,21 @@ public class Lists {
 	public static <O> Collector<O> collect(Class<O> pType) {
 		return new Collector<>(Objects.requireNonNull(pType, "Type"));
 	}
+
+	/** Returns a mutable, non-null list with the given elements.
+	 * @param pValues The list elements.
+	 * @return A mutable, non-null list with the given elements.
+	 */
+	@SafeVarargs
+	public static <O >@NonNull List<O> asList(O... pValues) {
+		if (pValues == null) {
+			return new ArrayList<>();
+		} else {
+			final List<O> list = new ArrayList<>(pValues.length);
+			for (O o : pValues) {
+				list.add(o);
+			}
+			return list;
+		}
+	}
 }
