@@ -286,7 +286,7 @@ public class Cli<B> extends OptionBuilder<B> {
 		final Predicate<String> optionNameChecker = on -> {
 			return primaryNamesByName.containsKey(on);
 		};
-		final @NonNull Context<B> ctx = new Context<>(bean, this, optionHandler, optionNameChecker) {
+		final @NonNull Context<B> ctx = new Context<B>(bean, this, optionHandler, optionNameChecker) {
 			@Override
 			protected boolean isOptionNamePresent(String pOptionName) {
 				return primaryNamesByName.containsKey(pOptionName);
@@ -300,7 +300,7 @@ public class Cli<B> extends OptionBuilder<B> {
 			final String opt;
 			if ("--".equals(arg)) {
 				// Terminate args processing.
-				args.forEach((s) -> Cli.this.handleExtraArg(ctx, s));
+				args.forEach((s) -> Cli.this.handleExtraArg(ctx, Objects.requireNonNull(s)));
 				break;
 			}
 			if (arg.startsWith("--")) {
@@ -356,6 +356,7 @@ public class Cli<B> extends OptionBuilder<B> {
 				}
 				ref.value = optValue;
 			}
+			ref.hasBeenUsed = true;
 		}
 		final List<Runnable> handlerCalls = new ArrayList<>();
 		for (OptionReference<B,?> ref : optionsByPrimaryName.values()) {
@@ -398,13 +399,7 @@ public class Cli<B> extends OptionBuilder<B> {
 	 */
 	protected Object validate(OptionReference<B,?> pOptionRef) {
 		final Option<?,B> opt = pOptionRef.option;
-		boolean present;
-		if (opt.isRepeatable()) {
-			present = pOptionRef.values != null  &&  !pOptionRef.values.isEmpty();
-		} else {
-			present = pOptionRef.value != null  ||  opt.hasDefaultValue();
-		}
-		if (opt.isRequired()  &&  !present) {
+		if (opt.isRequired()  &&  !pOptionRef.hasBeenUsed) {
 			throw new UsageException("Required option missing: " + opt.getPrimaryName());
 		}
 		if (opt.isRepeatable()) {
@@ -421,7 +416,14 @@ public class Cli<B> extends OptionBuilder<B> {
 			}
 			return null;
 		} else {
-			final String value = pOptionRef.value == null ? opt.getDefaultValue() : pOptionRef.value;
+			String value = pOptionRef.value;
+			if (pOptionRef.hasBeenUsed) {
+				if (value == null) {
+					value = opt.getDefaultValue();
+				}
+			} else {
+				return null;
+			}
 			if (value == null) {
 				return null;
 			} else {
@@ -443,6 +445,7 @@ public class Cli<B> extends OptionBuilder<B> {
 		final Option<T,O> option;
 		String value;
 		List<@NonNull String> values;
+		boolean hasBeenUsed;
 
 		/** Creates a new instance as a reference to the given option.
 		 * @param pOption The referenced option.

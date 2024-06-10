@@ -168,6 +168,39 @@ public class Data {
 			public String test(Path pPath, String pDescription);
 		}
 
+		/** Extracts a path from the given data store.
+		 * @param pData The data store, from which a value is being extracted.
+		 * @param pKey The key, which is being queried in the data store.
+		 * @param pDescription Short description of the expected value, for use in error messages.
+		 * @return The string, which has been retrieved.
+		 * @throws NullPointerException The value, which has been extracted from the data store, is null.
+		 * @throws IllegalArgumentException The value, which has been extracted from the data store,
+		 *   is empty, or not a string.
+		 * @throws IllegalStateException The value, which has been extracted from the data store,
+		 *   doesn't meet the given criteria.
+		 */
+		public @Nullable Path getPath(@NonNull O pData, @NonNull String pKey,
+				                      @NonNull String pDescription) {
+			final Object pathObject = getValue(pData, pKey);
+			if (pathObject == null) {
+				return null;
+			}
+			if (pathObject instanceof Path) {
+				return (Path) pathObject;
+			} else if (pathObject instanceof File) {
+				return ((File) pathObject).toPath();
+			} else if (pathObject instanceof String) {
+				final String str = (String) pathObject;
+				if (str.length() == 0) {
+					throw new IllegalArgumentException("Empty value for parameter " + pDescription);
+				}
+				return Paths.get((String) pathObject);
+			} else {
+				throw new IllegalArgumentException("Invalid value for parameter " + pDescription
+                        + ": Expected path, got " + pathObject.getClass().getName());
+			}
+		}
+
 		/** Extracts a path from the given data store, ensuring that the path
 		 * meets the given critera.
 		 * @param pData The data store, from which a value is being extracted.

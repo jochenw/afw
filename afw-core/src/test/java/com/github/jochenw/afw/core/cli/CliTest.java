@@ -235,12 +235,12 @@ public class CliTest {
 			   if (opts.command == null) {
 				   switch (cmd) {
 				   case "check":
-					   ctx.boolOption("dependencies", "deps").handler(depsHandler).end()
-					      .boolOption("duplicates", "dups").handler(dupsHandler).end();
+					   ctx.boolOption("dependencies", "deps").handler(depsHandler).end();
+					   ctx.boolOption("duplicates", "dups").handler(dupsHandler).end();
 					   break;
 				   case "search":
-					   ctx.boolOption("all", "a").handler(allHandler).end()
-					      .extraArgsHandler((ct,s) -> opts.keywords.add(s));
+					   ctx.boolOption("all", "a").handler(allHandler).end();
+					   ctx.extraArgsHandler((ct,s) -> opts.keywords.add(s));
 					   break;
 				   default:
 					   throw ctx.error("Invalid command: Expected check|search, got " + cmd);
