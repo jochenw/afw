@@ -8,7 +8,7 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.util.Reflection;
-import com.github.jochenw.afw.di.util.Exceptions;
+import com.github.jochenw.afw.core.util.Exceptions;
 
 /** An instance of this class provides access to field values,
  * or values, which are returned by get methods.

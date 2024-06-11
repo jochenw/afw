@@ -218,7 +218,11 @@ public class Lists {
 		/** Invokes the given consumer for every collected element.
 		 * @param pConsumer The consumer, which is being invoked
 		 *   for every element.
+		 * @param <T> Type of the exceptions, that the consumer
+		 *   may throw.
 	     * @throws NullPointerException The parameter is null.
+	     * @throws T An exception, which may be thrown by the
+	     *   consumer.
 		 */
 		public <T extends Throwable> void forEach(FailableConsumer<O,T> pConsumer) throws T {
 			final FailableConsumer<O,T> consumer = Objects.requireNonNull(pConsumer, "Consumer");
@@ -252,6 +256,7 @@ public class Lists {
 
 	/** Returns a mutable, non-null list with the given elements.
 	 * @param pValues The list elements.
+	 * @param <O> Type of the list elements.
 	 * @return A mutable, non-null list with the given elements.
 	 */
 	@SafeVarargs

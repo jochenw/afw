@@ -40,6 +40,7 @@ public class Html {
 	 *   return an empty value. Otherwise false.
 	 * @param pValueSupplier The supplier, which returns the string value, that
 	 *   is being escaped.
+	 * @return The converted HTML string, or the token "&nbsp;".
 	 */
 	public static String escapeOrNbspIf(boolean pEmpty, Supplier<String> pValueSupplier) {
 		if (pEmpty) {
