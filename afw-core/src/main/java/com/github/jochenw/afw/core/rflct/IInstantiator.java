@@ -64,7 +64,7 @@ public interface IInstantiator<C> {
 		} else {
 			final Class<?>[] parameterTypes = constructor.getParameterTypes();
 			// Java 9+, use the private lookup.
-			final MethodType mt = Rflct.getMethodType(declaringClass,
+			final MethodType mt = Rflct.getMethodType(Void.TYPE,
 					                                  parameterTypes);
 			MethodHandle mh;
 			try {
@@ -86,8 +86,8 @@ public interface IInstantiator<C> {
 								+ parameterTypes.length + " arguments, got "
 								+ numberOfArgs);
 					}
-					final Object[] args = new Object[parameterTypes.length];
-					args[0] = declaringClass;
+					final Object[] args = new Object[parameterTypes.length+1];
+					args[0] = null;
 					if (pArgs != null) {
 						for (int i = 0;  i < pArgs.length;  i++) {
 							args[i] = pArgs[i];
@@ -96,8 +96,14 @@ public interface IInstantiator<C> {
 					@NonNull
 					C instance;
 					try {
-						@SuppressWarnings({ "null", "unchecked" })
-						final @NonNull C c = (C) mh.invokeWithArguments(args);
+						final Object o;
+						if (args.length == 1) {
+							o = mh.invoke();
+						} else {
+							o = mh.invoke(args);
+						}
+						@SuppressWarnings({ "unchecked", "null" })
+						final @NonNull C c = (C) o;
 						instance = c;
 					} catch (RuntimeException e) {
 						throw e;
