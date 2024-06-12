@@ -30,6 +30,8 @@ public interface ISetter<B,I> {
 	/** Creates a new instance, which operates by updating the given field
 	 * directly.
 	 * @param pField The field, which is being updated.
+     * @param <B> The bean type.
+     * @param <I> The setters parameter type.
 	 * @return The created instance.
 	 * @throws NullPointerException The parameter {@code pField} is null.
 	 */
@@ -68,13 +70,13 @@ public interface ISetter<B,I> {
 		}
 	}
 
-	/** C
-	
 	/** Creates a new instance, which operates by updating the field
 	 * with the given name directly
 	 * @param pDeclaringType Type of the bean class, which declares the
 	 * field.
 	 * @param pProperty Name of the property, which is being updated.
+     * @param <B> The bean type.
+     * @param <I> The setters parameter type.
 	 * @return The created instance.
 	 * @throws NullPointerException Either of the parameters is null.
 	 * @throws IllegalArgumentException No field with the name
