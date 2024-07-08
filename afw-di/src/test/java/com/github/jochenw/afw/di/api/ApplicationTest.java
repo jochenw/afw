@@ -13,28 +13,33 @@ import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.github.jochenw.afw.di.api.Application.ComponentFactorySupplier;
+import com.github.jochenw.afw.di.impl.DefaultOnTheFlyBinder;
 
 /** Test for the {@link Application} class.
  */
 public class ApplicationTest {
 	/** Subclass of {@link Application}, which allows us to test, whether
 	 * {@link Application#of(Class, Module)}, or
-	 * {@link Application#of(Class, Supplier)}
+	 * {@link Application#of(Class, Supplier, String, IOnTheFlyBinder)}
 	 * can be used to create instances of a subclass.
 	 */
 	public static class MyApplication extends Application {
 		/** Creates a new instance with the given module supplier.
 		 * @param pModuleSupplier The module supplier, which will be
 		 *   used to create the {@link IComponentFactory}.
+		 * @param pAnnotationType The (optional) annotation style, either of "javax" (default), "jakarta", or "guice".
+		 * @param pOnTheFlyBinder The (optional) provider of dynamic bindings.
 		 */
-		public MyApplication(Supplier<@NonNull Module> pModuleSupplier) {
-			super(pModuleSupplier);
+		public MyApplication(Supplier<@NonNull Module> pModuleSupplier, String pAnnotationType, IOnTheFlyBinder pOnTheFlyBinder) {
+			super(pModuleSupplier, pAnnotationType, pOnTheFlyBinder);
 		}
 		/** Creates a new instance with the given component factory.
 		 * @param pComponentFactoryProvider The component factory provider.
+		 * @param pAnnotationType The (optional) annotation style, either of "javax" (default), "jakarta", or "guice".
+		 * @param pOnTheFlyBinder The (optional) provider of dynamic bindings.
 		 */
-		public MyApplication(ComponentFactorySupplier pComponentFactoryProvider) {
-			super(pComponentFactoryProvider);
+		public MyApplication(ComponentFactorySupplier pComponentFactoryProvider, String pAnnotationType, IOnTheFlyBinder pOnTheFlyBinder) {
+			super(pComponentFactoryProvider, pAnnotationType, pOnTheFlyBinder);
 		}
 	}
 	/** Subclass of {@link Application} without a valid constructor.
@@ -48,9 +53,11 @@ public class ApplicationTest {
 		 * @param pModuleSupplier The {@link Supplier module supplier},
 		 *   which is being invoked to acquire a
 		 *   {@link IComponentFactory component factory}.
+		 * @param pAnnotationType The (optional) annotation style, either of "javax" (default), "jakarta", or "guice".
+		 * @param pOnTheFlyBinder The (optional) provider of dynamic bindings.
 		 */
-		protected InvalidApplicationClass(Supplier<@NonNull Module> pModuleSupplier) {
-			super(pModuleSupplier);
+		protected InvalidApplicationClass(Supplier<@NonNull Module> pModuleSupplier, String pAnnotationType, IOnTheFlyBinder pOnTheFlyBinder) {
+			super(pModuleSupplier, pAnnotationType, pOnTheFlyBinder);
 			throw new IllegalStateException("Not implemented");
 		}
 
@@ -60,9 +67,11 @@ public class ApplicationTest {
 		 * @param pComponentFactoryProvider The {@link ComponentFactorySupplier
 		 * component factory provider}, which is being invoked to acquire a
 		 *   {@link IComponentFactory component factory}.
+		 * @param pAnnotationType The (optional) annotation style, either of "javax" (default), "jakarta", or "guice".
+		 * @param pOnTheFlyBinder The (optional) provider of dynamic bindings.
 		 */
-		protected InvalidApplicationClass(ComponentFactorySupplier pComponentFactoryProvider) {
-			super(pComponentFactoryProvider);
+		protected InvalidApplicationClass(ComponentFactorySupplier pComponentFactoryProvider, String pAnnotationType, IOnTheFlyBinder pOnTheFlyBinder) {
+			super(pComponentFactoryProvider, pAnnotationType, pOnTheFlyBinder);
 			throw new IllegalStateException("Not implemented");
 		}
 	}
@@ -74,8 +83,13 @@ public class ApplicationTest {
 		final Module module = (b) -> {
 			b.bind(Map.class).toClass(HashMap.class);
 		};
-		final Application appl = Application.of(module);
-		validate(appl, false);
+		final Application appl0 = Application.of(module);
+		validate(appl0, false, null, null);
+		final IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
+		final Application appl1 = Application.of(module, "jakarta", onTheFlyBinder);
+		validate(appl1, false, "jakarta", onTheFlyBinder);
+		final Application appl2 = Application.of(module, "javax", onTheFlyBinder);
+		validate(appl2, false, "javax", onTheFlyBinder);
 	}
 
 	/** Tests, whether the given application's component factory
@@ -85,7 +99,7 @@ public class ApplicationTest {
 	 *   that the component factory has a binding for the
 	 *   {@link Application} itself. Otherwise true.
 	 */
-	protected void validate(final Application pApplication, boolean pNoApplication) {
+	protected void validate(final Application pApplication, boolean pNoApplication, String pAnnotationType, IOnTheFlyBinder pOnTheFlyBinder) {
 		assertNotNull(pApplication);
 		final IComponentFactory cf = pApplication.getComponentFactory();
 		assertNotNull(cf);
@@ -99,6 +113,8 @@ public class ApplicationTest {
 		assertTrue(map1 instanceof HashMap);
 		assertTrue(map2 instanceof HashMap);
 		assertNotSame(map1, map2);
+		assertSame(pAnnotationType, pApplication.getAnnotationType());
+		assertSame(pOnTheFlyBinder, pApplication.getOnTheFlyBinder());
 	}
 
 	/** Test creating an application with a component factory provider.
@@ -111,8 +127,14 @@ public class ApplicationTest {
 		final ComponentFactorySupplier provider = () -> {
 			return new ComponentFactoryBuilder().module(module).build();
 		};
-		final Application appl = Application.of(provider);
-		validate(appl, true);
+		final Application appl0 = Application.of(provider);
+		validate(appl0, true, null, null);
+		final IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder() {
+		};
+		final Application appl1 = Application.of(module, "jakarta", onTheFlyBinder);
+		validate(appl1, true, "jakarta", onTheFlyBinder);
+		final Application appl2 = Application.of(module, "javax", onTheFlyBinder);
+		validate(appl2, true, "javax", onTheFlyBinder);
 		try {
 			Application.of(InvalidApplicationClass.class, provider);
 			fail("Expected Exception");
@@ -129,8 +151,8 @@ public class ApplicationTest {
 			b.bind(Map.class).toClass(HashMap.class);
 		};
 		final IComponentFactory cf = new ComponentFactoryBuilder().module(module).build();
-		final Application appl = Application.of(cf);
-		validate(appl, true);
+		final Application appl0 = Application.of(cf);
+		validate(appl0, true, null, null);
 	}
 
 	/** Test creating a subclass with a module supplier.
@@ -140,8 +162,14 @@ public class ApplicationTest {
 		final Module module = (b) -> {
 			b.bind(Map.class).toClass(HashMap.class);
 		};
-		final MyApplication appl = Application.of(MyApplication.class, module);
-		validate(appl, false);
+		final MyApplication appl0 = Application.of(MyApplication.class, module);
+		validate(appl0, false, null, null);
+		final IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
+		final MyApplication appl1 = Application.of(MyApplication.class, module, "jakarta", onTheFlyBinder);
+		validate(appl1, false, "jakarta", onTheFlyBinder);
+		final MyApplication appl2 = Application.of(MyApplication.class, module, "javax", onTheFlyBinder);
+		validate(appl2, false, "javax", onTheFlyBinder);
+		validate(appl0, false, null, null);
 		try {
 			Application.of(InvalidApplicationClass.class, module);
 			fail("Expected Exception");
@@ -160,8 +188,8 @@ public class ApplicationTest {
 		final ComponentFactorySupplier provider = () -> {
 			return new ComponentFactoryBuilder().module(module).build();
 		};
-		final MyApplication appl = Application.of(MyApplication.class, provider);
-		validate(appl, true);
+		final MyApplication appl0 = Application.of(MyApplication.class, provider);
+		validate(appl0, true, null, null);
 	}
 
 	/** A test class for testing {@code @PostConstruct},
