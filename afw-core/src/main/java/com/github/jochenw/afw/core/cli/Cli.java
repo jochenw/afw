@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -15,7 +16,6 @@ import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.util.Lists;
 import com.github.jochenw.afw.core.util.Objects;
-import com.google.common.base.Predicate;
 
 
 /** Abstract base class for deriving Cli applications.

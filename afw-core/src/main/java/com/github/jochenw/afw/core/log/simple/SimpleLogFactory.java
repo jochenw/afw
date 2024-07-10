@@ -220,7 +220,7 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 *   which case {@link Level#INFO} will be used as the log level.
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
-	public static @NonNull ILogFactory of(@Nullable PrintStream pOut, @Nullable Level pLogLevel) {
+	public static @NonNull SimpleLogFactory of(@Nullable PrintStream pOut, @Nullable Level pLogLevel) {
 		final SimpleLogFactory slf = new SimpleLogFactory(Objects.notNull(pOut, Objects.requireNonNull(System.out)));
 		slf.setLevel(Objects.notNull(pLogLevel, Level.INFO));
 		return slf;
@@ -233,8 +233,8 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 *   which case {@link System#out} will be used for logging.
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
-	public static @NonNull ILogFactory of(@Nullable PrintStream pOut) {
-		return of (pOut, Level.INFO);
+	public static @NonNull SimpleLogFactory of(@Nullable PrintStream pOut) {
+		return of(pOut, Level.INFO);
 	}
 
 	/**
@@ -242,7 +242,18 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 * using the log level {@link Level#INFO}.
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
-	public static @NonNull ILogFactory ofSystemOut() {
-		return of (System.out, Level.INFO);
+	public static @NonNull SimpleLogFactory ofSystemOut() {
+		return ofSystemOut(null);
+	}
+
+	/**
+	 * Creates a new instance, which is logging to the given {@link System#out},
+	 * using the given log level.
+	 * @param pLevel The created log factories log level. May be null, in
+	 *   which case the default ({@link Level#INFO}) is used.
+	 * @return The created instance of {@link SimpleLogFactory}.
+	 */
+	public static @NonNull SimpleLogFactory ofSystemOut(@Nullable Level pLevel) {
+		return of(System.out, Objects.notNull(null, Level.INFO));
 	}
 }
