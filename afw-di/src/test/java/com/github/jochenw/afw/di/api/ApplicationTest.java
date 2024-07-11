@@ -189,7 +189,7 @@ public class ApplicationTest {
 			return new ComponentFactoryBuilder().module(module).build();
 		};
 		final MyApplication appl0 = Application.of(MyApplication.class, provider);
-		validate(appl0, true, null, null);
+																																	validate(appl0, true, null, null);		
 	}
 
 	/** A test class for testing {@code @PostConstruct},

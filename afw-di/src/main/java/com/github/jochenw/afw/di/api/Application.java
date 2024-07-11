@@ -151,12 +151,35 @@ public class Application {
 	public static <App extends Application> App of(Class<App> pType, ComponentFactorySupplier pComponentFactoryProvider) {
 		final ComponentFactorySupplier provider = Objects.requireNonNull(pComponentFactoryProvider, "Provider");
 		final MethodHandles.Lookup lookup = MethodHandles.lookup();
+		Constructor<App> constructor1 = null;
+		Constructor<App> constructor2 = null;
 		try {
-			final Constructor<App> constructor = (Constructor<App>) pType.getDeclaredConstructor(ComponentFactorySupplier.class);
-			final MethodHandle mh = lookup.unreflectConstructor(constructor);
-			return (App) mh.invoke(provider);
-		} catch (Throwable t) {
-			throw Exceptions.show(t);
+			constructor1 = (Constructor<App>) pType.getDeclaredConstructor(ComponentFactorySupplier.class);
+		} catch (NoSuchMethodException e1) {
+			try {
+				constructor2 = (Constructor<App>) pType.getDeclaredConstructor(ComponentFactorySupplier.class,
+						                                                       String.class, IOnTheFlyBinder.class);
+			} catch (NoSuchMethodException e2) {
+				throw new IllegalStateException("The application class " + pType.getName()
+				    + " has neither of the following constructors: "
+				    + pType.getSimpleName() + "(ComponentFactorySupplier), or "
+				    + pType.getSimpleName() + "(ComponentFactorySuppier,String,IOnTheFlyBinder)");
+			}
+		}
+		if (constructor1 != null) {
+			try {
+				final MethodHandle mh = lookup.unreflectConstructor(constructor1);
+				return (App) mh.invoke(provider);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+		} else {
+			try {
+				final MethodHandle mh = lookup.unreflectConstructor(constructor2);
+				return (App) mh.invoke(provider, null, null);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
 		}
 	}
 
