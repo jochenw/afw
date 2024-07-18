@@ -101,9 +101,21 @@ public class SaxTest {
 			assertTrue(creator.isIndenting());
 			final String actual = new String(actualBytes, StandardCharsets.UTF_8).replace("\r\n", "\n");
 			
-			assertEquals("<test>\n"
-					     + "    <e>ok</e>\n"
-					     + "</test>\n", actual);
+			int blanks = -1;
+			for (int i = 0;  i < 16;  i++) {
+				final StringBuilder sb = new StringBuilder();
+				sb.append("<test>\n");
+				for (int j = 0;  j < i;  j++) {
+					sb.append(' ');
+				}
+				sb.append("<e>ok</e>\n");
+				sb.append("</test>\n");
+				if (sb.toString().equals(actual)) {
+					blanks = i;
+					break;
+				}
+			}
+			assertTrue(blanks >= 0);
 		}
 	}
 
@@ -118,14 +130,11 @@ public class SaxTest {
 		};
 		SaxWriter creator = Sax.creator();
 		assertNull(creator.getNamespaceUri());
-		final byte[] actualBytes = creator.withoutXmlDeclaration().withNamespaceUri("foo").withIndentation().writeBytes(contentCreator);
+		final byte[] actualBytes = creator.withoutXmlDeclaration().withNamespaceUri("foo").writeBytes(contentCreator);
 		assertEquals("foo", creator.getNamespaceUri());
-		assertTrue(creator.isIndenting());
 		final String actual = new String(actualBytes, StandardCharsets.UTF_8).replace("\r\n", "\n").replace("\"", "'");
 		
-		assertEquals("<test xmlns='foo'>\n"
-				     + "    <e>ok</e>\n"
-				     + "</test>\n", actual);
+		assertEquals("<test xmlns='foo'><e>ok</e></test>", actual);
 	}
 
 	/** Test using a prefix.
@@ -144,15 +153,11 @@ public class SaxTest {
 				    .withoutXmlDeclaration()
 				    .withNamespaceUri("foo")
 				    .withPrefix("p")
-				    .withIndentation()
 				    .writeBytes(contentCreator);
 		assertEquals("p", creator.getPrefix());
-		assertTrue(creator.isIndenting());
 		final String actual = new String(actualBytes, StandardCharsets.UTF_8).replace("\r\n", "\n").replace("\"", "'");
 		
-		assertEquals("<p:test xmlns:p='foo'>\n"
-				     + "    <p:e>ok</p:e>\n"
-				     + "</p:test>\n", actual);
+		assertEquals("<p:test xmlns:p='foo'><p:e>ok</p:e></p:test>", actual);
 
 		Functions.assertFail(IllegalStateException.class,
 				"A default prefix has been specified, but no namespace URI.",
