@@ -3,6 +3,7 @@ package com.github.jochenw.afw.core.rflct;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.junit.Test;
 
@@ -10,6 +11,9 @@ import org.junit.Test;
 /** Test suite for the {@link ISetter} interface.
  */
 public class SetterTest {
+	/** A test bean with various fields, and methods,
+	 * from which setters can be derived.
+	 */
 	public static class Bean {
 		private String a, b;
 
@@ -27,11 +31,26 @@ public class SetterTest {
 		public void setA(String pA) {
 			a = pA;
 		}
+		/** Setter for the "b" property.
+		 * @param pB The new value of the "b" property.
+		 */
+		public void setB(String pB) {
+			b = pB;
+		}
 		/** Setter for the "b" property, using the property name "foo".
 		 * @param pFoo The new value of the "b" property.
 		 */
 		public void setFoo(String pFoo) {
 			b = pFoo;
+		}
+		/** Builder method for the "a" property, using the property
+		 * name "bar",
+		 * @param pBar The new value of the "bar" property.
+		 * @return This bean.
+		 */
+		public Bean bar(String pBar) {
+			b = pBar;
+			return this;
 		}
 	}
 
@@ -39,10 +58,13 @@ public class SetterTest {
 	 * @throws Exception The test has failed.
 	 */
 	@Test
-	public void testOfField() throws Exception {
-		final Field bField = Bean.class.getDeclaredField("b");
-		final ISetter<Bean,String> setter = ISetter.of(bField);
-		validateSetterForB(setter);
+	public void testOfMethod() throws Exception {
+		final ISetter<Bean, String> bSetter = ISetter.of(Bean.class.getMethod("setB", String.class));
+		validateSetterForB(bSetter);
+		final ISetter<Bean, String> fooSetter = ISetter.of(Bean.class.getMethod("setFoo", String.class));
+		validateSetterForB(fooSetter);
+		final ISetter<Bean, String> barSetter = ISetter.of(Bean.class.getMethod("bar", String.class));
+		validateSetterForB(barSetter);
 	}
 
 	private void validateSetterForB(final ISetter<Bean, String> setter) {
