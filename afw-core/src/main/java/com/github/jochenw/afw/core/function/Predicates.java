@@ -178,6 +178,32 @@ public class Predicates {
 		};
 	}
 
+	/** Creates a new predicate, which evaluates to true, if any of
+	 * the given predicates does. (In other words, a logical OR on all
+	 * of the predicates.
+	 * @param pPredicates The predicates, on which the created
+	 *   predicate depends.
+	 * @param <O> Type of the terms, and the created predicate.
+	 * @return The created predicate, which implements a logical AND
+	 *   on all of the terms.
+	 */
+	public static <O> Predicate<O> anyOf(Iterable<Predicate<O>> pPredicates) {
+		return or(pPredicates);
+	}
+
+	/** Creates a new predicate, which evaluates to true, if all of
+	 * the given predicates do. (In other words, a logical AND on all
+	 * of the predicates.
+	 * @param pPredicates The predicates, on which the created
+	 *   predicate depends.
+	 * @param <O> Type of the terms, and the created predicate.
+	 * @return The created predicate, which implements a logical AND
+	 *   on all of the terms.
+	 */
+	public static <O> Predicate<O> allOf(Iterable<Predicate<O>> pPredicates) {
+		return and(pPredicates);
+	}
+
 	/** Creates a new predicate, which implements a logical AND on all of
 	 * the given predicates.
 	 * @param pPredicates The terms of the logical AND.

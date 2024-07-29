@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -254,5 +255,23 @@ public class JdbcHelperTest {
 			success.set();
 		});
 		assertTrue(success.isSet());
+	}
+
+	/** Test case for {@link JdbcHelper#query(Connection, Dialect, String, Object...)}.
+	 * @throws Exception The test failed.
+	 */
+	@Test
+	public void testQueryConnection() throws Exception {
+		final String sqlCreate = "CREATE TABLE table_three (id INT NOT NULL PRIMARY KEY, userId VARCHAR(16) NOT NULL)";
+		final String sqlDrop = "DROP TABLE table_three";
+		final Application application = getApplication(null);
+		final JdbcHelper jh = application.getComponentFactory().requireInstance(JdbcHelper.class);
+		final ConnectionProvider connectionProvider = application.getComponentFactory().requireInstance(ConnectionProvider.class);
+		try (Connection conn = connectionProvider.open()) {
+			conn.prepareStatement(sqlCreate).executeUpdate();
+			jh.query(conn, null, sqlDrop).run();
+			jh.query(conn, null, sqlCreate).run();
+			assertEquals(0l, jh.query(conn, null, "SELECT COUNT(*) FROM table_three").count());
+		}
 	}
 }

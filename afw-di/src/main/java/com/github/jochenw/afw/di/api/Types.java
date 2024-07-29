@@ -41,6 +41,12 @@ import org.jspecify.annotations.NonNull;
  * Not exactly obvious, not really comfortable, but it works!
  */
 public class Types {
+	/** This constructor s only present to omit certain
+	 * Javadoc warnings.
+	 */
+	public Types() {
+	}
+
 	/**
 	 * A generic class, that supports access to its parameter type at runtime.
 	 * @param <T> The parameter type.

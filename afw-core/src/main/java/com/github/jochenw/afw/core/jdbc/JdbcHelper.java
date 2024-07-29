@@ -1,6 +1,10 @@
 package com.github.jochenw.afw.core.jdbc;
 
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -240,6 +244,37 @@ public class JdbcHelper {
 			};
 		}
 
+		/** Executes a "count query", and returns the result. A "count query" is
+		 * defined to be a query, which returns exactly one row with exactly
+		 * one integer column.
+		 * @return The result of the "count query": An integer, or long, which
+		 * was returned in the first column of the first row in the result set.
+		 * @throws IllegalStateException The query is no "count query", because
+		 * it returned zero, or more than one result row, or because it returned
+		 * null, rather than an integer, or long value.
+		 */
+		public long count() {
+			try (Connection conn = connectionProvider.get();
+				 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
+			    helper.setParameters(stmt, parameters);
+			    try (ResultSet rs = stmt.executeQuery()) {
+			    	if (!rs.next()) {
+			    		throw new IllegalStateException("The query did not return a result row.");
+			    	}
+			    	final long l = rs.getLong(1);
+			    	if (rs.wasNull()) {
+			    		throw new IllegalStateException("The query returned a null object.");
+			    	}
+			    	if (rs.next()) {
+			    		throw new IllegalStateException("The query returned more than one result row.");
+			    	}
+			    	return l;
+			    }
+			} catch (Throwable t) {
+				throw handleError(t);
+			}
+		}
+	
 		/**
 		 * Executes the configured query, executes it, and returns the number
 		 * of affected rows.
@@ -1370,7 +1405,10 @@ public class JdbcHelper {
 	 * statement, and parameters.
 	 * The query will be executed by invocation of a suitable method on the
 	 * {@link JdbcHelper.Executor query executor}.
-	 * @param pConnectionSupplier A database connection provider.
+	 * @param pConnectionSupplier A database connection provider. The
+	 * connection, which is returned by the provider, will be closed.
+	 * If you need the connection to remain open, use
+	 * {@link #query(Connection, Dialect, String, Object...)}.
 	 * @param pDialect The SQL dialect, if available, for support in
 	 *   error handling.
 	 * @param pStatement The SQL statement, which is being executed.
@@ -1381,5 +1419,52 @@ public class JdbcHelper {
 			              @Nullable Dialect pDialect,
 			              @NonNull String pStatement, @Nullable Object... pParameters) {
 		return new Executor(this, pDialect, pConnectionSupplier, pStatement, pParameters);
+	}
+
+	/** Prepares a {@link JdbcHelper.Executor query executor} with the given SQL
+	 * statement, and parameters.
+	 * The query will be executed by invocation of a suitable method on the
+	 * {@link JdbcHelper.Executor query executor}.
+	 * @param pConnection An open database connection. This method will
+	 * <em>not</em> close the connection. If this doesn' suit, you may
+	 * use {@link #query(FailableSupplier, Dialect, String, Object...)}
+	 * instead.
+	 * @param pDialect The SQL dialect, if available, for support in
+	 *   error handling.
+	 * @param pStatement The SQL statement, which is being executed.
+	 * @param pParameters The numbered statement parameters.
+	 * @return The created {@link JdbcHelper.Executor query executor}.
+	 */
+	public Executor query(@NonNull Connection pConnection,
+			              @Nullable Dialect pDialect,
+			              @NonNull String pStatement, @Nullable Object... pParameters) {
+		final Connection conn = uncloseableConnection(pConnection);
+		return new Executor(this, pDialect, () -> conn, pStatement, pParameters);
+	}
+
+	/** Creates a new connection object, which acts as a wrapper for the
+	 * given database connection. However, the created connection has a
+	 * do-nothing {@link Connection#close()} method. In other words:
+	 * Invoking {@link Connection#close()} on the created connection
+	 * object will not close the wrapped database connection.
+	 * @param pConnection The database connection, which is being
+	 * wrapped.
+	 * @return The created, uncloseable, connection object.
+	 */
+	public Connection uncloseableConnection(Connection pConnection) {
+		final InvocationHandler ih = new InvocationHandler() {
+			@Override
+			public Object invoke(Object pProxy, Method pMethod, Object[] pArgs) throws Throwable {
+				if ("close".equals(pMethod.getName())) {
+					return null; // Do nothing.
+				} else {
+					return pMethod.invoke(pConnection, pArgs);
+				}
+			}
+		};
+		final Class<?>[] classes = (Class<?>[]) Array.newInstance(Class.class, 1);
+		classes[0] = Connection.class;
+		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		return (Connection) Proxy.newProxyInstance(cl, classes, ih);
 	}
 }
