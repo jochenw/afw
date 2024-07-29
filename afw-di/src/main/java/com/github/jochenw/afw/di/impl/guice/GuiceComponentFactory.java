@@ -32,6 +32,12 @@ import com.google.inject.matcher.Matchers;
  * internally.
  */
 public class GuiceComponentFactory extends AbstractComponentFactory {
+	/** Creates a new instance,
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	public GuiceComponentFactory() {}
+
 	private Injector injector;
 
 	@Override

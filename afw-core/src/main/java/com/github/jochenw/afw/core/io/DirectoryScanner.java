@@ -105,6 +105,12 @@ public class DirectoryScanner {
 		}
 	}
 
+	/** Creates a new instance. Private, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	DirectoryScanner() {}
+
 	/**
 	 * Called to scan the given base directory for files. For every file name, that
 	 * matches the include/exclude matchers, the given listener will be invoked.

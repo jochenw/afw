@@ -9,6 +9,12 @@ import java.util.Objects;
 /** Utility class for working with exceptions.
  */
 public class Exceptions {
+	/** Creates a new instance. Private, to avoid accidental instantiation.
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	private Exceptions() {}
+
 	/** Throws a {@link RuntimeException} with the given throwable as the cause.
 	 * @param pTh The {@link Throwable}, that caused the exception, which is
 	 *   being thrown.

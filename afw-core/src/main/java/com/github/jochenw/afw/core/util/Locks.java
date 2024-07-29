@@ -21,6 +21,12 @@ public class Locks {
 	public static class Lockable {
 		private final StampedLock stampedLock = new StampedLock();
 
+		/** Creates a new instance,
+		 * This constructor might be removed, it is mainly present to avoid a Javadoc
+		 * warning with JDK 21.
+		 */
+		Lockable() {}
+
 		/**
 		 * Creates a shared lock (read lock) on this {@link Lockable}, and executes
 		 * the given {@link FailableRunnable}, while still holding the lock. Guarantees,
@@ -171,6 +177,12 @@ public class Locks {
 			return o;
 		}
 	}
+
+	/** Creates a new instance, Private, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	private Locks() {}
 
 	/**
 	 * Obtains a lock on an object by invoking the given

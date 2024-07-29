@@ -32,6 +32,12 @@ public class DefaultLifecycleController implements ILifecycleController {
 	private List<Listener> startedListeners = new ArrayList<>();
 	private int state;
 
+	/** Creates a new instance,
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	public DefaultLifecycleController() {}
+
 	@Override
 	public synchronized void start() {
 		switch(state) {

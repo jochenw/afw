@@ -16,6 +16,12 @@ import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
  * created instance is derived from this class.
  */
 public abstract class AbstractComponentFactory implements IComponentFactory {
+	/** Creates a new instance. Protected, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	protected AbstractComponentFactory() {}
+
 	private IAnnotationProvider annotationProvider;
 
 	@Override

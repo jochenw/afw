@@ -23,7 +23,13 @@ import com.github.jochenw.afw.core.ResourceLocator;
 public abstract class AbstractLogFactory implements ILogFactory {
 	private boolean initialized;
 	private ResourceLocator resourceLocator;
-	
+
+	/** Creates a new instance. Protected, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	protected AbstractLogFactory() {}
+
 	@Override
 	public ResourceLocator getResourceLocator() {
 		return resourceLocator;

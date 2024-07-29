@@ -17,6 +17,12 @@ import com.github.jochenw.afw.di.api.PropInject;
 /** Abstract base class for implementing an {@link IOnTheFlyBinder}.
  */
 public abstract class AbstractOnTheFlyBinder implements IOnTheFlyBinder {
+	/** Creates a new instance. Private, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	protected AbstractOnTheFlyBinder() {}
+
 	private static class IsInjectableException extends RuntimeException {
 		private static final long serialVersionUID = 2820548098780229944L;
 	}

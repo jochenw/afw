@@ -183,47 +183,58 @@ public class DomHelper {
 	private BiFunction<Locator,@NonNull String,@NonNull LocalizableException> errorHandler;
 	private Function<Node,Locator> locationProvider;
 
-	/**
-	 * @return the defaultNamespaceUri
+	/** Returns the default namespace URI. 
+	 * @return the default namespace URI
 	 */
 	public String getDefaultNamespaceUri() {
 		return defaultNamespaceUri;
 	}
 
-	/**
-	 * @param defaultNamespaceUri the defaultNamespaceUri to set
+	/** Sets the default namespace URI. 
+	 * @param defaultNamespaceUri The new default namespace URI.
 	 */
 	public void setDefaultNamespaceUri(String defaultNamespaceUri) {
 		this.defaultNamespaceUri = defaultNamespaceUri;
 	}
 
-	/**
-	 * @return the errorHandler
+	/** Returns the error handler, which is invoked by {@link #error(Node, String)}.
+	 * @return The error handler, which is invoked by {@link #error(Node, String)}.
 	 */
 	public BiFunction<Locator, @NonNull String, @NonNull LocalizableException> getErrorHandler() {
 		return errorHandler;
 	}
 
-	/**
-	 * @param errorHandler the errorHandler to set
+	/** Sets the error handler, which is invoked by {@link #error(Node, String)}.
+	 * @param pErrorHandler The error handler, which is invoked by {@link #error(Node, String)}.
 	 */
-	public void setErrorHandler(BiFunction<Locator, @NonNull String, @NonNull LocalizableException> errorHandler) {
-		this.errorHandler = errorHandler;
+	public void setErrorHandler(BiFunction<Locator, @NonNull String, @NonNull LocalizableException> pErrorHandler) {
+		errorHandler = pErrorHandler;
 	}
 	
-	/** Returns the location provider, which is used by the {@link #error(Node,String)}
-	 * method.
-	 * @return the locationProvider
+	/** Returns the location provider. May be null, in which case a
+	 * default location provider. The default is suitable for
+	 * documents, that have been created by the
+	 * {@link LocalizableDocument} class.
+	 * @return The location provider. May be null, in which case a
+	 * default location provider. The default is suitable for
+	 * documents, that have been created by the
+	 * {@link LocalizableDocument} class.
 	 */
 	public Function<Node, Locator> getLocationProvider() {
 		return locationProvider;
 	}
 
-	/**
-	 * @param locationProvider the locationProvider to set
+	/** Sets the location provider. May be null, in which case a
+	 * default location provider. The default is suitable for
+	 * documents, that have been created by the
+	 * {@link LocalizableDocument} class.
+	 * @param pLocationProvider The newlocation provider. May be
+	 * null, in which case a default location provider will be
+	 * used. The default is suitable for documents, that have
+	 * been created by the {@link LocalizableDocument} class.
 	 */
-	public void setLocationProvider(Function<Node, Locator> locationProvider) {
-		this.locationProvider = locationProvider;
+	public void setLocationProvider(Function<Node, Locator> pLocationProvider) {
+		locationProvider = pLocationProvider;
 	}
 
 	/**

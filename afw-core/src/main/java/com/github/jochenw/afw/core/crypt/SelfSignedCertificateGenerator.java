@@ -29,6 +29,12 @@ public class SelfSignedCertificateGenerator {
 	private int validInDays;
 	private String name, orgUnit, organization, location, stateOrProvince, country;
 
+	/** Creates a new instance,
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	public SelfSignedCertificateGenerator() {}
+
 	/** Sets a logger.
 	 * @param pLogger A logger, which is being used for logging messages. May be null,
 	 *   in which case no logging is being done.

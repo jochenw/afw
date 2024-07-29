@@ -31,7 +31,12 @@ import org.jspecify.annotations.Nullable;
 public abstract class ResourceLocator {
 	private @Nullable String instanceName, applicationName;
 
-
+	/** Creates a new instance,
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	public ResourceLocator() {}
+	
 	/**
 	 * Returns the instance name.
 	 * @return The instance name.

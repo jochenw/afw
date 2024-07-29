@@ -21,6 +21,12 @@ import java.util.Objects;
 /** This class supports working with instances of {@code Named}.
  */
 public class Names {
+	/** Creates a new instance. Package private, to avoid accidental instantiaton.
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	Names() {}
+
 	/** Creates a camel cased method property name. Example: prefix=get,
 	 * suffix=foo yields getFoo.
 	 * @param pPrefix The method names prefix, for example "get", or "is".

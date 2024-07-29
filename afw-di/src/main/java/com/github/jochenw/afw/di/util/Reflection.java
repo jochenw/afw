@@ -18,6 +18,12 @@ import java.util.function.Supplier;
 /** Utility class for working with Java reflection.
  */
 public class Reflection {
+	/** Creates a new instance. Private, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	private Reflection() {}
+
 	/** Returns a supplier, which creates an instance by invoking the given constructor.
 	 * The constructors parameters are obtained by invoking the given parameter function.
 	 * @param pConstructor The constructor, which is being invoked to create the instance.

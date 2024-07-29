@@ -28,6 +28,12 @@ import com.github.jochenw.afw.di.util.Reflection;
  * Supports {@code PostConstruct}, and {@code PreDestroy}.
  */
 public class DefaultOnTheFlyBinder extends AbstractOnTheFlyBinder {
+	/** Creates a new instance,
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	public DefaultOnTheFlyBinder() {}
+
 	@Override
 	protected boolean isInjectable(Field pField) {
 		final Annotation[] annotations = pField.getAnnotations();

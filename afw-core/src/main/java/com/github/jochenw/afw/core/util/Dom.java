@@ -15,6 +15,13 @@ import com.github.jochenw.afw.core.util.DomHelper.LocalizableException;
 public class Dom {
 	private static final DomHelper domHelper = new DomHelper();
 
+	/** Creates a new instance. Private, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	private Dom() {}
+
+	/** Creates a new instance. 
 	/** Returns the given nodes child elements.
 	 * @param pNode The parent node, which is being queried for child elements.
 	 * @return The parent nodes child elements.

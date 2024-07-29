@@ -39,6 +39,12 @@ import com.github.jochenw.afw.di.util.Reflection;
  * any need to bring Guava, or Spring, into the dependency hell.
  */
 public class SimpleComponentFactory extends AbstractComponentFactory {
+	/** Creates a new instance.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	public SimpleComponentFactory() {}
+
 	private final ConcurrentMap<Class<Object>, MetaData> metaDataByClass = new ConcurrentHashMap<>();
 	private Predicate<Class<?>> staticInjectionPredicate;
 	private BindingRegistry bindings;

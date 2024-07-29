@@ -18,11 +18,15 @@ import com.github.jochenw.afw.core.data.Data.Accessor.PathCriterion;
 import com.github.jochenw.afw.core.util.Objects;
 
 
-/** Utility class for working with data objects.
+/** Utility class for working with data objects. Data objects
+ * are envelopes for named properties. Examples would be an
+ * instance of {@link Properties}, or {@link Map}.
  */
 public class Data {
 	/**
-	 * @param <O> Type of the data store object.
+	 * An Accessor is a helper object, which simplifies
+	 * working with data objects of a given type.
+	 * @param <O> Type of the data object.
 	 */
 	public static class Accessor<O extends Object> {
 		private final BiFunction<O,String,Object> function;

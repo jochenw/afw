@@ -30,6 +30,12 @@ import com.github.jochenw.afw.core.util.Tupel;
  * Default implementation of {@link IKeyHandler}, using RSA.
  */
 public class JceKeyHandler implements IKeyHandler {
+	/** Creates a new instance,
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	public JceKeyHandler() {}
+
 	@Override
 	public @NonNull KeyPair createKeyPair() {
 		try {

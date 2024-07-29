@@ -14,6 +14,12 @@ import jakarta.inject.Provider;
  * annotation.
  */
 public class JakartaAnnotationProvider implements IAnnotationProvider {
+	/** Creates a new instance,
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	public JakartaAnnotationProvider() {}
+
 	@Override
 	public @NonNull Class<? extends Annotation> getInjectClass() {
 		return jakarta.inject.Inject.class;

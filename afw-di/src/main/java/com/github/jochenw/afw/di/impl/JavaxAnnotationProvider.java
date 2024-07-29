@@ -15,6 +15,12 @@ import com.github.jochenw.afw.di.impl.simple.SimpleComponentFactory;
  * annotation.
  */
 public class JavaxAnnotationProvider implements IAnnotationProvider {
+	/** Creates a new instance,
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	public JavaxAnnotationProvider() {}
+
 	@Override
 	public @NonNull Class<? extends Annotation> getInjectClass() {
 		return javax.inject.Inject.class;

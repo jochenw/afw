@@ -15,6 +15,12 @@ import com.github.jochenw.afw.core.util.Exceptions;
  * Windows.
  */
 public class JavaNioSymbolicLinksHandler implements ISymbolicLinksHandler {
+	/** Creates a new instance,
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	public JavaNioSymbolicLinksHandler() {}
+
 	@Override
 	public void createDirectoryLink(@NonNull Path pTarget, @NonNull Path pLink) {
 		try {

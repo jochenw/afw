@@ -14,6 +14,12 @@ import com.google.inject.Provider;
  * annotation.
  */
 public class GoogleAnnotationProvider implements IAnnotationProvider {
+	/** Creates a new instance,
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	public GoogleAnnotationProvider() {}
+
 	@Override
 	public @NonNull Class<? extends Annotation> getInjectClass() {
 		return com.google.inject.Inject.class;

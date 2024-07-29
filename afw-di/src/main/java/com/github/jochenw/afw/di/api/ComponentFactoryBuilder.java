@@ -27,6 +27,12 @@ import com.github.jochenw.afw.di.util.Exceptions;
  * </pre>
  */
 public class ComponentFactoryBuilder {
+	/** Creates a new instance.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	public ComponentFactoryBuilder() {}
+
 	private @NonNull List<Module> modules = new ArrayList<>();
 	private @NonNull Supplier<@NonNull AbstractComponentFactory> supplier = newSupplier(SimpleComponentFactory.class);
 	private @Nullable IComponentFactory instance;

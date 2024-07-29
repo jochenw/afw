@@ -18,6 +18,12 @@ package com.github.jochenw.afw.di.api;
 /** This class specifies the possible instances of {@link Scope}.
  */
 public class Scopes {
+	/** Creates a new instance. Private, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	private Scopes() {}
+
 	/** The binding creates a singleton with lazy instantiation.
 	 */
 	public static final Scope SINGLETON = new Scope();

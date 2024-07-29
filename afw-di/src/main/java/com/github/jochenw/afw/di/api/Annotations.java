@@ -32,6 +32,12 @@ import com.github.jochenw.afw.di.impl.JavaxAnnotationProvider;
  * providers.
  */
 public class Annotations {
+	/** Creates a new instance. Private, to avoid accidental instantiation.
+	 * This constructor might be removed, it is mainly present to avoid a Javadoc
+	 * warning with JDK 21.
+	 */
+	private Annotations() {}
+
 	private static final @NonNull IAnnotationProvider @NonNull[] annotationProviders = initAnnotationProviders();
 
 	private static @NonNull IAnnotationProvider @NonNull[] initAnnotationProviders() {

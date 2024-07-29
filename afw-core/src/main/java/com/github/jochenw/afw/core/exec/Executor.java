@@ -31,8 +31,12 @@ import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.MutableInteger;
 import com.github.jochenw.afw.core.util.Objects;
 
-/**
- *
+/** An {@link Executor} is an object, which has the ability to run an external
+ * command, with parameters. The {@link Executor} can provide input for the
+ * external command. It can also record the external commands standard
+ * output, or error output. Basically, it is a convenient, and safe wrapper
+ * for a {@link Process}.
+ * Executors are created by using {@link Executor#builder()}.
  */
 public class Executor {
 	/**

@@ -42,7 +42,13 @@ import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
  * Utility class for working with Java reflection.
  */
 public class Reflection {
-    /** Searches for a field with the given name in the given
+	/** Creates a new instance. Private, to avoid accidental instantiaton.
+	 * This default constructor might be removed, it is mainly present to
+	 * avoid a Javadoc warning with JDK 21.
+	 */
+	public Reflection() {}
+
+	/** Searches for a field with the given name in the given
      * instance. If such a field is found, sets it to the given value.
      * Otherwise, throws an exception.
      * @param pInstance The instance being modified by setting the given value
