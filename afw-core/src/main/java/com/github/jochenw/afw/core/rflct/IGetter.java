@@ -2,7 +2,9 @@ package com.github.jochenw.afw.core.rflct;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
@@ -25,6 +27,63 @@ public interface IGetter<B,O> {
 	 *   {@code pObject}.
 	 */
 	public O get(B pObject);
+
+	/** Creates a new {@link IGetter}, which will work by reading
+	 * the given field.
+	 * @param pField The field, from which to read the getters
+	 *   result value.
+	 * @param <B> The bean type. (The class declaring the method.)
+	 * @param <O> The getter methods return type.
+	 * @return The created {@link IGetter getter}.
+	 * @throws NullPointerException The parameter {@code pField}
+	 *   is null.
+	 * @throws IllegalArgumentException The given field is
+	 *   static, or otherwise invalid.
+	 */
+	public static <B,O> IGetter<B,O> of(Field pField) {
+		final @NonNull Field field = Objects.requireNonNull(pField, "Field");
+		if (Modifier.isStatic(field.getModifiers())) {
+			throw new IllegalArgumentException("The field is static: " + field);
+		}
+		@SuppressWarnings("null")
+		final @NonNull Class<?> declaringClass = field.getDeclaringClass();
+		final Lookup privateLookup = Rflct.getPrivateLookup(declaringClass);
+		if (privateLookup == null) {
+			// Java 8
+			final IGetter<B,O> getter = new IGetter<B,O>() {
+				public O get(B pObject) {
+					Reflection.makeAcccessible(field);
+					try {
+						@SuppressWarnings("unchecked")
+						final O o = (O) field.get(pObject);
+						return o;
+					} catch (Throwable t) {
+						throw Exceptions.show(t);
+					}
+				}
+			};
+			return getter;
+		} else {
+			// Java 9, or later
+			final MethodHandle mh;
+			try {
+				mh = privateLookup.unreflectGetter(field);
+			} catch (Throwable t) {
+				throw Exceptions.show(t);
+			}
+			final IGetter<B,O> getter = new IGetter<B,O>() {
+				public O get(B pObject) {
+					try {
+						final O o = (O) mh.invoke(pObject);
+						return o;
+					} catch (Throwable t) {
+						throw Exceptions.show(t);
+					}
+				}
+			};
+			return getter;
+		}
+	}
 
 	/** Creates a new {@link IGetter}, which will work by invoking
 	 * the given method.
