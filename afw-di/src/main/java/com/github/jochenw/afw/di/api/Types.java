@@ -16,6 +16,8 @@
 package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
+import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
 
@@ -85,4 +87,9 @@ public class Types {
 			return rawType;
 		}
 	}
+
+	public static final Type TYPE_LIST_OBJECT = new Types.Type<List<Object>>() {};
+	public static final Type TYPE_LIST_STRING = new Types.Type<List<String>>() {};
+	public static final Type TYPE_MAP_STRING_OBJECT = new Types.Type<Map<String,Object>>() {};
+	public static final Type TYPE_MAP_STRING_STRING = new Types.Type<Map<String,String>>() {};
 }
