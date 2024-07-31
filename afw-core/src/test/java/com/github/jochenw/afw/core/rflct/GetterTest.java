@@ -46,6 +46,6 @@ public class GetterTest {
 		assertNull(aGetter.get(bean));
 		bean.a = "foo";
 		assertEquals("foo", aGetter.get(bean));
-		Functions.assertFail(NullPointerException.class, "Method", () -> IGetter.of(null));
+		Functions.assertFail(NullPointerException.class, "Method", () -> IGetter.of((Method) null));
 	}
 }
