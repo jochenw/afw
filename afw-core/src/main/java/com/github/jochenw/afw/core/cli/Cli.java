@@ -422,7 +422,7 @@ public class Cli<B> extends OptionBuilder<B> {
 					value = opt.getDefaultValue();
 				}
 			} else {
-				return null;
+				value = opt.getDefaultValue();
 			}
 			if (value == null) {
 				return null;
