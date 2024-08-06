@@ -254,6 +254,6 @@ public class SimpleLogFactory extends AbstractLogFactory {
 	 * @return The created instance of {@link SimpleLogFactory}.
 	 */
 	public static @NonNull SimpleLogFactory ofSystemOut(@Nullable Level pLevel) {
-		return of(System.out, Objects.notNull(null, Level.INFO));
+		return of(System.out, Objects.notNull(pLevel, Level.INFO));
 	}
 }
