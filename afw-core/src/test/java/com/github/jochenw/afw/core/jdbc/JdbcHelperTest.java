@@ -272,6 +272,7 @@ public class JdbcHelperTest {
 			jh.query(conn, null, sqlDrop).run();
 			jh.query(conn, null, sqlCreate).run();
 			assertEquals(0l, jh.query(conn, null, "SELECT COUNT(*) FROM table_three").count());
+			assertEquals(Long.valueOf(0L), jh.query(conn, null, "SELECT COUNT(*) FROM table_three").countNullable());
 		}
 	}
 }

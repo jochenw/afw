@@ -274,7 +274,38 @@ public class JdbcHelper {
 				throw handleError(t);
 			}
 		}
-	
+
+		/** Executes a "count query", and returns the nullable result.
+		 * A "count query" is defined to be a query, which returns exactly one
+		 * row with exactly one integer column.
+		 * @return The result of the "count query": An integer, or long, which
+		 * was returned in the first column of the first row in the result set.
+		 * @throws IllegalStateException The query is no "count query", because
+		 * it returned zero, or more than one result row, or because it returned
+		 * null, rather than an integer, or long value.
+		 */
+		public Long countNullable() {
+			try (Connection conn = connectionProvider.get();
+				 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
+			    helper.setParameters(stmt, parameters);
+			    try (ResultSet rs = stmt.executeQuery()) {
+			    	if (!rs.next()) {
+			    		throw new IllegalStateException("The query did not return a result row.");
+			    	}
+			    	final long l = rs.getLong(1);
+			    	if (rs.wasNull()) {
+			    		return null;
+			    	}
+			    	if (rs.next()) {
+			    		throw new IllegalStateException("The query returned more than one result row.");
+			    	}
+			    	return Long.valueOf(l);
+			    }
+			} catch (Throwable t) {
+				throw handleError(t);
+			}
+		}
+
 		/**
 		 * Executes the configured query, executes it, and returns the number
 		 * of affected rows.
