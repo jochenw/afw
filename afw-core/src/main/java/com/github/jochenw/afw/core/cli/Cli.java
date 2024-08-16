@@ -366,13 +366,13 @@ public class Cli<B> extends OptionBuilder<B> {
 				handlerCalls.add(() -> Functions.accept(handler, ctx, value));
 			}
 		}
+		handlerCalls.forEach(r -> r.run());
 		if (validator != null) {
 			final String errorMessage = validator.apply(bean);
 			if (errorMessage != null) {
 				throw new UsageException(errorMessage);
 			}
 		}
-		handlerCalls.forEach(r -> r.run());
 		return bean;
 	}
 
@@ -422,7 +422,7 @@ public class Cli<B> extends OptionBuilder<B> {
 					value = opt.getDefaultValue();
 				}
 			} else {
-				value = opt.getDefaultValue();
+				return null;
 			}
 			if (value == null) {
 				return null;
