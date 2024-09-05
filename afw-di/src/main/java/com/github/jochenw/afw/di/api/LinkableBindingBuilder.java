@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.Constructor;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -36,6 +37,16 @@ public interface LinkableBindingBuilder<T> extends ScopableBindingBuilder {
 	 * @return A binding builder without scope, but with supplier.
 	 */
 	ScopableBindingBuilder to(Key<? extends T> pKey);
+	/** Requests, that the injected object should be obtained by invoking
+	 *   the given function, passing the {@link IComponentFactory component
+	 *   factory} as an argument. In effect, this enables the creation
+	 *   of objects, that depend on an initialized component factory.
+	 * The bindings scope is implicitly specified as {@link Scopes#SINGLETON}.
+	 * @param pFunction The function, which is being invoked to create the
+	 *   injected object.
+	 * @return A binding builder without scope, but with supplier.
+	 */
+	ScopableBindingBuilder to(Function<IComponentFactory,T> pFunction);  
 	/** Requests, that the injected object should be the given instance.
 	 * The bindings scope is implicitly specified as {@link Scopes#SINGLETON}.
 	 * @param pInstance The instance, which is being injected by this

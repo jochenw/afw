@@ -1,7 +1,10 @@
 package com.github.jochenw.afw.di.impl.guice;
 
+import java.util.function.Function;
+
 import org.junit.Test;
 
+import com.github.jochenw.afw.di.api.LinkableBindingBuilder;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests;
 import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateJavaxMapsObject;
@@ -41,5 +44,12 @@ public class GuiceComponentFactoryTest {
 	@Test
 	public void testModuleOverrides() {
 		ComponentFactoryTests.testModuleOverrides(COMPONENT_FACTORY_TYPE);
+	}
+
+	/** Test for {@link LinkableBindingBuilder#to(Function)}.
+	 */
+	@Test
+	public void testBindToFunction() {
+		ComponentFactoryTests.testBindToFunction(COMPONENT_FACTORY_TYPE);
 	}
 }

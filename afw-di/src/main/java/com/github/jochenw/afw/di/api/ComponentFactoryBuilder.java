@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
@@ -211,6 +212,12 @@ public class ComponentFactoryBuilder {
 					@Override
 					public LinkableBindingBuilder<Object> named(@NonNull String pValue) {
 						return annotatedWith(getAnnotations().newNamed(pValue));
+					}
+
+					@Override
+					public ScopableBindingBuilder to(Function<IComponentFactory,Object> pFunction) {
+						final Supplier<Object> supplier = () -> pFunction.apply(pComponentFactory);
+						return toSupplier(supplier);
 					}
 				};
 				finished();

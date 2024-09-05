@@ -88,8 +88,16 @@ public class Types {
 		}
 	}
 
-	public static final Type TYPE_LIST_OBJECT = new Types.Type<List<Object>>() {};
-	public static final Type TYPE_LIST_STRING = new Types.Type<List<String>>() {};
-	public static final Type TYPE_MAP_STRING_OBJECT = new Types.Type<Map<String,Object>>() {};
-	public static final Type TYPE_MAP_STRING_STRING = new Types.Type<Map<String,String>>() {};
+	/** A predefined type for {@link List List&lt;Object&gt;}
+	 */
+	public static final Type<List<Object>> TYPE_LIST_OBJECT = new Types.Type<List<Object>>() {};
+	/** A predefined type for {@link List List&lt;String&gt;}
+	 */
+	public static final Type<List<String>> TYPE_LIST_STRING = new Types.Type<List<String>>() {};
+	/** A predefined type for {@link Map Map&lt;String,Object&gt;}
+	 */
+	public static final Type<Map<String,Object>> TYPE_MAP_STRING_OBJECT = new Types.Type<Map<String,Object>>() {};
+	/** A predefined type for {@link Map Map&lt;String,String&gt;}
+	 */
+	public static final Type<Map<String,String>> TYPE_MAP_STRING_STRING = new Types.Type<Map<String,String>>() {};
 }

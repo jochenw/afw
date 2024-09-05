@@ -8,12 +8,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +43,7 @@ import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.ILifecycleController;
 import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
+import com.github.jochenw.afw.di.api.LinkableBindingBuilder;
 import com.github.jochenw.afw.di.api.LogInject;
 import com.github.jochenw.afw.di.api.Module;
 import com.github.jochenw.afw.di.api.PropInject;
@@ -413,5 +416,35 @@ public class ComponentFactoryTests {
 		validator.accept(module0.extend(module1));
 		validator.accept(module0.extend(new @Nullable Module @Nullable [] {module1}));
 		validator.accept(module0.extend(Arrays.asList(module1)));
+	}
+
+	/** Test for {@link LinkableBindingBuilder#to(Function)}.
+	 */
+	public static void testBindToFunction(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		final Map<String,Object> hashMap = new HashMap<>();
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final Map[] array = (Map<String,Object>[]) Array.newInstance(Map.class, 1);
+		@SuppressWarnings("null")
+		final Module module = (b) -> {
+			b.bind(Map.class).toInstance(hashMap);
+			@SuppressWarnings("rawtypes")
+			final Function<IComponentFactory,Map[]> arrayCreator = (cf) -> {
+				@SuppressWarnings("unchecked")
+				Map<String,Object> map = (Map<String,Object>) cf.requireInstance(Map.class);
+				array[0] = map;
+				@SuppressWarnings("rawtypes")
+				final Map[] arr = array;
+				return arr;
+			};
+			b.bind(Map[].class).to(arrayCreator);
+		};
+		final IComponentFactory cf = IComponentFactory.builder().type(pComponentFactoryType).module(module).build();
+		assertNull(array[0]);
+		@SuppressWarnings("unchecked")
+		final Map<String,Object>[] arr = cf.requireInstance(Map[].class);
+		assertNotNull(arr);
+		assertSame(hashMap, arr[0]);
+		assertSame(array, arr);
+		assertNotNull(array[0]);
 	}
 }
