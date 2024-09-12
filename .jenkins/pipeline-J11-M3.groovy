@@ -19,9 +19,9 @@ pipeline {
                 ) {
 				    script {
 				        if (isUnix()) {
-    			            sh 'mvn -fpom.xml -Pjacoco clean install'
+    			            sh 'mvn -V -fpom.xml -Pjacoco clean install'
 					    } else {
-    			            bat 'mvn.cmd -fpom.xml -Pjacoco clean install'
+    			            bat 'mvn.cmd -V -fpom.xml -Pjacoco clean install'
 					    }
 					}
                 }
