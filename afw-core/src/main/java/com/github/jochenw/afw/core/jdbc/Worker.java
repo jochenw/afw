@@ -22,6 +22,10 @@ public class Worker {
 	/** A context object, which is designed for use in application code.
 	 */
 	public class Context implements AutoCloseable {
+		/** Creates a new instance.
+		 */
+		public Context() {}
+
 		private final List<AutoCloseable> resources = new ArrayList<>();
 		private Connection connection;
 

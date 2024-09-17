@@ -48,6 +48,11 @@ import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
  * useful.)
  */
 public class Objects {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	public Objects() {}
+
 	/**
 	 * Checks, if the given value is null. If so, returns the default value.
 	 * Otherwise, returns the non-null input value.
@@ -303,6 +308,10 @@ public class Objects {
 	 * if necessary.
 	 */
 	public static class CachedObjectSerializer {
+		/** Creates a new instance.
+		 */
+		public CachedObjectSerializer() {}
+	
 		/** Serializes the given object to the given output stream.
 		 * (Called to write the cached object to the cache file.).
 		 * @param pObject The object, that is being cached.

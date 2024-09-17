@@ -44,6 +44,11 @@ import com.github.jochenw.afw.core.props.Interpolator;
 /** Utility class for working with files, and directories.
  */
 public class FileUtils {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	public FileUtils() {}
+
 	/** <p>Constructs a path, which is guaranteed to be within the base directory {@code pBaseDir}.</p>
 	 * <p>The use case is a web application, which is supposed to read a file within that directory.
 	 * However, for security reasons, we must guarantee, that the result must not be outside.</p>

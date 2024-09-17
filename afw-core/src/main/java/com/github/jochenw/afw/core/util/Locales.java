@@ -8,6 +8,11 @@ import org.jspecify.annotations.Nullable;
 /** Utility class for working with {@link Locale Locales}.
  */
 public class Locales {
+	/** Creates a new instance. Private construcor,
+	 * because all methods are static.
+	 */
+	private Locales() {}
+
 	/**
 	 * Returns the {@link Locale} with the given language tag.
 	 * @param pLanguageTag The language tag, for which to query a locale.

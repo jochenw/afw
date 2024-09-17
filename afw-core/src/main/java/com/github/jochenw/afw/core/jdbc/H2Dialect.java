@@ -6,6 +6,9 @@ import java.sql.SQLException;
  * <a href="http://www.h2database.com/">H2 database</a>.
  */
 public class H2Dialect implements Dialect {
+	/** Creates a new instance.
+	 */
+	public H2Dialect() {}
 
 	@Override
 	public boolean isDroppedTableDoesnExistError(SQLException pError) {

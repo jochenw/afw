@@ -24,6 +24,10 @@ public interface IObjectComparator {
 	 * in case of any difference.
 	 */
 	public static class DefaultListener implements Listener {
+		/** Creates a new instance.
+		 */
+		public DefaultListener() {}
+
 		@Override
 		public void difference(String pContext, String pDescription) {
 			throw new IllegalStateException("At " + pContext + ": " + pDescription);

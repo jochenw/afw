@@ -23,6 +23,11 @@ import java.util.List;
 /** Utility class for working with {@link Enumeration enumerations}.
  */
 public class Enumerations {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private Enumerations() {}
+
 	/**
 	 * Converts the enumeration into a list with the same elements.
 	 * @param pEnum The enumeration, that is being converted.

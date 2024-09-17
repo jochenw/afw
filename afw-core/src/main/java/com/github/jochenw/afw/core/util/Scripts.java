@@ -17,6 +17,11 @@ import com.github.jochenw.afw.core.scripts.IScriptEngine.Script;
  * Utility class for working with templates.
  */
 public class Scripts {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Scripts() {}
+
 	private static @NonNull IScriptEngineRegistry scriptEngineRegistry = new DefaultScriptEngineRegisty();
 
 

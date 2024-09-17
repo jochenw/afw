@@ -18,6 +18,11 @@ import com.github.jochenw.afw.core.crypt.IKeyHandler;
 /** Utility class, which provides static encryption/decryption methods.
  */
 public class Keys {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private Keys() {}
+
 	private static volatile @NonNull IKeyHandler keyHandler = new DefaultKeyHandler();
 
 	/**

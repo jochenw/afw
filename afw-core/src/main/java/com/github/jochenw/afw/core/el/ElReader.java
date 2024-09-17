@@ -25,6 +25,10 @@ import com.github.jochenw.afw.core.util.Exceptions;
 /** A parser for EL expressions.
  */
 public class ElReader {
+	/** Creates a new instance.
+	 */
+	public ElReader() {}
+
 	/** Parses the given string as an EL expression.
 	 * @param pExpression The EL expression string, which is being parsed.
 	 * @return The parsed EL expression, which may then be evaluated using

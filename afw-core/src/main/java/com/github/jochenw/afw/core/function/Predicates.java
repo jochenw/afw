@@ -22,6 +22,11 @@ import java.util.function.Predicate;
  * Utility class for working with instances of {@link Predicate}.
  */
 public class Predicates {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Predicates() {}
+
 	/** A {@link Predicate}, which is always true, or false.
 	 * @param pValue The created predicates result.
 	 * @param <O> The predicates argument type.

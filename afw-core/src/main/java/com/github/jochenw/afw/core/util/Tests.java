@@ -35,6 +35,11 @@ import com.github.jochenw.afw.core.function.Functions;
 /** Utility class for unit tests.
  */
 public class Tests {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Tests() {}
+
 	/** A pair of files. Typically, the input file must not be modified.
 	 * The output file, however, has been created by copying the input file,
 	 * and may be modified.

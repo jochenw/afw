@@ -60,7 +60,8 @@ public class WritableCharacterStream implements AutoCloseable, Flushable, Append
 		charSet = pCharSet;
 	}
 
-	/**
+	/** Returns the character set, that is being used for conversion
+	 *   of characters to bytes, if any. Null, if no conversion occurs.
 	 * @return The character set, that is being used for conversion
 	 *   of characters to bytes, if any. Null, if no conversion occurs.
 	 */

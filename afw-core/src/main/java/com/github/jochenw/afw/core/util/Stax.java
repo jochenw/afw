@@ -8,6 +8,11 @@ import javax.xml.stream.XMLStreamReader;
  * Utility class for working with Stax parsers.
  */
 public class Stax {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Stax() {}
+
 	/**
 	 * Enumeration of possible return codes for {@link ElementListener#element(XMLStreamReader, int, String, String)}.
 	 */

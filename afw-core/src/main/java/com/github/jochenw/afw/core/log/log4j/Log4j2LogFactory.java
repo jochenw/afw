@@ -36,6 +36,10 @@ import com.github.jochenw.afw.core.util.Exceptions;
 /** Implementation of {@link ILogFactory}, which is based on Apache Log4j 2.
  */
 public class Log4j2LogFactory extends AbstractLogFactory {
+	/** Creates a new instance.
+	 */
+	public Log4j2LogFactory() {}
+
 	private Logger logger;
 
 	@Override

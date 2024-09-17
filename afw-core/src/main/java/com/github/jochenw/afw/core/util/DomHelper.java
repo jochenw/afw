@@ -28,6 +28,10 @@ import com.google.common.base.Supplier;
 /** A helper object for parsing DOM documents.
  */
 public class DomHelper {
+	/** Creates a new instance.
+	 */
+	public DomHelper() {}
+
 	/** Exception class, which is thrown by the various assert methods.
 	 */
 	public static class LocalizableException extends RuntimeException {

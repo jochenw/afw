@@ -95,6 +95,10 @@ public interface IPluginRegistry {
 	 * Abstract base implementation of {@link Initializer}.
 	 */
 	public static abstract class AbstractInitializer implements Initializer {
+		/** Creates a new instance.
+		 */
+		protected AbstractInitializer() {}
+
 		private String id;
 		private List<String> dependsOn;
 

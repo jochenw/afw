@@ -64,6 +64,10 @@ import com.github.jochenw.afw.core.util.HttpConnector.HttpConnection;
  * </pre>
  */
 public class Http {
+	/** Creates a new instance.
+	 */
+	public Http() {}
+
 	/** Interface of the response object.
 	 */
 	public static interface Response {

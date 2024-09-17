@@ -35,6 +35,11 @@ import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
  * Lambda expressions is met better than in the first version.
  */
 public class ObjectStreams {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private ObjectStreams() {}
+
 	/** A reduced, and simplified version of a {@link Stream} with
 	 * failable method signatures.
 	 * @param <O> The streams element type.

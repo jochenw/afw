@@ -55,6 +55,10 @@ import com.github.jochenw.afw.core.util.Sax;
 /** A parser for plugin lists.
  */
 public class PluginListParser {
+	/** Creates a new instance.
+	 */
+	public PluginListParser() {}
+
 	/** Interface of an initializer specification, as read by the parser.
 	 */
 	public interface IInitializerSpec {

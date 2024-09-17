@@ -33,6 +33,10 @@ import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 /** Utility methods for working with lists.
  */
 public class Lists {
+	/** Creates a new instance.
+	 */
+	public Lists() {}
+
 	/** Converts the given parameter array into a list.
 	 * Compared to {@link Arrays#asList(Object...)}, this
 	 * method has the advantage, that the created list is

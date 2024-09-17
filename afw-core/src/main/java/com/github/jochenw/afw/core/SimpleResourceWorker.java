@@ -34,6 +34,10 @@ import org.jspecify.annotations.NonNull;
  * of the transaction.
  */
 public class SimpleResourceWorker {
+	/** Creates a new instance.
+	 */
+	public SimpleResourceWorker() {}
+
 	/**
 	 * A runnable object, which may be invoked, adding
 	 * resources to the {@link SimpleResourceWorker
@@ -79,6 +83,10 @@ public class SimpleResourceWorker {
 	 * collected resources on behalf of the latter.
 	 */
 	public class SimpleResourceTracker {
+		/** Creates a new instance.
+		 */
+		public SimpleResourceTracker() {}
+
 		private final List<Object> resources = new ArrayList<>();
 
 

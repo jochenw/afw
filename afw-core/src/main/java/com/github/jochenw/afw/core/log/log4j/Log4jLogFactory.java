@@ -30,6 +30,10 @@ import com.github.jochenw.afw.core.log.ILogFactory;
 /** Implementation of {@link ILogFactory}, which is based on Apache Log4j 1.
  */
 public class Log4jLogFactory extends AbstractLogFactory {
+	/** Creates a new instance.
+	 */
+	public Log4jLogFactory() {}
+
 	private Logger logger;
 
 	@Override

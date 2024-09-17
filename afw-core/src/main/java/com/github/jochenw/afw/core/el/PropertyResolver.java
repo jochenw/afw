@@ -23,6 +23,10 @@ import java.util.Objects;
  * resolving properties in the model.
  */
 public abstract class PropertyResolver {
+	/** Creates a new instance.
+	 */
+	public PropertyResolver() {}
+
 	/**
 	 * Called to resolve a nullable property in the model.
 	 * @param pObject The model, which is being applied to the EL expression.

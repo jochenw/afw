@@ -25,10 +25,15 @@ import com.github.jochenw.afw.core.util.Exceptions;
  * @param <T> The consumers input type.
  */
 public class FinalizableConsumer<T> implements Consumer<T> {
+	/** Creates a new instance.
+	 */
+	public FinalizableConsumer() {}
+
 	/** Called for success.
 	 */
 	public void finished() {
 	}
+
 	/**  Called to report an error.
 	 * @param pThrowable The error, which is being reported.
 	 */

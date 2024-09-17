@@ -29,6 +29,11 @@ import java.util.function.Function;
  * operating system level.
  */
 public class FileLocker {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	public FileLocker() {}
+
 	/**
 	 * Interface of an object, that can be used to access the locked file's contents. 
 	 */

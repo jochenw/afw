@@ -44,6 +44,10 @@ import com.github.jochenw.afw.core.util.Exceptions;
 /** A helper object for working with JDBC connections.
  */
 public class JdbcHelper {
+	/** Creates a new instance.
+	 */
+	public JdbcHelper() {}
+
 	private static final @NonNull ZoneId UTC = Objects.requireNonNull(ZoneId.of("GMT"));
 	private @NonNull ZoneId dbZoneId = UTC;
 	private @NonNull ZoneId appZoneId = Objects.requireNonNull(ZoneId.systemDefault());

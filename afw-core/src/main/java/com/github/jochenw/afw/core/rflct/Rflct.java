@@ -13,6 +13,11 @@ import org.jspecify.annotations.NonNull;
  * in this package.
  */
 public class Rflct {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Rflct() {}
+
 	/** This method returns a private {@link Lookup}, if available.
 	 * Otherwise, it returns null. This is also used to distinguish
 	 * between the case, that we are using Java 8 (aka traditional

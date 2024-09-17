@@ -23,6 +23,11 @@ import java.math.BigInteger;
  * A factory for literal values.
  */
 public class LiteralFactory {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private LiteralFactory() {}
+
     /**
      * Creates a new integer value.
      * @param pValue Returns a number with the given value.

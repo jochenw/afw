@@ -33,6 +33,11 @@ import com.github.jochenw.afw.core.util.Exceptions;
  * generally permitted.
  */
 public class Functions {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private Functions() {}
+
 	/**
 	 * Represents an operation that accepts a single {@code short}-valued argument and
 	 * returns no result.  This is the primitive type specialization of
@@ -273,7 +278,8 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableFunction<I extends Object, O extends Object, T extends Throwable> {
-		/** @param pInput The functions input object
+		/** Called to apply the function on the given input value.
+		 * @param pInput The functions input object
 		 * @return The functions result object
 	     * @throws T The exception type being thrown by the function.
 		 * @see Function#apply(Object)
@@ -290,7 +296,8 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableBiFunction<I1 extends Object, I2 extends Object, O extends Object, T extends Throwable> {
-		/** @param pInput1 The functions first input object
+		/** Called to apply the function on the given input values.
+		 * @param pInput1 The functions first input object
 		 * @param pInput2 The functions first input object
 		 * @return The functions result object
 	         * @throws T The exception type being thrown by the function.
@@ -307,7 +314,8 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableBiIntFunction<I extends Object, O extends Object, T extends Throwable> {
-		/** @param pInput1 The functions first input parameter, a primitive integer.
+		/** Called to apply the function on the given input value.
+		 * @param pInput1 The functions first input parameter, a primitive integer.
 		 * @param pInput2 The functions second input parameter, an instance of I.
 		 * @return The functions result object
 	         * @throws T The exception type being thrown by the function.
@@ -324,7 +332,8 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableBiLongFunction<I extends Object, O extends Object, T extends Throwable> {
-		/** @param pInput1 The functions first input parameter, a primitive integer.
+		/** Called to apply the function on the given input values.
+		 * @param pInput1 The functions first input parameter, a primitive integer.
 		 * @param pInput2 The functions second input parameter, an instance of I.
 		 * @return The functions result object
 	         * @throws T The exception type being thrown by the function.
@@ -339,7 +348,8 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableRunnable<T extends Throwable> {
-		/** @see Runnable#run()
+		/** Executes the {@link FailableRunnable}.
+		 * @see Runnable#run()
 		 * @throws T The exception type being thrown by the runnable.
 		 */
 		public void run() throws T;
@@ -352,7 +362,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableCallable<O extends Object,T extends Throwable> {
-		/**
+		/** Invokes the callable, and returns the result.
 		 * @return The result object.
 		 * @throws T The exception type being thrown by the callable.
 		 * @see Callable#call()
@@ -367,7 +377,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailablePredicate<O extends Object,T extends Throwable> {
-		/**
+		/** Applies the {@link FailablePredicate} on the given object.
 		 * @param pObject The predicates argument (The object being tested.)
 		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
 		 * @throws T The exception type being thrown by the predicate.
@@ -382,7 +392,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableIntPredicate<T extends Throwable> {
-		/**
+		/** Applies the predicate on the given value.
 		 * @param pValue The predicates argument (The object being tested.)
 		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
 		 * @throws T The exception type being thrown by the predicate.
@@ -397,7 +407,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableLongPredicate<T extends Throwable> {
-		/**
+		/** Applies the predicate on the given value.
 		 * @param pValue The predicates argument (The object being tested.)
 		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
 		 * @throws T The exception type being thrown by the predicate.
@@ -414,7 +424,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableBiPredicate<O1 extends Object,O2 extends Object,T extends Throwable> {
-		/**
+		/** Called to test the given input objects.
 		 * @param pObject1 The predicates first argument (The first object being tested.)
 		 * @param pObject2 The predicates second argument (The second object being tested.)
 		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
@@ -431,7 +441,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableBiIntPredicate<O extends Object,T extends Throwable> {
-		/**
+		/** Called to test the given input values.
 		 * @param pValue1 The predicates first argument (The integer value being tested.)
 		 * @param pObject2 The predicates second argument (The second object being tested.)
 		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
@@ -448,7 +458,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableBiLongPredicate<O extends Object,T extends Throwable> {
-		/**
+		/** Called to test the given input values.
 		 * @param pValue1 The predicates first argument (The integer value being tested.)
 		 * @param pObject2 The predicates second argument (The second object being tested.)
 		 * @return True, if the predicate accepts the object. (The object matches) Otherwise false.
@@ -465,7 +475,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableSupplier<O extends Object,T extends Throwable> {
-		/**
+		/** Returns the result object, as created by the supplier.
 		 * @return The result object, as created by the supplier.
 		 * @throws T The exception type being thrown by the supplier.
 		 * @see Supplier#get()
@@ -478,7 +488,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableIntSupplier<T extends Throwable> {
-		/**
+		/** Returns the result value, as created by the supplier.
 		 * @return The result value, as created by the supplier.
 		 * @throws T The exception type being thrown by the supplier.
 		 * @see Supplier#get()
@@ -491,7 +501,7 @@ public class Functions {
 	 */
 	@FunctionalInterface
 	public interface FailableLongSupplier<T extends Throwable> {
-		/**
+		/** Returns the result value, as created by the supplier.
 		 * @return The result value, as created by the supplier.
 		 * @throws T The exception type being thrown by the supplier.
 		 * @see Supplier#get()

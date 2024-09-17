@@ -16,6 +16,10 @@ public class SimpleTemplate<M> implements Template<M> {
 	 * @param <T> Type of the data model.
 	 */
 	public static class Context<T> {
+		/** Creates a new instance,
+		 */
+		public Context() {}
+
 		@SuppressWarnings("null")
 		private T model;
 		private PrintWriter writer;

@@ -26,6 +26,10 @@ import org.jspecify.annotations.Nullable;
  * @param <T> Type of the wrapped object.
  */
 public class Holder<T> implements Supplier<@Nullable T> {
+	/** Creates a new instance..
+	 */
+	public Holder() {}
+
 	private @Nullable T value;
 
 	/** Returns the wrapped object. May be null, if there the wrapped object hasn't been set.

@@ -14,6 +14,11 @@ import com.github.jochenw.afw.core.components.ISymbolicLinksHandler;
 /** Utility class for working with symbolic links.
  */
 public class SymbolicLinks {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private SymbolicLinks() {}
+
 	private static final ISymbolicLinksHandler handler = new DefaultSymbolicLinksHandler();
 
 	/**

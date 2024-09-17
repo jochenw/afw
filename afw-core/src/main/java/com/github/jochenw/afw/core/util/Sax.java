@@ -69,9 +69,18 @@ import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
  * Utility class for working with SAX handlers.
  */
 public class Sax {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Sax() {}
+
 	/** Abstract base class for implementing SAX handlers.
 	 */
 	public abstract static class AbstractContentHandler implements ContentHandler {
+		/** Creates a new instance.
+		 */
+		protected AbstractContentHandler() {}
+
 		private int level;
 		private Locator locator;
 		private StringBuilder sb;
@@ -406,6 +415,10 @@ public class Sax {
 	 * guaranteed to produce well formed output.
 	 */
 	public static class SaxWriter {
+		/** Creates a new instance.
+		 */
+		public SaxWriter() {}
+
 		private boolean indenting;
 		private boolean omittingXmlDeclaration;
 		private String encoding;

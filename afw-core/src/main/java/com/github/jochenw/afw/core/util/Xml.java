@@ -33,6 +33,11 @@ import groovyjarjarpicocli.CommandLine.IParameterConsumer;
 /** Utility class for working with XML.
  */
 public class Xml {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Xml() {}
+
 	/** An objects, which permits writing XML in a convenient manner.
 	 */
 	public static class Writer {

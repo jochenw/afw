@@ -19,6 +19,14 @@ package com.github.jochenw.afw.core.util;
  */
 public class MutableInteger extends Number implements Comparable<MutableInteger> {
 	private static final long serialVersionUID = 5486916587259114022L;
+	/** Creates a new instance with value 0.
+	 */
+	public MutableInteger() { this(0); }
+	/** Creates a new instance with the given value.
+	 * @param pValue The initial value.
+	 */
+	public MutableInteger(int pValue) { value = pValue; }
+
 	/** The current value.
 	 */
 	private int value;

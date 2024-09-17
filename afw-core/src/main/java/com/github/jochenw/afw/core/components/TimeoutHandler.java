@@ -24,6 +24,10 @@ import com.github.jochenw.afw.core.util.Exceptions;
  * which is restrained by a timeout.
  */
 public class TimeoutHandler {
+	/** Creates a new instance.
+	 */
+	public TimeoutHandler() {}
+
 	/** Called to execute the given {@link FailableRunnable task}. If the task finishes within
 	 * the given amount of milliseconds, invokes the {@link FailableRunnable success handler}.
 	 * If not, and the task expires, invokes the {@link FailableRunnable expiration handler}.

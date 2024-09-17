@@ -21,6 +21,11 @@ import javax.annotation.Nullable;
 /** Utility class for working with Generics.
  */
 public class Generics {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private Generics() {}
+
 	/** Tricks the compiler into believing a cast.
 	 * @param <O> The casts result type.
 	 * @param pObject The object, which is being casted.

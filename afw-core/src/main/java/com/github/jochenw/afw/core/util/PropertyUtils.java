@@ -29,6 +29,10 @@ import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 /** A class for reading, and writing property files, including comments.
  */
 public class PropertyUtils {
+	/** Creates a new instance.
+	 */
+	public PropertyUtils() {}
+
 	/** A class, which representy an entry in the property set.
 	 */
 	public static class Entry {

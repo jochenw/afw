@@ -45,6 +45,11 @@ import com.github.jochenw.afw.core.function.Functions.FailableFunction;
  * this class ought to be useful always.
  */
 public class Strings {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private Strings() {}
+
 	/** Returns the given value, if it is non-null, and non-empty, or
 	 * the default value.
 	 * @param pValue The value to check for null, or empty.

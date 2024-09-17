@@ -42,6 +42,10 @@ import java.util.Map;
  *
  */
 public class ExecutorBuilder {
+	/** Creates a new instance.
+	 */
+	public ExecutorBuilder() {}
+
 	private final List<String> cmdLine = new ArrayList<>();
 	private final Map<String,String> environment = new HashMap<>();
     private ProcessOutputHandler stdOutHandler, stdErrHandler;

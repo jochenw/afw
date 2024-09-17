@@ -39,6 +39,11 @@ import com.github.jochenw.afw.core.util.Sax;
 /** A utility class for working with XML parsers.
  */
 public class XmlParsers {
+	/** Creates a new instance. Private constructor, because
+	 * all methods are static.
+	 */
+	private XmlParsers() {}
+
 	/**
 	 * Parses the given {@link InputSource} into a DOM document, which is then
 	 * passed to the given {@link Consumer}.

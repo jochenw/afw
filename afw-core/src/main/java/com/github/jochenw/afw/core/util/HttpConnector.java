@@ -27,6 +27,10 @@ import java.security.cert.X509Certificate;
  * A component, which provides HTTP, or HTTPS connections.
  */
 public class HttpConnector {
+	/** Creates a new instance.
+	 */
+	public HttpConnector() {}
+
 	/** A {@link X509TrustManager}, which accepts all certificates.
 	 */
 	public static final X509TrustManager TRUST_ALL_MANAGER = new X509TrustManager() {

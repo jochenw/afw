@@ -25,6 +25,15 @@ import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
  */
 public class MutableBoolean implements Serializable, Comparable<MutableBoolean> {
 	private static final long serialVersionUID = 3402519841525500747L;
+
+	/** Creates a new instance with value false.
+	 */
+	public MutableBoolean() { this(false); }
+	/** Creates a new instance with the given value.
+	 * @param pValue The initial value.
+	 */
+	public MutableBoolean(boolean pValue) { value = pValue; }
+
 	/** The current value.
 	 */
 	private boolean value;

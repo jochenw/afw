@@ -23,6 +23,10 @@ import com.github.jochenw.afw.core.log.ILogFactory;
 /** Implementation of {@link ILogFactory}, which is based on SLF4J.
  */
 public class Slf4jLogFactory extends AbstractLogFactory {
+	/** Creates a new instance.
+	 */
+	public Slf4jLogFactory() {}
+
     @Override
     protected AbstractLog newLog(String pId) {
         return new Slf4jLog(this, pId);

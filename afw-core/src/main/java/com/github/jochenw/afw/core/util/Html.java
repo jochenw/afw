@@ -5,6 +5,11 @@ import java.util.function.Supplier;
 /** Utility class for working with Html, or Jsp files.
  */
 public class Html {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private Html() {}
+
 	/**
 	 * Escape the given string into a format, that can be embedded into an HTML element,
 	 * @param pValue The string, which is being escaped.

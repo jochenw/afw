@@ -23,6 +23,10 @@ import groovy.lang.GroovyShell;
  * scripts.
  */
 public class GroovyScriptEngine implements IScriptEngine {
+	/** Creates a new instance.
+	 */
+	public GroovyScriptEngine() {}
+
 	/** Implementation of {@link IScriptEngine.Script} for Groovy
 	 * scripts.
 	 */
