@@ -27,6 +27,10 @@ import org.jspecify.annotations.NonNull;
 /** Default implementation of {@link IPluginRegistry}.
  */
 public class DefaultPluginRegistry implements IPluginRegistry {
+	/** Creates a new instance.
+	 */
+	public DefaultPluginRegistry() {}
+
 	/** Key of a registered extension point.
 	 */
 	public static class Key {
@@ -73,6 +77,10 @@ public class DefaultPluginRegistry implements IPluginRegistry {
 	 * @param <O> The extension points plugin type.
 	 */
 	public static class DefaultExtensionPoint<O extends Object> implements IPluginRegistry.IExtensionPoint<O> {
+		/** Creates a new instance.
+		 */
+		public DefaultExtensionPoint() {}
+	
 		private final List<O> plugins = new ArrayList<O>();
 		private List<O> unmodifiablePlugins = Collections.emptyList();
 

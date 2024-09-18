@@ -26,6 +26,10 @@ import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
  * when the real logging facility is not yet available.
  */
 public class DefaultLogFactory extends AbstractLogFactory implements ILogFactory, LogManager.Listener {
+	/** Creates a new instance.
+	 */
+	public DefaultLogFactory() {}
+
     private AbstractLogFactory lf = new SimpleLogFactory();
     private boolean initialized;
     private final List<DefaultLog> loggers = new ArrayList<DefaultLog>();

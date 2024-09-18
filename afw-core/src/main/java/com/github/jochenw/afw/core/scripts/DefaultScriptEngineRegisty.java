@@ -16,6 +16,10 @@ import com.github.jochenw.afw.core.util.MutableBoolean;
  * but others can be registered manually.
  */
 public class DefaultScriptEngineRegisty implements IScriptEngineRegistry {
+	/** Creates a new instance.
+	 */
+	public DefaultScriptEngineRegisty() {}
+
 	/**
 	 * Returns the default list of {@link IScriptEngine script engines}.
 	 * As of this writing, the only engine is the {@link GroovyScriptEngine}.

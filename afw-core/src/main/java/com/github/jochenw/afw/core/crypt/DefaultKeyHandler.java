@@ -20,6 +20,10 @@ import com.github.jochenw.afw.core.util.Tupel;
  * otherwise Bouncycastle.
  */
 public class DefaultKeyHandler implements IKeyHandler {
+	/** Creates a new instance.
+	 */
+	public DefaultKeyHandler() {}
+
 	final IKeyHandler keyHandler = newKeyHandler();
 
 

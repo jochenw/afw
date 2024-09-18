@@ -14,11 +14,16 @@ import org.jspecify.annotations.Nullable;
 /** Abstract base implementation of {@link ISymbolicLinksHandler}.
  */
 public abstract class AbstractSymbolicLinksHandler implements ISymbolicLinksHandler {
-        /** Called to assert, that the given path is actually a directory.
-         * @param pTarget The path, which is being checked.
-         * @throws IllegalArgumentException The path doesn't refer to a
-         *   directory.
-         */
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	protected AbstractSymbolicLinksHandler() {}
+
+	/** Called to assert, that the given path is actually a directory.
+     * @param pTarget The path, which is being checked.
+     * @throws IllegalArgumentException The path doesn't refer to a
+     *   directory.
+     */
 	protected void assertDirectory(Path pTarget) {
 		final Path target = Objects.requireNonNull(pTarget, "The target must not be null.");
 		if (!Files.isDirectory(target)) {

@@ -15,6 +15,10 @@ import com.github.jochenw.afw.core.util.Systems;
  * depending on the current operating system.
  */
 public class DefaultSymbolicLinksHandler extends AbstractSymbolicLinksHandler {
+	/** Creates a new instance.
+	 */
+	public DefaultSymbolicLinksHandler() {}
+
 	private final ISymbolicLinksHandler handler = Systems.isWindows() ?
 			new WindowsCmdSymbolicLinksHandler() : new JavaNioSymbolicLinksHandler();
 

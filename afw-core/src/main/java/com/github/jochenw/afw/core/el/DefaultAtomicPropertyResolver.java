@@ -34,6 +34,10 @@ import com.github.jochenw.afw.core.util.Reflection;
  * properties like "foo.bar" in nested objects.
  */
 public class DefaultAtomicPropertyResolver extends PropertyResolver {
+	/** Creates a new instance.
+	 */
+	public DefaultAtomicPropertyResolver() {}
+
 	@Override
 	public Object getValue(Object pObject, String pProperty) {
 		Objects.requireNonNull(pObject, "Object");

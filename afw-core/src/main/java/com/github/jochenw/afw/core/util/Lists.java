@@ -152,6 +152,7 @@ public class Lists {
 	}
 
 	/** A collector is basically a builder for lists.
+	 * @param <O> The lists element type.
 	 */
 	public static class Collector<O> {
 		private final Class<O> type;

@@ -23,6 +23,11 @@ import com.github.jochenw.afw.core.util.Objects;
  * instance of {@link Properties}, or {@link Map}.
  */
 public class Data {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private Data() {}
+
 	/**
 	 * An Accessor is a helper object, which simplifies
 	 * working with data objects of a given type.

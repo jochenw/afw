@@ -28,6 +28,10 @@ import com.github.jochenw.afw.di.impl.DefaultOnTheFlyBinder;
  * and {@link com.github.jochenw.afw.core.props.IProperty}.
  */
 public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
+	/** Creates a new instance.
+	 */
+	public AfwCoreOnTheFlyBinder() {}
+
 	@Override
 	protected Object getLogger(IComponentFactory pFactory, Class<?> pType, String pId) {
 		if (pType == ILog.class) {

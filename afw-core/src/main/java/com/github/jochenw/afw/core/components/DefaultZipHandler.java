@@ -26,6 +26,10 @@ import com.github.jochenw.afw.core.util.Streams;
 /** Default implementation of {@link IZipFileHandler}
  */
 public class DefaultZipHandler implements IZipFileHandler {
+	/** Creates a new instance.
+	 */
+	public DefaultZipHandler() {}
+
 	@Override
 	public void createZipFile(Path pSourceDir, Path pZipFile, boolean pBaseDirIncludedInPath) {
 		final Path zipFileDir = pZipFile.getParent();

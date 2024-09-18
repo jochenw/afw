@@ -39,6 +39,10 @@ import org.jspecify.annotations.Nullable;
  * </ol>
  */
 public class DependencyResolver {
+	/** Creates a new instance.
+	 */
+	public DependencyResolver() {}
+
 	/** Representation of a node in the graph.
 	 * @param <T> The node type.
 	 */

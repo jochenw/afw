@@ -27,6 +27,10 @@ import org.jspecify.annotations.NonNull;
  * Abstract base implementation of {@link IPropertyFactory}.
  */
 public abstract class AbstractPropertyFactory implements IPropertyFactory {
+	/** Creates a new instance.
+	 */
+	protected AbstractPropertyFactory() {}
+
     private final List<IPropertyFactory.ChangeListener> listeners = new ArrayList<>();
 
     /** Called to notify the listeners, that an updated property set is available.

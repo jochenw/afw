@@ -23,6 +23,10 @@ import org.jspecify.annotations.Nullable;
  * @param <T> Actual type of the builder.
  */
 public abstract class AbstractBuilder<S,T extends AbstractBuilder<S,T>> extends AbstractMutable {
+	/** Creates a new instance.
+	 */
+	protected AbstractBuilder() {}
+
 	private @Nullable S instance;
 
 	/** Returns this builder.

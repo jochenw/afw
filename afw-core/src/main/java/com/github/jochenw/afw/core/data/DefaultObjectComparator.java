@@ -16,6 +16,10 @@ import java.util.function.Consumer;
  * Default implementation of {@link IObjectComparator}.
  */
 public class DefaultObjectComparator implements IObjectComparator {
+	/** Creates a new instance.
+	 */
+	public DefaultObjectComparator() {}
+
 	/** This object is used to calculate the location of a difference.
 	 *(The first argument of {@link IObjectComparator.Listener#difference(String, String)}.
 	 */

@@ -27,6 +27,10 @@ import com.github.jochenw.afw.core.util.Strings;
  * @param <Data> The data objects type.
  */
 public abstract class AfwCoreContextInitializer<Data extends Object> implements ServletContextListener {
+	/** Creates a new instance.
+	 */
+	public AfwCoreContextInitializer() {}
+
 	private static final String KEY = AfwCoreContextInitializer.class.getName() + ".KEY";
 
 	@Override

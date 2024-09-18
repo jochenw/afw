@@ -39,6 +39,10 @@ import com.github.jochenw.afw.core.util.Tupel;
 /** Implementation of IKeyHandler, based on the BounceCastle JCE provider.
  */
 public class BcKeyHandler implements IKeyHandler {
+	/** Creates a new instance.
+	 */
+	public BcKeyHandler() {}
+
 	@Override
 	public @NonNull KeyPair createKeyPair() {
 		try {

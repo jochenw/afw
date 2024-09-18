@@ -15,6 +15,10 @@ import com.github.jochenw.afw.core.util.Reflection;
 /** Default implementation of {@link IInstantiator}.
  */
 public class DefaultInstantiator implements IInstantiator {
+	/** Creates a new instance.
+	 */
+	public DefaultInstantiator() {}
+
 	/** Creates a new instance of the given class, using the given {@link ClassLoader}.
 	 * @param pClassLoader The {@link ClassLoader}, which is being used.
 	 * @param pClassName Name of the class, that is being created.

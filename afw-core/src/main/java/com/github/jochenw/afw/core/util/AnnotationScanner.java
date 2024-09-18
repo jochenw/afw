@@ -38,6 +38,10 @@ import java.util.Map;
  * up to four hexadecimal character).
  */
 public class AnnotationScanner {
+	/** Creates a new instance.
+	 */
+	public AnnotationScanner() {}
+
 	/** Implementation of an annotation, that has been detected by the scanner.
 	 */
 	public static class Annotation implements Serializable {

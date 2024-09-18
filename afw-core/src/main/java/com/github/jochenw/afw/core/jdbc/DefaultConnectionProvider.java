@@ -17,6 +17,10 @@ import com.github.jochenw.afw.di.api.IComponentFactory;
  * _prefix_ is "jdbc", but may be {@link #setPrefix(String) overwritten}.
  */
 public class DefaultConnectionProvider implements ConnectionProvider {
+	/** Creates a new instance.
+	 */
+	public DefaultConnectionProvider() {}
+
 	private @NonNull String prefix = "jdbc";
 	private IPropertyFactory propertyFactory;
 	private IComponentFactory componentFactory;

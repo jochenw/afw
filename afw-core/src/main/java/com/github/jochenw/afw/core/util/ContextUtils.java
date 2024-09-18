@@ -11,6 +11,11 @@ import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
  * working with context objects.
  */
 public class ContextUtils {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	public ContextUtils() {}
+
 	/** Interface of void method, which is being called with a
 	 * context object as the sole argument.
 	 * @param <C> Type of the context object.

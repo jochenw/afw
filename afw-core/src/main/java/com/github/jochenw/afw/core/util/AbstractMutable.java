@@ -19,6 +19,10 @@ package com.github.jochenw.afw.core.util;
  * Abstract base class for objects, that are initially mutable, but may become immutable.
  */
 public class AbstractMutable {
+	/** Creates a new instance.
+	 */
+	protected AbstractMutable() {}
+
 	private boolean immutable;
 	/**
 	 * Asserts, that this object is still mutable.

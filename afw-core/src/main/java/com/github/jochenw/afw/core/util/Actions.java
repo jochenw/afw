@@ -24,6 +24,11 @@ import java.util.concurrent.Executors;
 /** Utility class for supporting various kinds of actions.
  */
 public class Actions {
+	/** Creates a new instance. Private constructor,
+	 * because all methods are static.
+	 */
+	private Actions() {}
+
 	/** Executes all the given tasks in parallel, without any
 	 * determined order, using a thread pool with the given size.
 	 * @param pTasks The tasks, that are being executed.

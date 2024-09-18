@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
+/** A builder for {@link Executor executors}.
  *
  */
 public class ExecutorBuilder {

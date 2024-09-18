@@ -26,12 +26,20 @@ import com.github.jochenw.afw.core.util.Reflection;
  * {@link BeanVisitor visitor}.
  */
 public class BeanWalker {
+	/** Creates a new instance.
+	 */
+	public BeanWalker() {}
+
 	/** The context object is created by the {@link BeanVisitor visitor}.
 	 * The visitor may use this to store the necessary information inside the
 	 * context. Applied carefully, this allows thread safe visitor implementations. 
 	 */
 	public static class Context {
+		/** Creates a new instance.
+		 */
+		public Context() {}
 	}
+
 	/** The visitor is invoked by the {@link BeanWalker bean walker},
 	 * whenever the walker detects a new field.
 	 * @param <C> The type of the context object.
