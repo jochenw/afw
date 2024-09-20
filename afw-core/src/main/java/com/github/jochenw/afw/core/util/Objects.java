@@ -317,8 +317,9 @@ public class Objects {
 		 * @param pObject The object, that is being cached.
 		 * @param pOut The output stream, to which the
 		 *   cached object is being written.
+		 * @throws Exception Reading the cache file has failed.
 		 */
-		public void write(@NonNull Object pObject, @NonNull OutputStream pOut) {
+		public void write(@NonNull Object pObject, @NonNull OutputStream pOut) throws Exception {
 			final Object object = Objects.requireNonNull(pObject, "Object");
 			final OutputStream os = Objects.requireNonNull(pOut, "OutputStream"); 
 			try {
@@ -335,8 +336,9 @@ public class Objects {
 		 *   cached object is being read.
 		 * @return The cached object, that has been read from the input
 		 *   stream.
+		 * @throws Exception Reading the cache file has failed.
 		 */
-		public @NonNull Object read(@NonNull InputStream pIn) {
+		public @NonNull Object read(@NonNull InputStream pIn) throws Exception {
 			final InputStream in = Objects.requireNonNull(pIn, "InputStream");
 			try {
 				final ObjectInputStream ois = new ObjectInputStream(in);
@@ -422,7 +424,7 @@ public class Objects {
 					@SuppressWarnings("unchecked")
 					final O o = (O) getSerializer().read(in);
 					return o;
-				} catch (IOException e) {
+				} catch (Exception e) {
 					throw Exceptions.show(e);
 				}
 			} else {
@@ -455,6 +457,25 @@ public class Objects {
 	 */
 	public static <O> O getCacheableObject(@NonNull Path pCacheFile, @NonNull FailableSupplier<O,? > pSupplier) {
 		return CachedObjectManager.of(pCacheFile, pSupplier).get();
+	}
+
+	/** Returns a cached object, if available. Otherwise, invokes the cached object supplier,
+	 * stores the created object in the cache file, and returns it. Subsequent invocations of
+	 * the same method with the same parameters will no longer invoke the cached object
+	 * supplier, but read the object from the cache file.
+	 * @param pCacheFile The cache file. If that file exists, it is assumed to contain a valid
+	 *   cached object.
+	 * @param pSerializer The serializer, which is being used,
+	 *   when writing, or reading the cache file.
+	 * @param pSupplier The cached object supplier, which will be invoked to create the
+	 *   cached object afresh, if the cache file isn't found.
+	 * @param <O> Type of the cached object.
+	 * @return The cached, or created object.
+	 */
+	public static <O> O getCacheableObject(@NonNull Path pCacheFile,
+			@NonNull CachedObjectSerializer pSerializer,
+			@NonNull FailableSupplier<O,? > pSupplier) {
+		return CachedObjectManager.of(pCacheFile, pSupplier).serializer(pSerializer).get();
 	}
 
 	/** For testing only: Returns a value, which is assumed to be non-null,
