@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.util.tests;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -30,6 +30,8 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Streams;
 
 
 /** Utility class for unit tests.

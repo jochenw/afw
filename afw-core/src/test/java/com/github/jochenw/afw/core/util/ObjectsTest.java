@@ -26,8 +26,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +45,7 @@ import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.Objects.CachedObjectSerializer;
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 /** Test suite for the {@link Objects} class.
  */

@@ -21,6 +21,8 @@ import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -798,21 +801,21 @@ public class Strings {
 	/** Creates a string representation of the list, or collection {@code pValues},
 	 * like {@link String#join(CharSequence, Iterable)}, except that the current
 	 * method accepts arbitrary lists.
-	 * @param <O> Element type of the list
+	 * @param pContractAndEbIds The value list, which is being converted into a string
+	 *   representation.
 	 * @param pSeparator String, which separates two consecutive elements in the
 	 *   string representation.
-	 * @param pValues The value list, which is being converted into a string
-	 *   representation.
-	 * @param pMapper A mapping function, which will be invoked for every element
+	 * @param pTcIdMapper A mapping function, which will be invoked for every element
 	 *   in the list, in order to create a string representation of a single
 	 *   element.
+	 * @param <O> Element type of the list
 	 * @return The created string representation.
 	 * @throws NullPointerException Either of the parameters is null.
 	 */
-	public static <O> String join(CharSequence pSeparator, Iterable<O> pValues, FailableFunction<O,String,?> pMapper) {
+	public static <O> String joinList(Iterable<O> pContractAndEbIds, CharSequence pSeparator, FailableFunction<O, String, ?> pTcIdMapper) {
 		final CharSequence separator = Objects.requireNonNull(pSeparator, "Separator");
-		final Iterable<O> values = Objects.requireNonNull(pValues, "Values");
-		final FailableFunction<O,String,?> mapper = Objects.requireNonNull(pMapper, "Mapper");
+		final Iterable<O> values = Objects.requireNonNull(pContractAndEbIds, "Values");
+		final FailableFunction<O,String,?> mapper = Objects.requireNonNull(pTcIdMapper, "Mapper");
 		final StringBuilder sb = new StringBuilder();
 		CharSequence sep = null;
 		for (O o : values) {
@@ -839,11 +842,11 @@ public class Strings {
 	 *   element.
 	 * @return The created string representation.
 	 * @throws NullPointerException Either of the parameters is null.
-	 * @see #join(CharSequence, Iterable, Functions.FailableFunction)
+	 * @see #joinList(Iterable, CharSequence, Functions.FailableFunction)
 	 */
 	public static <O> String join(CharSequence pSeparator, O[] pValues, FailableFunction<O,String,?> pMapper) {
 		final O[] array = Objects.requireNonNull(pValues, "Values");
-		return join(pSeparator, Arrays.asList(array), pMapper);
+		return joinList(Arrays.asList(array), pSeparator, pMapper);
 	}
 
 	/** Creates a string representation of the given {@code pValues},
@@ -859,12 +862,29 @@ public class Strings {
 	 *   representation.
 	 * @return The created string representation.
 	 * @throws NullPointerException Either of the parameters is null.
-	 * @see #join(CharSequence, Iterable, Functions.FailableFunction)
+	 * @see #joinList(Iterable, CharSequence, Functions.FailableFunction)
 	 */
 	public static <O> String join(CharSequence pSeparator, FailableFunction<O,String,?> pMapper,
 			                      @SuppressWarnings("unchecked") O... pValues) {
 		final O[] array = Objects.requireNonNull(pValues, "Values");
-		return join(pSeparator, Arrays.asList(array), pMapper);
+		return joinList(Arrays.asList(array), pSeparator, pMapper);
+	}
+
+	/** Replacement for {@link URL#URL(String)}, which is deprecated, as of
+	 * Java 20.
+	 * @param pUrlStr The string, which is being converted into an URL.
+	 * @return The converted URL, if any.
+	 * @throws NullPointerException The parameter {@code pUrlStr} is null.
+	 * @throws IllegalArgumentException The parameter {@code pUrlStr} is empty.
+	 * @throws MalformedURLException The parameter {@code pUrlStr} is otherwise invalid.
+	 */
+	@SuppressWarnings("deprecation")
+	public static URL asUrl(String pUrlStr) throws MalformedURLException {
+		final String urlStr = Objects.requireNonNull(pUrlStr, "UrlStr");
+		if (urlStr.trim().length() == 0) {
+			throw new IllegalArgumentException("The parameter UrlStr is empty.");
+		}
+		return new URL(urlStr);
 	}
 }
 

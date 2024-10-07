@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.core.util;
+package com.github.jochenw.afw.core.util.tests;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,8 @@ import java.nio.file.Path;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 
 /** Test for the {@link Tests} class.
@@ -29,7 +31,7 @@ public class TestsTest {
 			Tests.requireResource(cl, Tests.class.getName().replace('.', '/') + ".clazz");
 			Assert.fail("Expected Exception");
 		 } catch (IllegalStateException e) {
-			 assertEquals("Failed to locate resource: com/github/jochenw/afw/core/util/Tests.clazz (via ClassLoader TestClassLoader)", e.getMessage());
+			 assertEquals("Failed to locate resource: com/github/jochenw/afw/core/util/tests/Tests.clazz (via ClassLoader TestClassLoader)", e.getMessage());
 		 }
 		Thread.currentThread().setContextClassLoader(cl);
 		assertNotNull(Tests.requireResource(Tests.class.getName().replace('.', '/') + ".class"));
@@ -37,7 +39,7 @@ public class TestsTest {
 			Tests.requireResource(Tests.class.getName().replace('.', '/') + ".clazz");
 			fail("Expected Exception");
 		 } catch (IllegalStateException e) {
-			 assertEquals("Failed to locate resource: com/github/jochenw/afw/core/util/Tests.clazz (via ClassLoader TestClassLoader)", e.getMessage());
+			 assertEquals("Failed to locate resource: com/github/jochenw/afw/core/util/tests/Tests.clazz (via ClassLoader TestClassLoader)", e.getMessage());
 		}
 		Thread.currentThread().setContextClassLoader(cl.getParent());
 	}

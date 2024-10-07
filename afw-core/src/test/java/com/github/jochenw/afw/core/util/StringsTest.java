@@ -403,11 +403,11 @@ public class StringsTest {
     		}
     	}
     }
-    /** Test case for {@link Strings#join(CharSequence, Iterable, Functions.FailableFunction)}.
+    /** Test case for {@link Strings#joinList(Iterable, CharSequence, Functions.FailableFunction)}.
      */
     @Test
     public void testJoinStringIterableFunction() {
-    	final String actual = Strings.join(", ", Arrays.asList(Person.SOME_PERSONS), Person::getName);
+    	final String actual = Strings.joinList(Arrays.asList(Person.SOME_PERSONS), ", ", Person::getName);
     	assertEquals(Person.SOME_PERSONS_STRING, actual);
     }
 

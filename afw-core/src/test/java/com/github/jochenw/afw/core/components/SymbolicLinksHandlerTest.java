@@ -17,7 +17,7 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.util.SymbolicLinks;
 import com.github.jochenw.afw.core.util.Systems;
-import com.github.jochenw.afw.core.util.Tests;
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 /**
  * @author jwi

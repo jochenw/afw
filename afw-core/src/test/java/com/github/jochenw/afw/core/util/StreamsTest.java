@@ -59,6 +59,7 @@ import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.io.IReadable;
 import com.github.jochenw.afw.core.io.ObservableInputStream.Listener;
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 import junit.framework.AssertionFailedError;
 

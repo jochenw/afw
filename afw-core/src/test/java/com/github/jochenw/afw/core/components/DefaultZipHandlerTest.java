@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.io.AbstractFileVisitor;
-import com.github.jochenw.afw.core.util.Tests;
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 /** Test suite for the {@link DefaultZipHandler} class.
  */

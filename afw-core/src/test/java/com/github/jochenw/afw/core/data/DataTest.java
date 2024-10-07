@@ -21,7 +21,7 @@ import com.github.jochenw.afw.core.data.Data.InvalidDataTypeException;
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.Objects;
-import com.github.jochenw.afw.core.util.Tests;
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 /**
  * Test suite for the {@link Data} class.

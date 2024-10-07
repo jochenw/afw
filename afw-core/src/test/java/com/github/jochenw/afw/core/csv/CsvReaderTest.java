@@ -25,7 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.csv.CsvReader.CsvRow;
-import com.github.jochenw.afw.core.util.Tests;
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 
 /** Test for the {@link CsvReader}.
