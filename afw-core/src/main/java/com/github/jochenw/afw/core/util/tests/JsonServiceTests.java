@@ -13,11 +13,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonString;
+import javax.json.JsonValue;
+
+import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.util.HttpConnector;
 import com.github.jochenw.afw.core.util.Objects;
@@ -26,48 +33,132 @@ import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 
 public class JsonServiceTests {
+	/** A named list of values, which is used to store query parameters, or HTTP headers.
+	 */
+	public static class ValueList {
+		private final @NonNull String name;
+		private final @NonNull List<@NonNull String> values = new ArrayList<>();
+
+		/** Creates a new instance with the given name.
+		 * @param pName The lists name (Case sensitive).
+		 */
+		public ValueList(@NonNull String pName) {
+			name = pName;
+		}
+
+		/** Returns the lists name.
+		 * @return The lists name.
+		 */
+		public @NonNull String getName() {
+			return name;
+		}
+
+		/** Returns the lists values.
+		 * @return The lists values.
+		 */
+		public @NonNull List<@NonNull String> getValues() {
+			return values;
+		}
+
+		/** Called to iterate over the values by invoking a value consumer for every value, in order.
+		 * @param pConsumer The consumer, which is being invoked for every value, in order.
+		 */
+		public void forEach(@NonNull Consumer<@NonNull String> pConsumer) {
+			values.forEach(pConsumer);
+		}
+	}
 	/** Request specification, suitable for
 	 * {@link JsonServiceTests#runServiceTest(Path)}
 	 */
 	public static class JsonServiceTestSpecification implements Serializable {
 		private static final long serialVersionUID = -64038754447555476L;
 
-		private final URL url;
-		private final String method;
-		private Map<String,List<String>> queryParameters, headers;
+		private final @NonNull URL url;
+		private final @NonNull String method;
+		private Map<@NonNull String,@NonNull ValueList> queryParameters, headers;
 
-		public JsonServiceTestSpecification(URL pUrl, String pMethod) {
-			url = pUrl;
-			method = pMethod;
+		/** Creates a new instance with the given URL, and method.
+		 * @param pUrl The URL, to which a JSON request is being sent.
+		 * @param pMethod The HTTP method, which is being sent, when sending the JSON request.
+		 */
+		public JsonServiceTestSpecification(@NonNull URL pUrl, @NonNull String pMethod) {
+			url = Objects.requireNonNull(pUrl, "Url");
+			method = Objects.requireNonNull(pMethod, "Method");
 		}
 
-		protected void addValueToMap(final Map<String,List<String>> pMap, String pKey, String pValue) {
-			final String key = Objects.requireNonNull(pKey, "Key").toLowerCase();
-			final String value = Objects.requireNonNull(pKey, "Value");
-			pMap.computeIfAbsent(key, (k) -> new ArrayList<>()).add(value);
+		/**
+		 * Adds a new value to a map of parameters, or headers.
+		 * @param pMap The map of parameters, or headers.
+		 * @param pKey The parameter, or header, name.
+		 * @param pValue The parameter, or header, value.
+		 */
+		protected void addValueToMap(final Map<@NonNull String,@NonNull ValueList> pMap, @NonNull String pKey, @NonNull String pValue) {
+			@SuppressWarnings("null")
+			final @NonNull String key = Objects.requireNonNull(pKey, "Key").toLowerCase();
+			final @NonNull String value = Objects.requireNonNull(pValue, "Value");
+			@SuppressWarnings("null")
+			final @NonNull ValueList vList = pMap.computeIfAbsent(key, (k) -> {
+				return new ValueList(pKey);
+			});
+			vList.getValues().add(value);
 		}
-	
-		public void addQueryParameter(String pKey, String pValue) {
+
+		/** Adds a query parameter with the given name, and value.
+		 * @param pKey The query parameters name.
+		 * @param pValue The query parameters value.
+		 */
+		public void addQueryParameter(@NonNull String pKey, @NonNull String pValue) {
 			if (queryParameters == null) {
 				queryParameters = new HashMap<>();
 			}
 			addValueToMap(queryParameters, pKey, pValue);
 		}
 
-		public void addHeader(String pKey, String pValue) {
+		/** Adds a HTTP header with the given name, and value.
+		 * @param pKey The HTTP headers name.
+		 * @param pValue The HTTP headers value.
+		 */
+		public void addHeader(@NonNull String pKey, @NonNull String pValue) {
 			if (headers == null) {
 				headers = new HashMap<>();
 			}
 			addValueToMap(headers, pKey, pValue);
 		}
+
+		/** Returns the URL, to which a JSON request is being sent.
+		 * @return The URL, to which a JSON request is being sent.
+		 */
+		public URL getUrl() { return url; }
+		/** Returns the HTTP method, which is being sent, when sending the JSON request.
+		 * @return The HTTP method, which is being sent, when sending the JSON request.
+		 */
+		public String getMethod() { return method; }
+
+		/** Returns the map of query parameters.
+		 * @return The map of query parameters.
+		 */
+		@NonNull Map<@NonNull String, @NonNull ValueList> getQueryParameters() { return Objects.requireNonNull(queryParameters); }
+		/** Returns the map of HTTP request headers.
+		 * @return The map of HTTP request headers.
+		 */
+		@NonNull Map<@NonNull String, @NonNull ValueList> getHeaders() { return Objects.requireNonNull(headers); }
 	}
 
+	/** Representation of a service test, which can be executed. The representation is
+	 * typically read from a file "request.json".
+	 */
 	public static class JsonServiceTest implements IComponentFactoryAware {
 		private final Path dir;
 		private final Path requestJsonFile;
-		private static final HttpConnector DEFAULT_HTTP_CONNECTOR = new HttpConnector();
-		private HttpConnector httpConnector;
+		private static final @NonNull HttpConnector DEFAULT_HTTP_CONNECTOR = new HttpConnector();
+		private static final @NonNull JsonServiceSpecificationReader DEFAULT_SERVICE_SPEC_READER = new JsonServiceSpecificationReader();
+		private @NonNull HttpConnector httpConnector = DEFAULT_HTTP_CONNECTOR;
+		private @NonNull JsonServiceSpecificationReader reader = DEFAULT_SERVICE_SPEC_READER;
 
+		/** Creates a new instance.
+		 * @param pDir The directory from which to read the service test representation.
+		 * The directory is supposed to contain a file "request.json".
+		 */
 		public JsonServiceTest(Path pDir) {
 			dir = pDir;
 			if (!Files.isDirectory(pDir)) {
@@ -79,67 +170,26 @@ public class JsonServiceTests {
 			}
 		}
 
+		/** Initializes the instance by obtaining a {@link HttpConnector}.
+		 * @param pFactory The component factory, which provides the {@link HttpConnector}.
+		 */
 		@Override
 		public void init(IComponentFactory pFactory) throws Exception {
 			httpConnector = Objects.notNull(pFactory.getInstance(HttpConnector.class), DEFAULT_HTTP_CONNECTOR);
+			reader = Objects.notNull(pFactory.getInstance(JsonServiceSpecificationReader.class), DEFAULT_SERVICE_SPEC_READER);
 		}
 
 		public void run() {
 			try (InputStream is = Files.newInputStream(requestJsonFile);
 				 JsonReader jsonReader = Json.createReader(is)) {
-				run(jsonReader.readObject());
+				JsonObject jo = jsonReader.readObject();
+				
 			} catch (IOException ioe) {
 				throw new UncheckedIOException(ioe);
 			}
 		}
 
-		public JsonServiceTestSpecification run(JsonObject pServiceSpecification) {
-			final String urlStr = pServiceSpecification.getString("url");
-			if (urlStr == null) {
-				throw new NullPointerException("Attribute url is missing in service test specification");
-			}
-			if (urlStr.trim().length() == 0) {
-				throw new IllegalArgumentException("Attribute url is empty in service test specification");
-			}
-			final URL url;
-			try {
-				url = Strings.asUrl(urlStr);
-			} catch (MalformedURLException e) {
-				throw new IllegalArgumentException("Attribute url is invalid in service test specification: " + urlStr, e);
-			}
-			String method = validateMethod(pServiceSpecification.getString("method"));
-			if (method == null) {
-				throw new IllegalArgumentException("Attribute method is invalid in service test specification: "
-							+ pServiceSpecification.getString("method"));
-			}
-			
-			return new JsonServiceTestSpecification(url, method);
-		}
-
-		/** Called to validate (and , possibly, adjust the value of the HTTP method verb.
-		 * @param pMethod The specified value of the HTTP method verb.
-		 * @return A non-null value indicates, that the HTTP method verb is valid,
-		 * possibly with adjustments applied. The caller should replace the input
-		 * value with the return value. (For example, the returned value is uppercased.)
-		 * Null, if the input value was found to be invalid.
-		 */
-		protected String validateMethod(String pMethod) {
-			if (pMethod == null) {
-				return "GET"; // Okay
-			} else {
-				final String method = pMethod.toUpperCase();
-				switch (method) {
-				  case "GET":
-				  case "POST":
-				  case "PUT":
-				  case "DELETE":
-				  case "PATCH":
-					  return method; // Okay.
-				  default:
-					  return null;
-				}
-			}
-		}
+		
 	}
 
 	public static void runServiceTest(Path pDir) {
@@ -148,7 +198,7 @@ public class JsonServiceTests {
 		try (InputStream is = Files.newInputStream(jst.requestJsonFile);
 			 JsonReader jr = Json.createReader(is)) {
 			final JsonObject jo = jr.readObject();
-			jsts = jst.run(jo);
+			jsts = jst.reader.parse(jo);
 		} catch (IOException ioe) {
 			throw new UncheckedIOException(ioe);
 		}

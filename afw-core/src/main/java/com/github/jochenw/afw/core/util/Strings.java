@@ -879,7 +879,7 @@ public class Strings {
 	 * @throws MalformedURLException The parameter {@code pUrlStr} is otherwise invalid.
 	 */
 	@SuppressWarnings("deprecation")
-	public static URL asUrl(String pUrlStr) throws MalformedURLException {
+	public static @NonNull URL asUrl(@NonNull String pUrlStr) throws MalformedURLException {
 		final String urlStr = Objects.requireNonNull(pUrlStr, "UrlStr");
 		if (urlStr.trim().length() == 0) {
 			throw new IllegalArgumentException("The parameter UrlStr is empty.");
