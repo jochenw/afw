@@ -824,9 +824,15 @@ public class Streams {
 	public static final @NonNull Charset UTF_8 = Objects.requireNonNull(StandardCharsets.UTF_8);
 
 	/**
-	 * A reference to the systems line separator, which is declared zto be non-null.
+	 * A reference to the systems line separator, which is declared to be non-null.
 	 */
 	public static final @NonNull String LINE_SEPARATOR = Objects.requireNonNull(System.lineSeparator());
+
+	/**
+	 * A reference to the systems line separator (as a byte array), which is declared to be non-null.
+	 */
+	@SuppressWarnings("null")
+	public static final byte @NonNull [] LINE_SEPARATOR_BYTES = LINE_SEPARATOR.getBytes(StandardCharsets.UTF_8);
 
     /**
      * Reads the given {@link IReadable} as a text file, invoking the given consumer for
