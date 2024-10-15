@@ -1,12 +1,21 @@
 package com.github.jochenw.afw.core.util;
 
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.NonNull;
+
+import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.function.Functions.FailablePredicate;
@@ -359,4 +368,319 @@ public class ObjectStreams {
 	public static <O> FailableStream<O> failable(Stream<O> pStream) {
 		return new FailableStream<O>(pStream);
 	}
+
+	/** <p>A {@link PStream pushable stream} is a data pipeline,
+	 * roughly comparable to a {@link Stream}. The main
+	 * difference is, that the former is controlled by the
+	 * sending side of the pipeline, which "pushes" data
+	 * into the stream, while the latter is controlled by
+	 * the receiving side, that "pulls" data from the stream.</p>
+	 * <p>The difference affects the API, which is a bit more
+	 * natural, and convenient, for {@link Stream
+	 * standard streams}. On the other hand, the {@link PStream}
+	 * might come in handy in a event-driven, or "reactive"
+	 * environment.</p>
+	 * <p>The {@link PStream} is implemented as an ordered chain
+	 * of {@link PLink link} elements, each of which
+	 * processes incoming data, and passes it on to the next
+	 * link in the chain.</p> 
+	 */
+	public static class PStream<I,O> implements Consumer<I> {
+		private final @NonNull PLink<I,?> firstLink;
+		private @NonNull PLink<?,O> lastLink;
+
+		private PStream(@NonNull PLink<I,?> pFirstLink, @NonNull PLink<?,O> pLastLink) {
+			firstLink = pFirstLink;
+			lastLink = pLastLink;
+		}
+
+		@Override
+		public void accept(I pItem) {
+			firstLink.accept(pItem);
+		}
+
+		/** Pushes an item into the data stream by invoking {@link #accept(Object)}.
+		 * @param pItem The item, which is being pushed into the data stream.
+		 * @return This stream, ready to receive more items.
+		 */
+		public PStream<I,O> push(I pItem) {
+			accept(pItem);
+			return this;
+		}
+
+		/** Pushes all of the given items into the data stream by invoking
+		 * {@link #accept(Object)} for every item, one-by-one, and in the
+		 * given order.
+		 * @param pItems The items, which are being pushed into the data stream.
+		 * @return This stream, ready to receive more items.
+		 */
+		public PStream<I,O> push(@SuppressWarnings("unchecked") I @NonNull... pItems) {
+			for (I item : pItems) {
+				accept(item);
+			}
+			return this;
+		}
+
+		/** Pushes all of the given items into the data stream by invoking
+		 * {@link #accept(Object)} for every item, one-by-one, and in the
+		 * iterable's natural order.
+		 * @param pItems The items, which are being pushed into the data stream.
+		 * @return This stream, ready to receive more items.
+		 */
+		public PStream<I,O> push(@NonNull Iterable<I> pItems) {
+			for (I item : pItems) {
+				accept(item);
+			}
+			return this;
+		}
+
+		/** Pushes all of the given items into the data stream by invoking
+		 * {@link #accept(Object)} for every item, one-by-one, and in the
+		 * streams natural order.
+		 * @param pItems The items, which are being pushed into the data stream.
+		 * @return This stream, ready to receive more items.
+		 */
+		public PStream<I,O> push(@NonNull Stream<I> pItems) {
+			pItems.forEach(this::accept);
+			return this;
+		}
+
+		/** Pushes all of the given items into the data stream by invoking
+		 * {@link #accept(Object)} for every item, one-by-one, and in the
+		 * iteration's natural order.
+		 * @param pItems The items, which are being pushed into the data stream.
+		 * @return This stream, ready to receive more items.
+		 */
+		public PStream<I,O> push(@NonNull Iterator<I> pItems) {
+			while(pItems.hasNext()) {
+				accept(pItems.next());
+			}
+			return this;
+		}
+
+		/** Pushes all of the given items into the data stream by invoking
+		 * {@link #accept(Object)} for every item, one-by-one, and in the
+		 * enumeration's natural order.
+		 * @param pItems The items, which are being pushed into the data stream.
+		 * @return This stream, ready to receive more items.
+		 */
+		public PStream<I,O> push(@NonNull Enumeration<I> pItems) {
+			while(pItems.hasMoreElements()) {
+				accept(pItems.nextElement());
+			}
+			return this;
+		}
+
+		/** Extends the stream by adding a filter: The
+		 * stream will now discard any output items,
+		 * for which the given {@link Predicate}
+		 * evaluates to false.
+		 * @param pPredicate The filter predicate,
+		 *   which will be invoked for any potential
+		 *   output item. If the predicate returns
+		 *   {@code false}, then the output item
+		 *   will be silently discarded.
+		 * @return This stream, with the
+		 *   requested extension applied.
+		 */
+		public PStream<I,O> filter(@NonNull Predicate<O> pPredicate) {
+			final PLink<O,O> link = new PLink<O,O>() {
+				@Override
+				public void accept(O pItem) {
+					if (pPredicate.test(pItem)) {
+						pushUp(pItem);
+					}
+				}
+			};
+			lastLink.nextLink = link;
+			lastLink = link;
+			return this;
+		}
+
+		/** Failable version of {@link #filter(Predicate)}: If the
+		 * given predicate fails, then the thrown Exception will
+		 * be mapped to a {@link RuntimeException}, not affecting
+		 * the filters signature.
+		 * @param pPredicate The filter predicate,
+		 *   which will be invoked for any potential
+		 *   output item. If the predicate returns
+		 *   {@code false}, then the output item
+		 *   will be silently discarded. If the predicate
+		 *   fails, throwing an Exception, then that
+		 *   Exception will be trapped, and wrapped into
+		 *   a {@link RuntimeException}, which will then
+		 *   be thrown.
+		 * @return This stream, with the
+		 *   requested extension applied.
+		 */
+		public PStream<I,O> filter(@NonNull FailablePredicate<O,?> pPredicate) {
+			@SuppressWarnings("null")
+			final @NonNull Predicate<O> predicate = Functions.asPredicate(pPredicate);
+			return filter(predicate);
+		}
+
+		/** Extends the stream by adding a transformation:
+		 * For any potential output item, the given
+		 * {@link Function mapping function}, which
+		 * transforms the potential output item
+		 * into the actual output item.
+		 * @param pMapper The mapping function, which
+		 * will be invoked to transform the output
+		 * items.
+		 * @return A new stream, which extends the
+		 * current stream by adding the requested
+		 * transformation.
+		 */
+		public <R> PStream<I,R> map(Function<O,R> pMapper) {
+			final  PLink<O,R> link = new PLink<O,R>(){
+				@Override
+				public void accept(O pItem) {
+					final R r = pMapper.apply(pItem);
+					pushUp(r);
+				}
+			};
+			lastLink.nextLink = link;
+			@SuppressWarnings("unchecked")
+			final PStream<I,R> ps = (PStream<I,R>) this;
+			ps.lastLink = link;
+			return ps;
+		}
+
+		/** Failable version of {@link #map(Function)}:
+		 * If the transformation to the actual output
+		 * item fails, then the thrown Exception will
+		 * be trapped, and wrapped into a {@link RuntimeException},
+		 * which will be thrown instead.
+		 * @param pMapper The mapping function, which
+		 * will be invoked to transform the output
+		 * item.
+		 * If the tranformation fails, then the thrown
+		 * Exception will be trapped, and wrapped into a
+		 * {@link RuntimeException}, which will be
+		 * thrown instead.
+		 * @return A new stream, which extends the
+		 * current stream by adding the requested
+		 * transformation.
+		 */
+		public <R> PStream<I,R> map(@NonNull FailableFunction<O,R,?> pMapper) {
+			@SuppressWarnings("null")
+			final @NonNull Function<O,R> mapper = Functions.asFunction(pMapper);
+			return map(mapper);
+		}
+		
+		/** Extends the stream by adding a new output
+		 * branch. The created output branch will
+		 * be terminated immediately by invoking
+		 * the given collector. The main branch
+		 * may be extended further by following
+		 * invocations of
+		 * {@link #filter(Predicate)},
+		 * {@link #map(Function)}, or
+		 * {@link #collect(Consumer)}.
+		 * @param pCollector The collector,
+		 * which will be invoked to receive
+		 * output items.
+		 * @return This stream, with the requested
+		 * extension applied.
+		 */
+		public PStream<I,O> collect(Consumer<O> pCollector) {
+			final PLink<O,O> link = new PLink<O,O>(){
+				@Override
+				public void accept(O pItem) {
+					if (nextLink != null) {
+						pushUp(pItem);
+					}
+					pCollector.accept(pItem);
+				}
+			};
+			lastLink.nextLink = link;
+			lastLink = link;
+			return this;
+		}
+
+		/** Failable version of {@link #collect(Consumer)}:
+		 * If the given consumer fails, throwing an Exception,
+		 * then the thrown Exception will
+		 * be trapped, and wrapped into a {@link RuntimeException},
+		 * which will be thrown instead.
+		 * @param pCollector The collector, which will
+		 *   be invoked for any output item. If the collector
+		 *   fails, throwing an Exception, then the thrown Exception will
+		 *   be trapped, and wrapped into a {@link RuntimeException},
+		 *   which will be thrown instead. 
+		 * @return This stream object, with the requested
+		 *   extension applied.
+		 */
+		public PStream<I,O> collect(@NonNull FailableConsumer<O,?> pCollector) {
+			@SuppressWarnings("null")
+			final @NonNull Consumer<O> collector = Functions.asConsumer(pCollector);
+			return collect(collector);
+		}
+
+		/** Extends the stream by adding a new output
+		 * branch. The created output branch will
+		 * be terminated immediately by adding the
+		 * item to the given collection.
+		 * In other words: This is equivalent to
+		 * <pre>
+		 *   collect(pCollection::add)
+		 * </pre>
+		 * @param pCollector A collection, which acts as an
+		 * output collector. The collections {@link Collection#add(Object)}
+		 * method will be invoked for every output item.
+		 * @return This stream object, with the requested
+		 *   extension applied.
+		 */
+		public PStream<I,O> collect(@NonNull Collection<O> pCollector) {
+			final @NonNull Consumer<O> collector = pCollector::add;
+			return collect(collector);
+		}
+		
+		/** Creates a new stream with the input type
+		 * {@code &lt;E&gt;}.
+		 * @param <E> The created streams input type.
+		 *   (Also the output type, as long as the stream
+		 *   isn't extended by invoking any of the
+		 *   methods {@link #filter(Predicate)},
+		 *   {@link #map(Function)},
+		 *   or {@link #collect(Consumer)}. 
+		 * @return The created stream.
+		 */
+		public static <E> PStream<E,E> of() {
+			final PLink<E,E> link = new PLink<E,E>(){
+				@Override
+				public void accept(E pItem) {
+					pushUp(pItem);
+				}
+			};
+			final PStream<E,E> stream = new PStream<>(link, link);
+			stream.lastLink = link;
+			return stream;
+		}
+	}
+
+	/** A {@link PLink link} is a single chain in the
+	 * chain, that makes up a {@link PStream}.
+	 * @param <I> The links input type.
+	 * @param <O> The links output type, possibly the same
+	 *   than the input type.
+	 */
+	public abstract static class PLink<I,O> implements Consumer<I> {
+		/** The next link in the streams chain. The method {@link #pushUp(Object)}
+		 * uses this to invoke {@link #accept(Object)} on the next link.
+		 */
+		protected PLink<O,?> nextLink;
+
+		/** Called to push the item to the next link in the streams chain.
+		 * 
+		 * @param pItem The item, which is being pushed up in the stream.
+		 */
+		protected void pushUp(O pItem) {
+			if (nextLink == null) {
+				throw new IllegalStateException("The stream isn't terminated. Did you use a collect method?");
+			}
+			nextLink.accept(pItem);
+		}
+	}
+
 }

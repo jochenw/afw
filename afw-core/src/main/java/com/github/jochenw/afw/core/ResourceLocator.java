@@ -75,8 +75,11 @@ public abstract class ResourceLocator {
 	 * @see #requireResource(String)
 	 */
 	public @Nullable URL getResource(@NonNull String pUri) {
-		return getResource(Thread.currentThread().getContextClassLoader(), pUri);
+		@SuppressWarnings("null")
+		final @NonNull ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		return getResource(cl, pUri);
 	}
+
 	/**
 	 * Returns the resource with the given URI, searching in the
 	 * current threads context class loader.
@@ -118,7 +121,7 @@ public abstract class ResourceLocator {
 	 * @see #getResource(ClassLoader, String)
 	 * @see #getResource(String)
 	 */
-	public URL requireResource(ClassLoader pClassLoader, @NonNull String pUri) {
+	public @NonNull URL requireResource(ClassLoader pClassLoader, String pUri) {
 		final URL url = getResource(pClassLoader, pUri);
 		if (url == null) {
 			throw new NoSuchElementException("Unable to locate resource: " + pUri

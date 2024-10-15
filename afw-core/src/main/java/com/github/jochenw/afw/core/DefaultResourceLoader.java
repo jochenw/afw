@@ -76,7 +76,7 @@ public class DefaultResourceLoader extends ResourceLocator {
 	}
 	
 	@Override
-	public URL getResource(ClassLoader pClassLoader, String pUri) {
+	public @Nullable URL getResource(ClassLoader pClassLoader, String pUri) {
 		final String instanceName = getInstanceName();
 		if (instanceName != null  &&  instanceName.length() > 0) {
 			final String uri = instanceName + "/" + pUri;
@@ -96,7 +96,7 @@ public class DefaultResourceLoader extends ResourceLocator {
          *   loaded through the given ClassLoader, or null, if no such resource
          *   has been found.
          */
-	protected URL findResource(String pUri, ClassLoader pCl) {
+	protected @Nullable URL findResource(String pUri, ClassLoader pCl) {
 		final String rp = getResourcePrefix();
 		if (rp == null  ||  rp.length() == 0) {
 			return pCl.getResource(pUri);

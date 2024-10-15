@@ -38,9 +38,9 @@ public interface LinkableBindingBuilder<T> extends ScopableBindingBuilder {
 	 */
 	ScopableBindingBuilder to(Key<? extends T> pKey);
 	/** Requests, that the injected object should be obtained by invoking
-	 *   the given function, passing the {@link IComponentFactory component
-	 *   factory} as an argument. In effect, this enables the creation
-	 *   of objects, that depend on an initialized component factory.
+	 * the given function, passing the {@link IComponentFactory component
+	 * factory} as an argument. In effect, this enables the creation
+	 * of objects, that depend on an initialized component factory.
 	 * The bindings scope is implicitly specified as {@link Scopes#SINGLETON}.
 	 * @param pFunction The function, which is being invoked to create the
 	 *   injected object.

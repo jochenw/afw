@@ -870,7 +870,7 @@ public class Strings {
 		return joinList(Arrays.asList(array), pSeparator, pMapper);
 	}
 
-	/** Replacement for {@link URL#URL(String)}, which is deprecated, as of
+	/** Replacement for {@code new URL(String)}, which is deprecated, as of
 	 * Java 20.
 	 * @param pUrlStr The string, which is being converted into an URL.
 	 * @return The converted URL, if any.

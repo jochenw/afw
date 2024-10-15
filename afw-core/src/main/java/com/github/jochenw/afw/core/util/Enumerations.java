@@ -16,9 +16,12 @@
 package com.github.jochenw.afw.core.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+
+import org.jspecify.annotations.NonNull;
 
 /** Utility class for working with {@link Enumeration enumerations}.
  */
@@ -89,5 +92,46 @@ public class Enumerations {
 				return asIterator(pEnum);
 			}
 		};
+	}
+
+	/** Converts the given iterator into an enumeration with the same elements.
+	 * @param pIterator The iterator, which is being converted.
+	 *   <em>Note:</em> The iterator is <em>not</em> consumed
+	 *   by this method. However, using the iterator, or the created
+	 *   enumeration, will affect the state of
+	 *   the iterator.
+	 * @return An enumeration returning the same elements.
+	 */
+	public static @NonNull <O> Enumeration<O> asEnumeration(Iterator<O> pIterator) {
+		return new Enumeration<O>() {
+			@Override
+			public boolean hasMoreElements() {
+				return pIterator.hasNext();
+			}
+
+			@Override
+			public O nextElement() {
+				return pIterator.next();
+			}
+		};
+	}
+
+	/** Converts the given iterable into an enumeration with the same elements.
+	 * @param pIterable The iterable, which is being converted.
+	 *   <em>Note:</em> The iterable is <em>not</em> altered
+	 *   by this method. However, modifications of the iterable will
+	 *   render the created enumeration invalid.
+	 * @return An enumeration returning the same elements.
+	 */
+	public static @NonNull <O> Enumeration<O> asEnumeration(Iterable<O> pIterable) {
+		return asEnumeration(pIterable.iterator());
+	}
+
+	/** Converts the given items into an enumeration with the same elements.
+	 * @param pItems The array of items, which are being converted.
+	 * @return An enumeration returning the same elements.
+	 */
+	public static @NonNull <O> Enumeration<O> asEnumeration(@SuppressWarnings("unchecked") O... pItems) {
+		return asEnumeration(Arrays.asList(pItems));
 	}
 }

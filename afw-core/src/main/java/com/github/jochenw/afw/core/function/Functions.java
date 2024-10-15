@@ -26,6 +26,8 @@ import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
@@ -701,7 +703,7 @@ public class Functions {
 	 * @return An instance of {@link Consumer}, which is functionally equivalent to
 	 *   the input 
 	 */
-	public static <I> Consumer<I> asConsumer(FailableConsumer<I,?> pConsumer) {
+	public static <I> Consumer<I> asConsumer(@NonNull FailableConsumer<I,?> pConsumer) {
 		return (pInput) -> {
 			try {
 				pConsumer.accept(pInput);
