@@ -56,8 +56,9 @@ public abstract class Option<T,O> {
 	 * option value.
 	 * @param pStrValue The string value, which is being converted.
 	 * @return The converted value.
+	 * @throws RuntimeException Conversion failed, because the string value is invalid.
 	 */
-	public abstract @NonNull T getValue(@NonNull String pStrValue);
+	public abstract @NonNull T getValue(@NonNull String pStrValue) throws RuntimeException;
 
 	/** Terminates configuration of the option, returning the
 	 * {@link Cli}, that created this option, permitting

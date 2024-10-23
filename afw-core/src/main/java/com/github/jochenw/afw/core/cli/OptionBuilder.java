@@ -88,6 +88,18 @@ public abstract class OptionBuilder<O> {
 		return new LongOption<>(getCli(), this::optionAdded, pPrimaryName, pSecondaryNames);
 	}
 
+	/** Creates a new enum option.
+	 * @param pEnumType The enum type. (Option value is an instance of this class.)
+	 * @param pPrimaryName The primary option name.
+	 * @param pSecondaryNames The secondary option names.
+	 * @return The created enum option.
+	 */
+	public <E extends Enum<E>> EnumOption<O,E> enumOption(@NonNull Class<E> pEnumType, @NonNull String pPrimaryName,
+			                              @NonNull String... pSecondaryNames) {
+		checkOptionNames(pPrimaryName, pSecondaryNames);
+		return new EnumOption<>(getCli(), pEnumType, this::optionAdded, pPrimaryName, pSecondaryNames);
+	}
+
 	/** Checks, whether either of the given option names is already present.
 	 * @param pPrimaryName The primary option name.
 	 * @param pSecondaryNames The secondary option names.

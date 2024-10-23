@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.MutableBoolean;
 
 
@@ -250,5 +253,42 @@ public class CliTest {
 				   throw ctx.error("Command may be given only once.");
 			   }
 		   }).parse(pArgs);
+	}
+
+	/** Options class for {@link #testEnumOptions()}.
+	 */
+	private static class LoggingOptions {
+		@SuppressWarnings("unused")
+		private String logFile;
+		private Level logLevel;
+		public LoggingOptions() {}
+	}
+
+	/** Test case for {@link Enum enum} options.
+	 */
+	@Test
+	public void testEnumOptions() {
+		final Function<String[],LoggingOptions> optParser = (args) -> {
+			return Cli.of(new LoggingOptions())
+					.stringOption("logFile", "lf").handler((c,s) -> c.getBean().logFile = s).end()
+					.enumOption(Level.class, "logLevel", "ll").handler((c,l) -> c.getBean().logLevel = l).end()
+					.parse(args);
+		};
+		final BiConsumer<Level,String[]> tester = (level, array) -> {
+			final LoggingOptions opts = optParser.apply(array);
+			if (level == null) {
+				assertNull(opts.logLevel);
+			} else {
+				assertEquals(level, opts.logLevel);
+			}
+		};
+		tester.accept(null, new String[] {});
+		tester.accept(Level.INFO, new String[] {"-logLevel", "INFO"});
+		tester.accept(Level.WARN, new String[] {"-logLevel", "WARN"});
+		try {
+			tester.accept(Level.WARN, new String[] {"-logLevel", "warn"});
+		} catch (UsageException ue) {
+			assertEquals("Invalid value for option logLevel: warn", ue.getMessage());
+		}
 	}
 }
