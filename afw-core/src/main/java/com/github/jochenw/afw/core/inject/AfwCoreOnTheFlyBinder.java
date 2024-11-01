@@ -42,11 +42,8 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 	}
 
 	@Override
-	protected Object getProperty(@NonNull IComponentFactory pFactory,
-			                     @NonNull Class<?> pType,
-			                     @NonNull String pId,
-			                     @NonNull String pDefaultValue,
-			                     boolean pNullable) {
+	protected Object getProperty(@NonNull IComponentFactory pFactory, @NonNull Class<?> pType, @NonNull String pId, @NonNull String pDefaultValue,
+            boolean pNullable) {
 		if (pType == String.class) {
 			return pFactory.requireInstance(IPropertyFactory.class).getPropertyValue(pId);
 		} else if (pType == Integer.class) {
@@ -249,14 +246,18 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 	protected URL asUrl(String pValue, String pDefaultValue) {
 		if (!Strings.isEmpty(pValue)) {
 			try {
-				return new URL(pValue);
+				@SuppressWarnings("null")
+				final @NonNull String urlStr = (@NonNull String) pValue;
+				return Strings.asUrl(urlStr);
 			} catch (MalformedURLException e) {
 				// Do nothing, like empty value.
 			}
 		}
 		if (!Strings.isEmpty(pDefaultValue)) {
 			try {
-				return new URL(pDefaultValue);
+				@SuppressWarnings("null")
+				final @NonNull String urlStr = (@NonNull String) pDefaultValue;
+				return Strings.asUrl(urlStr);
 			} catch (MalformedURLException e) {
 				// Do nothing, like empty value.
 			}

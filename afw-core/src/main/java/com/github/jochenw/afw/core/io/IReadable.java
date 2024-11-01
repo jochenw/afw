@@ -25,6 +25,7 @@ import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Holder;
 import com.github.jochenw.afw.core.util.Streams;
+import com.github.jochenw.afw.core.util.Strings;
 
 
 /** An IReadable is an abstraction of named objects with a content, that
@@ -317,7 +318,7 @@ public interface IReadable {
 	 *   and the file's contents as a data stream.
 	 */
 	public static @NonNull IReadable of(@NonNull String pUri, @NonNull String pDefaultUri) {
-		final String uri = Objects.requireNonNull(pUri, "Uri");
+		final @NonNull String uri = Objects.requireNonNull(pUri, "Uri");
 		final String defaultUri = Objects.requireNonNull(pDefaultUri, "DefaultUri");
 		if (uri.startsWith("resource:")) {
 			final String subUri = uri.substring("resource:".length());
@@ -337,7 +338,7 @@ public interface IReadable {
 		} else {
 			final URL url;
 			try {
-				url = new URL(uri);
+				url = Strings.asUrl(uri);
 			} catch (MalformedURLException e) {
 				@SuppressWarnings("null")
 				final @NonNull Path p = Paths.get(uri);

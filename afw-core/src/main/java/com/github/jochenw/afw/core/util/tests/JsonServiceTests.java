@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UncheckedIOException;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,25 +11,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import javax.json.JsonString;
-import javax.json.JsonValue;
 
 import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.util.HttpConnector;
 import com.github.jochenw.afw.core.util.Objects;
-import com.github.jochenw.afw.core.util.Strings;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 
+/** A class for automated execution of REST service tests.
+ */
 public class JsonServiceTests {
 	/** A named list of values, which is used to store query parameters, or HTTP headers.
 	 */
@@ -73,9 +67,18 @@ public class JsonServiceTests {
 	public static class JsonServiceTestSpecification implements Serializable {
 		private static final long serialVersionUID = -64038754447555476L;
 
+		/** Base URL of the REST service, which is being resred.
+		 */
 		private final @NonNull URL url;
+		/** HTTP method of the REST service request.
+		 */
 		private final @NonNull String method;
-		private Map<@NonNull String,@NonNull ValueList> queryParameters, headers;
+		/** Map of HTTP query parameters.
+		 */
+		private Map<@NonNull String,@NonNull ValueList> queryParameters;
+		/** Map of HTTP headers.
+		 */
+		private Map<@NonNull String,@NonNull ValueList> headers;
 
 		/** Creates a new instance with the given URL, and method.
 		 * @param pUrl The URL, to which a JSON request is being sent.
@@ -148,10 +151,12 @@ public class JsonServiceTests {
 	 * typically read from a file "request.json".
 	 */
 	public static class JsonServiceTest implements IComponentFactoryAware {
+		@SuppressWarnings("unused")
 		private final Path dir;
 		private final Path requestJsonFile;
 		private static final @NonNull HttpConnector DEFAULT_HTTP_CONNECTOR = new HttpConnector();
 		private static final @NonNull JsonServiceSpecificationReader DEFAULT_SERVICE_SPEC_READER = new JsonServiceSpecificationReader();
+		@SuppressWarnings("unused")
 		private @NonNull HttpConnector httpConnector = DEFAULT_HTTP_CONNECTOR;
 		private @NonNull JsonServiceSpecificationReader reader = DEFAULT_SERVICE_SPEC_READER;
 
@@ -179,31 +184,48 @@ public class JsonServiceTests {
 			reader = Objects.notNull(pFactory.getInstance(JsonServiceSpecificationReader.class), DEFAULT_SERVICE_SPEC_READER);
 		}
 
+		/** Called to execute the test.
+		 */
 		public void run() {
 			try (InputStream is = Files.newInputStream(requestJsonFile);
 				 JsonReader jsonReader = Json.createReader(is)) {
+				@SuppressWarnings("unused")
 				JsonObject jo = jsonReader.readObject();
-				
 			} catch (IOException ioe) {
 				throw new UncheckedIOException(ioe);
 			}
 		}
-
-		
 	}
 
+	/** Creates a new instance. Private constructor, because all methods are static.
+	 */
+	private JsonServiceTests() {}
+	
+	/** Called to run a test, which is specified in the given directory.
+	 * @param pDir The directory, where the service test specification
+	 * is stored.
+	 */
 	public static void runServiceTest(Path pDir) {
 		final JsonServiceTest jst = new JsonServiceTest(pDir);
+		@SuppressWarnings("unused")
 		final JsonServiceTestSpecification jsts;
 		try (InputStream is = Files.newInputStream(jst.requestJsonFile);
 			 JsonReader jr = Json.createReader(is)) {
-			final JsonObject jo = jr.readObject();
+			@SuppressWarnings("null")
+			final @NonNull JsonObject jo = jr.readObject();
 			jsts = jst.reader.parse(jo);
 		} catch (IOException ioe) {
 			throw new UncheckedIOException(ioe);
 		}
 	}
 
+	/** Tests, whether a given directory contains a service
+	 * test specification. If so, the directory is a valid
+	 * argument for {@link #runServiceTest(Path)}.
+	 * @param pDir The directory, which is being tested.
+	 * @return True, if the directory contains a service
+	 *   test specification.
+	 */
 	public static boolean isServiceTestDirectory(Path pDir) {
 		try {
 			new JsonServiceTest(pDir);

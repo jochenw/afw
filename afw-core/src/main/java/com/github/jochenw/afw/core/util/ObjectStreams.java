@@ -384,6 +384,10 @@ public class ObjectStreams {
 	 * of {@link PLink link} elements, each of which
 	 * processes incoming data, and passes it on to the next
 	 * link in the chain.</p> 
+	 * @param <I> The streams input type. Type of the objects,
+	 *   that are being pushed into the stream.
+	 * @param <O> The streams output type. Type of the objects,
+	 *   that are being pushed out from the stream.
 	 */
 	public static class PStream<I,O> implements Consumer<I> {
 		private final @NonNull PLink<I,?> firstLink;
@@ -527,6 +531,9 @@ public class ObjectStreams {
 		 * @param pMapper The mapping function, which
 		 * will be invoked to transform the output
 		 * items.
+		 * @param <R> Output type of the mapper, also
+		 *   type of the extended streams output
+		 *   items.
 		 * @return A new stream, which extends the
 		 * current stream by adding the requested
 		 * transformation.
@@ -554,10 +561,13 @@ public class ObjectStreams {
 		 * @param pMapper The mapping function, which
 		 * will be invoked to transform the output
 		 * item.
-		 * If the tranformation fails, then the thrown
+		 * If the transformation fails, then the thrown
 		 * Exception will be trapped, and wrapped into a
 		 * {@link RuntimeException}, which will be
 		 * thrown instead.
+		 * @param <R> Output type of the mapper, also
+		 *   type of the extended streams output
+		 *   items.
 		 * @return A new stream, which extends the
 		 * current stream by adding the requested
 		 * transformation.
@@ -666,6 +676,10 @@ public class ObjectStreams {
 	 *   than the input type.
 	 */
 	public abstract static class PLink<I,O> implements Consumer<I> {
+		/** Creates a new instance.
+		 */
+		public PLink() {}
+
 		/** The next link in the streams chain. The method {@link #pushUp(Object)}
 		 * uses this to invoke {@link #accept(Object)} on the next link.
 		 */

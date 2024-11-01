@@ -31,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.BooleanConsumer;
 import com.github.jochenw.afw.core.function.Functions.ByteConsumer;
 import com.github.jochenw.afw.core.function.Functions.DoubleConsumer;
@@ -1461,8 +1462,8 @@ public class JdbcHelper {
 	 * The query will be executed by invocation of a suitable method on the
 	 * {@link JdbcHelper.Executor query executor}.
 	 * @param pConnection An open database connection. This method will
-	 * <em>not</em> close the connection. If this doesn' suit, you may
-	 * use {@link #query(FailableSupplier, Dialect, String, Object...)}
+	 * <em>not</em> close the connection. If this doesn't suit, you may
+	 * use {@link #query(Functions.FailableSupplier, Dialect, String, Object...)}
 	 * instead.
 	 * @param pDialect The SQL dialect, if available, for support in
 	 *   error handling.

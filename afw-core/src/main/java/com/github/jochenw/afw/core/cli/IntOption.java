@@ -1,32 +1,43 @@
 package com.github.jochenw.afw.core.cli;
 
-import java.util.function.Consumer;
-
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
-import com.github.jochenw.afw.core.util.Objects;
+import com.github.jochenw.afw.core.cli.Cli.UsageException;
+
 
 /** Implementation of {@link Option} for integer values.
- * @param <O> Type of the option bean.
+ * @param <B> The options bean type.
  */
-public class IntOption<O> extends Option<Integer,O> {
-	/** Creates a new instance with the given {@link Cli},
-	 * and {@code end handler}.
-	 * @param pCli The {@link Cli}, which is creating this option.
-	 * @param pEndHandler The {@code end handler}, which is being
-	 *   invoked upon invocation of {@link Option#end()}.
-	 * @param pPrimaryName The options primary name.
-	 * @param pSecondaryNames The options secondary names.
+public class IntOption<B> extends Option<B,Integer> {
+	/** Creates a new instance.
+	 * @param pCli The {@link Cli}, that creates this option.
+	 * @param pPrimaryName The options primary name. Always non-null.
+	 * @param pSecondaryNames The options secondary names, if any.
 	 */
-	protected IntOption(@NonNull Cli<O> pCli, @NonNull Consumer<Option<?,O>> pEndHandler,
-                        @NonNull String pPrimaryName,
-                        @NonNull String @Nullable [] pSecondaryNames) {
-		super(pCli, pEndHandler, pPrimaryName, pSecondaryNames);
+	@SuppressWarnings("null")
+	protected IntOption(@NonNull Cli<B> pCli, @NonNull String pPrimaryName, @NonNull String[] pSecondaryNames) {
+		super(pCli, Integer.class, pPrimaryName, pSecondaryNames);
 	}
 
 	@Override
-	public @NonNull Integer getValue(@NonNull String pStrValue) {
-		return Objects.requireNonNull(Integer.valueOf(pStrValue));
+	public Integer getValue(String pOptValue) throws UsageException {
+		if (pOptValue == null) {
+			final String defaultValue = getDefaultValue();
+			if (defaultValue == null) {
+				return null;
+			} else {
+				try {
+					return Integer.valueOf(pOptValue);
+				} catch (NumberFormatException nfe) {
+					throw new UsageException("Invalid default value for option " + getPrimaryName() + "; Expected integer number, got " + pOptValue);
+				}
+			}
+		} else {
+			try {
+				return Integer.valueOf(pOptValue);
+			} catch (NumberFormatException nfe) {
+				throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected integer number, got " + pOptValue);
+			}
+		}
 	}
 }

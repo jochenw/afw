@@ -76,6 +76,14 @@ public class Holder<T> implements Supplier<@Nullable T> {
 		return holder;
 	}
 
+	/** Creates a new Holder without wrapped object.
+	 * @param <O> Type of the wrapped object.
+	 * @return The created instance.
+	 */
+	public static <O> Holder<O> of() {
+		return new Holder<O>();
+	}
+
 	/** Converts the Holder into a thread safe version, that wraps the same object.
 	 * @param <O> Type of the wrapped object.
 	 * @param pObject The wrapped object.

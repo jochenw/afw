@@ -8,8 +8,10 @@ import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.util.Reflection;
+import com.github.jochenw.afw.di.api.Names;
 import com.github.jochenw.afw.di.util.Exceptions;
 
 /** Instance of this class provide the ability to change
@@ -46,6 +48,12 @@ public interface ISetter<B,I> {
 		}
 		if (parameterTypes.length > 1) {
 			throw new IllegalArgumentException("The method " + pMethod + " cannot be used as a setter, because it takes multiple arguments.");
+		}
+		if (Modifier.isAbstract(pMethod.getModifiers())) {
+			throw new IllegalArgumentException("The method " + pMethod + " cannot be used as a setter, because it is abstract.");
+		}
+		if (Modifier.isStatic(pMethod.getModifiers())) {
+			throw new IllegalArgumentException("The method " + pMethod + " cannot be used as a setter, because it is static.");
 		}
 		final Lookup lookup = Rflct.getPrivateLookup(methodClass);
 		if (lookup == null) {
@@ -130,55 +138,52 @@ public interface ISetter<B,I> {
 	 * @throws IllegalArgumentException No field with the name
 	 *   {@code pProperty} was found in the class {@code pDeclaringType}.
 	 */
-	public static <B,I> ISetter<B,I> of(Class<B> pDeclaringType, @NonNull String pProperty) {
-		final @NonNull Class<B> declaringType = Objects.requireNonNull(pDeclaringType, "Type");
+	public static <B,I> ISetter<B,I> of(@NonNull Class<B> pDeclaringType, @NonNull String pProperty) {
+		Objects.requireNonNull(pDeclaringType, "Type");
 		final @NonNull String property = Objects.requireNonNull(pProperty, "Property");
-		Class<?> cl = declaringType;
+		@Nullable Class<?> cl = pDeclaringType;
+		final String setterName = Names.upperCased("set", property);
 		while (cl != null  &&  cl != Object.class) {
-			Field field;
-			try {
-				field = declaringType.getDeclaredField(property);
-			} catch (NoSuchFieldException e) {
-				field = null;
-			}
-			if (field != null) {
-				return of(field);
-			}
-			cl = cl.getSuperclass();
-		}
-		if (property.length() > 0) {
-			final String setterMethodName = "set" + Character.toUpperCase(property.charAt(0)) + property.substring(1);
-			final String builderMethodName = property;
-			cl = declaringType;
-			while (cl != null  &&  cl != Object.class) {
-				for (Method m : cl.getDeclaredMethods()) {
-					final int modifiers = m.getModifiers();
-					if (!Modifier.isStatic(modifiers)  &&  !Modifier.isAbstract(modifiers)) {
-						final Class<?> returnType = m.getReturnType();
-						final Class<?>[] parameterTypes = m.getParameterTypes();
-						if (m.getName().equals(setterMethodName)  &&
-								(returnType == Void.TYPE  ||  returnType == Void.class)  &&
-								parameterTypes.length == 1) {
-							// This is a setter method. Convert it to an ISetter, and
-							// return that.
-							return of(m);
-						}
-						if (m.getName().equals(builderMethodName)  &&
-								(returnType != Void.TYPE  &&  returnType != Void.class)  &&
-								parameterTypes.length == 1) {
-							// This is a builder method. Convert it to an ISetter, and
-							// return that.
-							return of(m);
-						}
+			// Try finding a get method.
+			final Method[] methods = cl.getDeclaredMethods();
+			for (Method m : methods) {
+				final Class<?> methodType = m.getReturnType();
+				final boolean voidMethod = (methodType == Void.class  ||  methodType == Void.TYPE  ||  methodType == null);
+				final Class<?>[] parameterTypes = m.getParameterTypes();
+				final boolean exactlyOneParameter = parameterTypes != null  &&  parameterTypes.length == 1;
+				final int mod = m.getModifiers();
+				final boolean abstractOrStatic = Modifier.isAbstract(mod)  ||  Modifier.isStatic(mod);
+				if (setterName.equals(m.getName())) {
+					// Is the method a traditional setter:
+					//  - Void type
+					//  - Exactly one parameter
+					//  - Neither abstract, nor static
+					if (voidMethod  &&  exactlyOneParameter  &&  !abstractOrStatic) {
+						return of(m);
+					}
+				} else if (property.equals(m.getName())) {
+					// Is this a builder method:
+					//  - Non-void type
+					//  - Exactly one parameter
+					//  - Neither abstract, nor static
+					if (!voidMethod  &&  exactlyOneParameter  &&  !abstractOrStatic) {
+						return of(m);
 					}
 				}
 			}
-			throw new IllegalArgumentException("No field named " + property +
-					                           ", no setter method named " + setterMethodName +
-					                           ", and no builder method named " + builderMethodName +
-					                           " found in class " + declaringType.getName() +
-					                           ", or any anchestor class.");
- 		}
-		throw new IllegalArgumentException("No field named " + property + " found in class " + declaringType.getName());
+			// Try finding a matching field.
+			try {
+				final Field field = cl.getDeclaredField(property);
+				return of(field);
+			} catch (NoSuchFieldException e) {
+				// Do nothing.
+			}
+			cl = cl.getSuperclass();
+		}
+		throw new IllegalArgumentException("Neither a matching setter method " + setterName
+				+ ", nor a matching builder method " + property
+				+ ", nor a matching field " + property
+				+ " found in class " + pDeclaringType.getName()
+				+ ", or any superclass");
 	}
 }

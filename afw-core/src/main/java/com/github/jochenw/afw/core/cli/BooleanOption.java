@@ -1,42 +1,34 @@
 package com.github.jochenw.afw.core.cli;
 
-import java.util.function.Consumer;
-
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
-import com.github.jochenw.afw.core.util.Objects;
+import com.github.jochenw.afw.core.cli.Cli.UsageException;
 
 /** Implementation of {@link Option} for boolean values.
- * @param <O> Type of the option bean.
+ * @param <B> The options bean type.
  */
-public class BooleanOption<O> extends Option<Boolean,O> {
-	/** Creates a new instance with the given {@link Cli},
-	 * and {@code end handler}.
-	 * @param pCli The {@link Cli}, which is creating this option.
-	 * @param pEndHandler The {@code end handler}, which is being
-	 *   invoked upon invocation of {@link Option#end()}.
-	 * @param pPrimaryName The options primary name.
-	 * @param pSecondaryNames The options secondary names.
+public class BooleanOption<B> extends Option<B,Boolean> {
+	/** Creates a new instance.
+	 * @param pCli The {@link Cli}, that creates this option.
+	 * @param pPrimaryName The options primary name. Always non-null.
+	 * @param pSecondaryNames The options secondary names, if any.
 	 */
-	protected BooleanOption(@NonNull Cli<O> pCli, @NonNull Consumer<Option<?,O>> pEndHandler,
-                            @NonNull String pPrimaryName,
-                            @NonNull String @Nullable [] pSecondaryNames) {
-		super(pCli, pEndHandler, pPrimaryName, pSecondaryNames);
+	@SuppressWarnings("null")
+	protected BooleanOption(@NonNull Cli<B> pCli, @NonNull String pPrimaryName, @NonNull String[] pSecondaryNames) {
+		super(pCli, Boolean.class, pPrimaryName, pSecondaryNames);
 	}
-
+	public boolean isNullValueValid() { return true; }
 	@Override
-	public @NonNull Boolean getValue(@NonNull String pStrValue) {
-		return Objects.requireNonNull(Boolean.valueOf(pStrValue));
-	}
-
-	@Override
-	public String getDefaultValue() {
-		final String defaultValue = super.getDefaultValue();
-		if (defaultValue == null) {
-			return Boolean.TRUE.toString();
+	public Boolean getValue(String pOptValue) throws UsageException {
+		if (pOptValue == null) {
+			final String defaultValue = getDefaultValue();
+			if (defaultValue == null) {
+				return Boolean.TRUE;
+			} else {
+				return Boolean.valueOf(defaultValue);
+			}
 		} else {
-			return defaultValue;
+			return Boolean.valueOf(pOptValue);
 		}
 	}
 }

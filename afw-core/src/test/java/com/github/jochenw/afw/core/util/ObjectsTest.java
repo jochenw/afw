@@ -17,8 +17,11 @@ package com.github.jochenw.afw.core.util;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -42,6 +45,7 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.data.Data;
 import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.Objects.CachedObjectSerializer;
@@ -243,5 +247,32 @@ public class ObjectsTest {
 						     () -> Objects.valueOf(Level.class, "Dbug"));
 		
 		
+	}
+
+	/** Test case for {@link Objects#ifNotNull(Object, Functions.FailableConsumer)}.
+	 */
+	@Test
+	public void testIfNotNull() {
+		final Holder<String> holder = Holder.of();
+		assertNull(holder.get());
+		Objects.ifNotNull("", (FailableConsumer<@NonNull String, RuntimeException>) (s) -> holder.set(s));
+		assertEquals("", holder.get());
+	}
+
+	/** Test case for {@link Objects#ifNotNullElse(Object, Functions.FailableConsumer, Functions.FailableRunnable)}.
+	 */
+	@Test
+	public void testIfNotNullElse() {
+		final MutableBoolean runnableInvoked = new MutableBoolean();
+		final Holder<String> holder = Holder.of();
+		assertNull(holder.get());
+		assertFalse(runnableInvoked.isSet());
+		Objects.ifNotNullElse("", (FailableConsumer<@NonNull String, RuntimeException>) (s) -> holder.set(s), runnableInvoked::set);
+		assertEquals("", holder.get());
+		assertFalse(runnableInvoked.isSet());
+		holder.set(null);
+		Objects.ifNotNullElse(null, (FailableConsumer<@NonNull String, RuntimeException>) (s) -> holder.set(s), runnableInvoked::set);
+		assertNull(holder.get());
+		assertTrue(runnableInvoked.isSet());
 	}
 }

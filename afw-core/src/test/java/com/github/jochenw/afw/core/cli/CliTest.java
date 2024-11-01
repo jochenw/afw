@@ -35,7 +35,7 @@ public class CliTest {
 	 */
 	@Test
 	public void testSimpleCase() {
-		final OptionsBean options = new Cli<>(new OptionsBean())
+		final OptionsBean options = Cli.of(new OptionsBean())
 			.pathOption("inputFile", "if").existsRequired().fileRequired().required()
 				.handler((c,p) -> c.getBean().inputFile = p).end()
 			.pathOption("outputFile", "of").required()
@@ -58,7 +58,7 @@ public class CliTest {
 	@Test
 	public void testDuplicateName() {
 		try {
-			new Cli<>(new OptionsBean())
+			Cli.of(new OptionsBean())
 				.pathOption("inputFile").end()
 				.stringOption("inputFile");
 			fail("Expected Exception");
@@ -67,7 +67,7 @@ public class CliTest {
 		}
 
 		try {
-			new Cli<>(new OptionsBean())
+			Cli.of(new OptionsBean())
 				.pathOption("inputFile", "if").end()
 				.stringOption("outputFile").end()
 				.stringOption("if");
@@ -77,7 +77,7 @@ public class CliTest {
 		}
 
 		try {
-			new Cli<>(new OptionsBean())
+			Cli.of(new OptionsBean())
 				.pathOption("inputFile").end()
 				.stringOption("if", "inputFile").end();
 			fail("Expected Exception");
@@ -91,7 +91,7 @@ public class CliTest {
 	@Test
 	public void testRequiredOptionMissing() {
 		try {
-			new Cli<>(new OptionsBean())
+			Cli.of(new OptionsBean())
 					.pathOption("inputFile", "if").existsRequired().fileRequired().required()
 					.handler((c,p) -> c.getBean().inputFile = p).end()
 					.pathOption("outputFile", "of").required()
@@ -111,7 +111,7 @@ public class CliTest {
 	 */
 	@Test
 	public void testValueInOption() {
-		final OptionsBean options = new Cli<>(new OptionsBean())
+		final OptionsBean options = Cli.of(new OptionsBean())
 				.pathOption("inputFile", "if").existsRequired().fileRequired().required()
 					.handler((c,p) -> c.getBean().inputFile = p).end()
 				.pathOption("outputFile", "of").required()
@@ -133,7 +133,7 @@ public class CliTest {
 	@Test
 	public void testBeanValidator() {
 		final MutableBoolean validated = new MutableBoolean();
-		final OptionsBean options = new Cli<>(new OptionsBean())
+		final OptionsBean options = Cli.of(new OptionsBean())
 				.pathOption("inputFile", "if").existsRequired().fileRequired().required()
 					.handler((c,p) -> c.getBean().inputFile = p).end()
 				.pathOption("outputFile", "of").required()
@@ -234,23 +234,23 @@ public class CliTest {
 		final FailableBiConsumer<Context<DnfOptions>,Boolean,?> allHandler =
 				(ct,b) -> opts.all = b.booleanValue();
 		return Cli.of(opts)
-		   .extraArgsHandler((ctx, cmd) -> {
+		   .extraArgsHandler((cli, cmd) -> {
 			   if (opts.command == null) {
 				   switch (cmd) {
 				   case "check":
-					   ctx.boolOption("dependencies", "deps").handler(depsHandler).end();
-					   ctx.boolOption("duplicates", "dups").handler(dupsHandler).end();
+					   cli.boolOption("dependencies", "deps").handler(depsHandler).end();
+					   cli.boolOption("duplicates", "dups").handler(dupsHandler).end();
 					   break;
 				   case "search":
-					   ctx.boolOption("all", "a").handler(allHandler).end();
-					   ctx.extraArgsHandler((ct,s) -> opts.keywords.add(s));
+					   cli.boolOption("all", "a").handler(allHandler).end();
+					   cli.extraArgsHandler((ct,s) -> opts.keywords.add(s));
 					   break;
 				   default:
-					   throw ctx.error("Invalid command: Expected check|search, got " + cmd);
+					   throw cli.error("Invalid command: Expected check|search, got " + cmd);
 				   }
 				   opts.command = cmd;
 			   } else {
-				   throw ctx.error("Command may be given only once.");
+				   throw cli.error("Command may be given only once.");
 			   }
 		   }).parse(pArgs);
 	}
@@ -271,7 +271,7 @@ public class CliTest {
 		final Function<String[],LoggingOptions> optParser = (args) -> {
 			return Cli.of(new LoggingOptions())
 					.stringOption("logFile", "lf").handler((c,s) -> c.getBean().logFile = s).end()
-					.enumOption(Level.class, "logLevel", "ll").handler((c,l) -> c.getBean().logLevel = l).end()
+					.enumOption(Level.class, "logLevel", "ll").caseInsensitive().handler((c,l) -> c.getBean().logLevel = l).end()
 					.parse(args);
 		};
 		final BiConsumer<Level,String[]> tester = (level, array) -> {

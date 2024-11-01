@@ -100,6 +100,8 @@ public class Enumerations {
 	 *   by this method. However, using the iterator, or the created
 	 *   enumeration, will affect the state of
 	 *   the iterator.
+	 * @param <O> Element type of the iterator, also element type of the created
+	 *   enumeration.
 	 * @return An enumeration returning the same elements.
 	 */
 	public static @NonNull <O> Enumeration<O> asEnumeration(Iterator<O> pIterator) {
@@ -121,6 +123,8 @@ public class Enumerations {
 	 *   <em>Note:</em> The iterable is <em>not</em> altered
 	 *   by this method. However, modifications of the iterable will
 	 *   render the created enumeration invalid.
+	 * @param <O> Element type of the iterable, also element type of the created
+	 *   enumeration.
 	 * @return An enumeration returning the same elements.
 	 */
 	public static @NonNull <O> Enumeration<O> asEnumeration(Iterable<O> pIterable) {
@@ -129,6 +133,8 @@ public class Enumerations {
 
 	/** Converts the given items into an enumeration with the same elements.
 	 * @param pItems The array of items, which are being converted.
+	 * @param <O> Element type of the array, also element type of the created
+	 *   enumeration.
 	 * @return An enumeration returning the same elements.
 	 */
 	public static @NonNull <O> Enumeration<O> asEnumeration(@SuppressWarnings("unchecked") O... pItems) {

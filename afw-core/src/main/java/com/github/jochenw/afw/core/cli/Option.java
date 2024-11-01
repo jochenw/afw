@@ -1,146 +1,188 @@
 package com.github.jochenw.afw.core.cli;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
+import com.github.jochenw.afw.core.cli.Cli.UsageException;
+import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 
-/** Builder for an option value.
- * @param <T> The option value's type.
- * @param <O> The option beans type.
- */
-public abstract class Option<T,O> {
-	private final @NonNull Consumer<Option<?,O>> endHandler;
-	private final @NonNull Cli<O> cli;
-	private final @NonNull String primaryName;
-	private final @NonNull String @Nullable [] secondaryNames;
-	private @Nullable String defaultValue;
-	private boolean required;
-	private FailableBiConsumer<Context<O>,T,?> handler;
 
-	/** Creates a new instance with the given {@link Cli},
-	 * and {@code end handler}.
-	 * @param pCli The {@link Cli}, which is creating this option.
-	 * @param pEndHandler The {@code end handler}, which is being
-	 *   invoked upon invocation of {@link #end()}.
-	 * @param pPrimaryName The options primary name.
-	 * @param pSecondaryNames The options secondary names.
+/** An {@link Option} object represents a configurable option value.
+ * @param <B> Type of the options bean.
+ * @param <O> Type of the option value.
+ */
+public abstract class Option<B,O> {
+	private final @NonNull Cli<B> cli;
+	private final @NonNull Class<O> type;
+	private final @NonNull String primaryName;
+	private final @NonNull String[] secondaryNames;
+	private FailableBiConsumer<Context<B>,O,?> argsHandler;
+	private String defaultValue;
+	private boolean required;
+	private boolean immutable;
+
+	/** Creates a new instance.
+	 * @param pCli The {@link Cli}, that creates this option.
+	 * @param pPrimaryName The options primary name. Always non-null.
+	 * @param pSecondaryNames The options secondary names, if any.
+	 * @param pType The option values type.
 	 */
-	protected Option(@NonNull Cli<O> pCli, @NonNull Consumer<Option<?,O>> pEndHandler,
-			         @NonNull String pPrimaryName, @NonNull String @Nullable [] pSecondaryNames) {
+	protected Option(@NonNull Cli<B> pCli, @NonNull Class<O> pType, @NonNull String pPrimaryName,
+			         @NonNull String[] pSecondaryNames) {
 		cli = pCli;
-		endHandler = pEndHandler;
+		type = pType;
 		primaryName = pPrimaryName;
 		secondaryNames = pSecondaryNames;
 	}
 
-	/** Returns the options primary name.
-	 * @return The options primary name.
+	/** Asserts, that this option is still mutable.
+	 * @throws IllegalStateException The {@link #end()} method
+	 *   has already been invoked, and this object is no
+	 *   longer mutable.
 	 */
-	public @NonNull String getPrimaryName() {
-		return primaryName;
+	protected void assertMutable() {
+		if (immutable) {
+			throw new IllegalStateException("The end() method has already been"
+					+ " invoked, and this object is no longer mutable,");
+		}
 	}
 
-	/** Returns the options seondary names.
-	 * @return The options secondary names.
-	 */
-	public @NonNull String @Nullable [] getSecondaryNames() {
-		return secondaryNames;
-	}
-
-	/** Converts the options string value into the actual
-	 * option value.
-	 * @param pStrValue The string value, which is being converted.
-	 * @return The converted value.
-	 * @throws RuntimeException Conversion failed, because the string value is invalid.
-	 */
-	public abstract @NonNull T getValue(@NonNull String pStrValue) throws RuntimeException;
-
-	/** Terminates configuration of the option, returning the
-	 * {@link Cli}, that created this option, permitting
-	 * continued configuration of the {@link Cli}.
+	/** Returns the {@link Cli}, that created this option.
 	 * @return The {@link Cli}, that created this option.
 	 */
-	public @NonNull Cli<O> end() {
-		endHandler.accept(this);
-		return cli;
-	}
-
-	/** Declares, that this is a required option.
-	 * @return This option.
+	public Cli<B> getCli() { return cli; }
+	/** Returns the option values type.
+	 * @return The option values type.
+	 * @see #end()
 	 */
-	public @NonNull Option<T,O> required() {
-		this.required = true;
+	public Class<O> getType() { return type; }
+	/** Returns the options primary name. Never null.
+	 * @return The options primary name. Never null.
+	 */
+	public @NonNull String getPrimaryName() { return primaryName; }
+	/** Returns the options secondary names, if any, or null.
+	 * @return The options secondary names, if any, or null.
+	 */
+	public @NonNull String[] getSecondaryNames() { return secondaryNames; }
+	/** Returns, whether an option value is required. The only exception is
+	 * a boolean value. (Simply specifying the option name sets a
+	 * boolean option value to true.) For all non-boolean
+	 * options, this will return false.
+	 * @return True, if an option value is required, otherwise false.
+	 */
+	public boolean isNullValueValid() { return false; }
+
+	/** Called to convert the value string into the actual
+	 * option value.
+	 * @param pOptValue The actual value string, or null,
+	 *   if the default value should be used.
+	 * @return This option.
+	 * @throws UsageException The value string is invalid,
+	 *   and cannot be converted.
+	 */
+	public abstract O getValue(String pOptValue) throws UsageException;
+
+	/** Returns the options argument handler. The argument handler will be
+	 * invoked, as soon as the actual option value is available.
+	 * @return The options argument handler. 
+	 * @see #handler(Functions.FailableBiConsumer)
+	 */
+	public FailableBiConsumer<Context<B>,O,?> getArgHandler() { return argsHandler; }
+
+	/** Sets the options argument handler. The argument handler will be
+	 * invoked, as soon as the actual option value is available.
+	 * @param pHandler The options argument handler. 
+	 * @return This option.
+	 * @see Context#getBean()
+	 * @see Context#getOptName()
+	 * @see #getArgHandler()
+	 */
+	public Option<B,O> handler(FailableBiConsumer<Context<B>,O,?> pHandler) {
+		assertMutable();
+		argsHandler = pHandler;
 		return this;
 	}
 
-	/** Returns, whether this is a required option.
-	 * @return True, if this option is required, otherwise false.
+	/** Returns the options default value, if any, or null.
+	 * @return The options default value, if any, or null.
+	 * @see #defaultValue(String)
 	 */
-	public boolean isRequired() {
-		return required;
-	}
+	public String getDefaultValue() { return defaultValue; }
 
-	/** Declares, that this is a required option.
+	/** Sets the options default value.
+	 * @param pDefaultValue The options default value, if any, or null.
+	 * @see #getDefaultValue()
 	 * @return This option.
 	 */
-	public @NonNull Option<List<T>,O> repeatable() {
-		return new ListOption<T,O>(this);
-	}
-
-	/** Returns, whether this option is repeatable.
-	 * @return True, iif this option is repeatable, otherwise false.
-	 */
-	public boolean isRepeatable() { return false; }
-
-	/** Declares this options default value.
-	 * @param pDefaultValue This options default value.
-	 * @return This option.
-	 */
-	public @NonNull Option<T,O> defaultValue(@NonNull String pDefaultValue) {
+	public Option<B,O> defaultValue(String pDefaultValue) {
+		assertMutable();
 		defaultValue = pDefaultValue;
 		return this;
 	}
 
-	/** Returns this options default value.
-	 * @return The options default value.
+	/** Returns, whether this option is required.
+	 * @return True, if this option is required, otherwise false.
+	 * @see #required(boolean)
+	 * @see #required()
 	 */
-	public @Nullable String getDefaultValue() {
-		return defaultValue;
-	}
+	public boolean isRequired() { return required; }
 
-	@NonNull Consumer<Option<?, O>> getEndHandler() {
-		return endHandler;
-	}
-
-	@NonNull Cli<O> getCli() {
-		return cli;
-	}
-
-	/** Returns, whether a non-null default value has been specified for this option.
-	 * @return True, if a non-null default value has been specified for this option.
-	 */
-	public boolean hasDefaultValue() {
-		return defaultValue != null;
-	}
-
-	/** Called to specify the options value handler.
-	 * @param pHandler The options value handler.
+	/** Sets, whether this option is required.
+	 * @param pRequired True, if this option is required, otherwise false.
 	 * @return This option.
+	 * @see #isRequired()
+	 * @see #required()
 	 */
-	public @NonNull Option<T,O> handler(FailableBiConsumer<Context<O>,T,?> pHandler) {
-		handler = pHandler;
+	public Option<B,O> required(boolean pRequired) {
+		assertMutable();
+		required = pRequired;
 		return this;
 	}
 
-	/** Returns the options value handler, if any, or null.
-	 * @return The options value handler, if any, or null.
+	/** Sets, that this option is required. Equivalent to
+	 * <pre>
+	 *   required(true)
+	 * </pre>
+	 * @return This option.
+	 * @see #isRequired()
+	 * @see #required(boolean)
 	 */
-	public FailableBiConsumer<Context<O>,T,?> getHandler() {
-		return handler;
+	public Option<B,O> required() { return required(true); }
+
+	/** Specifies, that this option may be used more than once.
+	 * If so, then the option value will be a list, rather
+	 * than a single object.
+	 * @return A new option object with the same primary,
+	 *   and secondary names, but a different value type.
+	 *   The new option object will have
+	 *   {@code isRepeatable() == true}.
+	 * @see #isRepeatable()
+	 */
+	public RepeatableOption<B,O> repeatable() {
+		return new RepeatableOption<B,O>(cli, this, primaryName, secondaryNames);
+	}
+
+	/** Returns, whether this option is repeatable.
+	 * @return True, if this option is repeatable, otherwise false.
+	 * @see #repeatable()
+	 */
+	public boolean isRepeatable() { return false; }
+
+	/** Terminates configuration of this option object, and returns the
+	 * {@link Cli}, for continued use in a builder pipeline.
+	 * @return The {@link Cli} object, that created this option
+	 * object.
+	 * @see #getCli()
+	 * @throws IllegalStateException This method may be invoked only
+	 *   once, but this is the second invocation.
+	 */
+	public Cli<B> end() {
+		if (immutable) {
+			throw new IllegalStateException("The end() method has already been invoked on this object.");
+		} else {
+			immutable = true;
+		}
+		return cli;
 	}
 }

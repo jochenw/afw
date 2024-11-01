@@ -5,6 +5,8 @@ import java.net.URL;
 
 import org.jspecify.annotations.NonNull;
 
+import com.github.jochenw.afw.core.util.Strings;
+
 
 /** Implementation of {@link IURLProperty}.
  */
@@ -19,7 +21,8 @@ public class UrlProperty extends AbstractProperty<URL> implements IURLProperty {
 			return getDefaultValue();
 		}
 		try {
-			return new URL(pStrValue);
+			final @NonNull String urlStr = pStrValue;
+			return Strings.asUrl(urlStr);
 		} catch (MalformedURLException e) {
 			return getDefaultValue();
 		}

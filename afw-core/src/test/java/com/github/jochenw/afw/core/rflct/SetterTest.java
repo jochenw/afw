@@ -90,5 +90,7 @@ public class SetterTest {
 		final Class<Bean> beanClass = Bean.class;
 		final ISetter<Bean,String> setter = ISetter.of(beanClass, "b");
 		validateSetterForB(setter);
+		final ISetter<Bean,String> barSetter = ISetter.of(beanClass, "bar");
+		validateSetterForB(barSetter);
 	}
 }

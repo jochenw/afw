@@ -40,6 +40,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
+import com.github.jochenw.afw.core.function.Functions.FailableRunnable;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 
 
@@ -583,5 +586,73 @@ public class Objects {
 		@SuppressWarnings("unchecked")
 		final O o = (O) pObject;
 		return o;
+	}
+
+	/** Invokes the given consumer, if the argument {@code pValue} is null.
+	 *  @param pValue A (possibly null) value. If it is non-null, then the
+	 *    given consumer will be invoked, passing the non-null value.
+	 *  @param pFunction The function, which will be invoked to process the
+	 *    non-null value, and produce the output value.
+	 *  @param <O> Type of the value, which is tested for null. Also
+	 *   input type of the function.
+	 *  @param <Out> Output type of the function. Also output type
+	 *   of this method.
+	 * @param <E> Exception, which may be thrown by the function.
+	 *  @return The output object, that has been produced by the
+	 *    function (if the value is non-null), or null.
+	 * @throws E An exception, which has been thrown by the consumer, and
+	 *   will be passed to the caller.
+	 */
+	public static <O,Out,E extends Throwable> @Nullable Out ifNotNull(@Nullable O pValue, FailableFunction<@NonNull O,Out,E> pFunction) throws E {
+		if (pValue != null) {
+			final @NonNull O value = Objects.requireNonNull(pValue);
+			return pFunction.apply(value);
+		} else {
+			return null;
+		}
+	}
+	/** Invokes the given consumer, if the argument {@code pValue} is null.
+	 *  @param pValue A (possibly null) value. If it is non-null, then the
+	 *    given consumer will be invoked, passing the non-null value.
+	 *  @param pConsumer The consumer, which will be invoked to process the
+	 *    non-null value.
+	 * @param <O> Type of the value, which is tested for null. Also
+	 *   input type of the consumer.
+	 * @param <E> Exception, which may be thrown by the consumer.
+	 * @throws E An exception, which has been thrown by the consumer, and
+	 *   will be passed to the caller.
+	 */
+	public static <O,E extends Throwable> void ifNotNull(@Nullable O pValue, FailableConsumer<@NonNull O,E> pConsumer) throws E {
+		if (pValue != null) {
+			final @NonNull O value = Objects.requireNonNull(pValue);
+			pConsumer.accept(value);
+		}
+	}
+
+	/** Invokes the given consumer, if the argument {@code pValue} is null.
+	 * Otherwise, invokes the given {@code pRunnable}.
+	 * @param pValue A (possibly null) value. If it is non-null, then the
+	 *   given consumer will be invoked, passing the non-null value.
+	 * @param pConsumer The consumer, which will be invoked to process the
+	 *   non-null value.
+	 * @param pRunnable The runnable, which will be invoked, if the value
+	 * is non-null.
+	 * @param <O> Type of the value, which is tested for null. Also
+	 *   input type of the consumer.
+	 * @param <E1> Exception, which may be thrown by the consumer.
+	 * @param <E2> Exception, which may be thrown by the runnable.
+	 * @throws E1 An exception, which has been thrown by the consumer, and
+	 *   will be passed to the caller.
+	 * @throws E2 An exception, which has been thrown by the runnable, and
+	 *   will be passed to the caller.
+	 */
+	public static <O,E1 extends Throwable,E2 extends Throwable> void ifNotNullElse(@Nullable O pValue,
+			FailableConsumer<@NonNull O,E1> pConsumer, FailableRunnable<E2> pRunnable) throws E1, E2 {
+		if (pValue != null) {
+			final @NonNull O value = Objects.requireNonNull(pValue);
+			pConsumer.accept(value);
+		} else {
+			pRunnable.run();
+		}
 	}
 }

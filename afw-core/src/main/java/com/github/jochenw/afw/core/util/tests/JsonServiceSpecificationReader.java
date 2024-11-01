@@ -18,6 +18,10 @@ import com.github.jochenw.afw.core.util.tests.JsonServiceTests.JsonServiceTestSp
  * An object, which converts a "request.json" file into a service test specification.
  */
 public class JsonServiceSpecificationReader {
+	/** Creates a new instance.
+	 */
+	public JsonServiceSpecificationReader() {}
+
 	/**
 	 * Parses the contents of a "request.json" file, and converts it into a service test specification.
 	 * @param pServiceSpecification A Json object, which supplies the details of the created
