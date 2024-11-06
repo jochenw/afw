@@ -1,5 +1,6 @@
 package com.github.jochenw.afw.core.cli;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,20 +21,83 @@ import com.github.jochenw.afw.core.util.Reflection;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
-/** Helper class for deriving Cli applications.
- * Suggested usage:
+/** <p>An instance of this class can be used in a command line appplication
+ * (command line interface, or cli) to implement a processor in a quick,
+ * and precise manner.</p>
+ * <p>The class is based on the assumption, that command line options are
+ * transformed into properties of a so-called {@code options bean}. For
+ * example, if the cli user specifies an option
+ * <pre>-inputFile file.txt</pre>, then there should be a field
+ * {@code inputFile} in the options bean. The fields type should be
+ * {@link Path}, and the value a {@link Path} object, that points to
+ * <pre>file.txt</pre></p>.
+ *
+ * For every option, there must be a so-called
+ * {@link Option#handler(FailableBiConsumer) argument handler}.
+ * An argument handler is a callback, which is invoked, if an option
+ * has been identified, and the option value has been parsed
+ * successfully.
+ *
+ * <p>The argument handler takes two arguments: A context object, which
+ * allows the handler a limited level of interaction with the Cli
+ * object, and the actual value object (<em>not</em> the value string).
+ * Typically, the argument handler would just take the value, and store
+ * it into the options bean. The argument handler allows to perform
+ * additional tasks, like validation, transformation, or combination.
+ * </p>
+ * <p>Things you should know about the context object:
+ * <ul>
+ *  <li>The option name, which is actually used, can be obtained via
+ *    {@link Context#getOptName()}. This can be used, for example,
+ *    to obtain a slightly different behaviour for a long, and a
+ *    short option name.</li>
+ *  <li>The context object provides access to the {@link Cli}
+ *    object itself via {@link Context#getCli()}.
+ *    This can be used, for example, to add additional options,
+ *    based on the use of an option.</li>
+ *  <li>The context object also provides access to the options bean
+ *    via {@link Context#getBean()}.</li>
+ *  <li>If the argument handler detects an invalid value, it
+ *    can invoke either {@link Context#usage(String)}, or
+ *    {@link Context#error(String)}, and throw the returned
+ *    exception.
+ *    
+ *    The difference between these methods is, that the latter
+ *    exception will be trapped, and mapped to an invocation of
+ *    the <a href="#cli-example-usage-handler">usage handler</a>.</li>
+ * </ul>
+
+ * 
+ * <a name="cli-example-bean"></a>
+ * <h2>Cli example: The options bean</h2>
+ * <p>So, let's begin our example with an options bean. (It should
+ * be noted, that you can do without an options bean, as we
+ * will demonstrate <a href="#cli-example-non-bean">below</a>.
+ * The example could look like this:
  * <pre>
- *   public class MyCli {
- *       public static void main(String[] pArgs) {
- *          final OptionsBean bean = Cli.of(new OptionsBean())
- *              .stringOption("--inputFile", "-if").default("inputFile.xml")
- *                 .handler((c,s) -&gt;{ \* Process the value *\ }).end()
- *              .parse(pArgs);
- *          run(bean);
- *       }
- *  }
+ *   	// Example of an options bean.
+ *      public static class OptionsBean {
+ *        private Path inputFile, outputFile;
+ *        private boolean verbose;
+ *      }
  * </pre>
- * @param <B> Type of the option bean.
+ * As you can see, this is an example of a simple bean with a few properties.
+ * </p>
+ * <a name="cli-example-instance"></a>
+ * <h2>Cli example: Creating a Cli object</h2>
+ * <p>Having implemented the options bean, we can now create the Cli object,
+ * which is as simple as this:
+ * <pre>
+ *   Cli&lt;OptionsBean&gt; cli = Cli.of(new OptionsBean());
+ * </pre>
+ * The main point here is passing a new, unconfigured instance of the
+ * options bean, which also ensures the generic signature of the created
+ * {@link Cli} object.
+ * <a name="cli-example-options"></a>
+ * <h2>Cli example: Options</h2>
+ * 
+ * 
+ * @param <B> Type of the options bean.
  */
 public class Cli<B> {
 	/** A context object, which is passed to the
@@ -60,13 +124,25 @@ public class Cli<B> {
 		/** Called to create an exception, which triggers a usage message.
 		 * @param pMsg The created exceptions message.
 		 * @return The created exception.
+		 * @see #error(String)
+		 * @see #error(String, Throwable)
 		 */
 		default UsageException usage(String pMsg) { return new UsageException(pMsg); }
 		/** Called to create an exception, which is being thrown.
 		 * @param pMsg The created exceptions message.
 		 * @return The created exception.
+		 * @see #error(String, Throwable)
+		 * @see #usage(String)
 		 */
 		default IllegalStateException error(String pMsg) { return new IllegalStateException(pMsg); }
+		/** Called to create an exception, which is being thrown.
+		 * @param pMsg The created exceptions message.
+		 * @param pCause The created exceptions cause, if any, or null.
+		 * @return The created exception.
+		 * @see #error(String)
+		 * @see #usage(String)
+		 */
+		default IllegalStateException error(String pMsg, Throwable pCause) { return new IllegalStateException(pMsg, pCause); }
 	}
 	/** An Exception, which may be thrown to trigger a usage message.
 	 */
@@ -92,7 +168,7 @@ public class Cli<B> {
 	private final @NonNull B bean;
 	private final Map<@NonNull String,Option<B,?>> optionsByName = new HashMap<>();
 	private @Nullable BiConsumer<@NonNull Cli<B>,@NonNull String> extraArgsHandler;
-	private @Nullable Function<@Nullable String,@NonNull RuntimeException> usageHandler;
+	private @Nullable Function<@Nullable UsageException,@NonNull RuntimeException> usageHandler;
 	private @Nullable FailableFunction<@NonNull B,@Nullable String,?> validator;
 
 	/** Creates a new instance with the given options bean.
@@ -145,6 +221,63 @@ public class Cli<B> {
 	}
 
 	/** Creates a new option, which configures a string value.
+	 *
+	 *
+	 * Our {@link Cli} object needs to know about the properties, that are
+	 * configurable in the options bean. Let's begin with a property
+	 * {@code inputFile}. The command line applications user must
+	 * configure it by using a term like "-inputFile file.txt". As a
+	 * shorter version, we will allow "-if file.txt" instead.
+	 * So, we'll begin with writing
+	 * <pre>
+     *   cli.stringOption("inputFile", "if").required()
+     *      .handler((c,s) -> c.getBean().inputFile = s)
+	 * </pre>
+	 * 
+     * This snippet should be fairly obvious:
+     * <ul>
+     *   <li>We create a PathOption object by invoking the
+     *     {@link Cli#stringOption(String, String...)} method,
+     *     supplying the accepted option names "inputFile", and
+     *     "if".</li>
+     *   <li>We make this a required option by invoking the
+     *     {@link Option#required()} on the Option object.
+     *     (By doing that, we are making the null value invalid
+     *     on the option beans {@code inputFile} property.</li>
+     *  <li>We connect the value of the command line option
+     *     "inputFile" to the options bean property of the
+     *     same name by specifying a argument handler on the
+     *     option object. This piece of code is less obvious,
+     *     so we'll cover argument handlers in more detail below-</li>
+     * </ul>
+     * 
+     * When using the option bean, then we'll notice a minor
+     * inconvenience: The "inputFile" is a plain string. We'd
+     * rather have a path object. This can be achieved by changing
+     * the above snippet as follows:
+     * 
+	 * <pre>
+     *   cli.pathOption("inputFile", "if").required()
+     *      .handler((c,p) -> c.getBean().inputFile = p)
+	 * </pre>
+     * 
+     * That is almost identical, apart from replacing "stringOption"
+     * with "pathOption", and changing the type of the "inputField"
+     * property in the options bean.
+     * 
+     * In summary, the most important takeaway here is, that you create a
+     * {@link String string} valued option using the method
+     * {@link Cli#stringOption(String, String...)}. In other words: How
+     * you create the option object, depends on the option values type.
+     * For other types, there are also
+     * <ol>
+     *   <li>{@link Cli#boolOption(String, String...)} (boolean values)</li>
+     *   <li>{@link Cli#intOption(String, String...)} (integer values)</li>
+     *   <li>{@link Cli#pathOption(String, String...)} (path values)</li>
+     *   <li>{@link Cli#urlOption(String, String...)} (URL values)</li>
+     *   <li>{@link Cli#enumOption(Class, String, String...)} (Enum values)</li>
+     * </ol>
+     *
 	 * @param pPrimaryName The options primary name.
 	 * @param pSecondaryNames The options secondary names, if any.
 	 * @return The created option.
@@ -378,9 +511,18 @@ public class Cli<B> {
 		} catch (UsageException ue) {
 			if (usageHandler != null) {
 				@SuppressWarnings("null")
-				final @NonNull Function<String,RuntimeException> handler =
-						(@NonNull Function<String,RuntimeException>) usageHandler;
-				throw handler.apply(ue.getMessage());
+				final @Nullable Function<UsageException,RuntimeException> handler = usageHandler;
+				if (handler == null) {
+					throw ue;
+				} else {
+					final RuntimeException rte = handler.apply(ue);
+					if (rte != null) {
+						throw rte;
+					} else {
+						System.exit(1);
+						return Objects.fakeNonNull();
+					}
+				}
 			}
 		}
 		for (Map.Entry<@NonNull String, Option<B,?>> en : optionsByName.entrySet()) {
@@ -438,18 +580,78 @@ public class Cli<B> {
 	 * @return The handler for producing a usage message.
 	 * @see #usageHandler(Function)
 	 */
-	public @Nullable Function<@Nullable String,@NonNull RuntimeException> getUsageHandler() { return usageHandler; }
-	/** Sets the handler for producing a usage message.
+	public @Nullable Function<@Nullable UsageException,@NonNull RuntimeException> getUsageHandler() { return usageHandler; }
+	/** Sets the handler for reporting a usage message.
+	 * 
+	 * If the cli users enters invalid input (like an invalid argument value,
+	 * an invalid option name, or the like), then the CLI application is
+	 * supposed to exit with an error message, printing out a usage text,
+	 * that explains the problem.
+	 *
+     * The {@link Cli cli object} supports this by using a so-called usage
+     * handler. The usage handler works as follows:</p>
+     * <ul>
+     *  <li>The piece of code, that detects the invalid input
+     *    (the {@link Cli cli object} itself, the argument
+     *    handler, a validator, or whatever) throws a
+     *    {@link Cli.UsageException}.</li>
+     *  <li>The {@link Cli cli object} catches that
+     *    exception, and invokes the
+     *    {@link Cli#usageHandler(Function)}, passing the
+     *    exceptions message as an error message.</li>
+     *  <li>The usage handler writes out the usage message,
+     *    including the error message (if any), and
+     *    returns null, or an exception.</li>
+     *  <li> If the usage handler returned an exception,
+     *    then that exception is being thrown, terminating
+     *    the operation. In the case of the return value
+     *    null, the {@link Cli cli} will invoke
+     *    {@link System#exit(int)} with a status code of
+     *    1.</li>
+     * </ul>
+     *
+     * A typical usage handler would look like this:
+     * <pre>
+     *   public void usage(UsageException pException) {
+     *       final String msg = pException.getMessage();
+     *       if (msg != null) {
+     *           System.err.println(msg);
+     *           System.err.println();
+     *       }
+     *       System.err.println("Usage: java MyApp &lt;Options&gt;");
+     *       System.err.println();
+     *       System.err.println("Required options are:");
+     *                          ...
+     *       System.err.println("Other options are:");
+     *                          ...
+     *       return null;
+     *   }
+     * </pre>
+     * 
 	 * @param pHandler The handler for producing a usage message.
 	 * @see #getUsageHandler()
 	 * @return This {@link Cli}.
 	 */
-	public Cli<B> usageHandler(@NonNull Function<@Nullable String,@NonNull RuntimeException> pHandler) {
+	public Cli<B> usageHandler(@NonNull Function<@Nullable UsageException,@NonNull RuntimeException> pHandler) {
 		usageHandler = pHandler;
 		return this;
 	}
 
 	/** Sets the bean validator.
+	 * 
+	 * Sometimes, validating single option values (which is, what the
+	 * argument handlers, can do), is not sufficient.For example,
+	 * option values may only be valid in a particular combination. In
+     * that case, you might specify {@link Cli#validator(FailableFunction)}.
+     * The validator is called after the argument handlers. In other words,
+     * what it receives is the fully configured option bean. If it detects,
+     * that the option beans configuration is invalid, then it returns a
+     * non-null error message, which will then be passed on to the
+     * {@link #usageHandler(Function)}. The return value null, on the
+     * other hand, indicates, that the options bean is valid, and may be
+     * returned to the caller, who will use the bean as a configuration
+     * for the actual operation.
+     *
 	 * @param pValidator The bean validator.
 	 * @return This {@link Cli}.
 	 * @see #getValidator()
@@ -468,11 +670,23 @@ public class Cli<B> {
 	/** Called to create an exception, which triggers a usage message.
 	 * @param pMsg The created exceptions message.
 	 * @return The created exception.
+	 * @see #error(String)
+	 * @see #error(String, Throwable)
 	 */
 	public UsageException usage(String pMsg) { return new UsageException(pMsg); }
 	/** Called to create an exception, which is being thrown.
 	 * @param pMsg The created exceptions message.
 	 * @return The created exception.
+	 * @see #error(String, Throwable)
+	 * @see #usage(String)
 	 */
 	public IllegalStateException error(String pMsg) { return new IllegalStateException(pMsg); }
+	/** Called to create an exception, which is being thrown.
+	 * @param pMsg The created exceptions message.
+	 * @param pCause The created exceptions cause, if any, or null.
+	 * @return The created exception.
+	 * @see #error(String)
+	 * @see #usage(String)
+	 */
+	public IllegalStateException error(String pMsg, Throwable pCause) { return new IllegalStateException(pMsg, pCause); }
 }
