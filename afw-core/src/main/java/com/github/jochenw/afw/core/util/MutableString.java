@@ -6,10 +6,12 @@ import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
 
-/** A mutable object providing a string value.
+/** A mutable object providing a string value, faking a mutable string.
  */
 public class MutableString implements Serializable, Consumer<String>, Supplier<String> {
 	private static final long serialVersionUID = 81563172113169338L;
+	/** The actual string value.
+	 */
 	private String value;
 
 	private MutableString(String pValue) { value = pValue; }

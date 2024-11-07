@@ -21,19 +21,20 @@ import com.github.jochenw.afw.core.util.Reflection;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
-/** <p>An instance of this class can be used in a command line appplication
+/** An instance of this class can be used in a command line appplication
  * (command line interface, or cli) to implement a processor in a quick,
- * and precise manner.</p>
- * <p>The class is based on the assumption, that command line options are
+ * and precise manner.
+ * 
+ * The class is based on the assumption, that command line options are
  * transformed into properties of a so-called {@code options bean}. For
  * example, if the cli user specifies an option
  * <pre>-inputFile file.txt</pre>, then there should be a field
  * {@code inputFile} in the options bean. The fields type should be
  * {@link Path}, and the value a {@link Path} object, that points to
- * <pre>file.txt</pre></p>.
+ * <pre>file.txt</pre>.
  *
  * For every option, there must be a so-called
- * {@link Option#handler(FailableBiConsumer) argument handler}.
+ * {@link Option#handler(Functions.FailableBiConsumer) argument handler}.
  * An argument handler is a callback, which is invoked, if an option
  * has been identified, and the option value has been parsed
  * successfully.
@@ -204,7 +205,7 @@ public class Cli<B> {
 	 * So, we'll begin with writing
 	 * <pre>
      *   cli.stringOption("inputFile", "if").required()
-     *      .handler((c,s) -> c.getBean().inputFile = s)
+     *      .handler((c,s) -&gt; c.getBean().inputFile = s)
 	 * </pre>
 	 * 
      * This snippet should be fairly obvious:
@@ -231,7 +232,7 @@ public class Cli<B> {
      * 
 	 * <pre>
      *   cli.pathOption("inputFile", "if").required()
-     *      .handler((c,p) -> c.getBean().inputFile = p)
+     *      .handler((c,p) -&gt; c.getBean().inputFile = p)
 	 * </pre>
      * 
      * That is almost identical, apart from replacing "stringOption"
@@ -562,7 +563,8 @@ public class Cli<B> {
 	 * that explains the problem.
 	 *
      * The {@link Cli cli object} supports this by using a so-called usage
-     * handler. The usage handler works as follows:</p>
+     * handler. The usage handler works as follows:
+     *
      * <ul>
      *  <li>The piece of code, that detects the invalid input
      *    (the {@link Cli cli object} itself, the argument
@@ -615,7 +617,7 @@ public class Cli<B> {
 	 * Sometimes, validating single option values (which is, what the
 	 * argument handlers, can do), is not sufficient.For example,
 	 * option values may only be valid in a particular combination. In
-     * that case, you might specify {@link Cli#validator(FailableFunction)}.
+     * that case, you might specify {@link Cli#validator(Functions.FailableFunction)}.
      * The validator is called after the argument handlers. In other words,
      * what it receives is the fully configured option bean. If it detects,
      * that the option beans configuration is invalid, then it returns a
