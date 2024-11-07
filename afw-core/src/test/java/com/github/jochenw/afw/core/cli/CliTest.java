@@ -10,6 +10,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
@@ -155,10 +156,12 @@ public class CliTest {
 	 */
 	@Test
 	public void testUsageHandler() {
+		@NonNull Function<@Nullable UsageException,@NonNull RuntimeException> usageHandler =
+				(ue) -> new IllegalStateException(ue == null ? null : ue.getMessage());
 		final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
 				.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
 				.stringOption("outputFile", "of").required().handler((c,s) -> c.getBean().outputFile = Paths.get(s)).end()
-				.usageHandler((s) -> new IllegalStateException(s));
+				.usageHandler(usageHandler);
 		try {
 			cli.parse(new @NonNull String[]{ "-if=pom.xml", "-of=/var/lib/of.log", "-h"});
 		} catch (IllegalStateException e) {

@@ -38,14 +38,14 @@ import com.github.jochenw.afw.core.util.Exceptions;
  * has been identified, and the option value has been parsed
  * successfully.
  *
- * <p>The argument handler takes two arguments: A context object, which
+ * The argument handler takes two arguments: A context object, which
  * allows the handler a limited level of interaction with the Cli
  * object, and the actual value object (<em>not</em> the value string).
  * Typically, the argument handler would just take the value, and store
  * it into the options bean. The argument handler allows to perform
  * additional tasks, like validation, transformation, or combination.
- * </p>
- * <p>Things you should know about the context object:
+ *
+ * Things you should know about the context object:
  * <ul>
  *  <li>The option name, which is actually used, can be obtained via
  *    {@link Context#getOptName()}. This can be used, for example,
@@ -66,35 +66,8 @@ import com.github.jochenw.afw.core.util.Exceptions;
  *    exception will be trapped, and mapped to an invocation of
  *    the <a href="#cli-example-usage-handler">usage handler</a>.</li>
  * </ul>
-
  * 
- * <a name="cli-example-bean"></a>
- * <h2>Cli example: The options bean</h2>
- * <p>So, let's begin our example with an options bean. (It should
- * be noted, that you can do without an options bean, as we
- * will demonstrate <a href="#cli-example-non-bean">below</a>.
- * The example could look like this:
- * <pre>
- *   	// Example of an options bean.
- *      public static class OptionsBean {
- *        private Path inputFile, outputFile;
- *        private boolean verbose;
- *      }
- * </pre>
- * As you can see, this is an example of a simple bean with a few properties.
- * </p>
- * <a name="cli-example-instance"></a>
- * <h2>Cli example: Creating a Cli object</h2>
- * <p>Having implemented the options bean, we can now create the Cli object,
- * which is as simple as this:
- * <pre>
- *   Cli&lt;OptionsBean&gt; cli = Cli.of(new OptionsBean());
- * </pre>
- * The main point here is passing a new, unconfigured instance of the
- * options bean, which also ensures the generic signature of the created
- * {@link Cli} object.
- * <a name="cli-example-options"></a>
- * <h2>Cli example: Options</h2>
+ * As a short introduction, we'll provide a small example for
  * 
  * 
  * @param <B> Type of the options bean.
