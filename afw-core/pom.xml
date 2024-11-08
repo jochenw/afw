@@ -91,6 +91,7 @@
                 <failOnError>true</failOnError>
                 <excludePackageNames>com.github.jochenw.afw.core.el.jcc</excludePackageNames>
                 <source>8</source>
+                <outputDirectory>${project.build.directory}/site</outputDirectory>
             </configuration>
         </plugin>
       </plugins>

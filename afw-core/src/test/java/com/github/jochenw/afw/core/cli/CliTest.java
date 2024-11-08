@@ -294,4 +294,21 @@ public class CliTest {
 			assertEquals("Invalid value for option logLevel: warn", ue.getMessage());
 		}
 	}
+
+	/** Test case for {@link Cli#error(String)}, and {@link Cli#error(String,Throwable)}.
+	 */
+	@Test
+	public void testCliError() {
+		final Cli<?> cli = Cli.of(new OptionsBean());
+		final String msg = "This is the error message.";
+		final IllegalStateException ise0 = cli.error(msg);
+		assertNotNull(ise0);
+		assertSame(msg, ise0.getMessage());
+		assertTrue(ise0.getCause() == null  ||  ise0.getCause() == ise0);
+		final RuntimeException rte = new RuntimeException();
+		final IllegalStateException ise1 = cli.error(msg, rte);
+		assertNotNull(ise1);
+		assertSame(msg, ise1.getMessage());
+		assertSame(rte, ise1.getCause());
+	}
 }
