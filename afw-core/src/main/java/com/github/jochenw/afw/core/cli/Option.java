@@ -1,11 +1,13 @@
 package com.github.jochenw.afw.core.cli;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.rflct.ISetter;
 
 
 /** An {@link Option} object represents a configurable option value.
@@ -102,6 +104,32 @@ public abstract class Option<B,O> {
 		assertMutable();
 		argsHandler = pHandler;
 		return this;
+	}
+
+	/** Sets the options argument handler by creating a
+	 * {@link ISetter setter} for the given property, which
+	 * will be invoked by the created argument handler.
+	 * In other words, if the property name is "foo", then
+	 * the created argument handler will set the field "foo",
+	 * in, or invoke the setter method "setFoo"
+	 * on the options bean without any validation of the property value.
+	 * @param pProperty The property name, as specified by
+	 * {@link ISetter#of(Class,String)}.
+	 * @return This option.
+	 * @throws IllegalArgumentException The method
+	 * {@link ISetter#of(Class, String)} could not create a
+	 * setter for the given property.
+	 * @throws NullPointerException The parameter {@code pProperty} is null.
+	 */
+	public Option<B,O> property(@NonNull String pProperty) {
+	    final @NonNull B bean = getCli().getBean();
+	    @SuppressWarnings("unchecked")
+		final @NonNull Class<B> beanType = (@NonNull Class<B>) bean.getClass();
+		final ISetter<B,O> setter = ISetter.of(beanType, pProperty);
+		final FailableBiConsumer<Context<B>,O,RuntimeException> argsHandler = (c,o) -> {
+			setter.set(c.getBean(), o);
+		};
+		return handler(argsHandler);
 	}
 
 	/** Returns the options default value, if any, or null.

@@ -2,11 +2,14 @@ package com.github.jochenw.afw.core.cli;
 
 import static org.junit.Assert.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
@@ -18,6 +21,7 @@ import com.github.jochenw.afw.core.cli.Cli.UsageException;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.MutableBoolean;
+import com.github.jochenw.afw.core.util.Strings;
 
 
 /** Test suite for the {@link Cli} class.
@@ -28,6 +32,8 @@ public class CliTest {
 	public static class OptionsBean {
 		private Path inputFile, outputFile, helperFile;
 		private boolean verbose;
+		private int intValue;
+		private URL urlValue;
 	}
 
 	/**
@@ -310,5 +316,70 @@ public class CliTest {
 		assertNotNull(ise1);
 		assertSame(msg, ise1.getMessage());
 		assertSame(rte, ise1.getCause());
+	}
+
+	/** Test case for {@link Cli.Context#error(String)}, and
+	 * {@link Cli.Context#error(String, Throwable)}.
+	 */
+	@Test
+	public void testContextError() {
+		final String msg = "This is the error message";
+		final BiConsumer<String,Throwable> tester = (m,th) -> {
+			@SuppressWarnings("null")
+			final @NonNull String[] args = (@NonNull String[]) new String[] {"-error", "foo"};
+			Cli.of(new OptionsBean())
+					.stringOption("error").handler((c,s) -> {
+						if (th == null) {
+							throw c.error(m);
+						} else {
+							throw c.error(m, th);
+						}
+					}).end().parse(args);
+		};
+		try {
+			tester.accept(msg, null);
+			fail("Expected Exception");
+		} catch (IllegalStateException ise) {
+			assertSame(msg, ise.getMessage());
+			assertTrue(ise.getCause() == null || ise == ise.getCause());
+		}
+		final RuntimeException rte = new RuntimeException();
+		try {
+			tester.accept(msg,  rte);
+		} catch (IllegalStateException ise) {
+			assertSame(msg, ise.getMessage());
+			assertSame(rte, ise.getCause());
+		}
+	}
+
+	/** Test case for {@link Cli#intOption(String, String...)}.
+	 */
+	@Test
+	public void testIntOption() {
+		final OptionsBean ob = new OptionsBean();
+		assertEquals(0, ob.intValue);
+		final @NonNull String[] args = {"-iv", "42"};
+
+		final OptionsBean ob2 = Cli.of(ob)
+				.intOption("iv").property("intValue").end().parse(args);
+		assertSame(ob2, ob);
+		assertEquals(42, ob.intValue);
+	}
+
+	/** Test case for {@link Cli#urlOption(String, String...)}.
+	 * @throws Exception The test failed.
+	 */
+	@Test
+	public void testUrlOption() throws Exception {
+		final OptionsBean ob = new OptionsBean();
+		assertNull(ob.urlValue);
+		final @NonNull String[] args = {"-uv", "http://127.0.0.1/"};
+
+		final OptionsBean ob2 = Cli.of(ob)
+				.urlOption("uv").property("urlValue").end().parse(args);
+
+		assertSame(ob2, ob);
+		final URL url = Strings.asUrl("http://127.0.0.1/");
+		assertEquals(url, ob.urlValue);
 	}
 }
