@@ -24,6 +24,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.github.jochenw.afw.core.cli.Cli.UsageException;
+
 
 /**
  * Utility class for working with Exceptions. Provides static utility methods.
@@ -180,5 +182,15 @@ public class Exceptions {
 		} else {
 			return null;
 		}
+	}
+
+	/** Returns true, if the given exception has a non-trivial cause.
+	 * (Neither null, nor itself).
+	 * @param pTh The exception, which is being checked.
+	 * @return True, if the exception has a non-trivial cause.
+	 */
+	public static boolean hasCause(@NonNull Throwable pTh) {
+		final Throwable cause = pTh.getCause();
+		return cause != null  &&  cause != pTh;
 	}
 }

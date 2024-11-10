@@ -11,16 +11,23 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.Test;
+import org.junit.validator.ValidateWith;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
+import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.log.ILog.Level;
+import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.MutableBoolean;
+import com.github.jochenw.afw.core.util.NotImplementedException;
 import com.github.jochenw.afw.core.util.Strings;
 
 
@@ -162,7 +169,7 @@ public class CliTest {
 	 */
 	@Test
 	public void testUsageHandler() {
-		@NonNull Function<@Nullable UsageException,@NonNull RuntimeException> usageHandler =
+		Functions.FailableFunction<@Nullable UsageException,@NonNull RuntimeException,?> usageHandler =
 				(ue) -> new IllegalStateException(ue == null ? null : ue.getMessage());
 		final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
 				.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
@@ -381,5 +388,64 @@ public class CliTest {
 		assertSame(ob2, ob);
 		final URL url = Strings.asUrl("http://127.0.0.1/");
 		assertEquals(url, ob.urlValue);
+	}
+
+	/** Test case for {@link Cli.Context#getOptName()}.
+	 */
+	@Test
+	public void testGetOptName() {
+		final List<String> optNames = new ArrayList<>();
+		final @NonNull String[] args = { "-iFile", "foo", "-of", "bar", "-helperFile", "baz" };
+		final FailableBiConsumer<Context<OptionsBean>,Path,?> argsHandler = (c,p) -> optNames.add(c.getOptName());
+		Cli.of(new OptionsBean())
+			.pathOption("inputFile", "iFile", "if").handler(argsHandler).end()
+			.pathOption("outputFile", "oFile", "of").handler(argsHandler).end()
+			.pathOption("helperFile", "hFile", "hf").handler(argsHandler).end()
+			.parse(args);
+		assertEquals(3, optNames.size());
+		assertEquals("iFile", optNames.get(0));
+		assertEquals("of", optNames.get(1));
+		assertEquals("helperFile", optNames.get(2));
+ 	}
+
+	/** Test for {@link Cli#usage(String)}.
+	 */
+	@Test
+	public void testCliUsage() {
+		final String msg = "This is the error message.";
+		final UsageException ue = Cli.of(new OptionsBean()).usage(msg);
+		assertSame(msg, ue.getMessage());
+		assertFalse(Exceptions.hasCause(ue));
+	}
+
+	/** Test for the {@link Cli#validator(Functions.FailableFunction)}.
+	 */
+	@Test
+	public void testCliValidator() {
+		final @NonNull FailableFunction<@NonNull OptionsBean,@Nullable String,?> validator = (ob) -> {
+			if (ob.inputFile != null  &&  ob.inputFile.toString().equals("foo")) {
+				return "Expected inputFile bar, got foo";
+			}
+			return null;
+		};
+		final Supplier<Cli<OptionsBean>> cliSupplier = () -> {
+			Cli<OptionsBean> cli = Cli.of(new OptionsBean())
+					.pathOption("inputFile").property("inputFile").end();
+			assertNull(cli.getValidator());
+			cli.validator(validator);
+			assertSame(validator, cli.getValidator());
+			return cli;
+		};
+		final OptionsBean ob1 = cliSupplier.get().parse("-inputFile", "bar");
+		assertNotNull(ob1);
+		assertNotNull(ob1.inputFile);
+		assertEquals("bar", ob1.inputFile.toString());
+		try {
+			cliSupplier.get().parse("-inputFile", "foo");
+			fail("Expected Exception");
+		} catch (UsageException ue) {
+			assertEquals("Expected inputFile bar, got foo", ue.getMessage());
+			assertFalse(Exceptions.hasCause(ue));
+		}
 	}
 }

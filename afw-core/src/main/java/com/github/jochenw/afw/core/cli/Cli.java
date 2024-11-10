@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Reflection;
@@ -142,7 +143,7 @@ public class Cli<B> {
 	private final @NonNull B bean;
 	private final Map<@NonNull String,Option<B,?>> optionsByName = new HashMap<>();
 	private @Nullable BiConsumer<@NonNull Cli<B>,@NonNull String> extraArgsHandler;
-	private @Nullable Function<@Nullable UsageException,@NonNull RuntimeException> usageHandler;
+	private @Nullable FailableFunction<@Nullable UsageException,@NonNull RuntimeException,?> usageHandler;
 	private @Nullable FailableFunction<@NonNull B,@Nullable String,?> validator;
 
 	/** Creates a new instance with the given options bean.
@@ -352,7 +353,7 @@ public class Cli<B> {
 	 * @param pOptConsumer A consumer, which will be invoked for every
 	 *   detected option reference.
 	 * @throws UsageException A usage error has been detected. The caller
-	 * is supposed to invoke the {@link #usageHandler(Function)}.
+	 * is supposed to invoke the {@link #usageHandler(Functions.FailableFunction)}.
 	 */
 	protected void parse(@NonNull String[] pArgs, @NonNull Consumer<OptRef<B,?>> pOptConsumer) throws UsageException {
 		final List<@NonNull String> args = new ArrayList<>(Arrays.asList(pArgs));
@@ -442,10 +443,10 @@ public class Cli<B> {
 	 * option references, and invoke the argument handlers.
 	 * @param pArgs The list of command line arguments.
 	 * @throws UsageException A usage error has been detected. The caller
-	 * is supposed to invoke the {@link #usageHandler(Function)}.
+	 * is supposed to invoke the {@link #usageHandler(Functions.FailableFunction)}.
 	 * @return The configured options bean.
 	 */
-	public B parse(@NonNull String[] pArgs) {
+	public B parse(@NonNull String... pArgs) {
 		final Map<String,Integer> usage = new HashMap<>();
 		final ContextImpl<B> ctx = new ContextImpl<>(this);
 		final Consumer<OptRef<B,?>> optConsumer = new Consumer<OptRef<B,?>>(){
@@ -482,22 +483,26 @@ public class Cli<B> {
 		};
 		try {
 			parse(pArgs, optConsumer);
+			final FailableFunction<@NonNull B,String,?> validator = getValidator();
+			if (validator != null) {
+				final String msg = Functions.apply(validator, getBean());
+				if (msg != null) {
+					throw usage(msg);
+				}
+			}
 		} catch (UsageException ue) {
 			if (usageHandler != null) {
 				@SuppressWarnings("null")
-				final @Nullable Function<UsageException,RuntimeException> handler = usageHandler;
-				if (handler == null) {
-					throw ue;
+				final @Nullable FailableFunction<UsageException,RuntimeException,?> handler = usageHandler;
+				final RuntimeException rte = Functions.apply(handler, ue);
+				if (rte != null) {
+					throw rte;
 				} else {
-					final RuntimeException rte = handler.apply(ue);
-					if (rte != null) {
-						throw rte;
-					} else {
-						System.exit(1);
-						return Objects.fakeNonNull();
-					}
+					System.exit(1);
+					return Objects.fakeNonNull();
 				}
 			}
+			throw ue;
 		}
 		for (Map.Entry<@NonNull String, Option<B,?>> en : optionsByName.entrySet()) {
 			@SuppressWarnings("null")
@@ -552,9 +557,9 @@ public class Cli<B> {
 	}
 	/** Returns the handler for producing a usage message.
 	 * @return The handler for producing a usage message.
-	 * @see #usageHandler(Function)
+	 * @see #usageHandler(Functions.FailableFunction)
 	 */
-	public @Nullable Function<@Nullable UsageException,@NonNull RuntimeException> getUsageHandler() { return usageHandler; }
+	public @Nullable FailableFunction<@Nullable UsageException,@NonNull RuntimeException,?> getUsageHandler() { return usageHandler; }
 	/** Sets the handler for reporting a usage message.
 	 * 
 	 * If the cli users enters invalid input (like an invalid argument value,
@@ -572,7 +577,7 @@ public class Cli<B> {
      *    {@link Cli.UsageException}.</li>
      *  <li>The {@link Cli cli object} catches that
      *    exception, and invokes the
-     *    {@link Cli#usageHandler(Function)}, passing the
+     *    {@link Cli#usageHandler(Functions.FailableFunction)}, passing the
      *    exceptions message as an error message.</li>
      *  <li>The usage handler writes out the usage message,
      *    including the error message (if any), and
@@ -607,7 +612,7 @@ public class Cli<B> {
 	 * @see #getUsageHandler()
 	 * @return This {@link Cli}.
 	 */
-	public Cli<B> usageHandler(@NonNull Function<@Nullable UsageException,@NonNull RuntimeException> pHandler) {
+	public Cli<B> usageHandler(@NonNull FailableFunction<@Nullable UsageException,@NonNull RuntimeException,?> pHandler) {
 		usageHandler = pHandler;
 		return this;
 	}
@@ -622,7 +627,7 @@ public class Cli<B> {
      * what it receives is the fully configured option bean. If it detects,
      * that the option beans configuration is invalid, then it returns a
      * non-null error message, which will then be passed on to the
-     * {@link #usageHandler(Function)}. The return value null, on the
+     * {@link #usageHandler(Functions.FailableFunction)}. The return value null, on the
      * other hand, indicates, that the options bean is valid, and may be
      * returned to the caller, who will use the bean as a configuration
      * for the actual operation.
