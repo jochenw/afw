@@ -448,4 +448,32 @@ public class CliTest {
 			assertFalse(Exceptions.hasCause(ue));
 		}
 	}
+
+	/** Test for {@link Option#repeatable()}.
+	 */
+	@Test
+	public void testRepeatable() {
+		/** Repeating an option without repeatable() is supposed to cause an error.
+		 */
+		try {
+			Cli.of(new OptionsBean())
+			    .stringOption("inputFile", "if").handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
+			    .parse("-inputFile", "foo", "-if", "bar");
+			fail("Expected Exception");
+		} catch (UsageException ue) {
+			assertEquals("The option if may be used only once.", ue.getMessage());
+			assertFalse(Exceptions.hasCause(ue));
+		}
+		/** With repeatable() we can do that.
+		 */
+		final List<String> values = new ArrayList<>();
+		Cli.of(new OptionsBean())
+	        .stringOption("inputFile", "if").repeatable().handler((c,l) -> {
+	        	values.addAll(l);
+	        }).end()
+	        .parse("-inputFile", "foo", "-if", "bar");
+		assertEquals(2, values.size());
+		assertEquals("foo", values.get(0));
+		assertEquals("bar", values.get(1));		
+	}
 }

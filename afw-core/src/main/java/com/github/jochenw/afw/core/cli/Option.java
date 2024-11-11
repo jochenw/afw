@@ -188,7 +188,10 @@ public abstract class Option<B,O> {
 	 * @see #isRepeatable()
 	 */
 	public RepeatableOption<B,O> repeatable() {
-		return new RepeatableOption<B,O>(cli, this, primaryName, secondaryNames);
+		final RepeatableOption<B,O> rptOpt = new RepeatableOption<B,O>(cli, this, primaryName, secondaryNames);
+		getCli().register(rptOpt);
+		return rptOpt;
+		
 	}
 
 	/** Returns, whether this option is repeatable.

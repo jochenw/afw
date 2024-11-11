@@ -142,7 +142,7 @@ public class Cli<B> {
 
 	private final @NonNull B bean;
 	private final Map<@NonNull String,Option<B,?>> optionsByName = new HashMap<>();
-	private @Nullable BiConsumer<@NonNull Cli<B>,@NonNull String> extraArgsHandler;
+	private @Nullable FailableBiConsumer<@NonNull Cli<B>,@NonNull String,?> extraArgsHandler;
 	private @Nullable FailableFunction<@Nullable UsageException,@NonNull RuntimeException,?> usageHandler;
 	private @Nullable FailableFunction<@NonNull B,@Nullable String,?> validator;
 
@@ -170,8 +170,12 @@ public class Cli<B> {
 	 */
 	protected <O,OP extends Option<B,O>> OP register(@NonNull OP pOption) {
 		final Consumer<@NonNull String> registration = (n) -> {
-			if (optionsByName.put(n, pOption) != null) {
-				throw new IllegalArgumentException("Duplicate option name: " + n);
+			if (pOption.isRepeatable()) {
+				optionsByName.put(n, pOption); // Replace the original, non-repeatable option.
+			} else {
+				if (optionsByName.put(n, pOption) != null) {
+					throw new IllegalArgumentException("Duplicate option name: " + n);
+				}
 			}
 		};
 		registration.accept(pOption.getPrimaryName());
@@ -371,10 +375,9 @@ public class Cli<B> {
 				opt = op;
 			} else {
 				if (extraArgsHandler != null) {
-					@SuppressWarnings("null")
-					final @NonNull BiConsumer<@NonNull Cli<B>,@NonNull String> handler =
-							(@NonNull BiConsumer<@NonNull Cli<B>,@NonNull String>) extraArgsHandler;
-					handler.accept(this, arg);
+					final @NonNull FailableBiConsumer<@NonNull Cli<B>,@NonNull String,?> handler =
+							Reflection.cast(extraArgsHandler);
+					Functions.accept(handler, this, arg);
 					continue;
 				} else {
 					throw new UsageException("Unexpected non-option argument: " + arg);
@@ -455,7 +458,7 @@ public class Cli<B> {
 				@SuppressWarnings("unchecked")
 				final OptRef<B,Object> optRef = (OptRef<B,Object>) pOptRef;
 				final String optPrimaryName = optRef.getOption().getPrimaryName();
-				usage.compute(optPrimaryName, (pn,cnt) -> {
+				final Integer useCount = usage.compute(optPrimaryName, (pn,cnt) -> {
 					if (cnt == null) {
 						return Integer.valueOf(1);
 					} else {
@@ -464,11 +467,14 @@ public class Cli<B> {
 				});
 				final Option<B,Object> option = optRef.getOption();
 				final FailableBiConsumer<Context<B>,Object,?> argHandler = option.getArgHandler();
-				if (option instanceof RepeatableOption) {
+				if (option.isRepeatable()) {
 					final RepeatableOption<B,Object> rptOpt = Reflection.cast(option);
 					final Object value = rptOpt.getElementValue(optRef.getOptValue());
 					rptOpt.addValue(value);
 				} else {
+					if (useCount.intValue() > 1) {
+						throw ctx.usage("The option " + optRef.getOptName() + " may be used only once.");
+					}
 					final Object value = option.getValue(optRef.getOptValue());
 					ctx.setOptName(optRef.getOptName());
 					if (argHandler != null) {
@@ -528,13 +534,13 @@ public class Cli<B> {
 						throw ctx.usage("Required option missing: " + optName);
 					}
 				}
-			}
-			if (opt instanceof RepeatableOption) {
-				final RepeatableOption<B,Object> rptOpt = Reflection.cast(opt);
-				final FailableBiConsumer<Context<B>,List<Object>,?> argHandler = rptOpt.getArgHandler();
-				if (argHandler != null) {
-					ctx.setOptName(optName);
-					Functions.accept(argHandler, ctx, rptOpt.getValues());
+				if (opt.isRepeatable()) {
+					final RepeatableOption<B,Object> rptOpt = Reflection.cast(opt);
+					final FailableBiConsumer<Context<B>,List<Object>,?> argHandler = rptOpt.getArgHandler();
+					if (argHandler != null) {
+						ctx.setOptName(optName);
+						Functions.accept(argHandler, ctx, rptOpt.getValues());
+					}
 				}
 			}
 		}
@@ -543,15 +549,15 @@ public class Cli<B> {
 
 	/** Returns the handler for additional arguments (other than option references).
 	 * @return The handler for additional arguments (other than option references).
-	 * @see #extraArgsHandler(BiConsumer)
+	 * @see #extraArgsHandler(Functions.FailableBiConsumer)
 	 */
-	public @Nullable BiConsumer<@NonNull Cli<B>,@NonNull String> getExtraArgsHandler() { return extraArgsHandler; }
+	public @Nullable FailableBiConsumer<@NonNull Cli<B>,@NonNull String,?> getExtraArgsHandler() { return extraArgsHandler; }
 	/** Sets the handler for additional arguments (other than option references).
 	 * @param pHandler The handler for additional arguments (other than option references).
 	 * @return This {@link Cli}.
 	 * @see #getExtraArgsHandler()
 	 */
-	public Cli<B> extraArgsHandler(@NonNull BiConsumer<@NonNull Cli<B>,@NonNull String> pHandler) {
+	public Cli<B> extraArgsHandler(@NonNull FailableBiConsumer<@NonNull Cli<B>,@NonNull String,?> pHandler) {
 		extraArgsHandler = pHandler;
 		return this;
 	}
