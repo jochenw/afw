@@ -97,7 +97,7 @@ public abstract class AbstractOnTheFlyBinder implements IOnTheFlyBinder {
 		walk(pClass, (cl) -> {
 			for (Field field : cl.getDeclaredFields()) {
 				if (isInjectable(field)) {
-					final BiConsumer<IComponentFactory, Object> injector = getInjector(field);
+					final BiConsumer<@NonNull IComponentFactory, Object> injector = getInjector(field);
 					if (injector == null) {
 						throw new NullPointerException("isInjectable(Field) is true, bug getInjector(Field) returned null for " + field);
 					}

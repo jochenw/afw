@@ -33,14 +33,14 @@ public class UrlOption<B> extends Option<B,URL> {
 				try {
 					return Strings.asUrl(defaultValue);
 				} catch (MalformedURLException mue) {
-					throw new UsageException("Invalid default value for option " + getPrimaryName() + "; Expected valid URL, got " + pOptValue, mue);
+					throw new UsageException("Invalid default value for option " + getPrimaryName() + "; Expected valid URL, got " + pOptValue);
 				}
 			}
 		} else {
 			try {
 				return Strings.asUrl(pOptValue);
 			} catch (MalformedURLException mue) {
-				throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected valid URL, got " + pOptValue, mue);
+				throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected valid URL, got " + pOptValue);
 			}
 		}
 	}

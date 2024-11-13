@@ -6,16 +6,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Reflection;
@@ -123,14 +120,6 @@ public class Cli<B> {
 	 */
 	public static class UsageException extends RuntimeException {
 		private static final long serialVersionUID = 1721768041601280483L;
-
-		/** Creates a new instance with the given message, and cause.
-		 * @param pMessage The created exceptions message.
-		 * @param pCause The created exceptions cause.
-		 */
-		public UsageException(String pMessage, Throwable pCause) {
-			super(pMessage, pCause);
-		}
 
 		/** Creates a new instance with the given message, and no cause.
 		 * @param pMessage The created exceptions message.
@@ -450,6 +439,7 @@ public class Cli<B> {
 	 * @return The configured options bean.
 	 */
 	public B parse(@NonNull String... pArgs) {
+		validate();
 		final Map<String,Integer> usage = new HashMap<>();
 		final ContextImpl<B> ctx = new ContextImpl<>(this);
 		final Consumer<OptRef<B,?>> optConsumer = new Consumer<OptRef<B,?>>(){
@@ -477,12 +467,10 @@ public class Cli<B> {
 					}
 					final Object value = option.getValue(optRef.getOptValue());
 					ctx.setOptName(optRef.getOptName());
-					if (argHandler != null) {
-						try {
-							argHandler.accept(ctx, value);
-						} catch (Throwable t) {
-							throw Exceptions.show(t);
-						}
+					try {
+						argHandler.accept(ctx, value);
+					} catch (Throwable t) {
+						throw Exceptions.show(t);
 					}
 				}
 			}
@@ -537,14 +525,23 @@ public class Cli<B> {
 				if (opt.isRepeatable()) {
 					final RepeatableOption<B,Object> rptOpt = Reflection.cast(opt);
 					final FailableBiConsumer<Context<B>,List<Object>,?> argHandler = rptOpt.getArgHandler();
-					if (argHandler != null) {
-						ctx.setOptName(optName);
-						Functions.accept(argHandler, ctx, rptOpt.getValues());
-					}
+					ctx.setOptName(optName);
+					Functions.accept(argHandler, ctx, rptOpt.getValues());
 				}
 			}
 		}
 		return bean;
+	}
+
+	/** Validates the Cli itself.
+	 */
+	public void validate() {
+		for (Option<B,?> opt : optionsByName.values()) {
+			if (!opt.isImmutable()) {
+				// Validate this option.
+				opt.end();
+			}
+		}
 	}
 
 	/** Returns the handler for additional arguments (other than option references).

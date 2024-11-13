@@ -1,7 +1,8 @@
 package com.github.jochenw.afw.core.cli;
 
+import java.util.NoSuchElementException;
+
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
@@ -48,6 +49,10 @@ public abstract class Option<B,O> {
 			throw new IllegalStateException("The end() method has already been"
 					+ " invoked, and this object is no longer mutable,");
 		}
+	}
+
+	boolean isImmutable() {
+		return immutable;
 	}
 
 	/** Returns the {@link Cli}, that created this option.
@@ -205,6 +210,7 @@ public abstract class Option<B,O> {
 	 * @return The {@link Cli} object, that created this option
 	 * object.
 	 * @see #getCli()
+	 * @throws NoSuchElementException No argument handler has been specified on the option.
 	 * @throws IllegalStateException This method may be invoked only
 	 *   once, but this is the second invocation.
 	 */
@@ -212,6 +218,10 @@ public abstract class Option<B,O> {
 		if (immutable) {
 			throw new IllegalStateException("The end() method has already been invoked on this object.");
 		} else {
+			if (getArgHandler() == null) {
+				throw new NoSuchElementException("No argument handler has been specified for option "
+						+ getPrimaryName() + ", and any value would be discarded.");
+			}
 			immutable = true;
 		}
 		return cli;

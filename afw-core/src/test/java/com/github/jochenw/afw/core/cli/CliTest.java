@@ -7,7 +7,9 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -73,7 +75,7 @@ public class CliTest {
 	public void testDuplicateName() {
 		try {
 			Cli.of(new OptionsBean())
-				.pathOption("inputFile").end()
+				.pathOption("inputFile").property("inputFile").end()
 				.stringOption("inputFile");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
@@ -82,8 +84,8 @@ public class CliTest {
 
 		try {
 			Cli.of(new OptionsBean())
-				.pathOption("inputFile", "if").end()
-				.stringOption("outputFile").end()
+				.pathOption("inputFile", "if").property("inputFile").end()
+				.stringOption("outputFile").property("outputFile").end()
 				.stringOption("if");
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
@@ -92,7 +94,7 @@ public class CliTest {
 
 		try {
 			Cli.of(new OptionsBean())
-				.pathOption("inputFile").end()
+				.pathOption("inputFile").property("inputFile").end()
 				.stringOption("if", "inputFile").end();
 			fail("Expected Exception");
 		} catch (IllegalArgumentException e) {
@@ -142,6 +144,63 @@ public class CliTest {
 			assertTrue(options.verbose);
 	}
 
+	/** Test case for a boolean option without value.
+	 */
+	@Test
+	public void testBooleanOptionWithoutValue() {
+		final OptionsBean ob = new OptionsBean();
+		assertFalse(ob.verbose);
+		Cli.of(ob)
+		    .pathOption("i").property("inputFile").end()
+		    .boolOption("v").property("verbose").end()
+		    .parse("-i", "foo", "-v");
+		assertTrue(ob.verbose);
+	}
+
+	@Test
+	public void testBooleanOptionWithExplicitTrue() {
+		{
+			final OptionsBean ob = new OptionsBean();
+			assertFalse(ob.verbose);
+			Cli.of(ob)
+				.pathOption("i").property("inputFile").end()
+				.boolOption("v").property("verbose").end()
+				.parse("-i", "foo", "--v=true");
+			assertTrue(ob.verbose);
+		}
+		{
+			final OptionsBean ob = new OptionsBean();
+			assertFalse(ob.verbose);
+			Cli.of(ob)
+				.pathOption("i").property("inputFile").end()
+				.boolOption("v").property("verbose").end()
+				.parse("-i", "foo", "-v", "true");
+			assertTrue(ob.verbose);
+		}
+	}
+
+	@Test
+	public void testBooleanOptionWithExplicitFalse() {
+		{
+			final OptionsBean ob = new OptionsBean();
+			assertFalse(ob.verbose);
+			Cli.of(ob)
+				.pathOption("i").property("inputFile").end()
+				.boolOption("v").property("verbose").end()
+				.parse("-i", "foo", "--v=false");
+			assertFalse(ob.verbose);
+		}
+		{
+			final OptionsBean ob = new OptionsBean();
+			assertFalse(ob.verbose);
+			Cli.of(ob)
+				.pathOption("i").property("inputFile").end()
+				.boolOption("v").property("verbose").end()
+				.parse("-i", "foo", "-v", "false");
+			assertFalse(ob.verbose);
+		}
+	}
+
 	/** Test case for a bean validator.
 	 */
 	@Test
@@ -171,10 +230,12 @@ public class CliTest {
 	public void testUsageHandler() {
 		Functions.FailableFunction<@Nullable UsageException,@NonNull RuntimeException,?> usageHandler =
 				(ue) -> new IllegalStateException(ue == null ? null : ue.getMessage());
-		final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
-				.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
-				.stringOption("outputFile", "of").required().handler((c,s) -> c.getBean().outputFile = Paths.get(s)).end()
-				.usageHandler(usageHandler);
+		final Cli<OptionsBean> cli = Cli.of(new OptionsBean());
+		assertNull(cli.getUsageHandler());
+		cli.stringOption("inputFile", "if").required().handler((c,s) -> c.getBean().inputFile = Paths.get(s)).end()
+		   .stringOption("outputFile", "of").required().handler((c,s) -> c.getBean().outputFile = Paths.get(s)).end()
+		   .usageHandler(usageHandler);
+		assertSame(usageHandler, cli.getUsageHandler());
 		try {
 			cli.parse(new @NonNull String[]{ "-if=pom.xml", "-of=/var/lib/of.log", "-h"});
 		} catch (IllegalStateException e) {
@@ -221,6 +282,62 @@ public class CliTest {
 		// For command = "search"
 		private boolean all;
 		private List<String> keywords = new ArrayList<>();
+	}
+
+	/** Test case for an invalid option.
+	 */
+	@Test
+	public void testInvalidOption() {
+		try {
+			Cli.of(new OptionsBean())
+				.pathOption("inputFile").property("inputFile").end()
+				.pathOption("outputFile").property("outputFile").end()
+				.parse("-if", "foo", "whatever", "-outputFile", "bar");
+			fail("Expected Exception");
+		} catch (UsageException ue) {
+			assertFalse(Exceptions.hasCause(ue));
+			assertEquals("Invalid option name: if", ue.getMessage());
+		}
+	}
+
+	/**
+	 * Test case for {@link Cli#extraArgsHandler(Functions.FailableBiConsumer)}
+	 */
+	@Test
+	public void testExtraArgs() {
+		/** Test using an extra argument without a handler. This is supposed to
+		 * trigger a usage exception.
+		 */
+		try {
+			Cli.of(new OptionsBean())
+				.pathOption("inputFile").property("inputFile").end()
+				.pathOption("outputFile").property("outputFile").end()
+				.parse("-inputFile", "foo", "whatever", "-outputFile", "bar");
+			fail("Expected Exception");
+		} catch (UsageException ue) {
+			assertFalse(Exceptions.hasCause(ue));
+			assertEquals("Unexpected non-option argument: whatever", ue.getMessage());
+		}
+		final List<String> extraArgs = new ArrayList<>();
+		Cli<OptionsBean> cli = Cli.of(new OptionsBean());
+		final FailableBiConsumer<@NonNull Cli<OptionsBean>, @NonNull String, ?> handler =
+			(FailableBiConsumer<@NonNull Cli<OptionsBean>, @NonNull String, ?>) (c,s) -> {
+				assertNotNull(c);
+				assertSame(cli, c);
+				assertNotNull(s);
+				extraArgs.add(s);
+			};
+		assertNull(cli.getExtraArgsHandler());
+		cli.pathOption("inputFile").property("inputFile").end()
+			.pathOption("outputFile").property("outputFile").end()
+			.extraArgsHandler(handler)
+		    .parse("abc", "-inputFile", "foo", "whatever", "-outputFile", "bar", "xyz", "baz");
+		assertSame(handler, cli.getExtraArgsHandler());
+		assertEquals(4, extraArgs.size());
+		assertEquals("abc", extraArgs.get(0));
+		assertEquals("whatever", extraArgs.get(1));
+		assertEquals("xyz", extraArgs.get(2));
+		assertEquals("baz", extraArgs.get(3));
 	}
 
 	@Test
@@ -475,5 +592,107 @@ public class CliTest {
 		assertEquals(2, values.size());
 		assertEquals("foo", values.get(0));
 		assertEquals("bar", values.get(1));		
+	}
+
+	/** Tests using <pre>--optName=optValue</pre>.
+	 */
+	@Test
+	public void testInlineValues() {
+		{
+			final OptionsBean ob0 = new OptionsBean();
+			assertNull(ob0.inputFile);
+			Cli.of(ob0)
+				.pathOption("if").property("inputFile").end()
+				.parse("-if", "foo");
+			assertNotNull(ob0.inputFile);
+			assertEquals("foo", ob0.inputFile.toString());
+		}
+		{
+			final OptionsBean ob0 = new OptionsBean();
+			assertNull(ob0.inputFile);
+			Cli.of(ob0)
+				.pathOption("if").property("inputFile").end()
+				.parse("-if=foo");
+			assertNotNull(ob0.inputFile);
+			assertEquals("foo", ob0.inputFile.toString());
+		}
+	}
+
+	/** Test a missing option value.
+	 */
+	@Test
+	public void testMissingOptionValue() {
+		try {
+			final OptionsBean ob0 = new OptionsBean();
+			assertNull(ob0.inputFile);
+			Cli.of(ob0)
+				.pathOption("inputFile", "if").property("inputFile").end()
+				.parse("-if");
+			fail("Expected Exception");
+		} catch (UsageException ue) {
+			assertFalse(Exceptions.hasCause(ue));
+			assertEquals("Option requires an argument: if", ue.getMessage());
+		}
+	}
+
+	/** Test a missing argument handler.
+	 */
+	@Test
+	public void testMissingArgumentHandler() {
+		try {
+			final OptionsBean ob0 = new OptionsBean();
+			assertNull(ob0.inputFile);
+			Cli.of(ob0)
+				.pathOption("inputFile", "if").end()
+				.parse("-if");
+			fail("Expected Exception");
+		} catch (NoSuchElementException nsee) {
+			assertFalse(Exceptions.hasCause(nsee));
+			assertEquals("No argument handler has been specified for option inputFile, and any value would be discarded.",
+					     nsee.getMessage());
+		}
+	}
+	/** Test triggering the 'help' option.
+	 */
+	@Test
+	public void testHelpMessage() {
+		for (String optName : Arrays.asList("-help", "-h", "--help")) {
+			try {
+				Cli.of(new OptionsBean())
+					.pathOption("if").property("inputFile").end()
+					.parse("-if", "foo", optName);
+				fail("Expected Exception");
+			} catch (UsageException ue) {
+				assertFalse(Exceptions.hasCause(ue));
+				assertNull(ue.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Test for {@link Cli#validate()}
+	 */
+	@Test
+	public void testValidate() {
+		try {
+			final Cli<OptionsBean> cli = Cli.of(new OptionsBean())
+				.pathOption("if").property("inputFile").end();
+			cli.pathOption("of");
+			cli.parse("-if", "foo");
+			fail("Expected Exception");
+		} catch (NoSuchElementException nsee) {
+			assertFalse(Exceptions.hasCause(nsee));
+			assertEquals("No argument handler has been specified for option of,"
+					+ " and any value would be discarded.", nsee.getMessage());
+		}
+	}
+
+	/** Some things, that are basically nonsense, but we want to enforce being
+	 * covered.
+	 */
+	@Test
+	public void testCoverageNonsense() {
+		// Array of secondary names is null.
+		Cli.of(new OptionsBean()).stringOption("if", (@NonNull String[]) null);
 	}
 }
