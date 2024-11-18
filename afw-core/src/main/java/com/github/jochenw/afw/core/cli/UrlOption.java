@@ -24,24 +24,11 @@ public class UrlOption<B> extends Option<B,URL> {
 	}
 
 	@Override
-	public URL getValue(String pOptValue) throws UsageException {
-		if (pOptValue == null) {
-			final String defaultValue = getDefaultValue();
-			if (defaultValue == null) {
-				return null;
-			} else {
-				try {
-					return Strings.asUrl(defaultValue);
-				} catch (MalformedURLException mue) {
-					throw new UsageException("Invalid default value for option " + getPrimaryName() + "; Expected valid URL, got " + pOptValue);
-				}
-			}
-		} else {
-			try {
-				return Strings.asUrl(pOptValue);
-			} catch (MalformedURLException mue) {
-				throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected valid URL, got " + pOptValue);
-			}
+	public URL getValue(@NonNull String pOptValue) throws UsageException {
+		try {
+			return Strings.asUrl(pOptValue);
+		} catch (MalformedURLException mue) {
+			throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected valid URL, got " + pOptValue);
 		}
 	}
 }

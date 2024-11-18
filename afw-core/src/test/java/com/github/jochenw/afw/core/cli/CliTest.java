@@ -59,7 +59,9 @@ public class CliTest {
 			.pathOption("helperFile", "hf")
 			    .handler((c,p) -> c.getBean().helperFile = p).end()
 			.boolOption("verbose", "v")
-			    .handler((c,b) -> c.getBean().verbose = b.booleanValue()).end()
+			    .handler((c,b) -> {
+			    	c.getBean().verbose = b.booleanValue();
+			    }).end()
 			.parse(new @NonNull String[]{"--inputFile", "pom.xml", "-of", "target/test/output.xml", "-verbose"});
 		assertNotNull(options);
 		assertEquals(options.inputFile.toString(), "pom.xml");
@@ -157,6 +159,9 @@ public class CliTest {
 		assertTrue(ob.verbose);
 	}
 
+	/** Test of a boolean option with explicitly specified true as
+	 * the value.
+	 */
 	@Test
 	public void testBooleanOptionWithExplicitTrue() {
 		{
@@ -179,6 +184,9 @@ public class CliTest {
 		}
 	}
 
+	/** Test of a boolean option with explicitly specified false as
+	 * the value.
+	 */
 	@Test
 	public void testBooleanOptionWithExplicitFalse() {
 		{
@@ -618,7 +626,7 @@ public class CliTest {
 		}
 	}
 
-	/** Test a missing option value.
+	/** Test for a missing option value.
 	 */
 	@Test
 	public void testMissingOptionValue() {
@@ -633,6 +641,30 @@ public class CliTest {
 			assertFalse(Exceptions.hasCause(ue));
 			assertEquals("Option requires an argument: if", ue.getMessage());
 		}
+	}
+
+	/** Test for a default value of an option, that isn't used.
+	 */
+	@Test
+	public void testDefaultValueForUnusedOption() {
+		final OptionsBean ob0 = new OptionsBean();
+		assertNull(ob0.inputFile);
+		Cli.of(ob0)
+		    .pathOption("inputFile", "if").property("inputFile").defaultValue("pom.xml").end()
+			.parse();
+		assertEquals(Paths.get("pom.xml"), ob0.inputFile);
+	}
+
+	/** Test for a default value of an option, that is used.
+	 */
+	@Test
+	public void testDefaultValueForUsedOption() {
+		final OptionsBean ob0 = new OptionsBean();
+		assertNull(ob0.inputFile);
+		Cli.of(ob0)
+		    .pathOption("inputFile", "if").property("inputFile").defaultValue("pom.xml").end()
+			.parse("-if", "pam.xml");
+		assertEquals(Paths.get("pam.xml"), ob0.inputFile);
 	}
 
 	/** Test a missing argument handler.
@@ -694,5 +726,13 @@ public class CliTest {
 	public void testCoverageNonsense() {
 		// Array of secondary names is null.
 		Cli.of(new OptionsBean()).stringOption("if", (@NonNull String[]) null);
+		for (String fileName : Arrays.asList("pom.xml", "-pom.xml", "--pom.xml")) {
+			@SuppressWarnings("null")
+			final @NonNull String flName = fileName;
+			final OptionsBean ob = Cli.of(new OptionsBean()).pathOption("if").property("inputFile").end()
+					.boolOption("verbose").property("verbose").end()
+					.parse("-if", flName, "-verbose");
+			assertEquals(Paths.get(flName), ob.inputFile);
+		}
 	}
 }

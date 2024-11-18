@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.core.cli;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 
@@ -19,16 +20,16 @@ public class BooleanOption<B> extends Option<B,Boolean> {
 	}
 	public boolean isNullValueValid() { return true; }
 	@Override
-	public Boolean getValue(String pOptValue) throws UsageException {
-		if (pOptValue == null) {
-			final String defaultValue = getDefaultValue();
-			if (defaultValue == null) {
-				return Boolean.TRUE;
-			} else {
-				return Boolean.valueOf(defaultValue);
-			}
-		} else {
-			return Boolean.valueOf(pOptValue);
-		}
+	public Boolean getValue(@NonNull String pOptValue) throws UsageException {
+		return Boolean.valueOf(pOptValue);
+	}
+
+	/** Returns the options builtin default value, if any.
+	 * @return The options builtin default value, or null,
+	 *   if there is no builtin default value.
+	 */
+	@Override
+	public @Nullable String getBuiltinDefaultValue() {
+		return "true";
 	}
 }

@@ -25,36 +25,25 @@ public class EnumOption<B,E extends Enum<E>> extends Option<B,E> {
 	}
 
 	@Override
-	public E getValue(String pOptValue) throws UsageException {
-		final String valueStr;
-		if (pOptValue == null) {
-			final String defaultValue = getDefaultValue();
-			if (defaultValue == null) {
-				return Objects.fakeNonNull();
-			} else {
-				valueStr = defaultValue;
-			}
-		} else {
-			valueStr = pOptValue;
-		}
+	public E getValue(@NonNull String pOptValue) throws UsageException {
 		@SuppressWarnings("null")
 		final @NonNull Class<E> type = getType();
 		if (isCaseInsensitive()) {
 			final @NonNull E[] valuesArray = Objects.enumValues(type);
 			for (int i = 0;  i < valuesArray.length;  i++) {
 				final E e = valuesArray[i];
-				if (e.name().equalsIgnoreCase(valueStr)) {
+				if (e.name().equalsIgnoreCase(pOptValue)) {
 					return e;
 				}
 			}
 			throw new UsageException("Invalid value for option " + getPrimaryName() + ": Expected "
-					+ Objects.enumNamesAsString(type, "|") + " (case insensitive), got " + valueStr);
+					+ Objects.enumNamesAsString(type, "|") + " (case insensitive), got " + pOptValue);
 		} else {
 			try {
-				return Enum.valueOf(type, valueStr);
+				return Enum.valueOf(type, pOptValue);
 			} catch (IllegalArgumentException e) {
 				throw new UsageException("Invalid value for option " + getPrimaryName() + ": Expected "
-						+ Objects.enumNamesAsString(type, "|") + ", got " + valueStr);
+						+ Objects.enumNamesAsString(type, "|") + ", got " + pOptValue);
 			}
 		}
 	}

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
@@ -389,11 +390,35 @@ public class Cli<B> {
 				}
 				throw new UsageException("Invalid option name: " + optName);
 			} else {
-				if (optValue == null  &&  !option.isNullValueValid()) {
-					if (args.isEmpty()) {
+				if (optValue == null) {
+					if (!args.isEmpty()) {
+						@SuppressWarnings("null")
+						@NonNull String possibleOptValue = args.get(0);
+						if (possibleOptValue.startsWith("--")
+								||  possibleOptValue.startsWith("-")) {
+							// Looks more like an option name, than an option value.
+							if (!option.isNullValueValid()) {
+								// The option needs a value, so we ignore
+								// the possibility of an option name.
+								optValue = possibleOptValue;
+								args.remove(0);
+							// } else {
+								// A boolean option doesn't need an option value,
+								// so we accept this as an option name, without
+								// an option value.
+							}
+						} else {
+							optValue = possibleOptValue;
+							args.remove(0);
+						}
+					}
+					if (optValue == null) {
+						if (option.isNullValueValid()) {
+							optValue = option.getBuiltinDefaultValue();
+						}
+					}
+					if (optValue == null) {
 						throw new UsageException("Option requires an argument: " + optName);
-					} else {
-						optValue = (@NonNull String) args.remove(0);
 					}
 				}
 			}
@@ -498,39 +523,49 @@ public class Cli<B> {
 			}
 			throw ue;
 		}
+		// Handle default values.
+		forEachOptionByPrimaryName((optName, opt) -> {
+			final Integer usageCount = usage.get(optName);
+			if (usageCount == null  ||  usageCount.intValue() == 0) {
+				if (opt.getDefaultValue() != null  &&  !opt.isNullValueValid()) {
+					final OptRef<B,?> optRef = new OptRef<>(optName, opt, opt.getDefaultValue());
+					optConsumer.accept(optRef);
+				}
+			}
+		});
+		// Handle required options.
+		forEachOptionByPrimaryName((optName, opt) -> {
+			if (opt.isRequired()) {
+				final Integer usageCount = usage.get(optName);
+				if (usageCount == null  ||  usageCount.intValue() == 0) {
+					throw ctx.usage("Required option missing: " + optName);
+				}
+			}
+			if (opt.isRepeatable()) {
+				final RepeatableOption<B,Object> rptOpt = Reflection.cast(opt);
+				final FailableBiConsumer<Context<B>,List<Object>,?> argHandler = rptOpt.getArgHandler();
+				ctx.setOptName(optName);
+				Functions.accept(argHandler, ctx, rptOpt.getValues());
+			}
+		});
+		return bean;
+	}
+
+	/** Called to iterate over the options by primary name, ignoring secondary
+	 * names.
+	 * @param pConsumer A consumer, which is being invoked for every option
+	 *   exactly once, passing the options primary name, and the option itself.
+	 */
+	protected void forEachOptionByPrimaryName(BiConsumer<@NonNull String,Option<B,?>> pConsumer) {
 		for (Map.Entry<@NonNull String, Option<B,?>> en : optionsByName.entrySet()) {
 			@SuppressWarnings("null")
 			final @NonNull String optName = en.getKey();
 			@SuppressWarnings("unchecked")
 			final @NonNull Option<B,Object> opt = (@NonNull Option<B,Object>) en.getValue();
 			if (optName.equals(opt.getPrimaryName())) {
-				if (opt.isRequired()) {
-					final Integer usageCount = usage.get(optName);
-					if (usageCount == null  ||  usageCount.intValue() == 0) {
-						final Object value = opt.getValue(null);
-						if (value != null) {
-							ctx.setOptName(opt.getPrimaryName());
-							final FailableBiConsumer<Context<B>,Object,?> argHandler = opt.getArgHandler();
-							if (argHandler != null) {
-								try {
-									argHandler.accept(ctx, value);
-								} catch (Throwable t) {
-									throw Exceptions.show(t);
-								}
-							}
-						}
-						throw ctx.usage("Required option missing: " + optName);
-					}
-				}
-				if (opt.isRepeatable()) {
-					final RepeatableOption<B,Object> rptOpt = Reflection.cast(opt);
-					final FailableBiConsumer<Context<B>,List<Object>,?> argHandler = rptOpt.getArgHandler();
-					ctx.setOptName(optName);
-					Functions.accept(argHandler, ctx, rptOpt.getValues());
-				}
+				pConsumer.accept(optName, opt);
 			}
 		}
-		return bean;
 	}
 
 	/** Validates the Cli itself.

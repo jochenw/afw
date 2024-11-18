@@ -25,18 +25,8 @@ public class PathOption<B> extends Option<B,Path> {
 	}
 
 	@Override
-	public Path getValue(String pOptValue) throws UsageException {
-		final Path p;
-		if (pOptValue == null) {
-			final String defaultValue = getDefaultValue();
-			if (defaultValue == null) {
-				return null;
-			} else {
-				p = Paths.get(defaultValue);
-			}
-		} else {
-			p = Paths.get(pOptValue);
-		}
+	public Path getValue(@NonNull String pOptValue) throws UsageException {
+		final Path p = Paths.get(pOptValue);
 		if (isDirRequired()  &&  !Files.isDirectory(p)) {
 			throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected existing directory, got " + p);
 		}

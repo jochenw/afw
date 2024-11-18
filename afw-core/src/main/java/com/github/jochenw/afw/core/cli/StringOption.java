@@ -19,10 +19,7 @@ public class StringOption<B> extends Option<B,String> {
 	}
 
 	@Override
-	public String getValue(String pOptValue) throws UsageException {
-		if (pOptValue == null) {
-			return getDefaultValue();
-		}
+	public String getValue(@NonNull String pOptValue) throws UsageException {
 		return pOptValue;
 	}
 }

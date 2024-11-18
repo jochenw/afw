@@ -20,24 +20,11 @@ public class IntOption<B> extends Option<B,Integer> {
 	}
 
 	@Override
-	public Integer getValue(String pOptValue) throws UsageException {
-		if (pOptValue == null) {
-			final String defaultValue = getDefaultValue();
-			if (defaultValue == null) {
-				return null;
-			} else {
-				try {
-					return Integer.valueOf(pOptValue);
-				} catch (NumberFormatException nfe) {
-					throw new UsageException("Invalid default value for option " + getPrimaryName() + "; Expected integer number, got " + pOptValue);
-				}
-			}
-		} else {
-			try {
-				return Integer.valueOf(pOptValue);
-			} catch (NumberFormatException nfe) {
-				throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected integer number, got " + pOptValue);
-			}
+	public Integer getValue(@NonNull String pOptValue) throws UsageException {
+		try {
+			return Integer.valueOf(pOptValue);
+		} catch (NumberFormatException nfe) {
+			throw new UsageException("Invalid value for option " + getPrimaryName() + "; Expected integer number, got " + pOptValue);
 		}
 	}
 }

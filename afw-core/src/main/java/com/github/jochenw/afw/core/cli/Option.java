@@ -3,6 +3,7 @@ package com.github.jochenw.afw.core.cli;
 import java.util.NoSuchElementException;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
@@ -88,7 +89,7 @@ public abstract class Option<B,O> {
 	 * @throws UsageException The value string is invalid,
 	 *   and cannot be converted.
 	 */
-	public abstract O getValue(String pOptValue) throws UsageException;
+	public abstract O getValue(@NonNull String pOptValue) throws UsageException;
 
 	/** Returns the options argument handler. The argument handler will be
 	 * invoked, as soon as the actual option value is available.
@@ -225,5 +226,13 @@ public abstract class Option<B,O> {
 			immutable = true;
 		}
 		return cli;
+	}
+
+	/** Returns the options builtin default value, if any.
+	 * @return The options builtin default value, or null,
+	 *   if there is no builtin default value.
+	 */
+	public @Nullable String getBuiltinDefaultValue() {
+		return null;
 	}
 }

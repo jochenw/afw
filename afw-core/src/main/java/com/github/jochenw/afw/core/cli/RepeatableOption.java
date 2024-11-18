@@ -36,7 +36,7 @@ public class RepeatableOption<B,E> extends Option<B,List<E>> {
 	}
 
 	@Override
-	public List<E> getValue(String optValue) throws UsageException {
+	public List<E> getValue(@NonNull String optValue) throws UsageException {
 		throw new NotImplementedException();
 	}
 
