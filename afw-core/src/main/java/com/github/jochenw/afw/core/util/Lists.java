@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -275,5 +276,81 @@ public class Lists {
 			}
 			return list;
 		}
+	}
+
+	/** Converts the given array of values into an {@link Iterable}.
+	 * @param <O> The element type of the input array, and of the
+	 * created {@link Iterable}.
+	 * @param pValues The elements, over which the created
+	 *   {@link Iterable} should iterate.
+	 * @return The created {@link Iterable}.
+	 */
+	public static <O> Iterable<O> iter(@SuppressWarnings("unchecked") O... pValues) {
+		return iter((o) -> o, pValues);
+	}
+
+	/** Converts the given array of values into an {@link Iterable}.
+	 * @param <O> The element type of the input array.
+	 * @param <E> The element type of the created {@link Iterable}.
+	 * @param pMapper A mapping function, which converts the
+	 *   array elements into the elements of the created
+	 *   {@link Iterable}. The mapping function will be invoked
+	 *   for every element of the input array.
+	 * @param pValues The input elements. The mapping function will
+	 *   be invoked for every element.
+	 * @return The created {@link Iterable}.
+	 */
+	public static <O,E> Iterable<E> iter(Function<O,E> pMapper, @SuppressWarnings("unchecked") O... pValues) {
+		final O[] values = Objects.requireNonNull(pValues, "Values");
+		return new Iterable<E>() {
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+					int i;
+
+					@Override
+					public boolean hasNext() {
+						return values.length > i;
+					}
+
+					@Override
+					public E next() {
+						return pMapper.apply(values[i++]);
+					}
+				};
+			}
+		};
+	}
+
+	/** Converts the given set of values into an {@link Iterable}.
+	 * @param <O> The element type of the set of input values.
+	 * @param <E> The element type of the created {@link Iterable}.
+	 * @param pMapper A mapping function, which converts the
+	 *   input elements into the elements of the created
+	 *   {@link Iterable}. The mapping function will be invoked
+	 *   for every element of the input array.
+	 * @param pValues The input elements. The mapping function will
+	 *   be invoked for every element.
+	 * @return The created {@link Iterable}.
+	 */
+	public static <O,E> Iterable<E> iter(Function<O,E> pMapper, Iterable<O> pValues) {
+		final Iterable<O> values = Objects.requireNonNull(pValues, "Values");
+		return new Iterable<E>() {
+			final Iterator<O> itertr = values.iterator();
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+					@Override
+					public boolean hasNext() {
+						return itertr.hasNext();
+					}
+
+					@Override
+					public E next() {
+						return pMapper.apply(itertr.next());
+					}
+				};
+			}
+		};
 	}
 }

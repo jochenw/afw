@@ -119,4 +119,6 @@ public class MutableBoolean implements Serializable, Comparable<MutableBoolean> 
 		}
 	}
 
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

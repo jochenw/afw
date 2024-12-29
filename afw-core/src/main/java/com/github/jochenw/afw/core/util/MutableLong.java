@@ -136,4 +136,8 @@ public class MutableLong extends Number implements Comparable<MutableLong> {
     	setValue(v);
     	return v;
 	}
+
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

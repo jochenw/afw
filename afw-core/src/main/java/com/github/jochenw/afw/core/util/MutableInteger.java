@@ -103,4 +103,7 @@ public class MutableInteger extends Number implements Comparable<MutableInteger>
     	setValue(value-1);
     	return value;
     }
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

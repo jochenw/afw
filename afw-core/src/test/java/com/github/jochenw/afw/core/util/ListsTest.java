@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
@@ -272,5 +274,52 @@ public class ListsTest {
 		assertEquals(2, list.size());
 		assertEquals("foo", list.get(0));
 		assertEquals("bar", list.get(1));
+	}
+
+	/** Test case for {@link Lists#iter(Object...)}.
+	 */
+	@Test
+	public void testIterObjects() {
+		final String[] expected = {"foo", "bar", "baz"};
+		final List<String> list = new ArrayList<>();
+		for (String s : Lists.iter(expected)) {
+			list.add(s);
+		}
+		assertArrayEquals(expected, list.toArray());
+	}
+
+	/** Test case for {@link Lists#iter(Function, Object...)}.
+	 */
+	@Test
+	public void testIterFunctionObjects() {
+		final Integer[] expectedInts = new Integer[] {Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3)};
+		final String[] expectedStrings = Stream.of(expectedInts).map((i) -> i.toString()).collect(Collectors.toList()).toArray(new String[0]);
+		final List<Integer> list = new ArrayList<>();
+		for (Integer i : Lists.iter(Integer::parseInt, expectedStrings)) {
+			list.add(i);
+		}
+		assertArrayEquals(expectedInts, list.toArray());
+	}
+
+	/** Test case for {@link Lists#iter(Function, Iterable)}.
+	 */
+	@Test
+	public void testIterFunctionIterable() {
+		final List<Integer> expectedInts = Lists.asList(Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3));
+		final List<String> expectedStrings = expectedInts.stream().map((i) -> i.toString()).collect(Collectors.toList());
+		final List<Integer> list = new ArrayList<>();
+		for (Integer i : Lists.iter(Integer::parseInt, expectedStrings)) {
+			list.add(i);
+		}
+		assertArrayEquals(expectedInts.toArray(), list.toArray());
+	}
+
+	/** Not a real test case, just coverage completion.
+	 */
+	@Test
+	public void testAsList() {
+		final List<String> list = Lists.asList((String[]) null);
+		assertNotNull(list);
+		assertTrue(list.isEmpty());
 	}
 }
