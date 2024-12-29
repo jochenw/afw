@@ -285,6 +285,7 @@ public class ListsTest {
 		for (String s : Lists.iter(expected)) {
 			list.add(s);
 		}
+		Functions.assertFail(NullPointerException.class, "Values", () -> Lists.iter((String[]) null));
 		assertArrayEquals(expected, list.toArray());
 	}
 
@@ -295,9 +296,12 @@ public class ListsTest {
 		final Integer[] expectedInts = new Integer[] {Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3)};
 		final String[] expectedStrings = Stream.of(expectedInts).map((i) -> i.toString()).collect(Collectors.toList()).toArray(new String[0]);
 		final List<Integer> list = new ArrayList<>();
-		for (Integer i : Lists.iter(Integer::parseInt, expectedStrings)) {
+		final Function<String, Integer> mapper = Integer::parseInt;
+		for (Integer i : Lists.iter(mapper, expectedStrings)) {
 			list.add(i);
 		}
+		Functions.assertFail(NullPointerException.class, "Mapper", () -> Lists.iter(null, expectedStrings));
+		Functions.assertFail(NullPointerException.class, "Values", () -> Lists.iter(mapper, (String[]) null));
 		assertArrayEquals(expectedInts, list.toArray());
 	}
 
@@ -308,9 +312,12 @@ public class ListsTest {
 		final List<Integer> expectedInts = Lists.asList(Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3));
 		final List<String> expectedStrings = expectedInts.stream().map((i) -> i.toString()).collect(Collectors.toList());
 		final List<Integer> list = new ArrayList<>();
-		for (Integer i : Lists.iter(Integer::parseInt, expectedStrings)) {
+		final Function<String, Integer> mapper = Integer::parseInt;
+		for (Integer i : Lists.iter(mapper, expectedStrings)) {
 			list.add(i);
 		}
+		Functions.assertFail(NullPointerException.class, "Mapper", () -> Lists.iter(null, expectedStrings));
+		Functions.assertFail(NullPointerException.class, "Values", () -> Lists.iter(mapper, (String[]) null));
 		assertArrayEquals(expectedInts.toArray(), list.toArray());
 	}
 
@@ -322,4 +329,47 @@ public class ListsTest {
 		assertNotNull(list);
 		assertTrue(list.isEmpty());
 	}
+
+	/** Test case for {@link Lists#forEach(Consumer,Object[])}.
+	 */
+	@Test
+	public void testForEachConsumerObjects() {
+		final String[] expected = {"foo", "bar", "baz"};
+		final List<String> list = new ArrayList<>();
+		Lists.forEach(list::add, expected);
+		Functions.assertFail(NullPointerException.class, "Action", () -> Lists.forEach(null, expected));
+		Functions.assertFail(NullPointerException.class, "Values", () -> Lists.forEach(list::add, (String[]) null));
+		assertArrayEquals(expected, list.toArray());
+	}
+
+	/** Test case for {@link Lists#forEach(Function, Consumer, Object...)}.
+	 */
+	@Test
+	public void testForEachFunctionConsumerObjects() {
+		final Integer[] expectedInts = new Integer[] {Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3)};
+		final List<Integer> list = new ArrayList<>();
+		final Function<Integer,String> mapper = (i) -> i.toString();
+		final Consumer<String> action = (s) -> list.add(Integer.valueOf(s));
+		Lists.forEach(mapper, action, expectedInts);
+		Functions.assertFail(NullPointerException.class, "Mapper", () -> Lists.forEach(null, action, expectedInts));
+		Functions.assertFail(NullPointerException.class, "Action", () -> Lists.forEach(mapper, null, expectedInts));
+		Functions.assertFail(NullPointerException.class, "Values", () -> Lists.forEach(mapper, action, (Integer[]) null));
+		assertArrayEquals(expectedInts, list.toArray());
+	}
+
+	/** Test case for {@link Lists#iter(Function, Iterable)}.
+	 */
+	@Test
+	public void testForEachFunctionConsumerIterable() {
+		final List<Integer> expectedInts = Arrays.asList(Integer.valueOf(2), Integer.valueOf(4), Integer.valueOf(3));
+		final List<Integer> list = new ArrayList<>();
+		final Function<Integer, String> mapper = (i) -> i.toString();
+		final Consumer<String> action = (s) -> list.add(Integer.valueOf(s));
+		Functions.assertFail(NullPointerException.class, "Mapper", () -> Lists.forEach(null, action, expectedInts));
+		Functions.assertFail(NullPointerException.class, "Action", () -> Lists.forEach(mapper, null, expectedInts));
+		Functions.assertFail(NullPointerException.class, "Values", () -> Lists.forEach(mapper, action, (Integer[]) null));
+		Lists.forEach(mapper, action, expectedInts);
+		assertArrayEquals(expectedInts.toArray(), list.toArray());
+	}
+
 }

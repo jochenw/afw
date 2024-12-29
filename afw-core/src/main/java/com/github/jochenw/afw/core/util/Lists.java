@@ -301,6 +301,7 @@ public class Lists {
 	 * @return The created {@link Iterable}.
 	 */
 	public static <O,E> Iterable<E> iter(Function<O,E> pMapper, @SuppressWarnings("unchecked") O... pValues) {
+		final Function<O,E> mapper = Objects.requireNonNull(pMapper, "Mapper");
 		final O[] values = Objects.requireNonNull(pValues, "Values");
 		return new Iterable<E>() {
 			@Override
@@ -315,7 +316,7 @@ public class Lists {
 
 					@Override
 					public E next() {
-						return pMapper.apply(values[i++]);
+						return mapper.apply(values[i++]);
 					}
 				};
 			}
@@ -334,6 +335,7 @@ public class Lists {
 	 * @return The created {@link Iterable}.
 	 */
 	public static <O,E> Iterable<E> iter(Function<O,E> pMapper, Iterable<O> pValues) {
+		final Function<O,E> mapper = Objects.requireNonNull(pMapper, "Mapper");
 		final Iterable<O> values = Objects.requireNonNull(pValues, "Values");
 		return new Iterable<E>() {
 			final Iterator<O> itertr = values.iterator();
@@ -347,10 +349,84 @@ public class Lists {
 
 					@Override
 					public E next() {
-						return pMapper.apply(itertr.next());
+						return mapper.apply(itertr.next());
 					}
 				};
 			}
 		};
 	}
+
+	/** For each of the given items: Applies the given mapping
+	 * function, and invokes the given action with the mapped
+	 * item (the mapping functions result).
+	 * @param pMapper The mapping function, which will be invoked
+	 *   for every one of the given input values. The mapping
+	 *   functions result will be used to invoke the action.
+	 * @param pAction The action, which will be invoked for each
+	 *   of the mapped values.
+	 * @param pValues The input values. Each of these values will
+	 *   be used to invoke the mapping function, and the mapping
+	 *   functions result will be used to invoke the action.
+	 * @param <O> Type of the input values.
+	 * @param <E> Type of the mapping functions result. Also type
+	 *   of the actions parameter.
+	 * @throws NullPointerException Either of the parameters is null.
+	 */
+	public static <O,E> void forEach(Function<O,E> pMapper, Consumer<E> pAction,
+			                         @SuppressWarnings("unchecked") O... pValues) {
+		final Function<O,E> mapper = Objects.requireNonNull(pMapper, "Mapper");
+		final Consumer<E> action = Objects.requireNonNull(pAction, "Action");
+		final O[] values = Objects.requireNonNull(pValues, "Values");
+		for (int i = 0;  i < values.length;  i++) {
+			action.accept(mapper.apply(values[i]));
+		}
+	}
+
+	/** For each of the given items: Invokes the given action with the
+	 * item. In other words, this is equivalent to invoking
+	 * {@link #forEach(Function, Consumer, Object[])} with an
+	 * identity mapping function.
+	 * @param pAction The action, which will be invoked for each
+	 *   of the mapped values.
+	 * @param pValues The input values. Each of these values will
+	 *   be used to invoke the mapping function, and the mapping
+	 *   functions result will be used to invoke the action.
+	 * @param <O> Type of the input values.
+	 * @throws NullPointerException Either of the parameters is null.
+	 */
+	public static <O> void forEach(Consumer<O> pAction,
+			                       @SuppressWarnings("unchecked") O... pValues) {
+		final Consumer<O> action = Objects.requireNonNull(pAction, "Action");
+		final O[] values = Objects.requireNonNull(pValues, "Values");
+		for (int i = 0;  i < values.length;  i++) {
+			action.accept(values[i]);
+		}
+	}
+
+	/** For each of the given items: Applies the given mapping
+	 * function, and invokes the given action with the mapped
+	 * item (the mapping functions result).
+	 * @param pMapper The mapping function, which will be invoked
+	 *   for every one of the given input values. The mapping
+	 *   functions result will be used to invoke the action.
+	 * @param pAction The action, which will be invoked for each
+	 *   of the mapped values.
+	 * @param pValues The input values. Each of these values will
+	 *   be used to invoke the mapping function, and the mapping
+	 *   functions result will be used to invoke the action.
+	 * @param <O> Type of the input values.
+	 * @param <E> Type of the mapping functions result. Also type
+	 *   of the actions parameter.
+	 * @throws NullPointerException Either of the parameters is null.
+	 */
+	public static <O,E> void forEach(Function<O,E> pMapper, Consumer<E> pAction,
+			                         Iterable<O> pValues) {
+		final Function<O,E> mapper = Objects.requireNonNull(pMapper, "Mapper");
+		final Consumer<E> action = Objects.requireNonNull(pAction, "Action");
+		final Iterable<O> values = Objects.requireAllNonNull(pValues, "Values");
+		for (O o : values) {
+			action.accept(mapper.apply(o));
+		}
+	}
+
 }
