@@ -534,6 +534,7 @@ public class ObjectStreams {
 		 * @return A new stream, which extends the
 		 * current stream by adding the requested
 		 * transformation.
+		 * @param <R> The created streams output type.
 		 */
 		public <R> PStream<I,R> map(Function<O,R> pMapper) {
 			final  PLink<O,R> link = new PLink<O,R>(){
@@ -565,6 +566,7 @@ public class ObjectStreams {
 		 * @return A new stream, which extends the
 		 * current stream by adding the requested
 		 * transformation.
+		 * @param <R> The created streams output type.
 		 */
 		public <R> PStream<I,R> map(@NonNull FailableFunction<O,R,?> pMapper) {
 			@SuppressWarnings("null")
@@ -670,6 +672,11 @@ public class ObjectStreams {
 	 *   than the input type.
 	 */
 	public abstract static class PLink<I,O> implements Consumer<I> {
+		/** Explicit constructor, to avoid warnings with JDK 21+.
+		 */
+		PLink() {
+		}
+
 		/** The next link in the streams chain. The method {@link #pushUp(Object)}
 		 * uses this to invoke {@link #accept(Object)} on the next link.
 		 */
