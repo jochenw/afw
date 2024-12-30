@@ -29,8 +29,9 @@ pipeline {
         }
 		stage ('collect profiler data') {
 		    steps {
-                step( [ $class: 'JacocoPublisher' ] )
-			}
+		        recordCoverage(tools: [[parser: 'JACOCO']],
+		                       sourceCodeRetention: 'MODIFIED',
+		                       sourceDirectories: [[glob: '**/src/main/java']])
 		}
     }
 }
