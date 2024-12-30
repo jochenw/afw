@@ -24,8 +24,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import com.github.jochenw.afw.core.cli.Cli.UsageException;
-
 
 /**
  * Utility class for working with Exceptions. Provides static utility methods.
@@ -44,17 +42,16 @@ public class Exceptions {
      * @param pTh The throwable being rethrown.
      * @return Nothing, this method will <em>always</em> throw an exception.
      */
-    public static RuntimeException show(Throwable pTh) {
-        if (pTh == null) {
-            throw new NullPointerException("The Throwable must not be null.");
-        } else if (pTh instanceof RuntimeException) {
-            throw (RuntimeException) pTh;
-        } else if (pTh instanceof Error) {
-            throw (Error) pTh;
-        } else if (pTh instanceof IOException) {
-            throw newUncheckedIOException((IOException) pTh);
+    public static RuntimeException show(@NonNull Throwable pTh) {
+    	final @NonNull Throwable th = Objects.requireNonNull(pTh, "The Throwable must not be null.");
+        if (th instanceof RuntimeException) {
+            throw (RuntimeException) th;
+        } else if (th instanceof Error) {
+            throw (Error) th;
+        } else if (th instanceof IOException) {
+            throw newUncheckedIOException((IOException) th);
         } else {
-            throw newUncheckedException(pTh);
+            throw newUncheckedException(th);
         }
     }
 
@@ -71,20 +68,20 @@ public class Exceptions {
      * @param <T> Type of an exception, which may be thrown without affecting the calling methods
      *   signature.
      */
-    public static <T extends Throwable> RuntimeException show(Throwable pTh, Class<T> pClass) throws T {
-        if (pTh == null) {
-            throw new NullPointerException("The Throwable must not be null.");
-        } else if (pClass.isAssignableFrom(pTh.getClass())) {
-            final T th = pClass.cast(pTh);
-			throw Objects.requireNonNull(th);
-        } else if (pTh instanceof RuntimeException) {
-            throw (RuntimeException) pTh;
-        } else if (pTh instanceof Error) {
-            throw (Error) pTh;
-        } else if (pTh instanceof IOException) {
-            throw newUncheckedIOException((IOException) pTh);
+    public static <T extends Throwable> RuntimeException show(@NonNull Throwable pTh, @NonNull Class<T> pClass)
+    		throws T {
+    	final @NonNull Throwable th = Objects.requireNonNull(pTh, "The Throwable must not be null.");
+        if (pClass.isAssignableFrom(th.getClass())) {
+            final T thr = pClass.cast(th);
+			throw Objects.requireNonNull(thr);
+        } else if (th instanceof RuntimeException) {
+            throw (RuntimeException) th;
+        } else if (th instanceof Error) {
+            throw (Error) th;
+        } else if (th instanceof IOException) {
+            throw newUncheckedIOException((IOException) th);
         } else {
-            throw newUncheckedException(pTh);
+            throw newUncheckedException(th);
         }
     }
 
@@ -93,26 +90,35 @@ public class Exceptions {
      * suitable subclass, which can be thrown safely, without affecting the calling
      * methods signature.
      * @param pPrefix A prefix for the thrown exceptions message.
-     * @param pTh The throwable being rethrown.
+     * @param pTh The throwable, which is being rethrown.
      * @return Nothing, this method will <em>always</em> throw an exception.
      */
-	public static RuntimeException show(String pPrefix, Throwable pTh) {
-		throw new UndeclaredThrowableException(pTh, pPrefix + pTh.getMessage());
+	public static RuntimeException show(String pPrefix, @NonNull Throwable pTh) {
+    	final @NonNull Throwable th = Objects.requireNonNull(pTh, "Throwable");
+    	final String msg;
+    	if (pPrefix == null) {
+    		msg = th.getMessage();
+    	} else {
+    		msg = pPrefix + th.getMessage();
+    	}
+		throw new UndeclaredThrowableException(th, msg);
 	}
 
     /** Converts the given {@link IOException} into a {@link RuntimeException}.
      * @param pExc The {@link IOException} being rethrown.
-     * @return Nothing, this method will <em>always</em> throw an exception.
+     * @return The {@link UncheckedIOException}, which is wrapping the given
+     *   {@link IOException}. Never null.
      */
-    public static RuntimeException newUncheckedIOException(IOException pExc) {
+    public static RuntimeException newUncheckedIOException(@NonNull IOException pExc) {
         return new UncheckedIOException(pExc);
     }
 
     /** Converts the given {@link Exception} into a {@link RuntimeException}.
      * @param pTh The {@link IOException} being rethrown.
-     * @return Nothing, this method will <em>always</em> throw an exception.
+     * @return The {@link RuntimeException}, which is wrapping the given
+     *   {@link Throwable}. Never null.
      */
-    public static RuntimeException newUncheckedException(Throwable pTh) {
+    public static RuntimeException newUncheckedException(@NonNull Throwable pTh) {
         return new UndeclaredThrowableException(pTh);
     }
 
@@ -134,23 +140,24 @@ public class Exceptions {
      * @param <T2> Type of another exception, which may be thrown without affecting the calling methods
      *   signature.
      */
-    public static <T1 extends Throwable, T2 extends Throwable> RuntimeException show(Throwable pTh, Class<T1> pClass1, Class<T2> pClass2) throws T1, T2 {
-        if (pTh == null) {
-            throw new NullPointerException("The Throwable must not be null.");
-        } else if (pClass1.isAssignableFrom(pTh.getClass())) {
+    public static <T1 extends Throwable, T2 extends Throwable> RuntimeException show(@NonNull Throwable pTh, @NonNull Class<T1> pClass1, @NonNull Class<T2> pClass2) throws T1, T2 {
+    	final Throwable th = Objects.requireNonNull(pTh, "The Throwable must not be null.");
+    	final Class<T1> class1 = Objects.requireNonNull(pClass1, "Class1");
+    	final Class<T2> class2 = Objects.requireNonNull(pClass2, "Class2");
+        if (class1.isAssignableFrom(th.getClass())) {
             @SuppressWarnings("null")
-			final @NonNull T1 th1 = pClass1.cast(pTh);
+			final @NonNull T1 th1 = class1.cast(th);
 			throw th1;
-        } else if (pClass2.isAssignableFrom(pTh.getClass())) {
+        } else if (class2.isAssignableFrom(th.getClass())) {
             @SuppressWarnings("null")
-			final @NonNull T2 th2 = pClass2.cast(pTh);
+			final @NonNull T2 th2 = pClass2.cast(th);
 			throw th2;
-        } else if (pTh instanceof RuntimeException) {
-            throw (RuntimeException) pTh;
-        } else if (pTh instanceof Error) {
-            throw (Error) pTh;
-        } else if (pTh instanceof IOException) {
-            throw newUncheckedIOException((IOException) pTh);
+        } else if (th instanceof RuntimeException) {
+            throw (RuntimeException) th;
+        } else if (th instanceof Error) {
+            throw (Error) th;
+        } else if (th instanceof IOException) {
+            throw newUncheckedIOException((IOException) th);
         } else {
             throw newUncheckedException(pTh);
         }
@@ -160,10 +167,11 @@ public class Exceptions {
      * @param pTh The {@link Throwable} to convert into a stack trace.
      * @return The given throwables stack trace.
      */
-    public static String toString(Throwable pTh) {
+    public static String toString(@NonNull Throwable pTh) {
+    	final @NonNull Throwable th = Objects.requireNonNull(pTh, "Throwable");
     	final StringWriter sw = new StringWriter();
     	final PrintWriter pw = new PrintWriter(sw);
-    	pTh.printStackTrace(pw);
+    	th.printStackTrace(pw);
     	pw.close();
     	return sw.toString();
     }
