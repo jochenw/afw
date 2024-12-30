@@ -35,10 +35,11 @@ pipeline {
 		       exclusionPattern: '**/com/github/jochenw/afw/core/el/jcc/*.class')
 	    }
 	}
-	stage ('Collect JavaDocs') {
-	    steps {
-		javadoc(javadocDir: './afw-core/target/site/apidocs',
-			keepAll: false)
+	stage ('collect profiler data') {
+            steps {
+	        recordCoverage(tools: [[parser: 'JACOCO']],
+		               sourceCodeRetention: 'MODIFIED',
+		               sourceDirectories: [[glob: '**/src/main/java']])
 	    }
 	}
     }

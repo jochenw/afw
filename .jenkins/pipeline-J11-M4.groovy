@@ -27,10 +27,12 @@ pipeline {
                 }
             }
         }
-		stage ('collect profiler data') {
-		    steps {
-                step( [ $class: 'JacocoPublisher' ] )
-			}
-		}
+	stage ('collect profiler data') {
+            steps {
+	        recordCoverage(tools: [[parser: 'JACOCO']],
+		               sourceCodeRetention: 'MODIFIED',
+		               sourceDirectories: [[glob: '**/src/main/java']])
+	    }
+	}
     }
 }
