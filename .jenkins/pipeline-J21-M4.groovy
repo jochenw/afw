@@ -32,6 +32,7 @@ pipeline {
 		        recordCoverage(tools: [[parser: 'JACOCO']],
 		                       sourceCodeRetention: 'MODIFIED',
 		                       sourceDirectories: [[glob: '**/src/main/java']])
+		   }
 		}
     }
 }
