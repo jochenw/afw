@@ -1079,6 +1079,26 @@ public class Functions {
 	}
 
 	/** Asserts, that a {@link FailableRunnable} throws an expected Exception.
+	 * @param pError The expected error
+	 * @param pRunnable The piece of code, that is being executed.
+	 * @throws IllegalStateException The {@code pRunnable} was executed
+	 *   without errors, or the error message was unexpected.
+	 * @throws RuntimeException An unexpected error occurred, while executing the
+	 *   {@code pRunnable}, and is being rethrown.
+	 */
+	public static <T extends Throwable> void assertFail(T pError,
+			                                            FailableRunnable<?> pRunnable) {
+		try {
+			pRunnable.run();
+			throw new IllegalStateException("Expected Exception was not thrown.");
+		} catch (Throwable th) {
+			if (pError != th) {
+				throw Exceptions.show(th);
+			}
+		}
+	}
+
+	/** Asserts, that a {@link FailableRunnable} throws an expected Exception.
 	 * @param pErrorType Type of the expected Exception.
 	 * @param <T> Type of the expected Exception.
 	 * @param pErrorValidator A function, which validates the error, and the

@@ -24,6 +24,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import com.github.jochenw.afw.core.function.Functions;
+
 
 /** Test for {@link Exceptions}.
  */
@@ -135,33 +137,11 @@ public class ExceptionsTest {
             Assert.assertFalse(e == npe);
         }
 
-        try {
-            Exceptions.show(npe, IOException.class, SAXException.class);
-            Assert.fail("Expected NPE");
-        } catch (NullPointerException e) {
-            Assert.assertSame(npe, e);
-        }
+        Functions.assertFail(npe, () -> Exceptions.show(npe, IOException.class, SAXException.class));
         OutOfMemoryError oome = new OutOfMemoryError();
-        try {
-            Exceptions.show(oome, IOException.class, SAXException.class);
-            Assert.fail("Expected OutOfMemoryError");
-        } catch (OutOfMemoryError e) {
-            Assert.assertSame(oome, e);
-        }
-        SAXException se = new SAXException("I/O Error");
-        try {
-            Exceptions.show(se, IOException.class, SAXException.class);
-            Assert.fail("Expected UncheckedIOException");
-        } catch (SAXException e) {
-            Assert.assertSame(se, e);
-        }
+        Functions.assertFail(oome, () -> Exceptions.show(oome, IOException.class, SAXException.class));
         IOException ioe = new IOException("I/O Error");
-        try {
-            Exceptions.show(ioe, IOException.class, SAXException.class);
-            Assert.fail("Expected UncheckedIOException");
-        } catch (IOException e) {
-            Assert.assertSame(ioe, e);
-        }
+        Functions.assertFail(ioe, () -> Exceptions.show(ioe, IOException.class, SAXException.class));
         SQLException sqle = new SQLException("SQL Error");
         try {
             Exceptions.show(sqle, IOException.class, SAXException.class);
