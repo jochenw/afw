@@ -7,6 +7,8 @@ import java.lang.reflect.Constructor;
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
+/** Test suite for {@link IInstantiator}.
+ */
 public class InstantiatorTest {
 	/** Instance class, that has a no-args constructor.
 	 */

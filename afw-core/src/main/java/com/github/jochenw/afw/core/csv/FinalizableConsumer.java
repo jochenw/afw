@@ -17,7 +17,10 @@ package com.github.jochenw.afw.core.csv;
 
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+
 import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Objects;
 
 
 /**
@@ -37,9 +40,11 @@ public class FinalizableConsumer<T> implements Consumer<T> {
 	/**  Called to report an error.
 	 * @param pThrowable The error, which is being reported.
 	 */
-	public void error(Throwable pThrowable) {
-		throw Exceptions.show(pThrowable);
+	public void error(@NonNull Throwable pThrowable) {
+		final @NonNull Throwable th = Objects.requireNonNull(pThrowable);
+		throw Exceptions.show(th);
 	}
+
 	@Override
 	public void accept(T pValue) {
 	}

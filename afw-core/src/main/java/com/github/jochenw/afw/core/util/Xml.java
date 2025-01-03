@@ -27,8 +27,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import groovyjarjarpicocli.CommandLine.IParameterConsumer;
-
 
 /** Utility class for working with XML.
  */

@@ -21,6 +21,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jspecify.annotations.NonNull;
+
 /** Utility class for supporting various kinds of actions.
  */
 public class Actions {
@@ -45,7 +47,8 @@ public class Actions {
 		try {
 			CompletableFuture.allOf(completableFutures).get();
 		} catch (ExecutionException e) {
-			throw Exceptions.show(e.getCause());
+			final @NonNull Throwable cause = Objects.requireNonNull(e.getCause());
+			throw Exceptions.show(cause);
 		} catch (InterruptedException e) {
 			throw Exceptions.show(e);
 		}

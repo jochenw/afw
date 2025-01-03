@@ -482,15 +482,16 @@ public class Cli<B> {
 				});
 				final Option<B,Object> option = optRef.getOption();
 				final FailableBiConsumer<Context<B>,Object,?> argHandler = option.getArgHandler();
+				final @NonNull String valueStr = Objects.requireNonNull(optRef.getOptValue());
 				if (option.isRepeatable()) {
 					final RepeatableOption<B,Object> rptOpt = Reflection.cast(option);
-					final Object value = rptOpt.getElementValue(optRef.getOptValue());
+					final Object value = rptOpt.getElementValue(valueStr);
 					rptOpt.addValue(value);
 				} else {
 					if (useCount.intValue() > 1) {
 						throw ctx.usage("The option " + optRef.getOptName() + " may be used only once.");
 					}
-					final Object value = option.getValue(optRef.getOptValue());
+					final Object value = option.getValue(valueStr);
 					ctx.setOptName(optRef.getOptName());
 					try {
 						argHandler.accept(ctx, value);

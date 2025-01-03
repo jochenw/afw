@@ -466,7 +466,7 @@ public class Reflection {
 			final O o = (O) cons.newInstance(objects.toArray(new Object[objects.size()]));
 			return o;
 		} catch (InvocationTargetException e) {
-			throw Exceptions.show(e.getCause());
+			throw Exceptions.show(Objects.requireNonNull(e.getCause()));
 		} catch (Throwable t) {
 			throw Exceptions.show(t);
 		}

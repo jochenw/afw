@@ -150,7 +150,7 @@ public class DefaultResourceLoaderTest {
 	 */
 	protected void assertResource(DefaultResourceLoader pLoader,
 			                      @Nullable ClassLoader pCl,
-			                      String pUri,
+			                      @NonNull String pUri,
 			                      @Nullable String pContent) {
 		final URL url;
 		if (pCl == null) {
@@ -179,7 +179,7 @@ public class DefaultResourceLoaderTest {
 	 */
 	protected void assertNoResource(DefaultResourceLoader pLoader,
 			                        @Nullable ClassLoader pCl,
-			                        String pUri) {
+			                        @NonNull String pUri) {
 		final URL url;
 		if (pCl == null) {
 			url = pLoader.getResource(pUri);

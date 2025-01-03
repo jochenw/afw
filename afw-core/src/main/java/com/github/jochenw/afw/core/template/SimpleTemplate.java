@@ -18,9 +18,9 @@ public class SimpleTemplate<M> implements Template<M> {
 	public static class Context<T> {
 		/** Creates a new instance,
 		 */
+		@SuppressWarnings("null")
 		public Context() {}
 
-		@SuppressWarnings("null")
 		private T model;
 		private PrintWriter writer;
 

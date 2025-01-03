@@ -10,8 +10,6 @@ import java.nio.file.Path;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jochenw.afw.core.util.tests.Tests;
-
 
 /** Test for the {@link Tests} class.
  */

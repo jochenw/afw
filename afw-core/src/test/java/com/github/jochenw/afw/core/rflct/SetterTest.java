@@ -3,7 +3,6 @@ package com.github.jochenw.afw.core.rflct;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import org.junit.Test;
 

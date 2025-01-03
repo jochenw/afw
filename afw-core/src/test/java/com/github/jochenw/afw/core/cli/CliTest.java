@@ -2,7 +2,6 @@ package com.github.jochenw.afw.core.cli;
 
 import static org.junit.Assert.*;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,25 +10,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.Test;
-import org.junit.validator.ValidateWith;
 
 import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
-import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.MutableBoolean;
-import com.github.jochenw.afw.core.util.NotImplementedException;
 import com.github.jochenw.afw.core.util.Strings;
 
 
@@ -348,6 +343,10 @@ public class CliTest {
 		assertEquals("baz", extraArgs.get(3));
 	}
 
+	/**
+	 * Test for options, that are dynamically added, based on an
+	 * "action" parameter.
+	 */
 	@Test
 	public void testActions() {
 		final DnfOptions checkOptions = testActions("check", "--duplicates");
@@ -366,7 +365,7 @@ public class CliTest {
 	 * @param pArgs The argument string
 	 * @return The configured instance of {@link DnfOptions}.
 	 */
-	protected DnfOptions testActions(String... pArgs) {
+	protected DnfOptions testActions(@NonNull String... pArgs) {
 		final DnfOptions opts = new DnfOptions();
 		final FailableBiConsumer<Context<DnfOptions>,Boolean,?> depsHandler =
 				(ct,b) -> opts.dependencies = b.booleanValue();
@@ -409,13 +408,13 @@ public class CliTest {
 	 */
 	@Test
 	public void testEnumOptions() {
-		final Function<String[],LoggingOptions> optParser = (args) -> {
+		final Function<@NonNull String[],LoggingOptions> optParser = (args) -> {
 			return Cli.of(new LoggingOptions())
 					.stringOption("logFile", "lf").handler((c,s) -> c.getBean().logFile = s).end()
 					.enumOption(Level.class, "logLevel", "ll").caseInsensitive().handler((c,l) -> c.getBean().logLevel = l).end()
 					.parse(args);
 		};
-		final BiConsumer<Level,String[]> tester = (level, array) -> {
+		final BiConsumer<Level,@NonNull String[]> tester = (level, array) -> {
 			final LoggingOptions opts = optParser.apply(array);
 			if (level == null) {
 				assertNull(opts.logLevel);
@@ -423,11 +422,11 @@ public class CliTest {
 				assertEquals(level, opts.logLevel);
 			}
 		};
-		tester.accept(null, new String[] {});
-		tester.accept(Level.INFO, new String[] {"-logLevel", "INFO"});
-		tester.accept(Level.WARN, new String[] {"-logLevel", "WARN"});
+		tester.accept(null, new @NonNull String[] {});
+		tester.accept(Level.INFO, new @NonNull String[] {"-logLevel", "INFO"});
+		tester.accept(Level.WARN, new @NonNull String[] {"-logLevel", "WARN"});
 		try {
-			tester.accept(Level.WARN, new String[] {"-logLevel", "warn"});
+			tester.accept(Level.WARN, new @NonNull String[] {"-logLevel", "warn"});
 		} catch (UsageException ue) {
 			assertEquals("Invalid value for option logLevel: warn", ue.getMessage());
 		}
@@ -688,7 +687,8 @@ public class CliTest {
 	 */
 	@Test
 	public void testHelpMessage() {
-		for (String optName : Arrays.asList("-help", "-h", "--help")) {
+		final List<@NonNull String> list = Arrays.asList("-help", "-h", "--help");
+		for (@NonNull String optName : list) {
 			try {
 				Cli.of(new OptionsBean())
 					.pathOption("if").property("inputFile").end()

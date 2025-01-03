@@ -31,8 +31,8 @@ import org.jspecify.annotations.NonNull;
 import com.github.jochenw.afw.core.util.Exceptions;
 
 
-/** Utility class, which mimicks the java.util.function package, except that unchecked exceptions are
- * generally permitted.
+/** Utility class, which mimicks the java.util.function package, except that
+ * unchecked exceptions are generally permitted.
  */
 public class Functions {
 	/** Creates a new instance. Private constructor,
@@ -1086,8 +1086,8 @@ public class Functions {
 	 * @throws RuntimeException An unexpected error occurred, while executing the
 	 *   {@code pRunnable}, and is being rethrown.
 	 */
-	public static <T extends Throwable> void assertFail(T pError,
-			                                            FailableRunnable<?> pRunnable) {
+	public static void assertFail(Throwable pError,
+			                      FailableRunnable<?> pRunnable) {
 		try {
 			pRunnable.run();
 			throw new IllegalStateException("Expected Exception was not thrown.");

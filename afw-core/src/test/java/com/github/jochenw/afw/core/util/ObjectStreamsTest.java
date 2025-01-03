@@ -186,7 +186,6 @@ public class ObjectStreamsTest {
 		final PStream<Integer,Integer> ps = PStream.of();
 		@SuppressWarnings("null")
 		final @NonNull List<Integer> rangeList = IntStream.range(0, 10).boxed().collect(Collectors.toList());
-		@SuppressWarnings("null")
 		final @NonNull Enumeration<Integer> rangeIterator = Enumerations.asEnumeration(rangeList.iterator());
 		ps.collect(list).push(rangeIterator);
 		assertEquals(10, list.size());

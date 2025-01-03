@@ -56,7 +56,7 @@ public class RepeatableOption<B,E> extends Option<B,List<E>> {
 	 * @throws UsageException The given string value is invalid,
 	 *   and cannot be converted.
 	 */
-	public E getElementValue(String pOptValue) {
+	public E getElementValue(@NonNull String pOptValue) {
 		return option.getValue(pOptValue);
 	}
 
