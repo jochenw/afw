@@ -34,7 +34,7 @@ public class ExceptionsTest {
     public void testSimpleShow() {
         final NullPointerException npe = new NullPointerException();
         try {
-            Exceptions.show(null);
+            Exceptions.show(Objects.fakeNonNull());
             Assert.fail("Expected NPE");
         } catch (NullPointerException e) {
             Assert.assertEquals("The Throwable must not be null.", e.getMessage());
@@ -77,7 +77,7 @@ public class ExceptionsTest {
     public void testOneExceptionDeclared() throws IOException {
         final NullPointerException npe = new NullPointerException();
         try {
-            Exceptions.show(null, IOException.class);
+            Exceptions.show(Objects.fakeNonNull(), IOException.class);
             Assert.fail("Expected NPE");
         } catch (NullPointerException e) {
             Assert.assertEquals("The Throwable must not be null.", e.getMessage());
@@ -128,7 +128,7 @@ public class ExceptionsTest {
     public void testTwoExceptionDeclared() throws IOException, SAXException {
         final NullPointerException npe = new NullPointerException();
         try {
-            Exceptions.show(null, IOException.class, SAXException.class);
+            Exceptions.show(Objects.fakeNonNull(), IOException.class, SAXException.class);
             Assert.fail("Expected NPE");
         } catch (NullPointerException e) {
             Assert.assertEquals("The Throwable must not be null.", e.getMessage());
