@@ -27,14 +27,6 @@ pipeline {
                 }
             }
         }
-	stage ('Collect Profiler Data') {
-	    steps {
-                // step( [ $class: 'JacocoPublisher' ] )
-		jacoco(execPattern: '**/*.exec',
-		       classPattern: '**/target/classes/**',
-		       exclusionPattern: '**/com/github/jochenw/afw/core/el/jcc/*.class')
-	    }
-	}
 	stage ('collect profiler data') {
             steps {
 	        recordCoverage(tools: [[parser: 'JACOCO']],
