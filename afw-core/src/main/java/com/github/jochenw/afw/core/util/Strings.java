@@ -886,5 +886,17 @@ public class Strings {
 		}
 		return new URL(urlStr);
 	}
+
+	/** Compares two nullable strings by treating null as the empty string.
+	 * @param pValue1 The first string, which is being compared.
+	 * @param pValue2 The second string, which is being compared.
+ 	 * @return Either of the values 0 (equal), -1 (first value lower than
+ 	 *   second value), or 1 (first value greater than second value).
+	 */
+	public static int compareSafe(String pValue1, String pValue2) {
+		final String value1 = (pValue1 == null) ? "" : pValue1;
+		final String value2 = (pValue2 == null) ? "" : pValue2;
+		return value1.compareTo(value2);
+	}
 }
 

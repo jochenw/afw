@@ -51,6 +51,51 @@ import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
  * useful.)
  */
 public class Objects {
+	/** Generic Exception class, which is being thrown, if an element
+	 * duplicates an existing exception.
+	 */
+	public static class DuplicateElementException extends RuntimeException {
+		private static final long serialVersionUID = -5828648235179571568L;
+
+		/** Creates a new instance without message, and cause.
+		 */
+		public DuplicateElementException() {}
+
+		/** Creates a new instance with the given message, and cause.
+		 * @param pMsg The created instances message. May be null,
+		 *   in which case this constructor is equivalent to
+		 *   {@link #DuplicateElementException()}, or
+		 *   {@link #DuplicateElementException(Throwable)},
+		 *   depending on the cause.
+		 * @param pCause The exceptions cause.  May be null,
+		 *   in which case this constructor is equivalent to
+		 *   {@link #DuplicateElementException()}, or
+		 *   {@link #DuplicateElementException(String)},
+		 *   depending on the message.
+		 */
+		public DuplicateElementException(String pMsg, Throwable pCause) {
+			super(pMsg, pCause);
+		}
+
+		/** Creates a new instance with the given message, and no cause.
+		 * @param pMsg The created instances message. May be null,
+		 *   in which case this constructor is equivalent to
+		 *   {@link #DuplicateElementException()}.
+		 */
+		public DuplicateElementException(String pMsg) {
+			super(pMsg);
+		}
+
+		/** Creates a new instance with the given message, and cause.
+		 * @param pCause The exceptions cause.  May be null,
+		 *   in which case this constructor is equivalent to
+		 *   {@link #DuplicateElementException()}.
+		 */
+		public DuplicateElementException(Throwable pCause) {
+			super(pCause);
+		}
+	}
+
 	/** Creates a new instance. Private constructor,
 	 * because all methods are static.
 	 */
