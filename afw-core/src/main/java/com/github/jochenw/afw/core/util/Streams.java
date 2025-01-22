@@ -644,6 +644,21 @@ public class Streams {
     		return load(is, uri);
     	});
     }
+   
+    /** Reads the given property {@link IReadable}, and returns it as an instance of
+     * {@link java.util.Properties}.
+     * @param pReadable The {@link IReadable}, which is being read.
+     * @return The contents of the given readable, as a {@link java.util.Properties}
+     *   object.
+     */
+	public static @NonNull Properties load(@NonNull IReadable pReadable) {
+    	final @NonNull IReadable readable = Objects.requireNonNull(pReadable, "Readable");
+    	return Objects.requireNonNull(readable.apply((InputStream is) -> {
+    	   	final Properties props = new Properties();
+    	    props.load(is);
+    	    return props;
+    	}));
+    }
 
     /** Returns a property set, which is obtained by reading the given
      * resource, which may be a String, {@link Path}, {@link File}, {@link URL},
