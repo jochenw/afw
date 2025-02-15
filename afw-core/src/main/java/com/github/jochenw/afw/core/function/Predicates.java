@@ -219,7 +219,7 @@ public class Predicates {
 	public static <O> Predicate<O> and(Iterable<Predicate<O>> pPredicates) {
 		return (o) -> {
 			for (Predicate<O> pr : pPredicates) {
-				if (pr.test(o)) {
+				if (!pr.test(o)) {
 					return false;
 				}
 			}
