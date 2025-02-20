@@ -303,12 +303,30 @@ public class Cli<B> {
 		return register(new EnumOption<B,E>(this, pEnumType, pPrimaryName, pSecondaryNames));
 	}
 
+	/** Creates a new option, which configures a date value.
+	 * @param pPrimaryName The options primary name.
+	 * @param pSecondaryNames The options secondary names, if any.
+	 * @return The created option.
+	 */
+	public DateOption<B> dateOption(@NonNull String pPrimaryName, @NonNull String... pSecondaryNames) {
+		return register(new DateOption<B>(this, pPrimaryName, pSecondaryNames));
+	}
+
+	/** Creates a new option, which configures a date value.
+	 * @param pPrimaryName The options primary name.
+	 * @param pSecondaryNames The options secondary names, if any.
+	 * @return The created option.
+	 */
+	public DateTimeOption<B> dateTimeOption(@NonNull String pPrimaryName, @NonNull String... pSecondaryNames) {
+		return register(new DateTimeOption<B>(this, pPrimaryName, pSecondaryNames));
+	}
+
 	/** An option reference is the specification of an option with the associated
 	 * option value.
 	 * @param <B> Type of the options bean.
 	 * @param <O> Type of the option value.
 	 */
-	protected static class OptRef<B,O> {
+ 	protected static class OptRef<B,O> {
 		private final @NonNull String optName;
 		private final @NonNull Option<B,O> option;
 		private final String optValue;

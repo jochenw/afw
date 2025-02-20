@@ -9,6 +9,7 @@ import com.github.jochenw.afw.core.cli.Cli.Context;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 import com.github.jochenw.afw.core.rflct.ISetter;
 
 
@@ -134,6 +135,35 @@ public abstract class Option<B,O> {
 		final ISetter<B,O> setter = ISetter.of(beanType, pProperty);
 		final FailableBiConsumer<Context<B>,O,RuntimeException> argsHandler = (c,o) -> {
 			setter.set(c.getBean(), o);
+		};
+		return handler(argsHandler);
+	}
+
+	/** Sets the options argument handler by creating a
+	 * {@link ISetter setter} for the given property, which
+	 * will be invoked by the created argument handler.
+	 * In other words, if the property name is "foo", then
+	 * the created argument handler will set the field "foo",
+	 * in, or invoke the setter method "setFoo"
+	 * on the options bean without any validation of the property value.
+	 * @param pProperty The property name, as specified by
+	 * {@link ISetter#of(Class,String)}.
+	 * @param pMapper A mapper, which converts the argument value
+	 *   (a string) into the actual property value.
+	 * @return This option.
+	 * @throws IllegalArgumentException The method
+	 * {@link ISetter#of(Class, String)} could not create a
+	 * setter for the given property.
+	 * @throws NullPointerException The parameter {@code pProperty} is null.
+	 */
+	public <P> Option<B,O> property(@NonNull String pProperty, FailableFunction<O,P,?> pMapper) {
+	    final @NonNull B bean = getCli().getBean();
+	    @SuppressWarnings("unchecked")
+		final @NonNull Class<B> beanType = (@NonNull Class<B>) bean.getClass();
+		final ISetter<B,P> setter = ISetter.of(beanType, pProperty);
+		final FailableBiConsumer<Context<B>,O,RuntimeException> argsHandler = (c,o) -> {
+			final P p = Functions.apply(pMapper, o);
+			setter.set(c.getBean(), p);
 		};
 		return handler(argsHandler);
 	}

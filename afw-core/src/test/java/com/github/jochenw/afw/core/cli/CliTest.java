@@ -2,6 +2,7 @@ package com.github.jochenw.afw.core.cli;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,6 +39,7 @@ public class CliTest {
 		private boolean verbose;
 		private int intValue;
 		private URL urlValue;
+		private File legacyFile;
 	}
 
 	/**
@@ -512,6 +514,19 @@ public class CliTest {
 		assertSame(ob2, ob);
 		final URL url = Strings.asUrl("http://127.0.0.1/");
 		assertEquals(url, ob.urlValue);
+	}
+
+	/** Test case for {@link Option#property(String,Functions.FailableFunction)}.
+	 */
+	@Test
+	public void testPropertyStringFunction() {
+		final @NonNull String[] args = {"-lf", "."};
+		final OptionsBean ob = Cli.of(new OptionsBean())
+				.pathOption("legacyFile", "lf").property("legacyFile", (p) -> p.toFile()).end()
+				.parse(args);
+		final File file = ob.legacyFile;
+		assertNotNull(file);
+		assertEquals(".", file.getPath());
 	}
 
 	/** Test case for {@link Cli.Context#getOptName()}.
