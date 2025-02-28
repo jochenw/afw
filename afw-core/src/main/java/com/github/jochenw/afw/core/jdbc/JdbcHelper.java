@@ -21,7 +21,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
@@ -111,154 +110,48 @@ public class JdbcHelper {
 			parameters = pParameters;
 		}
 
-		/**
-		 * Creates a {@link Callable}, which prepares, and executes, the query,
-		 * with the parameters applied. The {@link ResultSet}, that is created,
-		 * is being passed to the given function, that processes the result,
-		 * and returns the result object. 
-		 * @param <O> Type of the result object.
-		 * @param pFunction The function, which is being invoked to 
-		 *   the {@link ResultSet}.
-		 * @return The result object, that has been obtained by invoking the function.
-		 */
-		public @NonNull <O> Callable<O> withResultSet(@NonNull FailableFunction<ResultSet,O,?> pFunction) {
-			final @NonNull FailableFunction<ResultSet,O,?> function = Objects.requireNonNull(pFunction, "Function");
-			return () -> {
-				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
-						                                               "The connection provider returned null.");
-					 @SuppressWarnings("null") @NonNull
-					 PreparedStatement stmt = conn.prepareStatement(query)) {
-					helper.setParameters(stmt, parameters);
-					try (ResultSet rs = stmt.executeQuery()) {
-						return function.apply(rs);
-					}
-				} catch (Throwable t) {
-					throw handleError(t);
-				}
-			};
-		}
-
-		/**
-		 * Creates a {@link Runnable}, which prepares, and executes, the query,
-		 * with the parameters applied. The {@link ResultSet}, that is created,
-		 * is being passed to the given consumer, that processes the result,
-		 * without any result object.
-		 * @param pConsumer The consumer, which is being invoked to process
-		 *   the {@link ResultSet}.
-		 * @return The result object, that has been obtained by invoking the function.
-		 */
-		public @NonNull Runnable withResultSet(@NonNull FailableConsumer<ResultSet,?> pConsumer) {
-			final @NonNull FailableConsumer<ResultSet,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
-			return () -> {
-				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
-                        "The connection provider returned null.");
-                     @SuppressWarnings("null") @NonNull
-                     PreparedStatement stmt = conn.prepareStatement(query)) {
-					helper.setParameters(stmt, parameters);
-					try (ResultSet rs = stmt.executeQuery()) {
-						consumer.accept(rs);
-					}
-				} catch (Throwable t) {
-					throw handleError(t);
-				}
-			};
-		}
-
-		/**
-		 * Creates a {@link Callable}, which prepares, and executes, the query,
-		 * with the parameters applied. The {@link ResultSet}, that is created,
-		 * is being passed as a {@link Rows} to the given function, which processes
-		 * the result, and returns the result object.
-		 * @param <O> Type of the result object.
-		 * @param pFunction The function, which is being invoked to 
-		 *   the {@link ResultSet}.
-		 * @return The result object, that has been obtained by invoking the function.
-		 */
-		public @NonNull <O> Callable<O> withRows(@NonNull FailableFunction<Rows,O,?> pFunction) {
-			final @NonNull FailableFunction<Rows,O,?> function = Objects.requireNonNull(pFunction, "Function");
-			return () -> {
-				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
-                        "The connection provider returned null.");
-                     @SuppressWarnings("null") @NonNull
-                     PreparedStatement stmt = conn.prepareStatement(query)) {
-					helper.setParameters(stmt, parameters);
-					try (ResultSet rs = stmt.executeQuery()) {
-						return function.apply(helper.newRows(rs));
-					}
-				} catch (Throwable t) {
-					throw handleError(t);
-				}
-			};
-		}
-
-		/**
-		 * Creates a {@link Runnable}, which prepares, and executes, the query,
-		 * with the parameters applied. The {@link ResultSet}, that is created,
-		 * is being passed as a {@link Rows} object to the given consumer, which processes
-		 * the result. No result object is being produced.
-		 * @param pConsumer The function, which is being invoked to 
-		 *   the {@link ResultSet}.
-		 * @return The result object, that has been obtained by invoking the function.
-		 */
-		public @NonNull Runnable withRows(@NonNull FailableConsumer<Rows,?> pConsumer) {
-			final @NonNull FailableConsumer<Rows,?> consumer = Objects.requireNonNull(pConsumer, "Consumer");
-			return () -> {
-				try (@NonNull Connection conn = Objects.requireNonNull(connectionProvider.get(),
-                        "The connection provider returned null.");
-                     @SuppressWarnings("null") @NonNull
-                     PreparedStatement stmt = conn.prepareStatement(query)) {
-					helper.setParameters(stmt, parameters);
-					try (ResultSet rs = stmt.executeQuery()) {
-						while (rs.next()) {
-							consumer.accept(helper.newRows(rs));
-						}
-					}
-				} catch (Throwable t) {
-					throw Exceptions.show(t);
-				}
-			};
-		}
-
-		/**
-		 * Creates a {@link Callable}, which prepares, and executes, the query,
-		 * with the parameters applied. The query is supposed to return a single
-		 * row, and a single column. The object from the single row, and single
-		 * column is returned as a result object.
-		 * 
-		 * A typical use case would be a query like "SELECT COUNT(*) ...". For
-		 * such a query, we know, that it will return a single integer object.
-		 * @param <O> Type of the result object.
-		 * @return The result object, that has been obtained from the query result.
-		 */
-		public @NonNull <O> Callable<O> singleObject() {
-			return () -> {
-				try (Connection conn = connectionProvider.get();
-					 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
-					helper.setParameters(stmt, parameters);
-					try (ResultSet rs = stmt.executeQuery()) {
-						if (!rs.next()) {
-							throw new IllegalStateException("The query did not return any result.");
-						}
-						final Rows rows = helper.newRows(rs);
-						final O o = rows.nextObject();
-						return o;
-					}
-				} catch (Throwable t) {
-					throw handleError(t);
-				}
-			};
-		}
 
 		/** Executes a "count query", and returns the result. A "count query" is
 		 * defined to be a query, which returns exactly one row with exactly
-		 * one integer column.
+		 * one long integer column.
 		 * @return The result of the "count query": An integer, or long, which
 		 * was returned in the first column of the first row in the result set.
 		 * @throws IllegalStateException The query is no "count query", because
 		 * it returned zero, or more than one result row, or because it returned
 		 * null, rather than an integer, or long value.
 		 */
-		public long count() {
+		public int count() {
+			try (Connection conn = connectionProvider.get();
+				 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
+			    helper.setParameters(stmt, parameters);
+			    try (ResultSet rs = stmt.executeQuery()) {
+			    	if (!rs.next()) {
+			    		throw new IllegalStateException("The query did not return a result row.");
+			    	}
+			    	final int i = rs.getInt(1);
+			    	if (rs.wasNull()) {
+			    		throw new IllegalStateException("The query returned a null object.");
+			    	}
+			    	if (rs.next()) {
+			    		throw new IllegalStateException("The query returned more than one result row.");
+			    	}
+			    	return i;
+			    }
+			} catch (Throwable t) {
+				throw handleError(t);
+			}
+		}
+	
+		/** Executes a "count query", and returns the result. A "count query" is
+		 * defined to be a query, which returns exactly one row with exactly
+		 * one long integer column.
+		 * @return The result of the "count query": An integer, or long, which
+		 * was returned in the first column of the first row in the result set.
+		 * @throws IllegalStateException The query is no "count query", because
+		 * it returned zero, or more than one result row, or because it returned
+		 * null, rather than an integer, or long value.
+		 */
+		public long countLong() {
 			try (Connection conn = connectionProvider.get();
 				 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
 			    helper.setParameters(stmt, parameters);
@@ -312,11 +205,11 @@ public class JdbcHelper {
 		}
 
 		/**
-		 * Executes the configured query, executes it, and returns the number
-		 * of affected rows.
-		 * @return The number of rows, that have been affected by the query.
+		 * Executes the configured query, and returns the number of affected rows.
+		 * @return The number of affected rows (The result of
+		 * {@link PreparedStatement#executeUpdate()}.
 		 */
-		public int affectedRows() {
+		public int run() {
 			try (Connection conn = connectionProvider.get();
 				 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
 				helper.setParameters(stmt, parameters);
@@ -326,11 +219,81 @@ public class JdbcHelper {
 			}
 		}
 
-		/**
-		 * Executes the configured query. No result is being returned.
+		/** Executes the query, creates a {@link ResultSet},
+		 * and invokes the given function to process the
+		 * {@link ResultSet}. Returns the functions result.
+		 * @param <O> Type of the result object.
+		 * @param pFunction The consumer, which is being invoked to process the {@link ResultSet}.
+		 * @return The result object, which was returned by the function invocation.
 		 */
-		public void run() {
-			affectedRows();
+		public <O> O call(FailableFunction<ResultSet,O,?> pFunction) {
+			try (Connection conn = connectionProvider.get();
+				 PreparedStatement stmt = Objects.requireNonNull(conn.prepareStatement(query))) {
+				helper.setParameters(stmt, parameters);
+				try (ResultSet rs = stmt.executeQuery()) {
+					return pFunction.apply(rs);
+				}
+			} catch (Throwable t) {
+				throw handleError(t);
+			}
+		}
+	
+		/** Executes the query, creates a {@link Rows} object,
+		 * and invokes the given function to process the
+		 * {@link Rows} object. Returns the functions result.
+		 * @param <O> Type of the result object.
+		 * @param pFunction The consumer, which is being invoked to process the {@link Rows} object.
+		 * @return The result object, which was returned by the function invocation.
+		 */
+		public <O> O callWithRows(FailableFunction<Rows,O,?> pFunction) {
+			final FailableFunction<ResultSet,O,?> function = (rs) -> {
+				return pFunction.apply(helper.newRows(rs));
+			};
+			return call(function);
+		}
+	
+		/** Executes the query, creates a {@link ResultSet},
+		 * and invokes the given consumer to process the
+		 * {@link ResultSet}. Returns no result.
+		 * @param pConsumer The consumer, which is being invoked to process the {@link ResultSet}.
+		 */
+		public void run(FailableConsumer<ResultSet,?> pConsumer) {
+			call((FailableFunction<ResultSet, Object, ?>) (rs) -> {
+				pConsumer.accept(rs);
+				return null;
+			});
+		}
+
+		/** Executes the query, creates a {@link Rows} object,
+		 * and invokes the given consumer to process the
+		 * {@link Rows} object. Returns no result.
+		 * @param pConsumer The consumer, which is being invoked to process the {@link Rows} objects.
+		 */
+		public void runWithRows(FailableConsumer<Rows,?> pConsumer) {
+			callWithRows((FailableFunction<Rows, Object, ?>) (rows) -> {
+				pConsumer.accept(rows);
+				return null;
+			});
+		}
+
+		/** Executes a query, which returns exactly one row, and exactly one
+		 * column, and returns the result object.
+		 * @param <O> Type of the result object.
+		 * @return The query's single result object, possibly null (depending on the query).
+		 */
+		public <O> O singleObject() {
+			final FailableFunction<Rows,O,?> function = (rows) -> {
+				if (rows.next()) {
+					final O o = rows.nextObject();
+					if (rows.next()) {
+						throw new IllegalStateException("The query returned more than one result row.");
+					}
+					return o;
+				} else {
+					throw new IllegalStateException("The query did not return a result row.");
+				}
+			};
+			return callWithRows(function);
 		}
 
 		/** Called to handle an error, that has occurred.
@@ -1438,7 +1401,7 @@ public class JdbcHelper {
 	}
 
 	/** Prepares a {@link JdbcHelper.Executor query executor} with the given SQL
-	 * statement, and parameters.
+	 * statement, and parameters, and the given dialect.
 	 * The query will be executed by invocation of a suitable method on the
 	 * {@link JdbcHelper.Executor query executor}.
 	 * @param pConnectionSupplier A database connection provider. The
@@ -1458,7 +1421,24 @@ public class JdbcHelper {
 	}
 
 	/** Prepares a {@link JdbcHelper.Executor query executor} with the given SQL
-	 * statement, and parameters.
+	 * statement, and parameters, and no dialect.
+	 * The query will be executed by invocation of a suitable method on the
+	 * {@link JdbcHelper.Executor query executor}.
+	 * @param pConnectionSupplier A database connection provider. The
+	 * connection, which is returned by the provider, will be closed.
+	 * If you need the connection to remain open, use
+	 * {@link #query(Connection, Dialect, String, Object...)}.
+	 * @param pStatement The SQL statement, which is being executed.
+	 * @param pParameters The numbered statement parameters.
+	 * @return The created {@link JdbcHelper.Executor query executor}.
+	 */
+	public Executor query(@NonNull FailableSupplier<Connection,?> pConnectionSupplier,
+			              @NonNull String pStatement, @Nullable Object... pParameters) {
+		return new Executor(this, null, pConnectionSupplier, pStatement, pParameters);
+	}
+
+	/** Prepares a {@link JdbcHelper.Executor query executor} with the given SQL
+	 * statement, and parameters, and the given dialect.
 	 * The query will be executed by invocation of a suitable method on the
 	 * {@link JdbcHelper.Executor query executor}.
 	 * @param pConnection An open database connection. This method will
@@ -1472,10 +1452,28 @@ public class JdbcHelper {
 	 * @return The created {@link JdbcHelper.Executor query executor}.
 	 */
 	public Executor query(@NonNull Connection pConnection,
-			              @Nullable Dialect pDialect,
+					      @Nullable Dialect pDialect,
 			              @NonNull String pStatement, @Nullable Object... pParameters) {
 		final Connection conn = uncloseableConnection(pConnection);
-		return new Executor(this, pDialect, () -> conn, pStatement, pParameters);
+		return new Executor(this, null, () -> conn, pStatement, pParameters);
+	}
+
+	/** Prepares a {@link JdbcHelper.Executor query executor} with the given SQL
+	 * statement, and parameters, and no dialect.
+	 * The query will be executed by invocation of a suitable method on the
+	 * {@link JdbcHelper.Executor query executor}.
+	 * @param pConnection An open database connection. This method will
+	 * <em>not</em> close the connection. If this doesn't suit, you may
+	 * use {@link #query(Functions.FailableSupplier, Dialect, String, Object...)}
+	 * instead.
+	 * @param pStatement The SQL statement, which is being executed.
+	 * @param pParameters The numbered statement parameters.
+	 * @return The created {@link JdbcHelper.Executor query executor}.
+	 */
+	public Executor query(@NonNull Connection pConnection,
+			              @NonNull String pStatement, @Nullable Object... pParameters) {
+		final Connection conn = uncloseableConnection(pConnection);
+		return new Executor(this, null, () -> conn, pStatement, pParameters);
 	}
 
 	/** Creates a new connection object, which acts as a wrapper for the

@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
  * Interface of a module, that participates in the creation of bindings by
  * consuming, and using, the given {@link Binder binder}.
  */
+@FunctionalInterface
 public interface Module {
 	/**
 	 * Called to participate in the creation of bindings by

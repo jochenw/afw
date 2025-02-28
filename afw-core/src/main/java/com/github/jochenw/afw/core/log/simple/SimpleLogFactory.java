@@ -24,6 +24,7 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -44,6 +45,8 @@ public class SimpleLogFactory extends AbstractLogFactory {
     private final PrintStream ps;
     private final String eol = System.getProperty("line.separator");
     private Level level = Level.DEBUG;
+    private long startTime = System.currentTimeMillis();
+    private Supplier<String> nowStringSupplier;
 
     /**
      * Creates a new instance, which uses the given {@link Writer}
@@ -104,7 +107,7 @@ public class SimpleLogFactory extends AbstractLogFactory {
      * @param pMessage The log message.
      */
     public void write(String pId, Level pLevel, String pMessage) {
-        final String msg = System.currentTimeMillis() + " " + pLevel + " " + pId + " " + pMessage;
+        final String msg = getNowAsString() + " " + pLevel + " " + pId + " " + pMessage;
         if (writer == null) {
             ps.println(msg);
         } else {
@@ -117,6 +120,41 @@ public class SimpleLogFactory extends AbstractLogFactory {
         }
     }
 
+    /** Returns the supplier for a string with the current time.
+     * May be null, in which case the number of milliseconds since
+     * the log factories creation (startTime) is returned.
+     * @return The supplier for a string with the current time,
+     *   null for the default supplier.
+     */
+    public Supplier<String> getNowStringSupplier() {
+    	return nowStringSupplier;
+    }
+
+    /** Sets the supplier for a string with the current time.
+     * May be null, in which case the number of milliseconds since
+     * the log factories creation (startTime) is returned.
+     * @param pNowStringSupplier The supplier for a string with the current time,
+     *   or null for the default supplier.
+     */
+    public void setNowStringSupplier(Supplier<String> pNowStringSupplier) {
+    	nowStringSupplier = pNowStringSupplier;
+    }
+
+    /** Returns the current time, as a string. If available (the
+     * {@link #getNowStringSupplier() now string supplier} is non-null),
+     * then that supplier is invoked to obtain the result string.
+     * Otherwise, a default value is computed by subtracting the
+     * {@link System#currentTimeMillis() current time in milliseconds}
+     * from the time, when this log factory was created.
+     * @return The current time, as a string.
+     */
+	protected String getNowAsString() {
+		if (nowStringSupplier == null) {
+			return String.valueOf(System.currentTimeMillis()-startTime);
+		}
+		return nowStringSupplier.get();
+	}
+
     /**
      * Writes a log message, and an exception, with the given logger id,
      * and the given log level.
@@ -126,7 +164,7 @@ public class SimpleLogFactory extends AbstractLogFactory {
      * @param pTh The logged exception.
      */
     public void write(String pId, Level pLevel, String pMessage, Throwable pTh) {
-        final String msg = System.currentTimeMillis() + " " + pLevel + " " + pId + " " + pMessage;
+        final String msg = getNowAsString() + " " + pLevel + " " + pId + " " + pMessage;
         if (writer == null) {
             ps.println(msg);
             pTh.printStackTrace(ps);

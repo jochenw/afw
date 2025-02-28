@@ -255,7 +255,8 @@ public class ComponentFactoryBuilder {
 							throw new IllegalStateException("Neither of the methods to(Class), toClass(Class), "
 									+ " to(Key), toInstance(Object), toProvider(Provider), toSupplier(Supplier), "
 									+ " or toConstructor(Constructor) has been invoked on the previous BindingBuilder"
-									+ " for key " + currentBb.getKey() + ", and self-binding is not possible.");
+									+ " for key " + currentBb.getKey() + ", and self-binding is not possible"
+									+ " for annotations, interfaces, enumerations, and primitives.");
 						}
 					}
 				}

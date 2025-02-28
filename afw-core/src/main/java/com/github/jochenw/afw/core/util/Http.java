@@ -481,7 +481,7 @@ public class Http {
 		final String urlStr = Objects.requireNonNull(pBaseUrl, "Base URL");
 		final URL url;
 		try {
-			url = new URL(urlStr);
+			url = Strings.asUrl(urlStr);
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("Invalid base URL: " + urlStr, e);
 		}

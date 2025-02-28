@@ -19,7 +19,10 @@ import com.github.jochenw.afw.core.props.IntProperty;
 import com.github.jochenw.afw.core.props.LongProperty;
 import com.github.jochenw.afw.core.props.StringProperty;
 import com.github.jochenw.afw.core.util.Strings;
+import com.github.jochenw.afw.di.api.Application;
 import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.IOnTheFlyBinder;
+import com.github.jochenw.afw.di.api.Module;
 import com.github.jochenw.afw.di.impl.DefaultOnTheFlyBinder;
 
 /** Default implementation of {@link DefaultOnTheFlyBinder} for
@@ -311,5 +314,21 @@ public class AfwCoreOnTheFlyBinder extends DefaultOnTheFlyBinder {
 			return Boolean.valueOf(pDefaultValue);
 		}
 		return null;
+	}
+
+	/** Creates a new {@link Application} by invoking
+	 * {@link Application#of(Module, String, IOnTheFlyBinder)}
+	 * with the given module, the given {@code pAnnotationType}, and a new instance of
+	 * [@link {@link AfwCoreOnTheFlyBinder}}. In other words, this is equivalent to
+	 * <pre>
+	 *   Application.of(pModule, pAnnotationType. new AfwCoreOnTheFlyBinder))
+	 * </pre>
+	 * @param pModule A module, tha will be used to create the aplications
+	 *   component factory.
+	 * @param pAnnotationType The (optional) annotation style, either of "javax" (default), "jakarta", or "guice".
+	 * @return The created {@link Application} object.
+	 */
+	public static Application applicationOf(Module pModule, String pAnnotationType) {
+		return Application.of(pModule, pAnnotationType, new AfwCoreOnTheFlyBinder());
 	}
 }

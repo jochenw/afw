@@ -18,6 +18,9 @@ import java.util.Properties;
 import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.jdbc.JdbcHelper.Executor;
+import com.github.jochenw.afw.core.jdbc.JdbcHelper.Rows;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
 import com.github.jochenw.afw.core.props.DefaultPropertyFactory;
@@ -118,7 +121,7 @@ public class JdbcHelperTest {
 			} catch (DroppedTableDoesntExistException e) {
 				// Ignore this.
 			}
-			final int affectedRows = c.query(sqlCreate).affectedRows();
+			final int affectedRows = c.query(sqlCreate).run();
 			assertEquals(0, affectedRows);
 			success.set();
 		});
@@ -155,7 +158,7 @@ public class JdbcHelperTest {
 			} catch (DroppedTableDoesntExistException dtde) {
 				// Ignore this.
 			}
-			final int affectedRowsForCreate = c.query(sqlCreate).affectedRows();
+			final int affectedRowsForCreate = c.query(sqlCreate).run();
 			assertEquals(0, affectedRowsForCreate);
 			final byte byteColumnValue = (byte) 31;
 			final short shortColumnValue = (short) 42;
@@ -172,7 +175,7 @@ public class JdbcHelperTest {
 			final LocalDateTime localDateTimeColumnValue = zonedDateTimeValue.toLocalDateTime();
 			final LocalDate localDateColumnValue = zonedDateTimeValue.toLocalDate();
 			final LocalTime localTimeColumnValue = zonedDateTimeValue.toLocalTime();
-			c.query("INSERT INTO table_two (id, tinyIntColumn, smallIntColumn,"
+			final Executor q = c.query("INSERT INTO table_two (id, tinyIntColumn, smallIntColumn,"
 			        + " intColumn, bigIntColumn, varCharColumn, varBinaryColumn,"
 			        + " timeStampColumn, dateColumn, timeColumn, zonedDateTimeColumn,"
 			        + " localDateTimeColumn, localDateColumn, localTimeColumn) VALUES"
@@ -182,11 +185,12 @@ public class JdbcHelperTest {
 			        Long.valueOf(bigIntColumnValue), varCharColumnValue, varBinaryColumnValue,
 			        timeStampColumnValue, dateColumnValue, timeColumnValue,
 			        zonedDateTimeColumnValue, localDateTimeColumnValue, localDateColumnValue,
-			        localTimeColumnValue).run();
+			        localTimeColumnValue);
+			q.run();
 			c.query("INSERT INTO table_two (id) VALUES (?)",
 			        Long.valueOf(2)).run();
-			c.query("SELECT * FROM table_two WHERE id=?", Long.valueOf(1))
-			    .withRows((row) -> {
+			final FailableConsumer<Rows,?> tableTwoConsumer = (row) -> {
+				assertTrue(row.next());
 				assertEquals(1, row.nextLong());
 				assertEquals(byteColumnValue, row.nextByte());
 				assertEquals(shortColumnValue, row.nextShort());
@@ -217,40 +221,46 @@ public class JdbcHelperTest {
 				  .nextLocalDateTime((l) -> assertEquals(localDateTimeColumnValue, l))
 				  .nextLocalDate((l) -> assertEquals(localDateColumnValue, l), zoneId)
 				  .nextLocalTime((l) -> assertEquals(localTimeColumnValue, l), zoneId);
-			}).run();
+				assertFalse(row.next());
+			};
+			c.query("SELECT * FROM table_two WHERE id=?", Long.valueOf(1))
+			    .runWithRows(tableTwoConsumer);
+			final FailableConsumer<Rows,?> tableTwoConsumer2 = (row) -> {
+				assertTrue(row.next());
+		    	assertEquals(2, row.nextLong());
+		    	assertNull(row.nextByteObj());
+		    	assertNull(row.nextShortObj());
+		    	assertNull(row.nextIntObj());
+		    	assertNull(row.nextLongObj());
+		    	assertNull(row.nextStr());
+		    	assertNull(row.nextBytes());
+		    	assertNull(row.nextTimestamp());
+		    	assertNull(row.nextDate());
+		    	assertNull(row.nextTime());
+		    	assertNull(row.nextZonedDateTime(zoneId));
+		    	assertNull(row.nextLocalDateTime());
+		    	assertNull(row.nextLocalDate(zoneId));
+		    	assertNull(row.nextLocalTime(zoneId));
+		    	row.reset();
+		    	row
+		    	.nextLongObj((l) -> assertEquals(2, l.longValue()))
+		    	.nextByteObj((b) -> assertNull(b))
+		    	.nextShortObj((s) -> assertNull(s))
+		    	.nextIntObj((i) -> assertNull(i))
+		    	.nextLongObj((l) -> assertNull(l))
+		    	.nextStr((s) -> assertNull(s))
+		    	.nextBytes((b) -> assertNull(b))
+		    	.nextTimestamp((t) -> assertNull(t))
+		    	.nextDate((d) -> assertNull(d))
+		    	.nextTime((t) -> assertNull(t))
+		    	.nextZonedDateTime((z) -> assertNull(z), zoneId)
+		    	.nextLocalDateTime((l) -> assertNull(l))
+		    	.nextLocalDate((l) -> assertNull(l), zoneId)
+		    	.nextLocalTime((l) -> assertNull(l), zoneId);
+		    	assertFalse(row.next());
+		    };
 			c.query("SELECT * FROM table_two WHERE id=?", Long.valueOf(2))
-			    .withRows((row) -> {
-			    	assertEquals(2, row.nextLong());
-			    	assertNull(row.nextByteObj());
-			    	assertNull(row.nextShortObj());
-			    	assertNull(row.nextIntObj());
-			    	assertNull(row.nextLongObj());
-			    	assertNull(row.nextStr());
-			    	assertNull(row.nextBytes());
-			    	assertNull(row.nextTimestamp());
-			    	assertNull(row.nextDate());
-			    	assertNull(row.nextTime());
-			    	assertNull(row.nextZonedDateTime(zoneId));
-			    	assertNull(row.nextLocalDateTime());
-			    	assertNull(row.nextLocalDate(zoneId));
-			    	assertNull(row.nextLocalTime(zoneId));
-			    	row.reset();
-			    	row
-			    	.nextLongObj((l) -> assertEquals(2, l.longValue()))
-			    	.nextByteObj((b) -> assertNull(b))
-			    	.nextShortObj((s) -> assertNull(s))
-			    	.nextIntObj((i) -> assertNull(i))
-			    	.nextLongObj((l) -> assertNull(l))
-			    	.nextStr((s) -> assertNull(s))
-			    	.nextBytes((b) -> assertNull(b))
-			    	.nextTimestamp((t) -> assertNull(t))
-			    	.nextDate((d) -> assertNull(d))
-			    	.nextTime((t) -> assertNull(t))
-			    	.nextZonedDateTime((z) -> assertNull(z), zoneId)
-			    	.nextLocalDateTime((l) -> assertNull(l))
-			    	.nextLocalDate((l) -> assertNull(l), zoneId)
-			    	.nextLocalTime((l) -> assertNull(l), zoneId);
-			    }).run();
+			    .runWithRows(tableTwoConsumer2);
 			success.set();
 		});
 		assertTrue(success.isSet());
@@ -268,10 +278,10 @@ public class JdbcHelperTest {
 		final ConnectionProvider connectionProvider = application.getComponentFactory().requireInstance(ConnectionProvider.class);
 		try (Connection conn = connectionProvider.open()) {
 			conn.prepareStatement(sqlCreate).executeUpdate();
-			jh.query(conn, null, sqlDrop).run();
-			jh.query(conn, null, sqlCreate).run();
-			assertEquals(0l, jh.query(conn, null, "SELECT COUNT(*) FROM table_three").count());
-			assertEquals(Long.valueOf(0L), jh.query(conn, null, "SELECT COUNT(*) FROM table_three").countNullable());
+			jh.query(conn, sqlDrop).run();
+			jh.query(conn, sqlCreate).run();
+			assertEquals(0l, jh.query(conn, "SELECT COUNT(*) FROM table_three").count());
+			assertEquals(Long.valueOf(0L), jh.query(conn, "SELECT COUNT(*) FROM table_three").countNullable());
 		}
 	}
 }
