@@ -31,7 +31,7 @@ pipeline {
 		    steps {
 		        recordCoverage(tools: [[parser: 'JACOCO']],
 		                       sourceCodeRetention: 'MODIFIED',
-		                       sourceDirectories: [[glob: '**/src/main/java']])
+		                       sourceDirectories: [[path: 'afw-core/src/main/java'], [path: 'afw-di/src/main/java']])
 		   }
 		}
     }
