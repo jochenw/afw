@@ -52,4 +52,10 @@ public class GuiceComponentFactoryTest {
 	public void testBindToFunction() {
 		ComponentFactoryTests.testBindToFunction(COMPONENT_FACTORY_TYPE);
 	}
+
+	/** Test for injecting generics.
+	 */
+	public void testGenerics() {
+		ComponentFactoryTests.testGenerics(COMPONENT_FACTORY_TYPE);
+	}
 }

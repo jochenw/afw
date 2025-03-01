@@ -9,10 +9,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -48,6 +50,7 @@ import com.github.jochenw.afw.di.api.LogInject;
 import com.github.jochenw.afw.di.api.Module;
 import com.github.jochenw.afw.di.api.PropInject;
 import com.github.jochenw.afw.di.api.Scopes;
+import com.github.jochenw.afw.di.api.Types;
 
 
 /** A helper class for testing implementations of {@link IComponentFactory}.
@@ -419,6 +422,7 @@ public class ComponentFactoryTests {
 	}
 
 	/** Test for {@link LinkableBindingBuilder#to(Function)}.
+	 * @param pComponentFactoryType Type of the component factory, whivh is being tested.
 	 */
 	public static void testBindToFunction(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
 		final Map<String,Object> hashMap = new HashMap<>();
@@ -446,5 +450,26 @@ public class ComponentFactoryTests {
 		assertSame(hashMap, arr[0]);
 		assertSame(array, arr);
 		assertNotNull(array[0]);
+	}
+
+	/** Test injecting a generic object.
+	 * @param pComponentFactoryType Type of the component factory, whivh is being tested.
+	 */
+	public static void testGenerics(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		final List<String> list = new ArrayList<>();
+		final IComponentFactory cf = IComponentFactory.builder().jakarta().type(pComponentFactoryType).module((b) -> {
+			b.bind(Types.of()).toInstance(list);
+			b.bind(ListWrapper.class);
+		}).build();
+		final ListWrapper listWrapper = cf.requireInstance(ListWrapper.class);
+		assertNotNull(listWrapper);
+		assertSame(list, listWrapper.getList());
+	}
+
+	/** Test class for {@link #testGenerics}.
+	 */
+	private static class ListWrapper {
+		private @jakarta.inject.Inject List<String> list;
+		public List<String> getList() { return list; }
 	}
 }

@@ -100,4 +100,12 @@ public class Types {
 	/** A predefined type for {@link Map Map&lt;String,String&gt;}
 	 */
 	public static final Type<Map<String,String>> TYPE_MAP_STRING_STRING = new Types.Type<Map<String,String>>() {};
+
+	/** Creates a new instance of {@link Types.Type}, representing the type {@code O}.
+	 * @param <O> The type, which is represented by the created instance.
+	 * @return The created instance.
+	 */
+	public static <O> Types.@NonNull Type<O> of() {
+		return new Types.Type<O>() {};
+	}
 }

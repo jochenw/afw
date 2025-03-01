@@ -78,4 +78,10 @@ public class SimpleComponentFactoryTest {
 	public void testModuleExtension() {
 		ComponentFactoryTests.testModuleExtension(COMPONENT_FACTORY_TYPE);
 	}
+
+	/** Test for injecting generics.
+	 */
+	public void testGenerics() {
+		ComponentFactoryTests.testGenerics(COMPONENT_FACTORY_TYPE);
+	}
 }
