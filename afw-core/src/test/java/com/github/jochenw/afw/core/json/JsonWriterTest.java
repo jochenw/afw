@@ -48,6 +48,45 @@ public class JsonWriterTest {
 		assertEquals(JsonValue.TRUE, actual.get("status"));
 	}
 
+	/** Test for pretty printing enabled.
+	 */
+	@Test
+	public void testPrettyPrinting() {
+		final Consumer<String> validator = (actualStr) -> {
+			final JsonObject actual;
+			try (JsonReader jr = Json.createReader(new StringReader(actualStr))) {
+				actual = jr.readObject();
+			}
+			assertNotNull(actual);
+			assertEquals(3, actual.size());
+			assertEquals(42, ((JsonNumber) actual.get("answer")).intValueExact());
+			assertEquals("bar", ((JsonString) actual.get("foo")).getString());
+			assertEquals(JsonValue.TRUE, actual.get("status"));
+		};
+		// Test with pretty print = false.
+		{
+			final StringWriter sw = new StringWriter();
+			try (final JsonWriter jw = JsonWriter.of(sw)) {
+				assertFalse(jw.isPrettyPrintEnabled());
+				jw.object(null, "answer", Integer.valueOf(42), "foo", "bar", "status", Boolean.TRUE);
+			}
+			final String actualStrNoPrettyPrint = sw.toString();
+			validator.accept(actualStrNoPrettyPrint);
+			assertEquals(39, actualStrNoPrettyPrint.length());
+		}
+		// Test with pretty print = true.
+		{
+			final StringWriter sw = new StringWriter();
+			try (final JsonWriter jw = JsonWriter.of(sw).withPrettyPrint()) {
+				assertTrue(jw.isPrettyPrintEnabled());
+				jw.object(null, "answer", Integer.valueOf(42), "foo", "bar", "status", Boolean.TRUE);
+			}
+			final String actualStrWithPrettyPrint = sw.toString();
+			validator.accept(actualStrWithPrettyPrint);
+			assertTrue(actualStrWithPrettyPrint.length() > 39);
+		}
+	}
+	
 	/** Test for writing the various atomic number types.
 	 */
 	@Test

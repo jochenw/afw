@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -11,6 +12,7 @@ import java.util.stream.Stream;
 import javax.json.Json;
 import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonGeneratorFactory;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -26,9 +28,15 @@ import com.github.jochenw.afw.core.util.Objects;
  */
 public class JsonWriter implements AutoCloseable {
 	private final JsonGenerator jg;
+	private final boolean prettyPrintEnabled;
+	private final OutputStream out;
+	private final Writer w;
 
-	private JsonWriter(JsonGenerator pJg) {
+	private JsonWriter(JsonGenerator pJg, boolean pPrettyPrintEnabled, OutputStream pOut, Writer pWrt) {
 		jg = pJg;
+		prettyPrintEnabled = pPrettyPrintEnabled;
+		out = pOut;
+		w = pWrt;
 	}
 
 	/**
@@ -39,7 +47,7 @@ public class JsonWriter implements AutoCloseable {
 	 * @return The created {@link JsonWriter}.
 	 */
 	public static JsonWriter of(OutputStream pOut) {
-		return new JsonWriter(Json.createGenerator(pOut));
+		return new JsonWriter(Json.createGenerator(pOut), false, pOut, null);
 	}
 
 	/**
@@ -50,9 +58,36 @@ public class JsonWriter implements AutoCloseable {
 	 * @return The created {@link JsonWriter}.
 	 */
 	public static JsonWriter of(Writer pWriter) {
-		return new JsonWriter(Json.createGenerator(pWriter));
+		return new JsonWriter(Json.createGenerator(pWriter), false, null, pWriter);
 	}
 
+	/** Returns, whether pretty printing is enabled for this
+	 * {@link JsonWriter json writer}.
+	 * @return True, if pretty print is enabled, otherwise false.
+	 */
+	public boolean isPrettyPrintEnabled() {
+		return prettyPrintEnabled;
+	}
+
+	/** Creates a clone of this JsonWriter, which has pretty printing enabled.
+	 * @return Another JsonWriter, with {@link #isPrettyPrintEnabled()} = true.
+	 */
+	public JsonWriter withPrettyPrint() {
+		if (prettyPrintEnabled) {
+			return this;
+		} else {
+			final Map<String,?> config = Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, "true");
+			final JsonGeneratorFactory jgf = Json.createGeneratorFactory(config);
+			final JsonGenerator jg;
+			if (out == null) {
+				jg = jgf.createGenerator(w);
+			} else {
+				jg = jgf.createGenerator(out);
+			}
+			return new JsonWriter(jg, true, out, w);
+		}
+	}
+	
 	/** Writes a named, or unnamed, Json array. Named values are typically
 	 * used for writing object attributes, unnamed values are typically
 	 * used for writing the outermost element, or for array values.
