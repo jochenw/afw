@@ -46,7 +46,7 @@ public interface LinkableBindingBuilder<T> extends ScopableBindingBuilder {
 	 *   injected object.
 	 * @return A binding builder without scope, but with supplier.
 	 */
-	ScopableBindingBuilder to(Function<IComponentFactory,T> pFunction);  
+	ScopableBindingBuilder toFunction(Function<IComponentFactory,T> pFunction);  
 	/** Requests, that the injected object should be the given instance.
 	 * The bindings scope is implicitly specified as {@link Scopes#SINGLETON}.
 	 * @param pInstance The instance, which is being injected by this

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 /**
  * Interface of a provider for JDBC connections.
  */
+@FunctionalInterface
 public interface ConnectionProvider {
 	/** Opens a new database connection.
 	 * @return The new database connection, that has been opened.
@@ -16,10 +17,10 @@ public interface ConnectionProvider {
 	/** Returns the dialect id.
 	 * @return The dialect id.
 	 */
-	public String getDialectId();
+	public default String getDialectId() { return null; }
 
 	/** Returns the actual dialect.
 	 * @return The actual dialect.
 	 */
-	public Dialect getDialect();
+	public default Dialect getDialect() { return null; }
 }

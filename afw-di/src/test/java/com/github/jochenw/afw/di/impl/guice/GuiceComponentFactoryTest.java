@@ -46,7 +46,7 @@ public class GuiceComponentFactoryTest {
 		ComponentFactoryTests.testModuleOverrides(COMPONENT_FACTORY_TYPE);
 	}
 
-	/** Test for {@link LinkableBindingBuilder#to(Function)}.
+	/** Test for {@link LinkableBindingBuilder#toFunction(Function)}.
 	 */
 	@Test
 	public void testBindToFunction() {

@@ -5,6 +5,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -385,6 +387,9 @@ public class JdbcHelper {
 				case Types.VARBINARY:
 					object = getBytes(pIndex);
 					break;
+				case Types.NUMERIC:
+					object = getBigDecimal(pIndex);
+					break;
 				case Types.TIMESTAMP:
 					object = getZonedDateTime(pIndex, appZoneId);
 					break;
@@ -410,6 +415,11 @@ public class JdbcHelper {
 			}
 		}
 
+		/** Returns the underlying {@link ResultSet}.
+		 * @return The underlying {@link ResultSet}.
+		 */
+		public ResultSet getResultSet() { return rs; }
+		
 		/** Returns, whether there is another row available.
 		 * @return True, if there is another row available, otherwise false.
 		 * @throws SQLException The check for a next row failed.
@@ -424,6 +434,67 @@ public class JdbcHelper {
 		 */
 		public void reset() {
 			index = 0;
+		}
+
+		/** Returns the next big decimal in the column list.
+		 * @return The next big decimal in the column list.
+		 */
+		public BigDecimal nextBigDecimal() {
+			return getBigDecimal(++index);
+		}
+
+		/** Returns the big decimal with the given index in the column list.
+		 * @param pIndex A JDBC-style column index (1-based).
+		 * @return The big decimal with the given index in the column list.
+		 */
+		public BigDecimal getBigDecimal(int pIndex) {
+			try {
+				return rs.getBigDecimal(pIndex);
+			} catch (SQLException e) {
+				throw Exceptions.show(e);
+			}
+		}
+
+		/** Passes the next big decimal in the column list to the
+		 * given {@link Consumer}.
+		 * @param pConsumer The {@link Consumer}, that should receive the big decimal.
+		 * @return This row object. (Allows for builder-style code.)
+		 */
+		public Rows nextBigDecimal(Consumer<BigDecimal> pConsumer) {
+			final Consumer<BigDecimal> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+			consumer.accept(getBigDecimal(++index));
+			return this;
+		}
+
+		/** Returns the next big integer in the column list.
+		 * @return The next big integer in the column list.
+		 */
+		public BigInteger nextBigInteger() {
+			return getBigInteger(++index);
+		}
+
+		/** Returns the big integer with the given index in the column list.
+		 * @param pIndex A JDBC-style column index (1-based).
+		 * @return The big decimal with the given index in the column list.
+		 */
+		public BigInteger getBigInteger(int pIndex) {
+			try {
+				final BigDecimal bd = rs.getBigDecimal(pIndex);
+				return bd == null ? null : bd.toBigInteger();
+			} catch (SQLException e) {
+				throw Exceptions.show(e);
+			}
+		}
+
+		/** Passes the next big decimal in the column list to the
+		 * given {@link Consumer}.
+		 * @param pConsumer The {@link Consumer}, that should receive the big decimal.
+		 * @return This row object. (Allows for builder-style code.)
+		 */
+		public Rows nextBigInteger(Consumer<BigInteger> pConsumer) {
+			final Consumer<BigInteger> consumer = Objects.requireNonNull(pConsumer, "Consumer");
+			consumer.accept(getBigInteger(++index));
+			return this;
 		}
 
 		/** Returns the next string in the column list.

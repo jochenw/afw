@@ -421,7 +421,7 @@ public class ComponentFactoryTests {
 		validator.accept(module0.extend(Arrays.asList(module1)));
 	}
 
-	/** Test for {@link LinkableBindingBuilder#to(Function)}.
+	/** Test for {@link LinkableBindingBuilder#toFunction(Function)}.
 	 * @param pComponentFactoryType Type of the component factory, whivh is being tested.
 	 */
 	public static void testBindToFunction(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
@@ -440,7 +440,7 @@ public class ComponentFactoryTests {
 				final Map[] arr = array;
 				return arr;
 			};
-			b.bind(Map[].class).to(arrayCreator);
+			b.bind(Map[].class).toFunction(arrayCreator);
 		};
 		final IComponentFactory cf = IComponentFactory.builder().type(pComponentFactoryType).module(module).build();
 		assertNull(array[0]);

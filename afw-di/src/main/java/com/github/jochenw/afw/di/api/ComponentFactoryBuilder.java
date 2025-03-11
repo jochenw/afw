@@ -215,7 +215,7 @@ public class ComponentFactoryBuilder {
 					}
 
 					@Override
-					public ScopableBindingBuilder to(Function<IComponentFactory,Object> pFunction) {
+					public ScopableBindingBuilder toFunction(Function<IComponentFactory,Object> pFunction) {
 						final Supplier<Object> supplier = () -> pFunction.apply(pComponentFactory);
 						return toSupplier(supplier);
 					}
