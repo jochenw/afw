@@ -34,14 +34,27 @@ public interface ILifecycleController {
 		 */
 		void start();
 	}
+	/** Interface of a component, which can be stopped.
+	 */
+	@FunctionalInterface
+	public interface Stoppable {
+		/** Called to stop the component.
+		 * 
+		 */
+		void stop();
+	}
 	/**
 	 * Interface of a component, which needs to be started,
 	 * and stopped.
 	 */
-	public interface TerminableListener extends Listener {
+	public interface TerminableListener extends Listener, Stoppable {
 		/** Called to stop the component.
 		 */
 		void shutdown();
+		/** Called to stop the component.
+		 */
+		default void stop() { shutdown(); }
+		
 	}
 	/**
 	 * Called to start the lifecycle controller, and all registered components,
