@@ -150,6 +150,8 @@ public abstract class Option<B,O> {
 	 * {@link ISetter#of(Class,String)}.
 	 * @param pMapper A mapper, which converts the argument value
 	 *   (a string) into the actual property value.
+	 * @param <P> The mappers output value. Also, the type of the
+	 *   actual property value.
 	 * @return This option.
 	 * @throws IllegalArgumentException The method
 	 * {@link ISetter#of(Class, String)} could not create a

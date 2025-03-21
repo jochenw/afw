@@ -4,6 +4,11 @@ package com.github.jochenw.afw.core.util;
 /** Utility class for working with numbers.
  */
 public class Numbers {
+	/** Creates a new instance. (Private, because this class contains only
+	 * static methods.
+	 */
+	private Numbers() {}
+
 	/** Safe conversion of an int number to a short number.
 	 * @param pValue The int value, which is being converted.
 	 * @return The converted short value.

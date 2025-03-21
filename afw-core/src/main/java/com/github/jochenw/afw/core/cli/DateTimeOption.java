@@ -9,7 +9,7 @@ import org.jspecify.annotations.NonNull;
 import com.github.jochenw.afw.core.cli.Cli.UsageException;
 
 
-/** Implementation of {@link Option} for {@ink LocalDate} values.
+/** Implementation of {@link Option} for {@link LocalDateTime} values.
  * @param <B> The options bean type.
  */
 public class DateTimeOption<B> extends Option<B,LocalDateTime> {

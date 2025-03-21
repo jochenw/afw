@@ -33,6 +33,7 @@ public class DefaultResourceLoaderTest {
 	/** Called to initialize the URL fields, before the tests are actually running.
 	 * @throws Exception An error occurred.
 	 */
+	@SuppressWarnings("deprecation")
 	@Before
 	public void initUrls() throws Exception {
 		final URLStreamHandler ush = new URLStreamHandler() {

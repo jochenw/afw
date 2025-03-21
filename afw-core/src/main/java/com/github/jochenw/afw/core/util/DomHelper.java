@@ -261,6 +261,7 @@ public class DomHelper {
 				locator = lp.apply(pNode);
 			}
 		}
+		@SuppressWarnings("null")
 		final BiFunction<Locator,String,LocalizableException> eh = getErrorHandler();
 		if (eh == null) {
 			return new LocalizableException(locator, pMessage);

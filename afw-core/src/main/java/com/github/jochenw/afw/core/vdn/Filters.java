@@ -32,6 +32,10 @@ import com.github.jochenw.afw.core.util.Strings;
 /** Utility class for creating, and using filters.
  */
 public class Filters {
+	/** Private constructor, because this class contains only static methods.
+	 */
+	private Filters() {}
+
 	/** Builder class for creating a comparator, which combines other
 	 * comparators (so-called sub comparators) into a single one.
 	 * This is typically used for sorting over several properties,
@@ -87,6 +91,7 @@ public class Filters {
 		 * The typical use case is to compare beans, based on property values:
 		 * The given {@code pMapper} will extract the property values, which
 		 * are then compared by applying the given {@code pComparator}.
+		 * @param <T> The mappers result type. Also, the type of the comparator.
 		 * @param pMapper The mapper, which is used to extract the property
 		 *    values.
 		 * @param pComparator The comparator, which compares the extracted
@@ -148,6 +153,7 @@ public class Filters {
 		 * The typical use case is a predicate on a bean property: The mapper
 		 * extracts the property value from the bean, and the given predicate
 		 * is being applied on that value.
+		 * @param <T> The mappers result type. Also, the type of the predicate.
 		 * @param pPredicate The predicate, which is being applied on the
 		 *   mappers result.
 		 * @param pMapper The mapper, which is applied to retrieve the value,
@@ -215,6 +221,7 @@ public class Filters {
 	}
 
 	/** Creates a new {@link ComparatorBuilder}, and returns it.
+	 * @param <O> Bean type of the created {@link ComparatorBuilder}.
 	 * @return The created builder.
 	 */
 	public static <O> ComparatorBuilder<O> comparator() {
@@ -223,6 +230,8 @@ public class Filters {
 
 	/** Creates a new predicate, which tests, if an object in a collection
 	 * objects is within the specified limit.
+	 * @param <O> The bean type, on which the generated predicate
+	 *   is being applied to.
 	 * @param pOffset Specifies, that the given number of objects should
 	 *   be skipped. Use 0, or -1, for no offset.
 	 * @param pLimit Specifies the maximum number of permitted objects.
@@ -282,6 +291,9 @@ public class Filters {
 	 * {@code pMapper} to extract property values from the compared
 	 * objects, and applying the given {@code pComparator} on the
 	 * extracted property values.
+	 * @param <T> Result type of the mapper. Also, the type of the
+	 *   comparator.
+	 * @param <O> Bean type, on which the mapper is being applied.
 	 * @param pMapper The mapper, which is used to extract the property
 	 *    values.
 	 * @param pAscending True, if the created comparator shall be used

@@ -69,6 +69,7 @@ public class WindowsCmdSymbolicLinksHandler extends AbstractSymbolicLinksHandler
 	protected Path checkSymbolicLink(@NonNull Path pPath) {
 		try {
 			if (Files.exists(pPath)) {
+				@SuppressWarnings("null")
 				final BasicFileAttributes bfa = Files.readAttributes(pPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 				if (!bfa.isSymbolicLink()  &&  bfa.isOther()) {
 					return pPath.toRealPath();
