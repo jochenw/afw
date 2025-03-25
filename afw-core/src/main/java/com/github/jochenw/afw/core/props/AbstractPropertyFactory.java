@@ -139,6 +139,12 @@ public abstract class AbstractPropertyFactory implements IPropertyFactory {
         listeners.add(pListener);
     }
 
+
+	@Override
+	public IURLProperty getUrlProperty(@NonNull String pKey) {
+		return getUrlProperty(pKey, null);
+	}
+
 	@Override
 	public IURLProperty getUrlProperty(@NonNull String pKey, URL pDefaultValue) {
 		return getUrlProperty(pKey, pDefaultValue, null);

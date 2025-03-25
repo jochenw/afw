@@ -143,7 +143,7 @@ public interface IPropertyFactory {
      * @return An URL property object with the given key, no default value,
      * and no change listener.
      */
-    IURLProperty getUrlProperty(String pKey);
+    IURLProperty getUrlProperty(@NonNull String pKey);
     /** Returns an URL property object with the given key, the given default value,
      * and no change listener.
      * @param pKey The property objects key.
