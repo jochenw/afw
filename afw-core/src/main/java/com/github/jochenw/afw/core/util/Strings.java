@@ -897,5 +897,24 @@ public class Strings {
 		final String value2 = (pValue2 == null) ? "" : pValue2;
 		return value1.compareTo(value2);
 	}
+
+	private static final char[] HEX_DIGITS = "0123456789ABCDEF".toCharArray();
+	/** Converts the given byte array into a hex string.
+	 * @param pBytes The byte array, which is being converted.
+	 * @return The conversions result (the hex string).
+	 */
+	public static String toHexString(byte @NonNull[] pBytes) {
+		final byte[] bytes = Objects.requireNonNull(pBytes, "Bytes");
+		if (bytes.length == 0) { return ""; }
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0;  i < bytes.length;  i++) {
+			final int b = (int) bytes[i];
+			final int highNibble = b >> 4;
+			final int lowNibble = b & 0xf;
+			sb.append(HEX_DIGITS[highNibble]);
+			sb.append(HEX_DIGITS[lowNibble]);
+		}
+		return sb.toString();
+	}
 }
 

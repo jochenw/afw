@@ -45,6 +45,10 @@ public class HttpConnector {
 		}
 	};
 
+	/** Default instance, with no special support for HTTPS connections.
+	 */
+	public static final @NonNull HttpConnector DEFAULT_CONNECTOR = new HttpConnector();
+
 	/**
 	 * A wrapper for an {@link HttpURLConnection}, which implements
 	 * {@link AutoCloseable}.

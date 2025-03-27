@@ -1,5 +1,8 @@
 package com.github.jochenw.afw.core.util;
 
+import java.math.BigDecimal;
+
+import org.jspecify.annotations.Nullable;
 
 /** Utility class for working with numbers.
  */
@@ -59,5 +62,53 @@ public class Numbers {
 			throw new NumberFormatException("The given double value is not in the permitted range for a float number.");
 		}
 		return (float) pValue;
+	}
+
+	/** Attempts to convert the given {@link BigDecimal} into a
+	 * number object with smaller precision. If possible,
+	 * the conversion will be without loss of information.
+	 * @param pBd The number, which is being converted.
+	 * @return The converted number.
+	 */
+	public static @Nullable Object toNumber(BigDecimal pBd) {
+		try {
+			return pBd.byteValueExact();
+		} catch (ArithmeticException ae) {
+			try {
+				return pBd.shortValueExact();
+			} catch (ArithmeticException ae2) {
+				return toNumberPreferringInteger(pBd);
+			}
+		}
+	}
+
+	/** Attempts to convert the given {@link BigDecimal} into a
+	 * number object with smaller precision. If possible,
+	 * the conversion will be without loss of information.
+	 * Basically, this is the same as {@link #toNumber(BigDecimal)},
+	 * except that no attempt will be made to return a
+	 * {@link Byte}, or {@link Short}. Instead, such numbers
+	 * will be represented as {@link Integer}.
+	 * @param pBd The number, which is being converted.
+	 * @return The converted number.
+	 */
+	public static @Nullable Object toNumberPreferringInteger(BigDecimal pBd) {
+		try {
+			return Integer.valueOf(pBd.intValueExact());
+		} catch (ArithmeticException ae3) {
+			try {
+				return Long.valueOf(pBd.longValueExact());
+			} catch (ArithmeticException ae4) {
+				try {
+					return pBd.toBigIntegerExact();
+				} catch (ArithmeticException ae5) {
+					final double d = pBd.doubleValue();
+					if (d == Double.NEGATIVE_INFINITY  ||  d == Double.POSITIVE_INFINITY) {
+						return pBd;
+					}
+					return Double.valueOf(d);
+				}
+			}
+		}
 	}
 }
