@@ -66,12 +66,12 @@ public class Http {
 			log(Strings.formatCb(pMsg, pArgs));
 		}
 		public default void logErr(String pMsg, Object... pArgs) {
-			log(Strings.formatCb(pMsg, pArgs));
+			logErr(Strings.formatCb(pMsg, pArgs));
 		}
 		public default void log(InputStream pIn) { log(Streams.read(pIn)); }
 		public default void logErr(InputStream pIn) { logErr(Streams.read(pIn)); }
 		public default void logLn(InputStream pIn) { logLn(Streams.read(pIn)); }
-		public default void logErrLn(InputStream pIn) { logLn(Streams.read(pIn)); }
+		public default void logErrLn(InputStream pIn) { logErrLn(Streams.read(pIn)); }
 		public default boolean isLogging() { return true; }
 
 		public static final @NonNull TrafficLogger NULL_LOGGER = new TrafficLogger() {
@@ -414,7 +414,7 @@ public class Http {
 				throw new IllegalStateException("The HTTP method is null. Did you invoke get(), post(), put(), delete(), or method(String)?");
 			}
 			final URL u = getUrl();
-			logger.logLn(method + u.toExternalForm());
+			logger.logLn(method + " " + u.toExternalForm());
 			try (HttpConnection httpConn = getConnector().connect(u)) {
 				final HttpURLConnection urlConn = httpConn.getUrlConnection();
 				urlConn.setRequestMethod(getMethod());
@@ -529,12 +529,20 @@ public class Http {
 				}
 				if (logger.isLogging()  ||  pRepeatable) {
 					try {
-						bytes = Streams.read(inputStreamSupplier.get());
+						InputStream is = inputStreamSupplier.get();
+						if (is == null) {
+							bytes = new byte[0];
+						} else {
+							bytes = Streams.read(inputStreamSupplier.get());
+							is.close();
+						}
 					} catch (Throwable t) {
 						throw Exceptions.show(t);
 					}
 					if (logger.isLogging()) {
-						pLogger.accept(bytes);
+						@SuppressWarnings("null")
+						final byte @NonNull[] bt = (byte @NonNull[]) bytes;
+						pLogger.accept(bt);
 					}
 				} else {
 					try {
@@ -549,7 +557,7 @@ public class Http {
 				bytes = pBytes;
 			}
 			try {
-				pConsumer.accept(new ByteArrayInputStream(inputBytes));
+				pConsumer.accept(new ByteArrayInputStream(bytes));
 			} catch (Throwable t) {
 				throw Exceptions.show(t);
 			}
