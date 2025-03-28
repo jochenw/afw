@@ -79,14 +79,16 @@ public class Streams {
      * @param pIn The {@link InputStream} to read from. Will be closed.
      * @return The contents, which have been read from {@code pIn}.
      */
-    public static byte[] read(InputStream pIn) {
+    public static byte @NonNull[] read(InputStream pIn) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (InputStream in = pIn) {
             copy(in, baos);
         } catch (IOException e) {
             throw Exceptions.newUncheckedIOException(e);
         }
-        return baos.toByteArray();
+        @SuppressWarnings("null")
+		final byte @NonNull[] bytes = baos.toByteArray();
+        return bytes;
     }
 
     /**
