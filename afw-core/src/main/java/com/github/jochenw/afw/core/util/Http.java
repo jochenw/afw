@@ -507,13 +507,25 @@ public class Http {
 		 * parameters, and no resource strings are configured, then the base
 		 * URL is the complete URL.
 		 * @param pUrl The base URL.
-		 * @return This request object, for builder-like programming,
+		 * @return This request object, for builder-like programming.
+		 * @see #url(String)
+		 * @see #getUrl()
 		 */
 		public Request url(@NonNull URL pUrl) {
 			url = Objects.requireNonNull(pUrl, "URL");
 			return this;
 		}
 
+		/** Sets the base URL, as opposed to the complete URL. The complete
+		 * URL is built from this value, but also from the {@link #getRestResource()},
+		 * the {@link #getRestResourceId()}, and the HTTP parameters. If no
+		 * parameters, and no resource strings are configured, then the base
+		 * URL is the complete URL.
+		 * @param pUrl The base URL.
+		 * @return This request object, for builder-like programming.
+		 * @see #url(URL)
+		 * @see #getUrl()
+		 */
 		public Request url(@NonNull String pUrl) {
 			final @NonNull String urlStr = Objects.requireNonNull(pUrl, "URL");
 			final URL u;
@@ -525,28 +537,58 @@ public class Http {
 			return url(u);
 		}
 
+		/** Sets the logger, for displaying traffic details.
+		 * @param pLogger The traffic logger.
+		 * @return This request object, for builder-like programming.
+		 * @see #systemOutLogger()
+		 */
 		public Request logger(@NonNull TrafficLogger pLogger) {
 			logger = Objects.requireNonNull(pLogger, "Logger");
 			return this;
 		}
 
+		/** Sets the logger to {@link TrafficLogger#SYSTEM_OUT_LOGGER}, for displaying
+		 * traffic details.
+		 * @return This request object, for builder-like programming.
+		 * @see #logger(TrafficLogger)
+		 */
 		public Request systemOutLogger() {
 			return logger(TrafficLogger.SYSTEM_OUT_LOGGER);
 		}
 
+		/** Returns the current traffic logger. By default, this will be
+		 * {@link TrafficLogger#NULL_LOGGER}.
+		 * @return The current traffic logger.
+		 */
 		public @NonNull TrafficLogger getLogger() {
 			return logger;
 		}
-		public Request header(@NonNull String pKey, @NonNull String pValue) {
+
+		/** Adds an HTTP header to the request.
+		 * @param pKey The HTTP headers key.
+		 * @param pValue The HTTP headers value.
+		 * @return This request object, for builder-like programming.
+		 */
+		public @NonNull Request header(@NonNull String pKey, @NonNull String pValue) {
 			getHeaders().add(pKey, pValue);
 			return this;
 		}
 
-		public Request parameter(@NonNull String pKey, @NonNull String pValue) {
+		/** Adds an HTTP parameter to the request.
+		 * @param pKey The HTTP parameters key.
+		 * @param pValue The HTTP parameters value.
+		 * @return This request object, for builder-like programming.
+		 */
+		public @NonNull Request parameter(@NonNull String pKey, @NonNull String pValue) {
 			getParameters().add(pKey, pValue);
 			return this;
 		}
 
+		/** Returns the set of HTTP headers, which have been configured
+		 * through {@link #header(String, String)}.
+		 * @return The set of HTTP headers. Never null, but possibly
+		 *   an empty set.
+		 */
 		public @NonNull KvPairs getHeaders() {
 			if (headers == null) {
 				final @NonNull KvPairs hdrs = new KvPairs();
@@ -557,6 +599,11 @@ public class Http {
 			}
 		}
 
+		/** Returns the set of HTTP parameters, which have been configured
+		 * through {@link #parameter(String, String)}.
+		 * @return The set of HTTP parameters. Never null, but possibly
+		 *   an empty set.
+		 */
 		public @NonNull KvPairs getParameters() {
 			if (parameters == null) {
 				final @NonNull KvPairs params = new KvPairs(false);
@@ -567,43 +614,144 @@ public class Http {
 			}
 		}
 
+		/** Sets the HTTP connector, which is being used to open
+		 * the actual HTTP connection. This is mainly useful, if
+		 * you need to configure the connectors handling of SSL
+		 * certificates. By default, an unconfigured default
+		 * instance will be used, which matches the JVM's
+		 * default SSL handling.
+		 * @param pConnector The connector object, which will
+		 *   be used.
+		 * @return This request object, for builder-like programming.
+		 * @see #getConnector()
+		 */
 		public @NonNull Request connector(HttpConnector pConnector) {
 			connector = pConnector;
 			return this;
 		}
 
+		/** Returns the HTTP connector, which is being used to open
+		 * the actual HTTP connection. This is mainly useful, if
+		 * you need to configure the connectors handling of SSL
+		 * certificates. By default, an unconfigured default
+		 * instance will be used, which matches the JVM's
+		 * default SSL handling.
+		 * @return The connector object, which will
+		 * @see #connector(HttpConnector)
+		 */
 		public @NonNull HttpConnector getConnector() {
 			if (connector == null) {
-				return HttpConnector.DEFAULT_CONNECTOR;
+				final @NonNull HttpConnector hc = new HttpConnector();
+				connector = hc;
+				return hc;
 			} else {
 				return Objects.requireNonNull(connector);
 			}
 		}
 
+		/** Sets the HTTP method, which is being used.
+		 * This is a required method. However, you may use
+		 * {@link #get()}, {@link #post()}, {@link #put()}, or
+		 * {@link #delete()} instead.
+		 * @param pMethod The HTTP method to use,
+		 * @return This request object, for builder-like programming.
+		 * @see #get()
+		 * @see #post()
+		 * @see #put()
+		 * @see #delete()
+		 * @see #getMethod()
+		 */
 		public @NonNull Request method(@NonNull String pMethod) {
-			method = pMethod;
+			method = Objects.requireNonNull(pMethod, "Method");
 			return this;
 		}
 
+		/** Sets the HTTP method to "GET". In other words: This is
+		 * equivalent to invoking <pre>method("GET")</pre>.
+		 * @return This request object, for builder-like programming.
+		 * @see #method(String)
+		 * @see #post()
+		 * @see #put()
+		 * @see #delete()
+		 * @see #getMethod()
+		 */
 		public @NonNull Request get() { return method("GET"); }
 
+		/** Sets the HTTP method to "POST". In other words: This is
+		 * equivalent to invoking <pre>method("POST")</pre>.
+		 * @return This request object, for builder-like programming.
+		 * @see #method(String)
+		 * @see #get()
+		 * @see #put()
+		 * @see #delete()
+		 * @see #getMethod()
+		 */
 		public @NonNull Request post() { return method("POST"); }
 
+		/** Sets the HTTP method to "PUT". In other words: This is
+		 * equivalent to invoking <pre>method("PUT")</pre>.
+		 * @return This request object, for builder-like programming.
+		 * @see #method(String)
+		 * @see #get()
+		 * @see #post()
+		 * @see #delete()
+		 * @see #getMethod()
+		 */
 		public @NonNull Request put() { return method("PUT"); }
 
+		/** Sets the HTTP method to "DELETE". In other words: This is
+		 * equivalent to invoking <pre>method("DELETE")</pre>.
+		 * @return This request object, for builder-like programming.
+		 * @see #method(String)
+		 * @see #get()
+		 * @see #post()
+		 * @see #put()
+		 * @see #getMethod()
+		 */
 		public @NonNull Request delete() { return method("DELETE"); }
 
+		/** Returns the HTTP method, which is being used.
+		 * @return The HTTP method, which is being used.
+		 * @see #method(String)
+		 * @see #get()
+		 * @see #post()
+		 * @see #put()
+		 * @see #delete()
+		 */
 		public String getMethod() { return method; }
 
+		/** Sets the content type by adding a "content-type" header. In
+		 * other words: This is equivalent to
+		 * <pre>header("content-type", pContentType)</pre>
+		 * @param pContentType The value of the "content-type" header.
+		 * @return This request object, for builder-like programming.
+		 */
 		public @NonNull Request contentType(@NonNull String pContentType) {
 			return header("content-type", pContentType);
 		}
 
+		/** Sets the character set, which is being used for conversion
+		 * of strings to byte arrays, and vice versa.
+		 * @param pCharset The character set. May be null, in which case
+		 *   the {@link StandardCharsets#UTF_8} will be used.
+		 * @return This request object, for builder-like programming.
+		 * @see #charset(String)
+		 * @see #getCharset()
+		 */
 		public @NonNull Request charset(@NonNull Charset pCharset) {
 			charset = pCharset;
 			return this;
 		}
 
+		/** Sets the character set, which is being used for conversion
+		 * of strings to byte arrays, and vice versa.
+		 * @param pCharset Name of the character set. May be null, in which case
+		 *   the {@link StandardCharsets#UTF_8} will be used.
+		 * @return This request object, for builder-like programming.
+		 * @see #charset(Charset)
+		 * @see #getCharset()
+		 * @see Charset#forName(String)
+		 */
 		public @NonNull Request charset(@NonNull String pCharset) {
 			final Charset cs = Charset.forName(pCharset);
 			if (cs == null) {
@@ -612,10 +760,28 @@ public class Http {
 			return charset(cs);
 		}
 
+		/** Returns the character set, which is being used for conversion
+		 * of strings to byte arrays, and vice versa.
+		 * @return The character set. Never null, by default
+		 *   {@link StandardCharsets#UTF_8} will be used.
+		 * @see #charset(Charset)
+		 * @see #charset(String)
+		 */
 		public @NonNull Charset getCharset() {
 			return Objects.notNull(charset, Streams.UTF_8);
 		}
 
+		/** Sets the value of the "Authorization" header to basic authentication
+		 * with the given user name, and password. 
+		 * <em>Note:</em> Setting this value implies the use of preemptive
+		 * authentication (The user name, and password will be sent in any
+		 * case.) Reactive authentication (First attempt without user name,
+		 * and password, if necessary a second attempt without.) is not
+		 * supported.
+		 * @param pUserName The user name, for basic authentication.
+		 * @param pPassword password, for basic authentication.
+		 * @return This request object, for builder-like programming.
+		 */
 		public @NonNull Request basicAuth(@NonNull String pUserName, @NonNull String pPassword) {
 			final String authStr = pUserName + ":" + pPassword;
 			final byte[] authBytes = authStr.getBytes(getCharset());
@@ -623,33 +789,63 @@ public class Http {
 			return header("authorization", "Basic " + basicAuthStr);
 		}
 
+		/** Sets the value of the HTTP request body, which will be
+		 * created by invoking
+		 * the producer {@code pWriter}.
+		 * @param pWriter The HTTP body's producer.
+		 * @return This request object, for builder-like programming.
+		 */
 		public @NonNull Request body(FailableConsumer<OutputStream,?> pWriter) {
 			body = pWriter;
 			return this;
 		}
 
-		public @NonNull Request body(Consumer<OutputStream> pWriter) {
-			final @NonNull Consumer<OutputStream> writer = Objects.requireNonNull(pWriter, "Writer");
-			final FailableConsumer<OutputStream,?> failableWriter = (os) -> writer.accept(os);
-			return body(failableWriter);
-		}
-
+		/** Sets the value of the HTTP request body to the given byte array.
+		 * @param pBytes The byte array, which is being sent as the HTTP
+		 * request body.
+		 * @return This request object, for builder-like programming.
+		 */
 		public @NonNull Request body(byte[] pBytes) {
 			final  byte @NonNull[] bytes = Objects.requireNonNull(pBytes, "Bytes");
 			final FailableConsumer<OutputStream,?> writer = (os) -> os.write(bytes);
 			return body(writer);
 		}
 
+		/** Sets the value of the HTTP request body to the given byte array.
+		 * The configured {@link #getCharset()} will be used to convert
+		 * the string into a byte array.
+		 * @param pText The text string, which is being sent as the HTTP
+		 * request body.
+		 * @return This request object, for builder-like programming.
+		 */
 		public @NonNull Request body(String pText) {
 			return body(new StringReader(pText));
 		}
 
+		/** Sets the value of the HTTP request body to the contents
+		 * of the given {@link InputStream}.
+		 * If possible, the streams contents are read on-the-fly,
+		 * without conversion into an internal byte array.) In other
+		 * words: This is preferrable over {@link #body(byte[])}.
+		 * @param pIs The {@link InputStream}, which will be consumed.
+		 * @return This request object, for builder-like programming.
+		 */
 		public @NonNull Request body(InputStream pIs) {
 			final @NonNull InputStream is = Objects.requireNonNull(pIs, "InputStream");
 			final FailableConsumer<OutputStream,?> writer = (os) -> Streams.copy(is, os);
 			return body(writer);
 		}
 
+		/** Sets the value of the HTTP request body to the contents
+		 * of the given {@link Reader}.
+		 * The configured {@link #getCharset()} will be used to convert
+		 * characters into bytes.
+		 * If possible, the streams contents are read on-the-fly,
+		 * without conversion into an internal byte array.) In other
+		 * words: This is preferrable over {@link #body(String)}.
+		 * @param pReader The {@link Reader}, which will be consumed.
+		 * @return This request object, for builder-like programming.
+		 */
 		public @NonNull Request body(Reader pReader) {
 			final @NonNull Reader r = Objects.requireNonNull(pReader, "Reader");
 			final FailableConsumer<OutputStream,?> writer = (os) -> {
@@ -660,6 +856,15 @@ public class Http {
 		}
 
 
+		/** Sends the request, creates a {@link Response} object, and invokes the
+		 * given {@code pCallable} for processing the response, and
+		 * producing a result object.
+		 * @param <O> Type of the result object.
+		 * @param pCallable The function, which converts the response into the
+		 *   result object.
+		 * @return The created result object. (Obtained by invoking {@code pCallable}.
+		 * @see #run(FailableConsumer)
+		 */
 		public <O> O call(FailableFunction<Response,O,?> pCallable) {
 			if (url == null) {
 				throw new IllegalStateException("The URL is null. Did you invoke url(URL), or url(String)?");
@@ -684,7 +889,8 @@ public class Http {
 					if (logger.isLogging()) {
 						final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						body.accept(baos);
-						final byte[] bytes = baos.toByteArray();
+						@SuppressWarnings("null")
+						final byte @NonNull[] bytes = baos.toByteArray();
 						logger.logLn(bytes);
 						try (OutputStream os = urlConn.getOutputStream()) {
 							os.write(bytes);
@@ -702,6 +908,12 @@ public class Http {
 			}
 		}
 
+		/** Sends the request, creates a {@link Response} object, and invokes the
+		 * given {@code pRunnable} for processing the response. No result object
+		 * is produces.
+		 * @param pRunnable The consumer, which processes the response.
+		 * @see #call(FailableFunction)
+		 */
 		public void run(@NonNull FailableConsumer<Response,?> pRunnable) {
 			final @NonNull FailableConsumer<Response,?> consumer = Objects.requireNonNull(pRunnable, "Consumer");
 			final FailableFunction<Response,Void,?> callable = (res) -> {
@@ -713,10 +925,18 @@ public class Http {
 
 	}
 
+	/** Creates a new request object, which needs configuration by invoking
+	 * it's builder-like setters. The configured request object can then be
+	 * used to send the request by invoking {@link Request#call(FailableFunction)},
+	 * or {@link Request#run(FailableConsumer)}.
+	 * @return The created request object.
+	 */
 	public static Request request() {
 		return new Request();
 	}
-	
+
+	/** This object provides access to the details of the HTTP servers response.
+	 */
 	public static class Response {
 		private final int statusCode;
 		private final String statusMsg;
@@ -725,13 +945,23 @@ public class Http {
 		private FailableSupplier<InputStream,?> errorStreamSupplier;
 		private byte[] errorBytes;
 		private final TrafficLogger logger;
-		private final Charset charset;
+		private @NonNull Charset charset;
 		private final Supplier<KvPairs> headerSupplier;
 		private KvPairs headers;
 
+		/** Creates a new instance.
+		 * @param pStatusCode The servers HTTP status code.
+		 * @param pStatusMsg The servers HTTP response message.
+		 * @param pInputStreamSupplier A supplier for the servers response body.
+		 * @param pErrorStreamSupplier A supplier for the servers error response body.
+		 * @param pLogger The traffic logger, which is being used.
+		 * @param pCharset The character set, which is being used for conversion of
+		 *   characters into strings, and vice versa.
+		 * @param pHeaderSupplier A supplier for the set of HTTP response headers.
+		 */
 		public Response(int pStatusCode, String pStatusMsg, FailableSupplier<InputStream,?> pInputStreamSupplier,
 				        FailableSupplier<InputStream,?> pErrorStreamSupplier, TrafficLogger pLogger,
-				        Charset pCharset, Supplier<KvPairs> pHeaderSupplier) {
+				        @NonNull Charset pCharset, Supplier<KvPairs> pHeaderSupplier) {
 			statusCode = pStatusCode;
 			statusMsg = pStatusMsg;
 			inputStreamSupplier = pInputStreamSupplier;
@@ -744,6 +974,59 @@ public class Http {
 			headers = null;
 		}
 
+		/** Returns the character set, which is being used to process the response object.
+		 * By default, the character set will be inherited from the
+		 * {@link Request#getCharset() request object}.
+		 * @return The character set, which is being used to process the response
+		 * object. Never null, the default value is inherited from the request
+		 * object.
+		 * @see #charSet(String)
+		 * @see #charSet(Charset)
+		 * @see Request#getCharset()
+		 */
+		public @NonNull Charset getCharSet() {
+			return charset;
+		}
+
+		/** Sets the character set, which is being used to process the response object.
+		 * By default, the character set will be inherited from the
+		 * {@link Request#getCharset() request object}.
+		 * @param pCharset The character set, which is being used to process the response
+		 * object. Must not be null.
+		 * @return This response object, for builder-like programming.
+		 * @see #charSet(String)
+		 */
+		public @NonNull Response charSet(@NonNull Charset pCharset) {
+			charset = Objects.requireNonNull(pCharset, "Charset");
+			return this;
+		}
+
+		/** Sets the character set, which is being used to process the response object.
+		 * By default, the character set will be inherited from the
+		 * {@link Request#getCharset() request object}.
+		 * @param pCharset The character set, which is being used to process the response
+		 * object. Must not be null.
+		 * @return This response object, for builder-like programming.
+		 * @see #charSet(String)
+		 */
+		public @NonNull Response charSet(@NonNull String pCharset) {
+			final @NonNull String charSetName = Objects.requireNonNull(pCharset, "Charset");
+			final @NonNull Charset charSet;
+			try {
+				charSet = Objects.requireNonNull(Charset.forName(charSetName), "Charset (after lookup)");
+			} catch (IllegalArgumentException iae) {
+				throw new IllegalArgumentException("Invalid character set name: " + charSetName);
+			}
+			return charSet(charSet);
+		}
+
+		/** Creates a new instance by reading the necessary details from the HTTP request
+		 * object, and the open HTTP connection.
+		 * @param pRequest The request object, which provides the
+		 * {@link Request#getCharset() character set}, and the {@link Request#getLogger() traffic logger}.
+		 * @param pUrlConnection The open HTTP connection.
+		 * @return The created response object.
+		 */
 		public static Response of(Request pRequest, HttpURLConnection pUrlConnection) {
 			final Supplier<KvPairs> headerSupplier = () -> {
 				final KvPairs kvPairs = new KvPairs(false);
@@ -765,14 +1048,71 @@ public class Http {
 			}
 		}
 
+		/** Called to read, and process the response body. This method may only be invoked, if the
+		 * servers response indicates, that the request was processed successfully. In other words,
+		 * you should only use this method, if {@link #isOkay()} returns true.
+		 * @param pConsumer An object, which reads the HTTP response body by consuming the
+		 *   {@link InputStream}, that it receives as the parameter of {@link FailableConsumer#accept(Object)}.
+		 * @param pRepeatable True, if the caller intends to call this method again. This means,
+		 *   that the response object will read the HTTP response body into an internal byte
+		 *   array. Otherwise, of possible, the response body will be read on-th-fly, without
+		 *   internal storage.
+		 * @see #errorInput(FailableConsumer, boolean)
+		 */
 		public void input(@NonNull FailableConsumer<InputStream,?> pConsumer, boolean pRepeatable) {
 			inputBytes = provide(pConsumer, inputBytes, inputStreamSupplier, (bytes) -> logger.logLn(bytes), pRepeatable);
 			inputStreamSupplier = null;
 		}
+	
+		/** Called to read, and process the error response body. This method may only be invoked, if the
+		 * servers response indicates, that processing the request was causing an error. In other words,
+		 * you should only use this method, if {@link #isOkay()} returns false.
+		 * @param pConsumer An object, which reads the HTTP response body by consuming the
+		 *   {@link InputStream}, that it receives as the parameter of {@link FailableConsumer#accept(Object)}.
+		 * @param pRepeatable True, if the caller intends to call this method again. This means,
+		 *   that the response object will read the HTTP response body into an internal byte
+		 *   array. Otherwise, of possible, the response body will be read on-th-fly, without
+		 *   internal storage.
+		 * @see #input(FailableConsumer, boolean)
+		 */
 		public void errorInput(@NonNull FailableConsumer<InputStream,?> pConsumer, boolean pRepeatable) {
 			errorBytes = provide(pConsumer, errorBytes, errorStreamSupplier, (bytes) -> logger.logErrLn(bytes), pRepeatable);
 			errorStreamSupplier = null;
 		}
+
+		/** Returns the set of response headers.
+		 * @return The set of response headers. Never null, but the set may be empty.
+		 */
+		public @NonNull KvPairs getHeaders() {
+			if (headers == null) {
+				headers = headerSupplier.get();
+				if (headers == null) {
+					throw new IllegalStateException("The header supplier returned a null object.");
+				}
+			}
+			@SuppressWarnings("null")
+			final @NonNull KvPairs hdrs = headers;
+			return hdrs;
+		}
+
+		/** Internally called by {@link #input(FailableConsumer, boolean)}, and
+		 * {@link #errorInput(FailableConsumer, boolean)}. Handles the
+		 * {@code pRepeatable} parameter, and the traffic logging.
+		 * @param pConsumer The response stream consumer, which was passed by the
+		 *   caller.
+		 * @param pBytes The response stream, as a byte array, if the stream
+		 *   has been read before.
+		 * @param pInputSupplier The response stream supplier, if the byte
+		 *   array {@code pBytes} is null.
+		 * @param pLogger The traffic logger, which is being used to log the
+		 *   response stream.
+		 * @param pRepeatable True, if the caller intends to read the response
+		 *   stream again. If so, the stream must be preserved by reading it
+		 *   into an internal byte array.
+		 * @return The response stream, as a byte array. (If {@code pRepeatable}
+		 *   is true, or the traffic logger requested the response stream.
+		 *   Otherwise, returns null.
+		 */
 		protected byte[] provide(@NonNull FailableConsumer<InputStream,?> pConsumer, byte @Nullable[] pBytes,
                                  @Nullable FailableSupplier<InputStream,?> pInputSupplier,
 								 Consumer<byte @NonNull[]> pLogger, boolean pRepeatable) {
@@ -818,8 +1158,19 @@ public class Http {
 			return bytes;
 		}
 
+		/** Returns true, if the HTTP status code indicates success. In other
+		 * words: Returns true, if the {@link #getStatusCode() HTTP status code}
+		 * is &gt;= 200, and &lt; 300.
+		 * @return True, if the HTTP status code indicates success.
+		 */
 		public boolean isOkay() { return statusCode >= 200  &&  statusCode < 300; }
+		/** Returns the HTTP status code.
+		 * @return The HTTP status code.
+		 */
 		public int getStatusCode() { return statusCode; }
+		/** Returns the HTTP status message.
+		 * @return The HTTP status message.
+		 */
 		public String getStatusMsg() { return statusMsg; }
 	}
 }
