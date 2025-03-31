@@ -41,6 +41,9 @@ import com.github.jochenw.afw.core.util.HttpConnector.HttpConnection;
  * or {@link Http.Request#run(Functions.FailableConsumer)}.
  */
 public class Http {
+	/** Private constructor, because this class has only static methods.
+	 */
+	private Http() {}
 	/** A simple logger implementation, which can be used to log Http requests,
 	 * and the response.
 	 */
@@ -389,6 +392,11 @@ public class Http {
 		private FailableConsumer<OutputStream,?> body;
 		private URL url;
 		private String restResource, restResourceId;
+
+		/** Package protected constructor, because you
+		 * are supposed to use {@link Http#request()}.
+		 */
+		Request() {}
 
 		/** Returns the complete URL, which is being requested.
 		 * The URL is built from the following components, if

@@ -29,17 +29,54 @@ import javax.json.stream.JsonGenerator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.github.jochenw.afw.core.util.Exceptions;
 import com.github.jochenw.afw.core.util.Numbers;
-import com.github.jochenw.afw.di.util.Exceptions;
 
+
+/** This class provides utilities for dealing with Json
+ * documents.
+ */
 public class JsonUtils {
+	/** Private constructor, because this class has only static methods.
+	 */
+	private JsonUtils() {}
+	/** An object, which has the ability to create Json
+	 * documents from native objects, like {@link Map maps},
+	 * {@link List lists}. The created Json documents will
+	 * be written to an {@link OutputStream output stream},
+	 * or {@link Writer writer}.
+	 */
 	public static class JsnWriter implements Cloneable {
+		/** Protected constructor, because you are supposed
+		 * to use {@link JsonUtils#writer()}.
+		 */
+		protected JsnWriter() {}
 		private boolean usingPrettyPrint;
 		private boolean ordered;
 
+		/** Converts this object into an equivalent
+		 * object, except that the converted object
+		 * will have {@link #isUsingPrettyPrint() prettyprint=true}.
+		 * In other words: This method a shortcut for
+		 * <pre>usingPrettyPrint(true)</pre>.
+		 * @return The converted object.
+		 * @see #usingPrettyPrint(boolean)
+		 * @see #isUsingPrettyPrint()
+		 */
 		public JsnWriter usingPrettyPrint() {
 			return usingPrettyPrint(true);
 		}
+		/** Converts this object into an equivalent
+		 * object, except that the converted object
+		 * will have the given value for {@link #isUsingPrettyPrint()}.
+		 * In other words: This method is equivalent to
+		 * <pre>usingPrettyPrint(true)</pre>.
+		 * @param pPrettyPrint The converted objects value
+		 * for {@link #isUsingPrettyPrint()}.
+		 * @return The converted object.
+		 * @see #usingPrettyPrint()
+		 * @see #isUsingPrettyPrint()
+		 */
 		public JsnWriter usingPrettyPrint(boolean pPrettyPrint) {
 			if (pPrettyPrint == usingPrettyPrint) {
 				return this;
@@ -49,9 +86,27 @@ public class JsonUtils {
 				return jsnWriter;
 			}
 		}
+		/** Converts this object into an equivalent
+		 * object, except that the converted object
+		 * will have {@link #isOrdered() ordered=true}.
+		 * In other words: This method a shortcut for
+		 * <pre>ordered(true)</pre>.
+		 * @return The converted object.
+		 * @see #ordered(boolean)
+		 * @see #isOrdered()
+		 */
 		public JsnWriter ordered() {
 			return ordered(true);
 		}
+		/** Converts this object into an equivalent
+		 * object, except that the converted object
+		 * will have the given value for {@link #isOrdered()}.
+		 * @param pOrdered The converted objects value
+		 * for {@link #isUsingPrettyPrint()}.
+		 * @return The converted object.
+		 * @see #ordered()
+		 * @see #isOrdered()
+		 */
 		public JsnWriter ordered(boolean pOrdered) {
 			if (ordered == pOrdered) {
 				return this;
@@ -61,7 +116,22 @@ public class JsonUtils {
 				return jsnWriter;
 			}
 		}
+		/** Returns true, if object keys are being
+		 * sorted alphabetically. Using this property
+		 * will make the output predictable. By default,
+		 * the order of Json object keys depends on the
+		 * underlying {@link Map} implementation, which
+		 * appears to be random.
+		 * @return True, if ordered keys are enabled. The
+		 *   default value is false.
+		 */
 		public boolean isOrdered() { return ordered; }
+		/** Returns true, if indentation is enabled
+		 * for the created Json document. By default,
+		 * indentation is disabled.
+		 * @return True, if indentation is enabled. The
+		 *   default value is false.
+		 */
 		public boolean isUsingPrettyPrint() { return usingPrettyPrint; }
 
 		@Override public JsnWriter clone() {
@@ -70,7 +140,18 @@ public class JsonUtils {
 			jsw.ordered = ordered;
 			return jsw;
 		}
-	
+
+		/** Writes the given object as a Json document to the
+		 * given file.
+		 * @param pFile The destination file. It will be created,
+		 *   if necessary, but the files directory is supposed to
+		 *   exist.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 */
 		public void write(Path pFile, Object pObject) {
 			try (OutputStream os = Files.newOutputStream(pFile)) {
 				write(os, pObject);
@@ -79,6 +160,17 @@ public class JsonUtils {
 			}
 		}
 
+		/** Writes the given object as a Json document to the
+		 * given file.
+		 * @param pFile The destination file. It will be created,
+		 *   if necessary, but the files directory is supposed to
+		 *   exist.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 */
 		public void write(File pFile, Object pObject) {
 			try (OutputStream os = new FileOutputStream(pFile)) {
 				write(os, pObject);
@@ -87,18 +179,49 @@ public class JsonUtils {
 			}
 		}
 
+		/** Converts the given object to a byte
+		 * array, which contains a Json document.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 * @return The byte array, which contains the created
+		 *   Json document.
+		 */
 		public byte[] toBytes(Object pObject) {
 			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			write(baos, pObject);
 			return baos.toByteArray();
 		}
 
+		/** Converts the given object to a string, which
+		 * contains a Json document.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 * @return The string, which contains the created
+		 *   Json document.
+		 */
 		public String toString(Object pObject) {
 			final StringWriter sw = new StringWriter();
 			write(sw, pObject);
 			return sw.toString();
 		}
 
+		/** Converts the given object to a Json document,
+		 * which is being written to the given
+		 * {@link OutputStream output stream}.
+		 * @param pOut The output stream, which will
+		 *   receive the created Json document.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 */
 		public void write(OutputStream pOut, Object pObject) {
 			final JsonGenerator jg;
 			if (usingPrettyPrint) {
@@ -111,6 +234,17 @@ public class JsonUtils {
 			jg.flush();
 		}
 
+		/** Converts the given object to a Json document,
+		 * which is being written to the given
+		 * {@link Writer writer}.
+		 * @param pWriter The writer, which will
+		 *   receive the created Json document.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 */
 		public void write(Writer pWriter, Object pObject) {
 			final JsonGenerator jg;
 			if (usingPrettyPrint) {
@@ -123,10 +257,38 @@ public class JsonUtils {
 			jg.flush();
 		}
 
+		/** Converts the given object to a Json document,
+		 * which is being written by using the given
+		 * {@link JsonGenerator Json generator}. 
+		 * @param pJg The Json generator, which will
+		 *   receive the created Json document.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 *   Support for additional object types can be
+		 *   implemented by overwriting this method.
+		 */
 		public void write(JsonGenerator pJg, Object pObject) {
 			write(pJg, null, pObject);
 		}
 
+		/** Converts the given object to a Json document,
+		 * which is being written by using the given
+		 * {@link JsonGenerator Json generator}. 
+		 * @param pJg The Json generator, which will
+		 *   receive the created Json document.
+		 * @param pName The objects name within a Json object,
+		 *   if available, or null.
+		 * @param pObject The object, which is being converted.
+		 *   Supported object types are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 *   Support for additional object types can be
+		 *   implemented by overwriting this method.
+		 */
 		public void write(JsonGenerator pJg, String pName, Object pObject) {
 			if (pObject == null) {
 				if (pName == null) {
@@ -149,6 +311,23 @@ public class JsonUtils {
 			}
 		}
 
+		/** Converts the given {@link Map map} to a Json object,
+		 * which is being written by using the given
+		 * {@link JsonGenerator Json generator}. 
+		 * @param pJg The Json generator, which will
+		 *   receive the created Json document.
+		 * @param pName The objects name within a Json object,
+		 *   if available, or null.
+		 * @param pMap The map, which is being converted.
+		 *   The map keys are strings, which are being used as
+		 *   the Json objects keys. Supported object types
+		 *   for the values are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+0		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 *   Support for additional object types can be
+		 *   implemented by overwriting {@link #write(JsonGenerator, String, Object)}.
+		 */
 		protected void writeMap(JsonGenerator pJg, String pName, Map<String,?> pMap) {
 			final @NonNull Map<String,?> map = Objects.requireNonNull(pMap, "Map");
 			if (pName == null) {
@@ -171,17 +350,48 @@ public class JsonUtils {
 			pJg.writeEnd();
 		}
 
-		protected void writeList(JsonGenerator pJg, String pName, List<?> pList) {
-			final @NonNull List<?> list = Objects.requireNonNull(pList, "List");
+		/** Converts the given {@link Iterable iterable} to a Json array,
+		 * which is being written by using the given
+		 * {@link JsonGenerator Json generator}. 
+		 * @param pJg The Json generator, which will
+		 *   receive the created Json document.
+		 * @param pName The objects name within a Json object,
+		 *   if available, or null.
+		 * @param pIterable The collection, which is being converted.
+		 *   The map keys are strings, which are being used as
+		 *   the Json objects keys. Supported object types
+		 *   for the values are {@link Map maps} (Json objects),
+		 *   {@link List lists}, or arrays (Json array),
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 *   Support for additional object types can be
+		 *   implemented by overwriting {@link #write(JsonGenerator, String, Object)}.
+		 */
+		protected void writeList(JsonGenerator pJg, String pName, Iterable<?> pIterable) {
+			final @NonNull Iterable<?> iterable = Objects.requireNonNull(pIterable, "List");
 			if (pName == null) {
 				pJg.writeStartArray();
 			} else {
 				pJg.writeStartArray(pName);
 			}
-			list.forEach((v) -> write(pJg, null, v));
+			iterable.forEach((v) -> write(pJg, null, v));
 			pJg.writeEnd();
 		}
 
+		/** Converts the given atomic value to a Json value,
+		 * which is being written by using the given
+		 * {@link JsonGenerator Json generator}. 
+		 * @param pJg The Json generator, which will
+		 *   receive the created Json document.
+		 * @param pName The objects name within a Json object,
+		 *   if available, or null.
+		 * @param pValue The object, which is being converted.
+		 *   Supported object types are
+		 *   {@link Number numbers}, {@link Boolean booleans},
+		 *   {@link String strings}, and null values.
+		 *   Support for additional object types can be
+		 *   implemented by overwriting {@link #write(JsonGenerator, String, Object)}.
+		 */
 		protected void writeValue(JsonGenerator pJg, String pName, Object pValue) {
 			final @NonNull Object value = Objects.requireNonNull(pValue, "Value");
 			if (value instanceof String) {
@@ -259,8 +469,23 @@ public class JsonUtils {
 		}
 	}
 
+	/** Creates, and returns a new instance with default values
+	 * (ordered=false, and prettyPrint=false).
+	 * You may wish to configure this instance by invoking
+	 * {@link JsnWriter#ordered(boolean)}, or
+	 * {@link JsnWriter#usingPrettyPrint(boolean)}
+	 * on it.
+	 * @return The created instance.
+	 */
 	public static JsnWriter writer() { return new JsnWriter(); }
 
+	/** Converts the given Json object to a native Map. The Json
+	 * objects keys are used as the map keys, and the Json objects
+	 * values are being converted recursively.
+	 * @param pJsonObject The Json object, which is being converted.
+	 * @return The converted Json object. Never null, but the
+	 *   converted map may be empty.
+	 */
 	public static @NonNull Map<String, Object> toMap(JsonObject pJsonObject) {
 		if (pJsonObject == null) {
 			return new HashMap<>();
@@ -273,16 +498,32 @@ public class JsonUtils {
 		} );
 		return map;
 	}
-	public static @NonNull Object[] toArray(JsonArray pJsonArray) {
+	/** Converts the given Json array to a native array.
+	 * The Json arrays values are being converted recursively.
+	 * @param pJsonArray The Json array, which is being converted.
+	 * @return The converted Json array. Never null, but the
+	 * array may be empty.
+	 */
+	public static Object @NonNull[] toArray(JsonArray pJsonArray) {
 		if (pJsonArray == null) {
 			return new Object[0];
 		}
-		final Object[] array = new Object[pJsonArray.size()];
+		final Object @NonNull[] array = new Object[pJsonArray.size()];
 		for (int i = 0;  i < pJsonArray.size();  i++) {
 			array[i] = toObject(Objects.requireNonNull(pJsonArray.get(i)));
 		}
 		return array;
 	}
+	/** Converts the given Json value to a native value.
+	 * Supported object types are
+	 *   {@link Number numbers}, {@link Boolean booleans},
+	 *   {@link String strings}, null values,
+	 *   {@link Map maps} (Json objects),
+	 *   {@link List lists}, and arrays (Json array)
+	 * @param pJsonValue The Json value, which is being converted.
+	 * @return The converted Json value. May be null, if the
+	 * given Json value is {@link JsonValue#NULL}.
+	 */
 	public static @Nullable Object toObject(@NonNull JsonValue pJsonValue) {
 		if (pJsonValue == JsonValue.NULL) {
 			return null;
