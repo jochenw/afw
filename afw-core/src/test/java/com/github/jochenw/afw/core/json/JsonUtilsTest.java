@@ -3,6 +3,7 @@ package com.github.jochenw.afw.core.json;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -23,6 +24,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonValue;
+import javax.json.JsonWriter;
 
 import org.junit.Test;
 
@@ -139,7 +141,26 @@ public class JsonUtilsTest {
 		orderedKeys.sort(String::compareToIgnoreCase);
 		assertArrayEquals(orderedKeys.toArray(), keys.toArray());
 	}
-		
+
+	/** Test case for {@link JsonUtils.JsnBuilder#build(Object)}.
+	 * @throws Exception The test has failed.
+	 */
+	@Test
+	public void testBuilderBuildObject() throws Exception {
+		final Map<String,Object> map = newSampleMap();
+		final JsonObject jo = JsonUtils.builder().build(map);
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (JsonWriter jw = Json.createWriter(baos)) {
+			jw.write(jo);
+		}
+		final byte[] bytes = baos.toByteArray();
+		try (InputStream in = new ByteArrayInputStream(bytes);
+			 JsonReader jr = Json.createReader(in)) {
+			final JsonObject jobj = jr.readObject();
+			validateSampleMap(jobj);
+		}
+	}
+
 	protected void validateSampleMap(JsonObject pMap) {
 		assertEquals(13, pMap.size());
 		final JsonObject innerMapObject = pMap.getJsonObject("innerMap");
