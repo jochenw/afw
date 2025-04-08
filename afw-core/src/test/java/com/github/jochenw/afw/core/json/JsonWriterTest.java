@@ -3,7 +3,6 @@ package com.github.jochenw.afw.core.json;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -24,7 +23,6 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonValue;
-import javax.json.JsonWriter;
 
 import org.junit.Test;
 
@@ -32,8 +30,9 @@ import org.junit.Test;
 
 /** Test suite for the {@link JsonUtils} class.
  */
-public class JsonUtilsTest {
-	/** Test case for {@link JsonUtils.JsnWriter#toBytes(Object)}.
+public class JsonWriterTest {
+	/** Test case for {@link JsnWriter#toBytes(Object)}.
+	 * @throws Exception The test fails.
 	 */
 	@Test
 	public void testToBytes() throws Exception {
@@ -47,7 +46,8 @@ public class JsonUtilsTest {
 		}
 	}
 
-	/** Test case for {@link JsonUtils.JsnWriter#toBytes(Object)}, with pretty print.
+	/** Test case for {@link JsnWriter#toBytes(Object)}, with pretty print.
+	 * @throws Exception The test fails.
 	 */
 	@Test
 	public void testToBytesWithPrettyPrint() throws Exception {
@@ -61,7 +61,8 @@ public class JsonUtilsTest {
 		}
 	}
 
-	/** Test case for {@link JsonUtils.JsnWriter#toBytes(Object)}, with pretty print, and ordering.
+	/** Test case for {@link JsnWriter#toBytes(Object)}, with pretty print, and ordering.
+	 * @throws Exception The test fails.
 	 */
 	@Test
 	public void testToBytesWithPrettyPrintAndOrdered() throws Exception {
@@ -77,7 +78,8 @@ public class JsonUtilsTest {
 		}
 	}
 
-	/** Test case for {@link JsonUtils.JsnWriter#toString(Object)}.
+	/** Test case for {@link JsnWriter#toString(Object)}.
+	 * @throws Exception The test fails.
 	 */
 	@Test
 	public void testToString() throws Exception {
@@ -91,7 +93,8 @@ public class JsonUtilsTest {
 		}
 	}
 
-	/** Test case for {@link JsonUtils.JsnWriter#toString(Object)}, with pretty print.
+	/** Test case for {@link JsnWriter#toString(Object)}, with pretty print.
+	 * @throws Exception The test fails.
 	 */
 	@Test
 	public void testToStringWithPrettyPrint() throws Exception {
@@ -105,7 +108,8 @@ public class JsonUtilsTest {
 		}
 	}
 
-	/** Test case for {@link JsonUtils.JsnWriter#toString(Object)}, with pretty print, and ordering.
+	/** Test case for {@link JsnWriter#toString(Object)}, with pretty print, and ordering.
+	 * @throws Exception The test fails.
 	 */
 	@Test
 	public void testToStringWithPrettyPrintAndOrdered() throws Exception {
@@ -120,7 +124,8 @@ public class JsonUtilsTest {
 		}
 	}
 
-	/** Test case for {@link JsonUtils.JsnWriter#toString(Object)}, with ordering.
+	/** Test case for {@link JsnWriter#toString(Object)}, with ordering.
+	 * @throws Exception The test fails.
 	 */
 	@Test
 	public void testToStringOrdered() throws Exception {
@@ -135,6 +140,9 @@ public class JsonUtilsTest {
 		}
 	}
 
+	/** Checks, whether the given maps attributes are ordered.
+	 * @param pMap The map, which is being checked- 
+	 */
 	protected void assertOrdered(JsonObject pMap) {
 		final List<String> keys = new ArrayList<>(pMap.keySet());
 		final List<String> orderedKeys = new ArrayList<>(pMap.keySet());
@@ -142,26 +150,11 @@ public class JsonUtilsTest {
 		assertArrayEquals(orderedKeys.toArray(), keys.toArray());
 	}
 
-	/** Test case for {@link JsonUtils.JsnBuilder#build(Object)}.
-	 * @throws Exception The test has failed.
+	/** Validates the Json object, which has been obtained by
+	 * writing, and rereading the sample map.
+	 * @param pMap The Json object, which is being checked.
 	 */
-	@Test
-	public void testBuilderBuildObject() throws Exception {
-		final Map<String,Object> map = newSampleMap();
-		final JsonObject jo = JsonUtils.builder().build(map);
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try (JsonWriter jw = Json.createWriter(baos)) {
-			jw.write(jo);
-		}
-		final byte[] bytes = baos.toByteArray();
-		try (InputStream in = new ByteArrayInputStream(bytes);
-			 JsonReader jr = Json.createReader(in)) {
-			final JsonObject jobj = jr.readObject();
-			validateSampleMap(jobj);
-		}
-	}
-
-	protected void validateSampleMap(JsonObject pMap) {
+	static void validateSampleMap(JsonObject pMap) {
 		assertEquals(13, pMap.size());
 		final JsonObject innerMapObject = pMap.getJsonObject("innerMap");
 		assertNotNull(innerMapObject);
@@ -191,7 +184,10 @@ public class JsonUtilsTest {
 		assertEquals("Whatever", pMap.getJsonString("str").getString());
 	}
 
-	protected Map<String,Object> newSampleMap() {
+	/** Creates a new sample map.
+	 * @return The created sample map.
+	 */
+	static Map<String,Object> newSampleMap() {
 		final Map<String,Object> map = new HashMap<>();
 		map.put("innerMap", Collections.singletonMap("foo", "bar"));
 		map.put("null", null);
