@@ -22,10 +22,37 @@ import com.github.jochenw.afw.core.util.Numbers;
  * native Java objects, like {@link Map maps}, {@link List lists}, etc.
  */
 public class JsnReader {
+	/** Private constructor, because this class contains only static methods.
+	 */
+	private JsnReader() {}
+
+	/** If the JsnReader throws an exception, then it tries hard to use
+	 * this class, which includes location information.
+	 */
 	public static class JsonParseException extends RuntimeException implements JsonLocation {
+		private static final long serialVersionUID = 7592950485871454407L;
+		/** URI of the file, which is being parsed, or null.
+		 */
 		private final String uri;
-		private final long lineNumber, columnNumber, streamOffset;
+		/** Line number, part of the location information, as specified by
+		 * {@link JsonLocation#getLineNumber()}.
+		 */
+		private final long lineNumber;
+		/** Line number, part of the location information, as specified by
+		 * {@link JsonLocation#getColumnNumber()}.
+		 */
+		private final long columnNumber;
+		/** Line number, part of the location information, as specified by
+		 * {@link JsonLocation#getStreamOffset()}.
+		 */
+		private final long streamOffset;
 		
+		/** Creates a new instance.
+		 * @param pLocation The errors location, if available, or null.
+		 * @param pUri Uri of the file, which is being parsed. (Or null,
+		 *   if no URI is available.)
+		 * @param pMsg The error message (Without location information.)
+		 */
 		public JsonParseException(JsonLocation pLocation, String pUri, String pMsg) {
 			super(asMsg(pUri, pLocation, pMsg));
 			uri = pUri;
@@ -95,26 +122,46 @@ public class JsnReader {
 		}
 	}
 
+	/** The Json readers state. An instance of this object is created, when
+	 * the parser starts. This instance is then handed down through all the
+	 * method calls.
+	 */
 	public static class Context {
 		private final @NonNull FailableSupplier<@NonNull JsonParser,?> parserSupplier;
 		private final String uri;
 		private JsonParser jp;
 
+		/** Creates a new instance.
+		 * @param pParserSupplier A supplier for the {@link JsonParser}, which is being
+		 *   used internally. Note, that the {@link JsonParser} is tightly linked to
+		 *   the byte, or character stream, which is being parsed. So, in practice,
+		 *   this supplier is mainly responsible for providing that stream.
+		 * @param pUri URI of the file, which is being parsed. Null, if no such URI
+		 * is available.
+		 */
 		public Context(@NonNull FailableSupplier<@NonNull JsonParser,?> pParserSupplier, String pUri) {
 			parserSupplier = pParserSupplier;
 			uri = pUri;
 		}
 
 
+		/** Returns the URI of the file, which is being parsed.
+		 *@return The URI of the file, which is being parsed. Null, if no such URI
+		 * is available.
+		 */
 		public String getUri() {
 			return uri;
 		}
 
+		/** Returns the {@link JsonParser}, which is being used internally. The parser
+		 * is being created, when this method is being invoked for the first time.
+		 * @return The {@link JsonParser}, which is being used internally. The parser
+		 * is being created, when this method is being invoked for the first time.
+		 */
 		public @NonNull JsonParser getParser() {
 			if (jp == null) {
 				try {
-					@SuppressWarnings("null")
-					final JsonParser jprs = parserSupplier.get();
+					final @NonNull JsonParser jprs = Objects.requireNonNull(parserSupplier.get());
 					jp = jprs;
 				} catch (Throwable t) {
 					throw Exceptions.show(t);
