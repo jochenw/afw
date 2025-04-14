@@ -24,7 +24,7 @@ import com.github.jochenw.afw.core.util.Numbers;
 public class JsnReader {
 	/** Private constructor, because this class contains only static methods.
 	 */
-	private JsnReader() {}
+	JsnReader() {}
 
 	/** If the JsnReader throws an exception, then it tries hard to use
 	 * this class, which includes location information.
