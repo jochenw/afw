@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -468,7 +469,13 @@ public class Http {
 		 *   encoded.
 		 */
 		protected void urlEncode(StringBuilder pSb, String pValue) {
-			pSb.append(URLEncoder.encode(pValue, getCharset()));
+			final String encodedValue;
+			try {
+				encodedValue = URLEncoder.encode(pValue, getCharset().name());
+			} catch (UnsupportedEncodingException e) {
+				throw Exceptions.show(e);
+			}
+			pSb.append(encodedValue);
 		}
 
 		/** Sets the REST resource. If present, the REST resource is being

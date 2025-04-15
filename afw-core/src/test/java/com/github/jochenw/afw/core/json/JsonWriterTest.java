@@ -42,6 +42,8 @@ import com.github.jochenw.afw.core.util.tests.Tests;
 /** Test suite for the {@link JsonUtils} class.
  */
 public class JsonWriterTest {
+	private static final BigInteger TWO = new BigInteger("2");
+
 	/** Test case for {@link JsnWriter#toBytes(Object)}.
 	 * @throws Exception The test fails.
 	 */
@@ -256,7 +258,7 @@ public class JsonWriterTest {
 		final JsonArray emptyArray = (JsonArray) listObject.get(4);
 		assertTrue(emptyArray.isEmpty());
 		assertEquals(BigDecimal.TEN, pMap.getJsonNumber("bd").bigDecimalValue());
-		assertEquals(BigInteger.TWO, pMap.getJsonNumber("bi").bigIntegerValue());
+		assertEquals(TWO, pMap.getJsonNumber("bi").bigIntegerValue());
 		assertEquals(Double.valueOf(3.14159d), Double.valueOf(pMap.getJsonNumber("d").doubleValue()));
 		final Double fValue = Double.valueOf(pMap.getJsonNumber("f").doubleValue());
 		assertEquals(Float.valueOf(2.71f), Float.valueOf(fValue.floatValue()));
@@ -279,7 +281,7 @@ public class JsonWriterTest {
 		map.put("null", null);
 		map.put("list", Arrays.asList(null, Boolean.TRUE, "whatever", Integer.valueOf(42), new Object[0]));
 		map.put("bd", BigDecimal.TEN);
-		map.put("bi", BigInteger.TWO);
+		map.put("bi", TWO);
 		map.put("d", Double.valueOf(3.14159d));
 		map.put("f", Float.valueOf(2.71f));
 		map.put("l", Long.valueOf(Long.MAX_VALUE));
