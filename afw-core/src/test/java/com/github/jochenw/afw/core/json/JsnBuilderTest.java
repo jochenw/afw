@@ -14,16 +14,16 @@ import org.junit.Test;
 
 
 
-/** Test suite for the {@link JsonUtils} class.
+/** Test suite for the {@link JsnUtils} class.
  */
-public class JsonBuilderTest {
+public class JsnBuilderTest {
 	/** Test case for {@link JsnBuilder#build(Object)}.
 	 * @throws Exception The test has failed.
 	 */
 	@Test
 	public void testBuilderBuildObject() throws Exception {
-		final Map<String,Object> map = JsonWriterTest.newSampleMap();
-		final JsonObject jo = JsonUtils.builder().build(map);
+		final Map<String,Object> map = JsnWriterTest.newSampleMap();
+		final JsonObject jo = JsnUtils.builder().build(map);
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (JsonWriter jw = Json.createWriter(baos)) {
 			jw.write(jo);
@@ -32,7 +32,7 @@ public class JsonBuilderTest {
 		try (InputStream in = new ByteArrayInputStream(bytes);
 			 JsonReader jr = Json.createReader(in)) {
 			final JsonObject jobj = jr.readObject();
-			JsonWriterTest.validateSampleMap(jobj);
+			JsnWriterTest.validateSampleMap(jobj);
 		}
 	}
 }

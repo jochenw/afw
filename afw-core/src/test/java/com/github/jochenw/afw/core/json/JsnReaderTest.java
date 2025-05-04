@@ -37,9 +37,9 @@ public class JsnReaderTest {
 	 */
 	@Test
 	public void testReadSampleMap() {
-		final Map<String,Object> expect = JsonWriterTest.newSampleMap();
-		final byte[] bytes = JsonUtils.writer().toBytes(expect);
-		final Map<String,Object> actual = JsonUtils.reader().read(new ByteArrayInputStream(bytes), null);
+		final Map<String,Object> expect = JsnWriterTest.newSampleMap();
+		final byte[] bytes = JsnUtils.writer().toBytes(expect);
+		final Map<String,Object> actual = JsnUtils.reader().read(new ByteArrayInputStream(bytes), null);
 		assertEqual(expect, actual);
 	}
 

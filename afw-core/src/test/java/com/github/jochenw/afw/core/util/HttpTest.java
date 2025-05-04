@@ -43,7 +43,7 @@ import org.junit.Test;
 
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
-import com.github.jochenw.afw.core.json.JsonUtils;
+import com.github.jochenw.afw.core.json.JsnUtils;
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
@@ -250,7 +250,7 @@ public class HttpTest {
 							final byte[] bytes = Streams.read(entity.getContent());
 							requestMap.put("body", bytes);
 						}
-						final byte[] jsonBytes = JsonUtils.writer().usingPrettyPrint().toBytes(requestMap);
+						final byte[] jsonBytes = JsnUtils.writer().usingPrettyPrint().toBytes(requestMap);
 						pRes.setCode(200);
 						pRes.setReasonPhrase("Ok");
 						pRes.setEntity(new ByteArrayEntity(jsonBytes, ContentType.APPLICATION_JSON));
@@ -283,7 +283,7 @@ public class HttpTest {
 				} else {
 					final JsonReader jr = Json.createReader(is);
 					final JsonObject jo = jr.readObject();
-					final Map<String,Object> map = JsonUtils.toMap(jo);
+					final Map<String,Object> map = JsnUtils.toMap(jo);
 					if (pValidator != null) {
 						pValidator.accept(map);
 						valid.set();

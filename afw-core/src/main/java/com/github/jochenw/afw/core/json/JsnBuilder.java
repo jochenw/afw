@@ -28,7 +28,7 @@ import org.jspecify.annotations.NonNull;
  */
 public class JsnBuilder implements Cloneable {
 	/** Protected constructor, because you are supposed
-	 * to use {@link JsonUtils#builder()}.
+	 * to use {@link JsnUtils#builder()}.
 	 */
 	protected JsnBuilder() {}
 

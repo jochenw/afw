@@ -1,5 +1,6 @@
 package com.github.jochenw.afw.core.json;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,16 +15,14 @@ import javax.json.JsonValue;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import com.github.jochenw.afw.core.util.Numbers;
-
 
 /** This class provides utilities for dealing with Json
  * documents.
  */
-public class JsonUtils {
+public class JsnUtils {
 	/** Private constructor, because this class has only static methods.
 	 */
-	private JsonUtils() {}
+	private JsnUtils() {}
 	/** Creates, and returns a new writer instance with default values
 	 * (ordered=false, and prettyPrint=false).
 	 * You may wish to configure this instance by invoking
@@ -90,28 +89,41 @@ public class JsonUtils {
 	 * @return The converted Json value. May be null, if the
 	 * given Json value is {@link JsonValue#NULL}.
 	 */
-	public static @Nullable Object toObject(@NonNull JsonValue pJsonValue) {
+	public static <O> @Nullable O toObject(@NonNull JsonValue pJsonValue) {
+		Object result;
 		if (pJsonValue == JsonValue.NULL) {
-			return null;
+			result = null;
 		} else if (pJsonValue == JsonValue.TRUE) {
-			return Boolean.TRUE;
+			result = Boolean.TRUE;
 		} else if (pJsonValue == JsonValue.FALSE) {
-			return Boolean.FALSE;
+			result = Boolean.FALSE;
 		} else if (pJsonValue == JsonValue.EMPTY_JSON_ARRAY) {
-			return toArray(null);
+			result = toArray(null);
 		} else if (pJsonValue == JsonValue.EMPTY_JSON_OBJECT) {
-			return toMap(null);
+			result = toMap(null);
 		} else if (pJsonValue instanceof JsonObject) {
-			return toMap((JsonObject) pJsonValue);
+			result = toMap((JsonObject) pJsonValue);
 		} else if (pJsonValue instanceof JsonArray) {
-			return toArray((JsonArray) pJsonValue);
+			result = toArray((JsonArray) pJsonValue);
 		} else if (pJsonValue instanceof JsonString) {
-			return ((JsonString) pJsonValue).getString();
+			result = ((JsonString) pJsonValue).getString();
 		} else if (pJsonValue instanceof JsonNumber) {
 			final JsonNumber jn = (JsonNumber) pJsonValue;
-			return Numbers.toNumberPreferringInteger(jn.bigDecimalValue());
+			try {
+				result = Integer.valueOf(jn.intValueExact());
+			} catch (ArithmeticException ae3) {
+				final BigDecimal bd = jn.bigDecimalValue();
+				try {
+					result = Long.valueOf(bd.longValueExact());
+				} catch (ArithmeticException ae4) {
+					result = bd;
+				}
+			}
 		} else {
 			throw new IllegalStateException("Invalid type of JsonValue: " + pJsonValue.getClass().getName());
 		}
+		@SuppressWarnings("unchecked")
+		final O o = (O) result;
+		return o;
 	}
 }

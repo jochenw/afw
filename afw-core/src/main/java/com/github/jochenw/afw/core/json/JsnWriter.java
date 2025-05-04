@@ -32,7 +32,7 @@ import com.github.jochenw.afw.core.util.Exceptions;
 	 */
 	public class JsnWriter implements Cloneable {
 		/** Protected constructor, because you are supposed
-		 * to use {@link JsonUtils#writer()}.
+		 * to use {@link JsnUtils#writer()}.
 		 */
 		protected JsnWriter() {}
 		private boolean usingPrettyPrint;
