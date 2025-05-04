@@ -104,7 +104,7 @@ public class JsnUtilsTest {
 		}
 	}
 
-	private static class JsnValue implements JsonValue {
+	public static class JsnValue implements JsonValue {
 		@Override
 		public ValueType getValueType() {
 			return null;
