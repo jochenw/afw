@@ -39,9 +39,9 @@ import com.github.jochenw.afw.core.util.tests.Tests;
 
 
 
-/** Test suite for the {@link JsonUtils} class.
+/** Test suite for the {@link JsnWriter} class.
  */
-public class JsonWriterTest {
+public class JsnWriterTest {
 	private static final BigInteger TWO = new BigInteger("2");
 
 	/** Test case for {@link JsnWriter#toBytes(Object)}.
@@ -50,7 +50,7 @@ public class JsonWriterTest {
 	@Test
 	public void testToBytes() throws Exception {
 		final Map<String,Object> map = newSampleMap();
-		final byte[] bytes = JsonUtils.writer().toBytes(map);
+		final byte[] bytes = JsnUtils.writer().toBytes(map);
 		assertFalse(new String(bytes, StandardCharsets.UTF_8).contains("\n"));
 		try (InputStream in = new ByteArrayInputStream(bytes);
 			 JsonReader jr = Json.createReader(in)) {
@@ -64,11 +64,11 @@ public class JsonWriterTest {
 	 */
 	@Test
 	public void testWritePath() throws Exception {
-		final Path testDir = Tests.requireTestDirectory(JsonWriterTest.class);
+		final Path testDir = Tests.requireTestDirectory(JsnWriterTest.class);
 		Files.createDirectories(testDir);
 		final Path testFile = Files.createTempFile(testDir, "tst", ".json");
 		final Map<String,Object> map = newSampleMap();
-		JsonUtils.writer().write(testFile, map);
+		JsnUtils.writer().write(testFile, map);
 		final byte[] bytes = Files.readAllBytes(testFile);
 		assertFalse(new String(bytes, StandardCharsets.UTF_8).contains("\n"));
 		try (InputStream in = new ByteArrayInputStream(bytes);
@@ -83,13 +83,13 @@ public class JsonWriterTest {
 	 */
 	@Test
 	public void testWriteJsonGenerator() throws Exception {
-		final Path testDir = Tests.requireTestDirectory(JsonWriterTest.class);
+		final Path testDir = Tests.requireTestDirectory(JsnWriterTest.class);
 		Files.createDirectories(testDir);
 		final Path testFile = Files.createTempFile(testDir, "tst", ".json");
 		final Map<String,Object> map = newSampleMap();
 		try (OutputStream out = Files.newOutputStream(testFile);
 			 JsonGenerator jg = Json.createGenerator(out)) {
-			JsonUtils.writer().write(jg, map);
+			JsnUtils.writer().write(jg, map);
 		}
 		final byte[] bytes = Files.readAllBytes(testFile);
 		assertFalse(new String(bytes, StandardCharsets.UTF_8).contains("\n"));
@@ -105,11 +105,11 @@ public class JsonWriterTest {
 	 */
 	@Test
 	public void testWriteFile() throws Exception {
-		final Path testDir = Tests.requireTestDirectory(JsonWriterTest.class);
+		final Path testDir = Tests.requireTestDirectory(JsnWriterTest.class);
 		Files.createDirectories(testDir);
 		final File testFile = Files.createTempFile(testDir, "tst", ".json").toFile();
 		final Map<String,Object> map = newSampleMap();
-		JsonUtils.writer().write(testFile, map);
+		JsnUtils.writer().write(testFile, map);
 		final byte[] bytes = Files.readAllBytes(testFile.toPath());
 		assertFalse(new String(bytes, StandardCharsets.UTF_8).contains("\n"));
 		try (InputStream in = new ByteArrayInputStream(bytes);
@@ -125,7 +125,7 @@ public class JsonWriterTest {
 	@Test
 	public void testToBytesWithPrettyPrint() throws Exception {
 		final Map<String,Object> map = newSampleMap();
-		final byte[] bytes = JsonUtils.writer().usingPrettyPrint().toBytes(map);
+		final byte[] bytes = JsnUtils.writer().usingPrettyPrint().toBytes(map);
 		assertTrue(new String(bytes, StandardCharsets.UTF_8).contains("\n"));
 		try (InputStream in = new ByteArrayInputStream(bytes);
 			 JsonReader jr = Json.createReader(in)) {
@@ -140,7 +140,7 @@ public class JsonWriterTest {
 	@Test
 	public void testToBytesWithPrettyPrintAndOrdered() throws Exception {
 		final Map<String,Object> map = newSampleMap();
-		final JsnWriter jw0 = JsonUtils.writer();
+		final JsnWriter jw0 = JsnUtils.writer();
 		assertFalse(jw0.isUsingPrettyPrint());
 		final JsnWriter jw1 = jw0.usingPrettyPrint();
 		assertTrue(jw1.isUsingPrettyPrint());
@@ -172,7 +172,7 @@ public class JsonWriterTest {
 	@Test
 	public void testToString() throws Exception {
 		final Map<String,Object> map = newSampleMap();
-		final String string = JsonUtils.writer().toString(map);
+		final String string = JsnUtils.writer().toString(map);
 		assertFalse(string.contains("\n"));
 		try (Reader r = new StringReader(string);
 			 JsonReader jr = Json.createReader(r)) {
@@ -187,7 +187,7 @@ public class JsonWriterTest {
 	@Test
 	public void testToStringWithPrettyPrint() throws Exception {
 		final Map<String,Object> map = newSampleMap();
-		final String string = JsonUtils.writer().usingPrettyPrint().toString(map);
+		final String string = JsnUtils.writer().usingPrettyPrint().toString(map);
 		assertTrue(string.contains("\n"));
 		try (Reader r = new StringReader(string);
 			 JsonReader jr = Json.createReader(r)) {
@@ -202,7 +202,7 @@ public class JsonWriterTest {
 	@Test
 	public void testToStringWithPrettyPrintAndOrdered() throws Exception {
 		final Map<String,Object> map = newSampleMap();
-		final String string = JsonUtils.writer().usingPrettyPrint().ordered().toString(map);
+		final String string = JsnUtils.writer().usingPrettyPrint().ordered().toString(map);
 		assertTrue(string.contains("\n"));
 		try (Reader r = new StringReader(string);
 			 JsonReader jr = Json.createReader(r)) {
@@ -218,7 +218,7 @@ public class JsonWriterTest {
 	@Test
 	public void testToStringOrdered() throws Exception {
 		final Map<String,Object> map = newSampleMap();
-		final String string = JsonUtils.writer().ordered().toString(map);
+		final String string = JsnUtils.writer().ordered().toString(map);
 		assertFalse(string.contains("\n"));
 		try (Reader r = new StringReader(string);
 			 JsonReader jr = Json.createReader(r)) {
@@ -304,7 +304,7 @@ public class JsonWriterTest {
 				             "Invalid value type: java.lang.Object", () -> {
 			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			try (JsonGenerator jg = Json.createGenerator(baos)) {
-				JsonUtils.writer().writeValue(jg, null, new Object());
+				JsnUtils.writer().writeValue(jg, null, new Object());
 			}
 		});
 		/** Attempt to write an invalid number value.
@@ -313,7 +313,7 @@ public class JsonWriterTest {
 	                         "Invalid number type: " + MutableInteger.class.getName(), () -> {
 	                        	 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	                        	 try (JsonGenerator jg = Json.createGenerator(baos)) {
-	                        		 JsonUtils.writer().writeValue(jg, null, new MutableInteger());
+	                        		 JsnUtils.writer().writeValue(jg, null, new MutableInteger());
 	                        	 }
 	                         });
 		/** Write an array, which contains various numeric values.
@@ -328,7 +328,7 @@ public class JsonWriterTest {
 						                                (Object) new BigInteger("530"),
 						                                (Object) new BigDecimal("0.000000004530"),
 						                                (Object) Byte.valueOf((byte) 4));
-				JsonUtils.writer().write(jg, list);
+				JsnUtils.writer().write(jg, list);
 			}
 		}
 	}
