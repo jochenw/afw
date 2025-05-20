@@ -86,6 +86,7 @@ public class JsnUtils {
 	 *   {@link Map maps} (Json objects),
 	 *   {@link List lists}, and arrays (Json array)
 	 * @param pJsonValue The Json value, which is being converted.
+	 * @param <O> Type of the native value.
 	 * @return The converted Json value. May be null, if the
 	 * given Json value is {@link JsonValue#NULL}.
 	 */

@@ -558,19 +558,22 @@ public class FunctionsTest {
         final CloseableObject co = new CloseableObject();
         final FailableConsumer<Throwable, ? extends Throwable> consumer = co::run;
         final IllegalStateException ise = new IllegalStateException();
-        Throwable e = assertThrows(IllegalStateException.class, () -> Functions.tryWithResources(() -> consumer.accept(ise), co::close));
+        final FailableRunnable<?> action = () -> consumer.accept(ise);
+        Throwable e = assertThrows(IllegalStateException.class, () -> Functions.tryWithResources(action, co::close));
         assertSame(ise, e);
 
         assertTrue(co.isClosed());
         co.reset();
         final Error error = new OutOfMemoryError();
-        e = assertThrows(OutOfMemoryError.class, () -> Functions.tryWithResources(() -> consumer.accept(error), co::close));
+        final FailableRunnable<?> action2 = () -> consumer.accept(error);
+        e = assertThrows(OutOfMemoryError.class, () -> Functions.tryWithResources(action2, co::close));
         assertSame(error, e);
 
         assertTrue(co.isClosed());
         co.reset();
         final IOException ioe = new IOException("Unknown I/O error");
-        UncheckedIOException uioe = assertThrows(UncheckedIOException.class, () ->  Functions.tryWithResources(() -> consumer.accept(ioe), co::close));
+        final FailableRunnable<?> action3 = () -> consumer.accept(ioe);
+        UncheckedIOException uioe = assertThrows(UncheckedIOException.class, () ->  Functions.tryWithResources(action3, co::close));
         final IOException cause = uioe.getCause();
         assertSame(ioe, cause);
 

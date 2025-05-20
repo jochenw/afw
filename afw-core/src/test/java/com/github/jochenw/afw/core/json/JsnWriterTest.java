@@ -5,10 +5,12 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -295,9 +297,10 @@ public class JsnWriterTest {
 
 	/** Some stuff, that's been done for the sake of coverage
 	 * only. Don't take this serious.
+	 * @throws Exception The test has failed.
 	 */
 	@Test
-	public void testCoverageNonsense() {
+	public void testCoverageNonsense() throws Exception { 
 		/** Attempt to write an invalid object as a value.
 		 */
 		Functions.assertFail(IllegalArgumentException.class,
@@ -330,6 +333,38 @@ public class JsnWriterTest {
 						                                (Object) Byte.valueOf((byte) 4));
 				JsnUtils.writer().write(jg, list);
 			}
+		}
+		/** I/O error, while writing to a Path object.
+		 */
+		{
+			final Path testDir = Tests.requireTestDirectory(JsnWriterTest.class);
+			Files.createDirectories(testDir);
+			final Path testFile = Files.createTempFile(testDir, "tst", ".json");
+			final Map<String,Object> map = newSampleMap();
+			final UncheckedIOException ioe = new UncheckedIOException(new IOException("Write failed."));
+			final JsnWriter jw = new JsnWriter() {
+				@Override
+				public void write(OutputStream pOut, Object pObject) {
+					throw ioe;
+				}
+			};
+			Functions.assertFail(ioe, () -> jw.write(testFile, map));
+		}
+		/** I/O error, while writing to a File object.
+		 */
+		{
+			final Path testDir = Tests.requireTestDirectory(JsnWriterTest.class);
+			Files.createDirectories(testDir);
+			final Path testFile = Files.createTempFile(testDir, "tst", ".json");
+			final Map<String,Object> map = newSampleMap();
+			final UncheckedIOException ioe = new UncheckedIOException(new IOException("Write failed."));
+			final JsnWriter jw = new JsnWriter() {
+				@Override
+				public void write(OutputStream pOut, Object pObject) {
+					throw ioe;
+				}
+			};
+			Functions.assertFail(ioe, () -> jw.write(testFile.toFile(), map));
 		}
 	}
 	
