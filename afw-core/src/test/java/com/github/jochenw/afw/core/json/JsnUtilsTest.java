@@ -21,6 +21,8 @@ import org.junit.Test;
 /** Test suite for {@link JsnUtils}.
  */
 public class JsnUtilsTest {
+	private static final BigInteger TWO = new BigInteger("2");
+
 	/** Test case for {@link JsnUtils#toMap(JsonObject)}.
 	 */
 	@Test
@@ -32,7 +34,7 @@ public class JsnUtilsTest {
 			final @NonNull JsonObject jo = Json.createObjectBuilder()
 			    .add("s", "Whatever")
 			    .add("bd", bdValue)
-			    .add("bi", BigInteger.TWO)
+			    .add("bi", TWO)
 			    .add("map", JsonValue.EMPTY_JSON_OBJECT)
 			    .add("array", JsonValue.EMPTY_JSON_ARRAY)
 			    .add("true", JsonValue.TRUE)
@@ -79,7 +81,7 @@ public class JsnUtilsTest {
 			final @NonNull JsonArray ja = Json.createArrayBuilder()
 					.add(bdValue)
 					.add("Whatever")
-					.add(BigInteger.TWO)
+					.add(TWO)
 					.add(JsonValue.NULL)
 					.build();
 			final Object[] array = JsnUtils.toObject(ja);

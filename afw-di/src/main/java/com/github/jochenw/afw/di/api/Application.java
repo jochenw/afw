@@ -88,6 +88,7 @@ public class Application {
 	 * @return The created component factory.
 	 */
 	protected IComponentFactory newComponentFactory() {
+		final IComponentFactory cf;
 		if (componentFactoryProvider == null) {
 			final @NonNull Module mInner = Objects.requireNonNull(moduleSupplier.get(),
 					"Module supplier returned a null object.");
@@ -95,8 +96,8 @@ public class Application {
 				mInner.configure(b);
 				b.bind(ILifecycleController.class).to(DefaultLifecycleController.class).in(Scopes.SINGLETON);
 				b.bind(Application.class).toInstance(Application.this);
-				b.addFinalizer((cf) -> {
-					cf.requireInstance(ILifecycleController.class).start();
+				b.addFinalizer((cof) -> {
+					cof.requireInstance(ILifecycleController.class).start();
 				});
 			};
 			final ComponentFactoryBuilder componentFactoryBuilder = new ComponentFactoryBuilder();

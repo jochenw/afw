@@ -56,6 +56,14 @@ public interface ILifecycleController {
 		default void stop() { shutdown(); }
 		
 	}
+	/** Returns, whether the {@link #start()} method has been
+	 * invoked on this instance. If that is the case, an
+	 * invocation of {@link #shutdown()} won't affect the result.
+	 * @return True, if {@link #start()} has been invoked on this
+	 *   instance.
+	 */
+	boolean isStarted();
+
 	/**
 	 * Called to start the lifecycle controller, and all registered components,
 	 * in the order of registration.

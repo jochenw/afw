@@ -386,6 +386,7 @@
   <modules>
     <module>afw-di</module>
     <module>afw-core</module>
+    <module>afw-vdn</module>
   </modules>
   <licenses>
     <license>

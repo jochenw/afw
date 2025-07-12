@@ -63,7 +63,11 @@ public class DefaultLifecycleController implements ILifecycleController {
 				throw new IllegalStateException("Already shutting down");
 		}
 	}
-	
+
+	@Override
+	public synchronized boolean isStarted() {
+		return state != 0;
+	}
 
 	@Override
 	public synchronized void shutdown() {
