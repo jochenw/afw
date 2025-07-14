@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.log.ILog;
+import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Objects.DuplicateElementException;
 import com.github.jochenw.afw.di.api.IComponentFactory;
@@ -55,6 +57,10 @@ public class GridContainer<T> extends VerticalLayout {
 			@Override public String getHeader() { return header; }
 			@Override public IFilterHandler<V> getFilterHandler() { return filterHandler; }
 
+			public Column<T,V> filterHandler(IFilterHandler<V> pFilterHandler) {
+				filterHandler = pFilterHandler;
+				return this;
+			}
 			@Override
 			public String getFilterValue() {
 				if (filterValueSupplier == null) {
@@ -74,19 +80,9 @@ public class GridContainer<T> extends VerticalLayout {
 			private boolean caseSensitive;
 
 			public StringColumn(@NonNull Builder<T> pBuilder, @NonNull String pId, @NonNull Function<T, String> pMapper,
-					String pHeader) {
+					String pHeader, boolean pCaseSensitive) {
 				super(pBuilder, pId, pMapper, pHeader, String.class);
-			}
-
-			/** Sets, whether this column is case sensitive. Case sensitivity affects
-			 * sorting, and filtering. (Default is case insensitive.)
-			 * @param pCaseSensitive True, if this column is case sensitive. Case
-			 * sensitivity affects sorting, and filtering. (Default is case insensitive.)
-			 * @return This string column.
-			 */
-			public StringColumn<T> caseSensitive(boolean pCaseSensitive) {
 				caseSensitive = pCaseSensitive;
-				return this;
 			}
 
 			/** Returns, whether this column is case sensitive. Case sensitivity affects
@@ -200,6 +196,7 @@ public class GridContainer<T> extends VerticalLayout {
 		}
 
 		/** Creates a new string column, and adds it to the {@link Grid}.
+		 * The created column is case insensitive.
 		 * @param pId The column id, must be unique within the {@link Grid}.
 		 * @param pMapper A mapper, which extracts the columns value from the
 		 *   data bean, that is being displayed in a {@link Grid} row.
@@ -209,8 +206,27 @@ public class GridContainer<T> extends VerticalLayout {
 		 *   {@code pMapper}.
 		 */
 		public StringColumn<T> stringColumn(@NonNull String pId, @NonNull Function<T,String> pMapper,
-				                      String pHeader) {
-			return new StringColumn<T>(this, pId, pMapper, pHeader);
+                String pHeader) {
+			return stringColumn(pId, pMapper, pHeader, false);
+		}
+
+		/** Creates a new string column, and adds it to the {@link Grid}.
+		 * @param pId The column id, must be unique within the {@link Grid}.
+		 * @param pMapper A mapper, which extracts the columns value from the
+		 *   data bean, that is being displayed in a {@link Grid} row.
+		 * @param pHeader The grid columns header, or null, if the column
+		 *   is supposed to be invisible. 
+		 * @param pType Type of the column values. (Result type of the
+		 *   {@code pMapper}.
+		 * @param pCaseSensitive True, if the created column should be
+		 *   case sensitive.
+		 */
+		public StringColumn<T> stringColumn(@NonNull String pId, @NonNull Function<T,String> pMapper,
+				                      String pHeader, boolean pCaseSensitive) {
+			final StringColumn<T> col = new StringColumn<T>(this, pId, pMapper, pHeader, pCaseSensitive);
+			col.filterHandler(Grids.stringFilterHandler(pCaseSensitive));
+			column(col);
+			return col;
 		}
 
 		/** Creates a  new {@link GridContainer}, which is an instance
@@ -237,6 +253,7 @@ public class GridContainer<T> extends VerticalLayout {
 
 	private static final long serialVersionUID = 4989299971825455391L;
 	private IComponentFactory componentFactory;
+	private ILog log;
 	private Class<T> beanType;
 	private final Map<String,String> filterValueMap = new HashMap<>();
 	private Map<String,Builder.Column<T,Object>> columns;
@@ -262,13 +279,15 @@ public class GridContainer<T> extends VerticalLayout {
 	 * {@link #configure(Builder)}.
 	 */
 	protected void init() {
+		log.entering("init: ->");
 		filtersLayout = newFiltersLayout();
 		filtersContainer = newFiltersContainer(filtersLayout);
-		statusField = newStatusField();
-		statusContainer = newStatusComponent(statusContainer);
+		final Component sf = statusField = newStatusField();
+		statusContainer = newStatusComponent(sf);
 		grid = newGrid();
 		filtersChanged();
 		add(filtersContainer, statusContainer, grid);
+		log.exiting("init: <-");
 	}
 
 	/** Configures the grid container by copying the settings
@@ -280,6 +299,7 @@ public class GridContainer<T> extends VerticalLayout {
 	 */
 	protected void configure(Builder<T> pBuilder) {
 		componentFactory = pBuilder.componentFactory;
+		log = componentFactory.requireInstance(ILogFactory.class).getLog(GridContainer.class);
 		beanType = pBuilder.beanType;
 		columns = pBuilder.columns;
 		noFilterText = pBuilder.noFilterText;
@@ -293,7 +313,9 @@ public class GridContainer<T> extends VerticalLayout {
 	 */
 	protected Component newStatusComponent(Component pStatusField) {
 		final HorizontalLayout hl = new HorizontalLayout();
+		hl.setJustifyContentMode(JustifyContentMode.CENTER);
 		hl.setAlignItems(Alignment.CENTER);
+		hl.setWidthFull();
 		hl.add(pStatusField);
 		return hl;
 	}
@@ -326,9 +348,10 @@ public class GridContainer<T> extends VerticalLayout {
 	 */
 	protected Component newStatusField() {
 		final TextField tf = new TextField();
-		tf.setEnabled(false);
+		tf.setReadOnly(true);
 		tf.setVisible(true);
 		tf.setAriaLabel("Filter status");
+		tf.setLabel("Filter status");
 		return tf;
 	}
 
@@ -357,6 +380,8 @@ public class GridContainer<T> extends VerticalLayout {
 	 */
 	protected HorizontalLayout newFiltersLayout() {
 		final HorizontalLayout hl = new HorizontalLayout();
+		hl.setJustifyContentMode(JustifyContentMode.BETWEEN);
+		hl.setWidthFull();
 		columns.forEach((id, col) -> {
 			final IFilterHandler<Object> fh = col.getFilterHandler();
 			if (fh != null) {
@@ -382,6 +407,7 @@ public class GridContainer<T> extends VerticalLayout {
 	protected Component[] newFilterField(Column<T,Object> pColumn, String pIdPrefix) {
 		final TextField tf = new TextField();
 		tf.setAriaLabel(pColumn.getHeader());
+		tf.setLabel(pColumn.getHeader());
 		tf.addValueChangeListener((e) -> {
 			this.filterValueMap.put(pColumn.getId(), e.getValue());
 			filtersChanged();

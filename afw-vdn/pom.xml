@@ -16,7 +16,7 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-core</artifactId>
-      <version>24.7.6</version>
+      <version>24.8.3</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
