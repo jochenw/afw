@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
 
+import com.github.jochenw.afw.core.function.Functions;
+import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILogFactory;
@@ -21,6 +23,7 @@ import com.github.jochenw.afw.vdn.grid.GridContainer.Builder.Column;
 import com.github.jochenw.afw.vdn.grid.Grids.IColumn;
 import com.github.jochenw.afw.vdn.grid.Grids.IFilterHandler;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.NativeLabel;
@@ -97,6 +100,7 @@ public class GridContainer<T> extends VerticalLayout {
 		private final @NonNull Class<T> beanType;
 		private final Map<String,Column<T,Object>> columns = new LinkedHashMap<>();
 		private FailableSupplier<Collection<T>,?> valuesSupplier;
+		private FailableConsumer<T,?> editor;
 		private String idPrefix, noFilterText;
 
 		/** Creates a new instance. Typically, one would use
@@ -123,6 +127,25 @@ public class GridContainer<T> extends VerticalLayout {
 		 */
 		public Builder<T> values(@NonNull FailableSupplier<Collection<T>,?> pValuesSupplier) {
 			valuesSupplier = Objects.requireNonNull(pValuesSupplier, "ValuesSupplier");
+			return this;
+		}
+
+		/** Sets the detail editor. If an editor is configured, then the following
+		 * changes will be done:
+		 * <ul>
+		 *   <li>A "New" button will be added to the status layout, above the grid.
+		 *     Pressing the button will invoke the editor with a null argument.
+		 *   </li>
+		 *   <li>Double clicking on a grid row will be assumed to be a request to
+		 *     update the item, which is being displayed in the row. Technically,
+		 *     this will also invoke the editor, with the rows item as an argument.</li>
+		 * </ul>
+		 * @param pEditor The editor; typically, this is a listener, which opens a detail
+		 *   window, in which the item details can be edited.
+		 * @return This builder.
+		 */
+		public Builder<T> editor(FailableConsumer<T,?> pEditor) {
+			editor = pEditor;
 			return this;
 		}
 
@@ -158,6 +181,21 @@ public class GridContainer<T> extends VerticalLayout {
 		public FailableSupplier<Collection<T>,?> getValuesSupplier() {
 			return valuesSupplier;
 		}
+
+		/** Returns the detail editor. If an editor is configured, then the following
+		 * changes will be done:
+		 * <ul>
+		 *   <li>A "New" button will be added to the status layout, above the grid.
+		 *     Pressing the button will invoke the editor with a null argument.
+		 *   </li>
+		 *   <li>Double clicking on a grid row will be assumed to be a request to
+		 *     update the item, which is being displayed in the row. Technically,
+		 *     this will also invoke the editor, with the rows item as an argument.</li>
+		 * </ul>
+		 * @return The editor; typically, this is a listener, which opens a detail
+		 *   window, in which the item details can be edited.
+		 */
+		public FailableConsumer<T,?> getEditor() { return editor; }
 
 		/** Returns the text, which is being displayed as filter status, if no filters are
 		 *   active. A typical example would be "All items".
@@ -249,6 +287,11 @@ public class GridContainer<T> extends VerticalLayout {
 			gc.init();
 			return gc;
 		}
+
+		/** Returns the bean type, which is the class of the item type {@code &lt;T&gt;}.
+		 * @return The bean type.
+		 */
+		public Class<T> getBeanType() { return beanType; }
 	}
 
 	private static final long serialVersionUID = 4989299971825455391L;
@@ -264,6 +307,7 @@ public class GridContainer<T> extends VerticalLayout {
 	private Grid<T> grid;
 	private String noFilterText, idPrefix;
 	private FailableSupplier<Collection<T>,?> valuesSupplier;
+	private FailableConsumer<T,?> editor;
 
 	public IComponentFactory getComponentFactory() { return componentFactory; }
 	public Class<T> getBeanType() { return beanType; }
@@ -273,6 +317,7 @@ public class GridContainer<T> extends VerticalLayout {
 	public String getNoFilterText() { return noFilterText; }
 	public String getIdPrefix() { return idPrefix; }
 	public FailableSupplier<Collection<T>, ?> getValuesSupplier() { return valuesSupplier; }
+	public FailableConsumer<T,?> getEditor() { return editor; }
 
 	/** Initializes this {@link GridContainer} by applying the
 	 * configuration, that has been set via
@@ -305,6 +350,7 @@ public class GridContainer<T> extends VerticalLayout {
 		noFilterText = pBuilder.noFilterText;
 		idPrefix = pBuilder.idPrefix;
 		valuesSupplier = pBuilder.getValuesSupplier();
+		editor = pBuilder.getEditor();
 	}
 
 	/** Creates a component, which contains the status field.
@@ -317,7 +363,27 @@ public class GridContainer<T> extends VerticalLayout {
 		hl.setAlignItems(Alignment.CENTER);
 		hl.setWidthFull();
 		hl.add(pStatusField);
-		return hl;
+		if (editor == null) {
+			return hl;
+		} else {
+			final Button newButton = newNewButton();
+			final HorizontalLayout outerHl = new HorizontalLayout();
+			outerHl.setAlignItems(Alignment.CENTER);
+			outerHl.setJustifyContentMode(JustifyContentMode.BETWEEN);
+			outerHl.setWidthFull();
+			outerHl.add(hl, newButton);
+			return outerHl;
+		}
+	}
+
+	/** Creates a "New" button.
+	 */
+	protected Button newNewButton() {
+		final Button button = new Button("New");
+		button.addClickListener((e) -> {
+			Functions.accept(editor, null);
+		});
+		return button;
 	}
 
 	/** Creates the grid, which is being displayed by the container.
@@ -331,6 +397,14 @@ public class GridContainer<T> extends VerticalLayout {
 			final Grid.Column<T> gCol = grid.addColumn((t) -> mapper.apply(t)).setHeader(col.getHeader())
 					.setSortable(fh != null);
 			gCol.setId(col.getId());
+		}
+		if (editor != null) {
+			grid.addItemClickListener((e) -> {
+				final T item = e.getItem();
+				if (item != null) {
+					Functions.accept(editor, item);
+				}
+			});
 		}
 		final Map<String,IColumn<T,?>> columnMap = new HashMap<>();
 		columns.forEach((id, col) -> columnMap.put(id, col));

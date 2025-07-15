@@ -15,6 +15,7 @@ import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.function.Predicates;
 import com.github.jochenw.afw.core.util.Strings;
+import com.github.jochenw.afw.core.vdn.Filters;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.vdn.grid.GridContainer.Builder.Column;
 import com.vaadin.flow.data.provider.CallbackDataProvider.CountCallback;
@@ -229,9 +230,15 @@ public class Grids {
 			                                       Map<String,IColumn<T,?>> pColumns) {
 		final Predicate<T> predicate = getPredicate(pColumns.values().stream());
 		final FetchCallback<T,F> fetchCallback = (q) -> {
+			final int limit = q.getLimit();
+			final int offset = q.getOffset();
 			final Comparator<T> comparator = getComparator(q.getSortOrders(), pColumns::get);
 			final List<T> list = new ArrayList<>();
-			final Stream<T> stream = Functions.get(pValuesSupplier).stream();
+			Stream<T> stream = Functions.get(pValuesSupplier).stream();
+			if (limit > 0  ||  offset > 0) {
+				final Predicate<T> limitFilter = Filters.limit(offset, limit);
+				stream = stream.filter(limitFilter);
+			}
 			if (predicate == null) {
 				stream.forEach(list::add);
 			} else {
