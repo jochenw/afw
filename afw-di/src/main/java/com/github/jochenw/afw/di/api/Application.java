@@ -88,7 +88,6 @@ public class Application {
 	 * @return The created component factory.
 	 */
 	protected IComponentFactory newComponentFactory() {
-		final IComponentFactory cf;
 		if (componentFactoryProvider == null) {
 			final @NonNull Module mInner = Objects.requireNonNull(moduleSupplier.get(),
 					"Module supplier returned a null object.");

@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -18,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 import com.github.jochenw.afw.core.function.Functions;
 import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
+import com.github.jochenw.afw.core.function.TriFunction;
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.util.Objects;
@@ -58,7 +58,7 @@ public class GridContainer<T> extends VerticalLayout {
 			private final @NonNull String id;
 			private final @NonNull Function<T,V> mapper;
 			private BiConsumer<T,V> setter;
-			private BiFunction<IColumn<T,V>,V,String> validator;
+			private TriFunction<IColumn<T,V>,T,V,String> validator;
 			private final @NonNull Class<V> type;
 			private Supplier<String> filterValueSupplier;
 			private IFilterHandler<V> filterHandler;
@@ -78,7 +78,7 @@ public class GridContainer<T> extends VerticalLayout {
 			@Override public IFilterHandler<V> getFilterHandler() { return filterHandler; }
 			@Override public @NonNull Class<V> getValueType() { return type; } 
 			public BiConsumer<T,V> getSetter() { return setter; }
-			public BiFunction<IColumn<T,V>,V,String> getValidator() { return validator; }
+			public TriFunction<IColumn<T,V>,T,V,String> getValidator() { return validator; }
 
 			/** Sets the columns {@link IFilterHandler filter handler}. The
 			 * filter handler is responsible for handling of sorting, and
@@ -91,6 +91,15 @@ public class GridContainer<T> extends VerticalLayout {
 				return this;
 			}
 
+			/** Sets the columns setter.
+			 * @param pSetter The columns setter.
+			 * @return This column.
+			 */
+			public Column<T,V> setter(BiConsumer<T,V> pSetter) {
+				setter = pSetter;
+				return this;
+			}
+
 			/** Sets the columns validator. The validator takes as input a
 			 * {@link IColumn column object}, and the actual column value.
 			 * If the column value is valid, the validator must return null.
@@ -99,7 +108,7 @@ public class GridContainer<T> extends VerticalLayout {
 			 * @param The column validator.
 			 * @return This column.
 			 */
-			public Column<T,V> validator(BiFunction<IColumn<T,V>,V,String> pValidator) {
+			public Column<T,V> validator(TriFunction<IColumn<T,V>,T,V,String> pValidator) {
 				validator = pValidator;
 				return this;
 			}
@@ -539,10 +548,10 @@ public class GridContainer<T> extends VerticalLayout {
 		BindingBuilder<T,String> bb = pBinder.forField(tf);
 		final Column<T,String> strCol = Reflection.cast(pColumn);
 		final IColumn<T,String> stringCol = strCol;
-		BiFunction<IColumn<T,String>, String, String> validator = strCol.getValidator();
+		TriFunction<IColumn<T,String>, T, String, String> validator = strCol.getValidator();
 		if (validator != null) {
 			final Validator<String> vaadinValidator = (s, vc) -> {
-				final String msg = validator.apply(stringCol, s);
+				final String msg = validator.apply(stringCol, pBean, s);
 				if (msg == null) {
 					return ValidationResult.ok();
 				} else {
