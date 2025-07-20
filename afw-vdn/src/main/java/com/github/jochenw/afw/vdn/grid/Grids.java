@@ -38,6 +38,7 @@ public class Grids {
 		public String getHeader();
 		public IFilterHandler<V> getFilterHandler();
 		public String getFilterValue();
+		public @NonNull Class<V> getValueType();
 	}
 	public final static IFilterHandler<String> stringFilterHandler(boolean pCaseSensitive) {
 		return new IFilterHandler<String>() {

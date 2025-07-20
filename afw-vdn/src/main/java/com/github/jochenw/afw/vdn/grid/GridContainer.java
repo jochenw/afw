@@ -1,22 +1,28 @@
 package com.github.jochenw.afw.vdn.grid;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
 
 import com.github.jochenw.afw.core.function.Functions;
-import com.github.jochenw.afw.core.function.Functions.FailableConsumer;
+import com.github.jochenw.afw.core.function.Functions.FailableBiConsumer;
 import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.log.ILog;
 import com.github.jochenw.afw.core.log.ILogFactory;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Objects.DuplicateElementException;
+import com.github.jochenw.afw.core.util.Reflection;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.util.Exceptions;
 import com.github.jochenw.afw.vdn.grid.GridContainer.Builder.Column;
@@ -24,12 +30,21 @@ import com.github.jochenw.afw.vdn.grid.Grids.IColumn;
 import com.github.jochenw.afw.vdn.grid.Grids.IFilterHandler;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.Binder.BindingBuilder;
+import com.vaadin.flow.data.binder.Setter;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
+import com.vaadin.flow.function.ValueProvider;
 
 
 public class GridContainer<T> extends VerticalLayout {
@@ -42,6 +57,8 @@ public class GridContainer<T> extends VerticalLayout {
 			private final @NonNull Builder<T> builder;
 			private final @NonNull String id;
 			private final @NonNull Function<T,V> mapper;
+			private BiConsumer<T,V> setter;
+			private BiFunction<IColumn<T,V>,V,String> validator;
 			private final @NonNull Class<V> type;
 			private Supplier<String> filterValueSupplier;
 			private IFilterHandler<V> filterHandler;
@@ -59,11 +76,34 @@ public class GridContainer<T> extends VerticalLayout {
 			@Override public @NonNull Function<T, V> getMapper() { return mapper; }
 			@Override public String getHeader() { return header; }
 			@Override public IFilterHandler<V> getFilterHandler() { return filterHandler; }
+			@Override public @NonNull Class<V> getValueType() { return type; } 
+			public BiConsumer<T,V> getSetter() { return setter; }
+			public BiFunction<IColumn<T,V>,V,String> getValidator() { return validator; }
 
+			/** Sets the columns {@link IFilterHandler filter handler}. The
+			 * filter handler is responsible for handling of sorting, and
+			 * filtering, based on column values, in the grid.
+			 * @param pFilterHandler The columns filter handler.
+			 * @return This column.
+			 */
 			public Column<T,V> filterHandler(IFilterHandler<V> pFilterHandler) {
 				filterHandler = pFilterHandler;
 				return this;
 			}
+
+			/** Sets the columns validator. The validator takes as input a
+			 * {@link IColumn column object}, and the actual column value.
+			 * If the column value is valid, the validator must return null.
+			 * Otherwise, the validator must return an error message, which
+			 * is being displayed with the column value.
+			 * @param The column validator.
+			 * @return This column.
+			 */
+			public Column<T,V> validator(BiFunction<IColumn<T,V>,V,String> pValidator) {
+				validator = pValidator;
+				return this;
+			}
+
 			@Override
 			public String getFilterValue() {
 				if (filterValueSupplier == null) {
@@ -99,8 +139,8 @@ public class GridContainer<T> extends VerticalLayout {
 		private final @NonNull IComponentFactory componentFactory;
 		private final @NonNull Class<T> beanType;
 		private final Map<String,Column<T,Object>> columns = new LinkedHashMap<>();
-		private FailableSupplier<Collection<T>,?> valuesSupplier;
-		private FailableConsumer<T,?> editor;
+		private Persistor<T,?> persistor;
+		private FailableBiConsumer<Persistor<T,?>,T,?> editor;
 		private String idPrefix, noFilterText;
 
 		/** Creates a new instance. Typically, one would use
@@ -119,17 +159,6 @@ public class GridContainer<T> extends VerticalLayout {
 			componentFactory.init(this);
 		}
 
-		/** Sets the supplier, which provides the beans, that are being displayed in the
-		 * {@link Grid}.
-		 * @param pValuesSupplier The supplier, which provides the beans, that are being displayed in the
-		 * {@link Grid}.
-		 * @return This builder.
-		 */
-		public Builder<T> values(@NonNull FailableSupplier<Collection<T>,?> pValuesSupplier) {
-			valuesSupplier = Objects.requireNonNull(pValuesSupplier, "ValuesSupplier");
-			return this;
-		}
-
 		/** Sets the detail editor. If an editor is configured, then the following
 		 * changes will be done:
 		 * <ul>
@@ -144,8 +173,20 @@ public class GridContainer<T> extends VerticalLayout {
 		 *   window, in which the item details can be edited.
 		 * @return This builder.
 		 */
-		public Builder<T> editor(FailableConsumer<T,?> pEditor) {
+		public Builder<T> editor(FailableBiConsumer<Persistor<T,?>,T,?> pEditor) {
 			editor = pEditor;
+			return this;
+		}
+
+		/** Sets the persistor. If a persistor is present, then the
+		 * generated detail viewer will permit editing, and updating the bean.
+		 * @param pPersistor The persistor, which is being used.
+		 * @return The persistor.
+		 */
+		public Builder<T> persistor(Persistor<T,?> pPersistor) {
+			@SuppressWarnings("unchecked")
+			final Persistor<T,Object> p = (Persistor<T,Object>) pPersistor;
+			persistor = p;
 			return this;
 		}
 
@@ -172,15 +213,6 @@ public class GridContainer<T> extends VerticalLayout {
 			noFilterText = Objects.requireNonNull(pNoFilterText, "NoFilterText");
 			return this;
 		}
-	
-		/** Returns the supplier, which provides the beans, that are being displayed in the
-		 * {@link Grid}.
-		 * @return The supplier, which provides the beans, that are being displayed in the
-		 * {@link Grid}.
-		 */
-		public FailableSupplier<Collection<T>,?> getValuesSupplier() {
-			return valuesSupplier;
-		}
 
 		/** Returns the detail editor. If an editor is configured, then the following
 		 * changes will be done:
@@ -195,8 +227,18 @@ public class GridContainer<T> extends VerticalLayout {
 		 * @return The editor; typically, this is a listener, which opens a detail
 		 *   window, in which the item details can be edited.
 		 */
-		public FailableConsumer<T,?> getEditor() { return editor; }
+		public FailableBiConsumer<Persistor<T,?>,T,?> getEditor() { return editor; }
 
+		/** Returns the persistor. If a persistor is present, then the
+		 * generated detail viewer will permit editing, and updating the bean.
+		 * @return The persistor.
+		 */
+		public <O> Persistor<T,O> getPersistor() {
+			@SuppressWarnings("unchecked")
+			final Persistor<T,O> p = (Persistor<T,O>) persistor;
+			return p;
+		}
+		
 		/** Returns the text, which is being displayed as filter status, if no filters are
 		 *   active. A typical example would be "All items".
 		 * @return The text, which is being displayed as filter status,
@@ -300,14 +342,14 @@ public class GridContainer<T> extends VerticalLayout {
 	private Class<T> beanType;
 	private final Map<String,String> filterValueMap = new HashMap<>();
 	private Map<String,Builder.Column<T,Object>> columns;
+	private Persistor<T,Object> persistor;
 
 	private HorizontalLayout filtersLayout;
 	private Component filtersContainer;
 	private Component statusField, statusContainer;
 	private Grid<T> grid;
 	private String noFilterText, idPrefix;
-	private FailableSupplier<Collection<T>,?> valuesSupplier;
-	private FailableConsumer<T,?> editor;
+	private FailableBiConsumer<Persistor<T,?>,T,?> editor;
 
 	public IComponentFactory getComponentFactory() { return componentFactory; }
 	public Class<T> getBeanType() { return beanType; }
@@ -316,8 +358,12 @@ public class GridContainer<T> extends VerticalLayout {
 	public Grid<T> getGrid() { return grid; }
 	public String getNoFilterText() { return noFilterText; }
 	public String getIdPrefix() { return idPrefix; }
-	public FailableSupplier<Collection<T>, ?> getValuesSupplier() { return valuesSupplier; }
-	public FailableConsumer<T,?> getEditor() { return editor; }
+	public FailableBiConsumer<Persistor<T,?>,T,?> getEditor() { return editor; }
+	public <O> Persistor<T,O> getPersistor() {
+		@SuppressWarnings("unchecked")
+		final Persistor<T,O> p = (Persistor<T,O>) persistor;
+		return p;
+	}
 
 	/** Initializes this {@link GridContainer} by applying the
 	 * configuration, that has been set via
@@ -349,8 +395,8 @@ public class GridContainer<T> extends VerticalLayout {
 		columns = pBuilder.columns;
 		noFilterText = pBuilder.noFilterText;
 		idPrefix = pBuilder.idPrefix;
-		valuesSupplier = pBuilder.getValuesSupplier();
 		editor = pBuilder.getEditor();
+		persistor = pBuilder.getPersistor();
 	}
 
 	/** Creates a component, which contains the status field.
@@ -376,14 +422,145 @@ public class GridContainer<T> extends VerticalLayout {
 		}
 	}
 
-	/** Creates a "New" button.
+	/** Creates a "New" button, which uses the given
+	 * {@link Persistor} to create a new instance,
+	 * which will then be edited in the editor.
+	 * @param pPersistor The persistor, which is
+	 * being used by the detail editor to create
+	 * a new, blank instance.
+	 * @return The created button,
 	 */
 	protected Button newNewButton() {
+		final Persistor<T,Object> persistor = getPersistor();
 		final Button button = new Button("New");
 		button.addClickListener((e) -> {
-			Functions.accept(editor, null);
+			final T bean = persistor.newBean();
+			if (persistor.getId(bean) != null) {
+				throw new IllegalStateException("The persistor has created a bean with a non-null id.");
+			}
+			final Component editor = newEditor(bean);
+			final Dialog dialog = new Dialog(editor);
+			dialog.setModal(true);
+			dialog.setCloseOnEsc(true);
+			dialog.open();
 		});
 		return button;
+	}
+
+	/** Generates a detail viewer/editor for the given bean.
+	 * @param pBean The bean, which is being displayed/edited.
+	 * If the bean's id is null, then the created editor
+	 * whould be in read/write mode immediately.
+	 * Otherwise, the editor may be initially in read-only
+	 * mode.
+	 * @param pStorer A callback, which may be invoked to
+	 *   persist the bean. If the callback is null, then the
+	 *   created editor is supposed to be in read-only
+	 *   mode, and provide no means of entering read/write
+	 *   mode.
+	 * @return The created component, which is being displayed
+	 *   in a modal dialog.
+	 */
+	protected Component newEditor(T pBean) {
+		final Binder<T> binder = new Binder<>(getBeanType());
+		final VerticalLayout vl = new VerticalLayout();
+		final List<Consumer<Boolean>> readOnlyConsumers = new ArrayList<>();
+		final FormLayout fl = new FormLayout();
+		columns.values().forEach((col) -> {
+			final TextField tf = newAttributeEditor(binder, pBean, col);
+			fl.add(tf);
+			if (col.getSetter() == null) {
+				tf.setReadOnly(true);
+			} else {
+				final Consumer<Boolean> readOnlyConsumer = (b) -> {
+					tf.setReadOnly(b.booleanValue());
+				};
+				readOnlyConsumers.add(readOnlyConsumer);
+			}
+		});
+		final Persistor<T,?> persistor = getPersistor();
+		if (!readOnlyConsumers.isEmpty()) {
+			final boolean editable = !persistor.isReadOnly();
+			final Boolean initialState;
+			if (editable) {
+				initialState = Boolean.valueOf(persistor.getId(pBean) != null);
+			} else {
+				initialState = Boolean.TRUE;
+			}
+			readOnlyConsumers.forEach((cns) -> cns.accept(initialState));
+			if (editable && initialState.booleanValue()) {
+				// Create a button, which enables making the text fields editable.
+				final Button editButton = new Button("Edit");
+				editButton.addClickListener((e) -> {
+					readOnlyConsumers.forEach((cns) -> {
+						cns.accept(Boolean.FALSE);
+					});
+					editButton.setEnabled(false);
+				});
+				final HorizontalLayout hl = new HorizontalLayout();
+				hl.setJustifyContentMode(JustifyContentMode.END);
+				hl.setWidthFull();
+				hl.add(editButton);
+				vl.add(hl);
+			}
+		}
+		final Button saveButton = new Button("Save");
+		saveButton.addClickListener((e) -> {
+			try {
+				binder.writeChangedBindingsToBean(pBean);
+			} catch (ValidationException ve) {
+				/* Validation failed, do nothing.
+				 * (Dialog remains open, with error messages
+				 * being displayed, so the 
+				 */
+				return;
+			}
+			if (persistor.getId(pBean) == null) {
+				persistor.insert(pBean);
+			} else {
+				persistor.update(pBean);
+			}
+		});
+		final HorizontalLayout hl = new HorizontalLayout();
+		hl.setJustifyContentMode(JustifyContentMode.END);
+		hl.setWidthFull();
+		hl.add(saveButton);
+		vl.add(hl);
+		return vl;
+	}
+
+	protected TextField newAttributeEditor(Binder<T> pBinder, T pBean, Column<T,Object> pColumn) {
+		final Class<?> stringClass = String.class;
+		final Class<?> colClass = pColumn.getValueType();
+		if (stringClass != colClass) {
+			throw new IllegalStateException("Invalid column type: " + colClass.getName());
+		}
+		final TextField tf = new TextField();
+		BindingBuilder<T,String> bb = pBinder.forField(tf);
+		final Column<T,String> strCol = Reflection.cast(pColumn);
+		final IColumn<T,String> stringCol = strCol;
+		BiFunction<IColumn<T,String>, String, String> validator = strCol.getValidator();
+		if (validator != null) {
+			final Validator<String> vaadinValidator = (s, vc) -> {
+				final String msg = validator.apply(stringCol, s);
+				if (msg == null) {
+					return ValidationResult.ok();
+				} else {
+					return ValidationResult.error(msg);
+				}
+			};
+			bb = bb.withValidator(vaadinValidator);
+		}
+		final Function<T,String> getter = strCol.getMapper();
+		final BiConsumer<T,String> setter = strCol.getSetter();
+		final ValueProvider<T,String> vp = (t) -> getter.apply(t);
+		if (setter == null) {
+			bb.bindReadOnly(vp);
+		} else {
+			final Setter<T,String> vdnSetter = (t,s) -> setter.accept(t,  s);
+			bb.bind(vp, vdnSetter);
+		}
+		return tf;
 	}
 
 	/** Creates the grid, which is being displayed by the container.
@@ -402,12 +579,13 @@ public class GridContainer<T> extends VerticalLayout {
 			grid.addItemClickListener((e) -> {
 				final T item = e.getItem();
 				if (item != null) {
-					Functions.accept(editor, item);
+					Functions.accept(editor, getPersistor(), item);
 				}
 			});
 		}
 		final Map<String,IColumn<T,?>> columnMap = new HashMap<>();
 		columns.forEach((id, col) -> columnMap.put(id, col));
+		final FailableSupplier<Collection<T>,?> valuesSupplier = () -> getPersistor().getAllItems();
 		grid.setDataProvider(Grids.getDataProvider(valuesSupplier, columnMap));
 		return grid;
 	}
