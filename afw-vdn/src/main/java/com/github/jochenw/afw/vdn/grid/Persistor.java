@@ -23,25 +23,26 @@ public abstract class Persistor<T,V> {
 	public static abstract class Listener<T> {
 		/** Called, if a new bean has been inserted into the
 		 * persistent storage.
-		 * @param The newly inserted bean, with a non-null id.
+		 * @param pBean The newly inserted bean, with a non-null id.
 		 */
 		public void inserted(T pBean) {}
 		/** Called, if a new bean has been updated in the
 		 * persistent storage.
-		 * @param The recently updated bean, with the new
+		 * @param pBean The recently updated bean, with the new
 		 *   field values.
 		 */
 		public void updated(T pBean) {}
 		/** Called, if a new bean has been removed from the
 		 * persistent storage.
-		 * @param The recently deleted bean.
+		 * @param pBean The recently deleted bean.
 		 */
 		public void deleted(T pBean) {}
 	}
 	/** Returns the Id of a bean of type T.
 	 * @param pBean The bean, for which to return the id.
-	 * @param pBean The bean's id, if it has already been persisted,
-	 *   otherwise null.
+	 * @return The given bean's id, if any, or null.
+	 *   The null value indicates, that the bean has
+	 *   not yet been persisted.
 	 */
 	public abstract V getId(T pBean);
 	/** Inserts the given bean into the persistent storage.
@@ -61,15 +62,15 @@ public abstract class Persistor<T,V> {
 	 */
 	public abstract T insert(T pBean);
 	/** Updates the given bean in the persistent stage.
-	 * The beans id <em>cannot<em> be changed.
-	 * @param The bean, which is being changed, with the
+	 * The beans id <em>cannot</em> be changed.
+	 * @param pBean The bean, which is being changed, with the
 	 *   new attribute values.
 	 * @throws NoSuchElementException The given bean's id
 	 *   is not found in the persistent storage.
 	 */
 	public abstract void update(T pBean);
 	/** Deletes the given bean from the persistent stage.
-	 * @param The bean, which is being changed, with the
+	 * @param pBean The bean, which is being changed, with the
 	 *   new attribute values. The caller is supposed
 	 *   to discard the bean after calling, because it
 	 *   is assumed not to exist any longer.
@@ -92,14 +93,25 @@ public abstract class Persistor<T,V> {
 	/** Returns, whether this {@link Persistor}
 	 * is read-only. If so, then the write operations
 	 * {@link #insert(Object)}, {@link #update(Object)},
-	 * and {@#delete(Object)} will throw an
+	 * and {@link #delete(Object)} will throw an
 	 * {@link UnsupportedOperationException}.
 	 * A read-only persistor can easily be created
 	 * by using #of(Functions.FailableConsumer).
 	 * @see #readAll(FailableConsumer)
+	 * @return True, if this persistor supports
+	 *   the write operations
+	 *   {@link #insert(Object)},
+	 *   {@link #update(Object)}, and
+	 *   {@link #delete(Object)}.
 	 */
 	public abstract boolean isReadOnly();
 
+	/** Returns a list of all items from the persistent
+	 * storage. Basically, this is a convenience frontend
+	 * for {@link #readAll(FailableConsumer)}.
+	 * @return The list of all items, that have been
+	 *   read.
+	 */
 	public List<T> getAllItems() {
 		final List<T> list = new ArrayList<>();
 		readAll((t) -> list.add(t));
@@ -124,8 +136,12 @@ public abstract class Persistor<T,V> {
 	/** Creates a new persistor, which is read-only: Only
 	 * {@link #getAllItems()}, and {@link #readAll(FailableConsumer)},
 	 * are supported, and {@link #isReadOnly()} will return true.
-	 * @param <T>
-	 * @param pReader
+	 * @param <T> Type of the beans, which are handled by the
+	 *   created persistor.
+	 * @param <I> Type of the keys, which identify the beans,
+	 *   that are handled by the created persistor.
+	 * @param pReader The implementation for {@link #readAll(FailableConsumer)},
+	 *   thus indirectly the implementation for {@link #getAllItems()}. 
 	 * @param pIdMapper A {@link Function}, which maps the persisted
 	 *   items to their id. Internally, this implements
 	 *   {@link #getId(Object)}.
@@ -139,6 +155,11 @@ public abstract class Persistor<T,V> {
 
 	/** Creates a new {@link Builder}, as a means to implement a
 	 * {@link Persistor}.
+	 * @param <T> Type of the beans, which are handled by the
+	 *   created persistor.
+	 * @param <I> Type of the keys, which identify the beans,
+	 *   that are handled by the created persistor.
+	 * @return The created builder.
 	 */
 	public static <T,I> Builder<T,I> builder() {
 		return new Builder<T,I>();
@@ -169,7 +190,7 @@ public abstract class Persistor<T,V> {
 		/** Returns the reader, which has been supplied as
 		 * the implementation of {@link Persistor#readAll(FailableConsumer)}.
 		 * @return The reader, which has previously been supplied
-		 *   by invoking {@link #insert(Functions.FailableConsumer)},
+		 *   by invoking {@link #insert(FailableFunction)},
 		 *   or null.
 		 */
 		public FailableConsumer<FailableConsumer<T, ?>, ?> getReader() {
@@ -254,7 +275,7 @@ public abstract class Persistor<T,V> {
 		/** Returns the updater, which has been supplied as
 		 * the implementation of {@link Persistor#update(Object)}.
 		 * @return The updater, which has previously been supplied
-		 *   by invoking {@link #update(Functions.FailableFunction)},
+		 *   by invoking {@link #update(FailableConsumer)}.
 		 *   or null.
 		 */
 		public FailableConsumer<T, ?> getUpdater() {
@@ -276,7 +297,7 @@ public abstract class Persistor<T,V> {
 		/** Returns the deleter, which has been supplied as
 		 * the implementation of {@link Persistor#delete(Object)}.
 		 * @return The deleter, which has previously been supplied
-		 *   by invoking {@link #delete(Functions.FailableFunction)},
+		 *   by invoking {@link #delete(FailableConsumer)}.
 		 *   or null.
 		 */
 		public FailableConsumer<T, ?> getDeleter() {
@@ -284,6 +305,11 @@ public abstract class Persistor<T,V> {
 		}
 
 
+		/** Creates a new persistor, applying the builders
+		 * configuration, and returns the created instance.
+		 * @return The created persistor, with the builders
+		 *   configuration applied.
+		 */
 		public Persistor<T,I> get() {
 			if (reader == null  ||  idMapper == null) {
 				throw new IllegalStateException("A Persistor needs to implement, "

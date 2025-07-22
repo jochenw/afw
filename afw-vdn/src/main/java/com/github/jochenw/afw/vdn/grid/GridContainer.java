@@ -346,18 +346,59 @@ public class GridContainer<T> extends VerticalLayout {
 	}
 
 	private static final long serialVersionUID = 4989299971825455391L;
+	/** The component factory.
+	 */
 	private IComponentFactory componentFactory;
+	/** The logger.
+	 */
 	private ILog log;
+	/** Class of the beans, which are being displayed in the grid.
+	 */
 	private Class<T> beanType;
+	/** A map with the filter values, by column id.
+	 */
 	private final Map<String,String> filterValueMap = new HashMap<>();
+	/** The map of grid columns, by column id.
+	 */
 	private Map<String,Builder.Column<T,Object>> columns;
+	/** The persistor; basically the liaison with persistent
+	 * storage.
+	 */
 	private Persistor<T,Object> persistor;
 
+	/** The layout, which contains the filter fields.
+	 */
 	private HorizontalLayout filtersLayout;
+	/** The component, which contains the filters layout,
+	 * including the filters layout. Typically,  this
+	 * would be a vertical layout.
+	 */
 	private Component filtersContainer;
-	private Component statusField, statusContainer;
+	/** The component, which displays the grids filter status,
+	 * typically a read-only text field, or something the like.
+	 */
+	private Component statusField;
+	/** The component, which includes the status field,
+	 * typically a horizontal layout.
+	 */
+	private Component statusContainer;
+	/** The actual grid.
+	 */
 	private Grid<T> grid;
-	private String noFilterText, idPrefix;
+	/** The text, which is being displayed, if no filters
+	 * are active, and the grid displays all items.
+	 */
+	private String noFilterText;
+	/** The prefix, which is used for generated HTML id's.
+	 * The purpose of the prefix is to ensure uniqueness
+	 * over all grids in the application.
+	 */
+	private String idPrefix;
+	/** The editor is a consumer, which is being invoked
+	 * as a detail viewer/editor for the bean, that it
+	 * receives. Typically, this will open a dialog,
+	 * which displays the bean details.
+	 */
 	private FailableBiConsumer<Persistor<T,?>,T,?> editor;
 
 	public IComponentFactory getComponentFactory() { return componentFactory; }

@@ -26,9 +26,32 @@ import com.vaadin.flow.data.provider.SortDirection;
 
 public class Grids {
 	public interface IFilterHandler<V> {
+		/** Returns, whether the filter handler supports null values.
+		 * If so, the value null may be passed to the generated
+		 * {@link #getPredicate(String) predicate}, and the
+		 * {@link #getComparator() comparator}.
+		 * @return True, if the filter handler supports
+		 *   null values.
+		 */
 		public boolean isNullsafe();
+		/** Returns, whether the given filter value specifies,
+		 * that filtering is active on the filter handlers
+		 * column. Typically, filtering is not done, if the
+		 * filter value is null, or empty.
+		 * @param pValue The filter value.
+		 * @return True, if the filter value suggests
+		 *   filtering.
+		 */
 		public boolean isFiltering(String pValue);
 		public String getDescription(String pColumnId, String pValue);
+		/** Returns a predicate, which implements filtering
+		 * for the filter handlers column, or null.
+		 * Typically, the result is null, if
+		 * {@link #isFiltering(String)} returns false,
+		 * and vice versa.
+		 * @param pValue The filter value.
+		 * @return The generated predicate
+		 */
 		public Predicate<V> getPredicate(String pValue);
 		public Comparator<V> getComparator();
 	}
