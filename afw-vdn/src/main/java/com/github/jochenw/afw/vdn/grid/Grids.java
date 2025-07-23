@@ -18,13 +18,25 @@ import com.github.jochenw.afw.core.util.Strings;
 import com.github.jochenw.afw.core.vdn.Filters;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.vdn.grid.GridContainer.Builder.Column;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.CallbackDataProvider.CountCallback;
 import com.vaadin.flow.data.provider.CallbackDataProvider.FetchCallback;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.SortDirection;
 
+/** Utility class for working with {@link Grid grids}.
+ */
 public class Grids {
+	/** Private constructor, because this class provides only static methods.
++	 */
+	private Grids() {}
+
+	/** A filter handler for grid columns. This object
+	 * controls filtering, and sorting, based on the
+	 * column values.
+	 * @param <V> Type of the column values.
+	 */
 	public interface IFilterHandler<V> {
 		/** Returns, whether the filter handler supports null values.
 		 * If so, the value null may be passed to the generated
@@ -43,6 +55,15 @@ public class Grids {
 		 *   filtering.
 		 */
 		public boolean isFiltering(String pValue);
+		/** Creates a description of the filter, which would
+		 * be created by invoking {@link #getPredicate(String)}
+		 * with the given filter value.
+		 * @param pColumnId Id of the column, which is
+		 *   being filtered.
+		 * @param pValue The filter value 
+		 * @return The requested description, if any, or null,
+		 *   if the filter value suggests no filtering.
+		 */
 		public String getDescription(String pColumnId, String pValue);
 		/** Returns a predicate, which implements filtering
 		 * for the filter handlers column, or null.
@@ -53,16 +74,55 @@ public class Grids {
 		 * @return The generated predicate
 		 */
 		public Predicate<V> getPredicate(String pValue);
+		/** Returns a comparator, which can be used to sort grid rows
+		 * by this column.
+		 * @return The requested comparator, or null, if sorting
+		 * by this column is not supported.
+		 */
 		public Comparator<V> getComparator();
 	}
+
+	/** Interface of a column specification.
+	 * @param <T> Type of the data bean, which is being displayed in the grid.
+	 * @param <V> Type of the data bean attribute, which is being displayed
+	 *   in this column.
+	 */
 	public interface IColumn<T,V> {
+		/** The column id, must be unique within the grid.
+		 * @return The columns id.
+		 */
 		public @NonNull String getId();
+		/** A getter, which maps a data bean to the
+		 * columns attribute value.
+		 * @return The columns attribute value getter.
+		 */
 		public @NonNull Function<T,V> getMapper();
+		/** The header string, which is being displayed in the
+		 * grids top row for this column. Null, if the column
+		 * should not be visible.
+		 * @return The columns header string.
+		 */
 		public String getHeader();
+		/** Returns the columns filter handler, which controls
+		 * filtering, and sorting on this column.
+		 * @return The filter handler, which has bee configured
+		 *   for this column.
+		 */
 		public IFilterHandler<V> getFilterHandler();
+		/** Returns the columns current filter value.
+		 * @return The columns current filter value.
+		 */
 		public String getFilterValue();
+		/** Returns the type of the column values.
+		 * @return The type of the column values.
+		 */
 		public @NonNull Class<V> getValueType();
 	}
+	/** Creates a default filter handler for a string valued column.
+	 * @param pCaseSensitive True, if the filter should be case sensitive.
+	 *   Otherwise false.
+	 * @return The created default filter hamdler.
+	 */
 	public final static IFilterHandler<String> stringFilterHandler(boolean pCaseSensitive) {
 		return new IFilterHandler<String>() {
 			@Override
@@ -158,6 +218,12 @@ public class Grids {
 		};
 	}
 
+	/** Creates a filter predicate for a grids rows, based on the given columns.
+	 * @param <T> Type of the beans, which are being displayed in the grid.
+	 * @param pColumns The grids columns.
+	 * @return A predicate, which filters the grids beans, based on the
+	 *   {@link IColumn#getFilterValue() filter values}.
+	 */
 	public static <T> Predicate<T> getPredicate(Stream<IColumn<T,?>> pColumns) {
 		final List<Predicate<T>> list = new ArrayList<>();
 		pColumns.forEach((col) -> {
@@ -191,6 +257,16 @@ public class Grids {
 		}
 	}
 
+	/** Creates a comparator for sorting the grids content by applying the sort
+	 * order given by {@code pQsoList} on the columns given by
+	 * {@code pColumnLookup}
+	 * @param <T> Type of the data beans, which are being displayed.
+	 * @param pQsoList The sort order, basically a list of column id's, and
+	 * ascending/descending flags.
+	 * @param pColumnLookup A lookup for the columns, based on the column
+	 *   id's in {@code pQsoList}.
+	 * @return The created comparator.
+	 */
 	public static <T> Comparator<T> getComparator(List<QuerySortOrder> pQsoList, Function<String, IColumn<T,?>> pColumnLookup) {
 		final List<Comparator<T>> list = new ArrayList<>();
 		for (QuerySortOrder qso : pQsoList) {
@@ -250,6 +326,16 @@ public class Grids {
 		}
 	}
 
+	/** Creates a {@link DataProvider}, which supports filtering, and sorting the grid
+	 * contents.
+	 * @param <T> Type of the grids data bean.
+	 * @param <F> Type of the filter configuration, which is being used.
+	 * @param pValuesSupplier A supplier for the unfiltered collection of
+	 *   beans. The data provider is supposed to apply proper filtering,
+	 *   and sorting.
+	 * @param pColumns The columns, that are being displayed in the grid.
+	 * @return The created data provider.
+	 */
 	public static <T,F> DataProvider<T,F> getDataProvider(FailableSupplier<Collection<T>,?> pValuesSupplier,
 			                                       Map<String,IColumn<T,?>> pColumns) {
 		final Predicate<T> predicate = getPredicate(pColumns.values().stream());
@@ -290,6 +376,7 @@ public class Grids {
 	 *   used to configure this builder, and the created container.
 	 * @param pBeanType Bean type of the grid, that is being displayed within the
      *   created {@link GridContainer}.
+	 * @param <T> Type of the grids data beans.
      * @return The created builder.
 	 */
 	public static <T>  GridContainer.Builder<T> builder(@NonNull IComponentFactory pComponentFactory, @NonNull Class<T> pBeanType) {
@@ -299,7 +386,10 @@ public class Grids {
 	/** Returns a description of the current filter status.
 	 * @param pColumns The grid columns.
 	 * @param pNoFilterText The text, which is being displayed, if no filter is active,
-	 *   and 
+	 *   and all data beans are being displayed.
+	 * @param <T> Type of the grids data beans.
+	 * @param <V> Type of the grid columns.
+	 * @return The current filter status description.
 	 */
 	public static <T,V> String getFilterDescription(Collection<Column<T,V>> pColumns, String pNoFilterText) {
 		final List<String> filterValueDescriptions = new ArrayList<>();

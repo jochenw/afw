@@ -21,6 +21,10 @@ public abstract class Persistor<T,V> {
 	 * persistence related events.
 	 */
 	public static abstract class Listener<T> {
+		/** Creates a new instance.
+		 */
+		protected Listener() {}
+
 		/** Called, if a new bean has been inserted into the
 		 * persistent storage.
 		 * @param pBean The newly inserted bean, with a non-null id.
@@ -38,6 +42,9 @@ public abstract class Persistor<T,V> {
 		 */
 		public void deleted(T pBean) {}
 	}
+	/** Creates a new instance.
+	 */
+	protected Persistor() {}
 	/** Returns the Id of a bean of type T.
 	 * @param pBean The bean, for which to return the id.
 	 * @return The given bean's id, if any, or null.
@@ -169,6 +176,10 @@ public abstract class Persistor<T,V> {
 	 * to obtain one.
 	 */
 	public static class Builder<T,I> {
+		/** Creates a new instance.
+		 */
+		protected Builder() {}
+
 		private @Nullable FailableConsumer<FailableConsumer<T,?>,?> reader;
 		private @Nullable Function<T,I> idMapper;
 		private @Nullable Supplier<T> supplier;

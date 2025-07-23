@@ -53,6 +53,12 @@ public class GridContainer<T> extends VerticalLayout {
 	 * created {@link GridContainer}.
 	 */
 	public static class Builder<T> {
+		/** Configuration of a grid column. Note, that there is
+		 * {@link StringColumn a dedicated subclass} for
+		 * string valued columns.
+		 * @param <T> Type of the grids data beans.
+		 * @param <V> Type of the columns values.
+		 */
 		public static class Column<T,V> implements Grids.IColumn<T,V> {
 			private final @NonNull Builder<T> builder;
 			private final @NonNull String id;
@@ -64,6 +70,16 @@ public class GridContainer<T> extends VerticalLayout {
 			private IFilterHandler<V> filterHandler;
 			private final String header;
 
+			/** Creates a new column object.
+			 * @param pBuilder The builder, which is creating this column.
+			 *   Also the result value of {@link #end()}.
+			 * @param pId The column id. Must be unique within the grid.
+			 * @param pMapper A getter, which extracts the columns values
+			 *   from a data bean.
+			 * @param pHeader The columns header string, or null, if the
+			 *   column should not be visible.
+			 * @param pType Type of the columns values.
+			 */
 			public Column(@NonNull Builder<T> pBuilder, @NonNull String pId, @NonNull Function<T,V> pMapper,
 					      String pHeader, @NonNull Class<V> pType) {
 				builder = pBuilder;
@@ -77,7 +93,27 @@ public class GridContainer<T> extends VerticalLayout {
 			@Override public String getHeader() { return header; }
 			@Override public IFilterHandler<V> getFilterHandler() { return filterHandler; }
 			@Override public @NonNull Class<V> getValueType() { return type; } 
+			/** Returns the columns setter, if any, or null, if the
+			 * column value is read-only.
+			 * @return The columns setter, if any, or null, if the
+			 * column value is read-only.
+			 */
 			public BiConsumer<T,V> getSetter() { return setter; }
+			/** Returns the columns validator. The validators
+			 * {@link TriFunction#apply(Object, Object, Object)} method
+			 * receives the following arguments:
+			 * <ol>
+			 *   <li>The column object. This is designed to make one
+			 *     validator reusable over multiple columns.</li>
+			 *   <li>The current rows data bean.</li>
+			 *   <li>The current columns value object in the current rows
+			 *     data bean.</li>
+			 * </ol>
+			 * The validator returns either null (the column value is valid),
+			 *   or an error message, which is being displayed.
+			 * @return Either null (the column value is valid),
+			 *   or an error message, which is being displayed.
+			 */
 			public TriFunction<IColumn<T,V>,T,V,String> getValidator() { return validator; }
 
 			/** Sets the columns {@link IFilterHandler filter handler}. The
@@ -105,7 +141,18 @@ public class GridContainer<T> extends VerticalLayout {
 			 * If the column value is valid, the validator must return null.
 			 * Otherwise, the validator must return an error message, which
 			 * is being displayed with the column value.
-			 * @param The column validator.
+			 * @param pValidator The column validator. The validator's
+			 * {@link TriFunction#apply(Object, Object, Object)} method
+			 * receives the following arguments:
+			 * <ol>
+			 *   <li>The column object. This is designed to make one
+			 *     validator reusable over multiple columns.</li>
+			 *   <li>The current rows data bean.</li>
+			 *   <li>The current columns value object in the current rows
+			 *     data bean.</li>
+			 * </ol>
+			 * The validator returns either null (the column value is valid),
+			 *   or an error message, which is being displayed.
 			 * @return This column.
 			 */
 			public Column<T,V> validator(TriFunction<IColumn<T,V>,T,V,String> pValidator) {
@@ -128,9 +175,24 @@ public class GridContainer<T> extends VerticalLayout {
 			 */
 			public @NonNull Builder<T> end() { return builder; }
 		}
+		/** Representation of a string valued column. Compared to a basic
+		 * {@link Column}, this adds support for case sensitivity.
+		 * @param <T> Type of the grids data beans.
+		 */
 		public static class StringColumn<T> extends Column<T,String> {
 			private boolean caseSensitive;
 
+			/** Creates a new instance.
+			 * @param pBuilder The builder, which is creating this column.
+			 *   Also the result value of {@link #end()}.
+			 * @param pId The column id. Must be unique within the grid.
+			 * @param pMapper A getter, which extracts the columns values
+			 *   from a data bean.
+			 * @param pHeader The columns header string, or null, if the
+			 *   column should not be visible.
+			 * @param pCaseSensitive True, if filtering, and sorting should
+			 *   be case sensitive for this column.
+			 */
 			public StringColumn(@NonNull Builder<T> pBuilder, @NonNull String pId, @NonNull Function<T, String> pMapper,
 					String pHeader, boolean pCaseSensitive) {
 				super(pBuilder, pId, pMapper, pHeader, String.class);
@@ -214,7 +276,7 @@ public class GridContainer<T> extends VerticalLayout {
 
 		/** Sets the text, which is being displayed as filter status, if no filters are
 		 *   active. A typical example would be "All items".
-		 * @param pNoFiltersText The text, which is being displayed as filter status,
+		 * @param pNoFilterText The text, which is being displayed as filter status,
 		 *   if no filters are active. A typical example would be "All items".
 		 * @return This builder.
 		 */
@@ -240,7 +302,9 @@ public class GridContainer<T> extends VerticalLayout {
 
 		/** Returns the persistor. If a persistor is present, then the
 		 * generated detail viewer will permit editing, and updating the bean.
-		 * @return The persistor.
+		 * @param <O> Type of the data beans id.
+		 * @return The persistor, if any, or null. In the latter case, the
+		 *   generated detail viewer will be read-only.
 		 */
 		public <O> Persistor<T,O> getPersistor() {
 			@SuppressWarnings("unchecked")
@@ -259,6 +323,8 @@ public class GridContainer<T> extends VerticalLayout {
 
 		/** Adds a new column to the {@link Grid}.
 		 * @param pColumn The column, which is being added to the {@link Grid}.
+		 * @param <V> Type of the column values. (Result type of the
+		 *   {@code pMapper}.
 		 * @return The column, which has just been added, fot further configuration.
 		 */
 		public <V> Column<T,V> column(Column<T,V> pColumn) {
@@ -278,6 +344,9 @@ public class GridContainer<T> extends VerticalLayout {
 		 *   is supposed to be invisible. 
 		 * @param pType Type of the column values. (Result type of the
 		 *   {@code pMapper}.
+		 * @param <V> Type of the column values. (Result type of the
+		 *   {@code pMapper}.
+		 * @return The created column.
 		 */
 		public <V> Column<T,V> column(@NonNull String pId, @NonNull Function<T,V> pMapper,
 				                  String pHeader, @NonNull Class<V> pType) {
@@ -291,8 +360,8 @@ public class GridContainer<T> extends VerticalLayout {
 		 *   data bean, that is being displayed in a {@link Grid} row.
 		 * @param pHeader The grid columns header, or null, if the column
 		 *   is supposed to be invisible. 
-		 * @param pType Type of the column values. (Result type of the
-		 *   {@code pMapper}.
+		 * @return The created string column.
+		 * @see #stringColumn(String, Function, String, boolean)}
 		 */
 		public StringColumn<T> stringColumn(@NonNull String pId, @NonNull Function<T,String> pMapper,
                 String pHeader) {
@@ -305,10 +374,10 @@ public class GridContainer<T> extends VerticalLayout {
 		 *   data bean, that is being displayed in a {@link Grid} row.
 		 * @param pHeader The grid columns header, or null, if the column
 		 *   is supposed to be invisible. 
-		 * @param pType Type of the column values. (Result type of the
-		 *   {@code pMapper}.
 		 * @param pCaseSensitive True, if the created column should be
 		 *   case sensitive.
+		 * @return The created string column.
+		 * @see #stringColumn(String, Function, String)}.
 		 */
 		public StringColumn<T> stringColumn(@NonNull String pId, @NonNull Function<T,String> pMapper,
 				                      String pHeader, boolean pCaseSensitive) {
@@ -320,6 +389,11 @@ public class GridContainer<T> extends VerticalLayout {
 
 		/** Creates a  new {@link GridContainer}, which is an instance
 		 * of the given {@code pType}.
+		 * @param <GC> Type of the created object, a subclass of
+         *   {@link GridContainer}.
+		 * @param pType Type of the created object, a subclass of
+         *   {@link GridContainer}.
+		 * @return The created {@link GridContainer}.
 		 */
 		public <GC extends GridContainer<T>> GC build(Class<GC> pType) {
 			final Constructor<GC> constructor;
