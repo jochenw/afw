@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
@@ -70,7 +72,8 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 	public void configure(@NonNull IAnnotationProvider pAnnotationProvider,
 			              @NonNull IOnTheFlyBinder pOnTheFlyBinder,
 			              @NonNull List<BindingBuilder<Object>> pBuilders,
-			              @NonNull Set<Class<?>> pStaticInjectionClasses) {
+			              @NonNull Set<Class<?>> pStaticInjectionClasses,
+			              @Nullable Consumer<String> pLogger) {
 		setAnnotationProvider(pAnnotationProvider);
 		// Eliminate duplicate bindings.
 		final Map<Key<Object>,BindingBuilder<Object>> bindingsByKey = new HashMap<>();

@@ -49,6 +49,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	private Predicate<Class<?>> staticInjectionPredicate;
 	private BindingRegistry bindings;
 	private IOnTheFlyBinder onTheFlyBinder;
+	private Consumer<String> logger;
 
 	@Override
 	public void init(Object pObject) {
@@ -106,11 +107,13 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	public void configure(@NonNull IAnnotationProvider pAnnotationProvider,
 			              @NonNull IOnTheFlyBinder pOnTheFlyBinder,
 			              @NonNull List<BindingBuilder<Object>> pBuilders,
-			              @NonNull Set<Class<?>> pStaticInjectionClasses) {
+			              @NonNull Set<Class<?>> pStaticInjectionClasses,
+			              @Nullable Consumer<String> pLogger) {
 		setAnnotationProvider(pAnnotationProvider);
 		onTheFlyBinder = pOnTheFlyBinder;
 		staticInjectionPredicate = (cl) -> pStaticInjectionClasses.contains(cl);
 		bindings = new BindingRegistry(this, pBuilders);
+		logger = pLogger;
 		try {
 			bindings.init(this);
 		} catch (Throwable t) {
@@ -142,6 +145,12 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		void accept(O1 pO1, O2 pO2, O3 pO3);
 	}
 
+	protected void log(String pMsg) {
+		if (logger != null) {
+			logger.accept(pMsg);
+		}
+	}
+
 	/** Returns an injector for the given type.
 	 * The injector has the ability to configure an instance
 	 * of the given type by injecting values.
@@ -149,6 +158,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	 * @return The created injector.
 	 */
 	protected BiConsumer<SimpleComponentFactory,Object> newInjector(Class<Object> pType) {
+		log("newInjector: " + pType.getName());
 		final List<BiConsumer<SimpleComponentFactory,Object>> list = new ArrayList<>();
 		Class<Object> clazz = pType;
 		boolean staticInjection = staticInjectionPredicate.test(pType);
@@ -183,6 +193,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	 *   must be created.
 	 */
 	protected void newMethodInjector(final Consumer<BiConsumer<SimpleComponentFactory, Object>> pSink, Method pMethod) {
+		log("newMethodInjector: " + asString(pMethod));
 		if (Modifier.isAbstract(pMethod.getModifiers())) {
 			throw new IllegalStateException("The method " + asString(pMethod)
 				+ " is abstract. Therefore, it must not be annotated with @Inject.");
@@ -232,6 +243,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				throw new IllegalStateException("The field " + pField.getName() + " in class " + pClazz.getName()
 					+ " is final. Therefore, it must not be annotated with @Inject.");
 			}
+			log("newFieldInjector: " + pField);
 			final Binding binding = findBinding(pField.getGenericType(), pField.getAnnotations());
 			if (binding == null) {
 				throw new IllegalStateException("No binding registered for field "

@@ -2,8 +2,10 @@ package com.github.jochenw.afw.di.impl;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
@@ -49,9 +51,12 @@ public abstract class AbstractComponentFactory implements IComponentFactory {
 	 * @param pBuilders The list of binding builders
 	 * @param pStaticInjectionClasses The set of classes, that need static
 	 *   injection.
+	 * @param pLogger The component factories logger.
 	 */
 	public abstract void configure(@NonNull IAnnotationProvider pAnnotationProvider,
 			                       @NonNull IOnTheFlyBinder pOnTheFlyBinder,
 			                       @NonNull List<BindingBuilder<Object>> pBuilders,
-			                       @NonNull Set<Class<?>> pStaticInjectionClasses);
+			                       @NonNull Set<Class<?>> pStaticInjectionClasses,
+			                       @Nullable Consumer<String> pLogger);
+			                       
 }

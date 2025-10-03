@@ -39,6 +39,7 @@ public class ComponentFactoryBuilder {
 	private @Nullable IComponentFactory instance;
 	private @NonNull IAnnotationProvider annotationProvider = Annotations.getDefaultProvider();
 	private @NonNull IOnTheFlyBinder onTheFlyBinder = new DefaultOnTheFlyBinder();
+	private Consumer<String> logger;
 
 	/** Returns the {@link IAnnotationProvider}, which is being used by
 	 * this builder, and the component factory, that it creates.
@@ -118,6 +119,39 @@ public class ComponentFactoryBuilder {
 		return modules;
 	}
 
+	/** Registers a logger for this builder.
+	 * @param pLogger The builders logger. If the builder already has a logger, then a
+	 *   new logger is being created, which invokes the old logger first, and then the
+	 *   given.
+	 *
+	 *   This value may be null, in which case an existing logger will be discarded.
+	 * @return This builder.
+	 */
+	public ComponentFactoryBuilder logger(Consumer<String> pLogger) {
+		if (pLogger == null) {
+			logger = null;
+		} else {
+			@SuppressWarnings("null")
+			final @NonNull Consumer<String> log = Objects.requireNonNull(pLogger, "Logger");
+			if (logger == null) {
+				logger = log;
+			} else {
+				@SuppressWarnings("null")
+				final @NonNull Consumer<String> oldLogger = Objects.requireNonNull(logger, "Old Logger");
+				logger = (s) -> {
+					oldLogger.accept(s);
+					log.accept(s);
+				};
+			}
+		}
+		return this;
+	}
+
+	/** Returns the current logger, if any, or null.
+	 * @return The current logger, if any, or null.
+	 */
+	public Consumer<String> getLogger() { return logger; }
+
 	/** Registers a new module for configuration of the created component
 	 * factory. The modules will be used in the order of registration.
 	 * @param pModule A new module for configuration of the created component
@@ -150,7 +184,7 @@ public class ComponentFactoryBuilder {
 
 	/** Registers new modules for configuration of the created component
 	 * factory. The modules will be used in the order of registration. For the
-	 * modules in the given set, the order is determined bythe iterables
+	 * modules in the given set, the order is determined by the iterables
 	 * natural order.
 	 * @param pModules A set of new modules for configuration of the created component
 	 * factory.
@@ -167,20 +201,33 @@ public class ComponentFactoryBuilder {
 		return this;
 	}
 
+	/** Logs a message.
+	 * @param pMsg The message, which is being logged.
+	 */
+	protected void log(String pMsg) {
+		if (pMsg != null  &&  logger != null) {
+			logger.accept(pMsg);
+		}
+	}
+
 	/** Upon the first invocation, creates a new component factory, and configures
 	 * it by applying the registered modules. For all following invocations, returns
 	 * the same instance.
-	 * @return The created, anf configured component factory, ready to use.
+	 * @return The created, and configured component factory, ready to use.
 	 */
 	public @NonNull IComponentFactory build() {
-		if (instance == null) {
-			final @NonNull AbstractComponentFactory inst = Objects.requireNonNull(supplier.get(),
+		final IComponentFactory inst = instance;
+		if (inst == null) {
+			log("build: Creating a new instance of IComponentFactory.");
+			@SuppressWarnings("null")
+			final @NonNull AbstractComponentFactory ins = Objects.requireNonNull(supplier.get(),
 					"The instance supplier returned null.");
-			configure(inst);
-			instance = inst;
-			return inst;
+			log("build: Created a new instance of " + ins.getClass().getName() + " as an implementation of IComponentFactory.");
+			configure(ins);
+			instance = ins;
+			return ins;
 		} else {
-			return Objects.requireNonNull((IComponentFactory) instance);
+			return inst;
 		}
 	}
 
@@ -197,18 +244,21 @@ public class ComponentFactoryBuilder {
 		final List<BindingBuilder<Object>> builders = new ArrayList<>();
 		final Set<Class<?>> staticInjectionClasses = new HashSet<>();
 		final List<@NonNull Consumer<@NonNull IComponentFactory>> finalizers = new ArrayList<>();
+		log("configure: Creating a new Binder.");
 		final FinalizableBinder binder = new FinalizableBinder() {
 			private BindingBuilder<Object> currentBb;
 
 			@Override
 			public <T> LinkableBindingBuilder<T> bind(@NonNull Key<T> pKey) {
+				log("configure.bind: Key=" + pKey);
 				@SuppressWarnings("unchecked")
 				final Key<Object> key = (Key<Object>) pKey;
 				return register(key);
 			}
 
-			protected <T> BindingBuilder<T> register(final @NonNull Key<Object> key) {
-				final BindingBuilder<Object> bb = new BindingBuilder<Object>(key) {
+			protected <T> BindingBuilder<T> register(final @NonNull Key<Object> pKey) {
+				log("configure.register: Key=" + pKey);
+				final BindingBuilder<Object> bb = new BindingBuilder<Object>(pKey) {
 					@Override
 					public LinkableBindingBuilder<Object> named(@NonNull String pValue) {
 						return annotatedWith(getAnnotations().newNamed(pValue));
@@ -297,17 +347,20 @@ public class ComponentFactoryBuilder {
 
 			@Override
 			public void addFinalizer(@NonNull Consumer<@NonNull IComponentFactory> pFinalizer) {
+				@SuppressWarnings("null")
 				final @NonNull Consumer<@NonNull IComponentFactory> finalizer = Objects.requireNonNull(pFinalizer, "Finalizer");
 				finalizers.add(finalizer);
 			}
 		};
 		for (Module module : getModules()) {
+			log("configure: Invoking module " + module);
 			module.configure(binder);
 		}
 		final IComponentFactory icf = pComponentFactory;
 		binder.bind(IComponentFactory.class).toInstance(icf);
 		binder.finished();
-		pComponentFactory.configure(getAnnotations(), onTheFlyBinder, builders, staticInjectionClasses);
+		log("configure: Bindings created, configuring the IComponentFactory instance");
+		pComponentFactory.configure(getAnnotations(), onTheFlyBinder, builders, staticInjectionClasses, logger);
 		for (@NonNull Consumer<@NonNull IComponentFactory> finalizer : finalizers) {
 			finalizer.accept(pComponentFactory);
 		}
@@ -357,7 +410,9 @@ public class ComponentFactoryBuilder {
 	 * @return This builder.
 	 */
 	public @NonNull ComponentFactoryBuilder onTheFlyBinder(@NonNull IOnTheFlyBinder pBinder) {
-		onTheFlyBinder = Objects.requireNonNull(pBinder);
+		@SuppressWarnings("null")
+		final @NonNull IOnTheFlyBinder binder = Objects.requireNonNull(pBinder);
+		onTheFlyBinder = binder;
 		return this;
 	}
 
