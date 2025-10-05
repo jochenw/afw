@@ -145,6 +145,10 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		void accept(O1 pO1, O2 pO2, O3 pO3);
 	}
 
+	/** Called to log a message by invoking the logger. If no logger is present,
+	 * does nothing.
+	 * @param pMsg The message, that is being logged.
+	 */
 	protected void log(String pMsg) {
 		if (logger != null) {
 			logger.accept(pMsg);

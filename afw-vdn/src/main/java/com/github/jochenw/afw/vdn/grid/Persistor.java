@@ -15,10 +15,13 @@ import com.github.jochenw.afw.core.function.Functions.FailableFunction;
 
 /** Interface of an object, which handles persistence. (Creating new beans,
  * Updating, or deleting existent beans.)
+ * @param <T> Type of the beans, that are being persisted.
+ * @param <V> Type of the beans id.
  */
 public abstract class Persistor<T,V> {
 	/** Interface of a listener, which is being notified about
 	 * persistence related events.
+	 * @param <T> Type of the beans, that are being persisted.
 	 */
 	public static abstract class Listener<T> {
 		/** Creates a new instance.
@@ -174,6 +177,8 @@ public abstract class Persistor<T,V> {
 
 	/** A builder class for persistors. Use {@link Persistor#builder()}
 	 * to obtain one.
+	 * @param <T> Type of the created persistors bean type.
+	 * @param <I> Type of the created persistors bean id.
 	 */
 	public static class Builder<T,I> {
 		/** Creates a new instance.

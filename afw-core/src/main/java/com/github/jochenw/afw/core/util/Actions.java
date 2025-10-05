@@ -159,6 +159,11 @@ public class Actions {
 	 * @param <O> Type of the actions result object, if any, or null.
 	 */
 	public static class Context<O> {
+		/** Creates a new instance.
+		 */
+		public Context() {
+		}
+
 		/** Causes the action to fail with status {@link Status.State#error}
 		 * by throwing an {@link ActionErrorException} with the
 		 * given error code, error message, and error details.
@@ -210,7 +215,15 @@ public class Actions {
 	 */
 	public static class ActionErrorException extends RuntimeException {
 		private static final long serialVersionUID = 1132107670465496535L;
-		private final String errorCode, errorMsg, errorDetails;
+		/** The error code.
+		 */
+		private final String errorCode;
+		/** The error message.
+		 */
+		private final String errorMsg;
+		/** The detailed error message.
+		 */
+		private final String errorDetails;
 
 		/** Creates a new instance with the given error code, error message, and error details.
 		 * @param pErrorCode The error code.
@@ -242,6 +255,8 @@ public class Actions {
 	 */
 	public static class ActionWarningException extends ActionErrorException {
 		private static final long serialVersionUID = 6228572470668976054L;
+		/** The result object, that has been produced, or null.
+		 */
 		private final Object result;
 
 		/** Creates a new instance with the given result object, error code, error message,
@@ -282,7 +297,12 @@ public class Actions {
 
 	/** A status provider is an object, that can perform actions, providing a status.
 	 */
-	public abstract static class StatusProvider {
+	public static class StatusProvider {
+		/** Creates a new instance.
+		 */
+		public StatusProvider() {
+		}
+
 		/**
 		 * Performs the given action, and returns the result object, if any, or null.
 		 * @param <O> Type of the result object, if any, or {@link Void}.
@@ -410,8 +430,7 @@ public class Actions {
 		}
 	}
 
-	private static final StatusProvider statusProvider = new StatusProvider() {
-	};
+	private static final StatusProvider statusProvider = new StatusProvider();
 
 
 	/**

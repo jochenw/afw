@@ -47,7 +47,25 @@ import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.function.ValueProvider;
 
 
+/** A grid container is a provider for a Vaadin component, that
+ * contains
+ * <ol>
+ *   <li>a Vaadin grid (a table, which displays a set of beans).
+ *     By double clicking on a Grid row, a dialog opens,
+ *     which displays the details of the respective bean.
+ *   <li>a set of text fields for specification of filters on the
+ *     grid contents</li>
+ *   <li>a status field, which displays a description of the
+ *     current filter</li>
+ * </ol>
+ * @param <T> The containers bean type.
+ */
 public class GridContainer<T> extends VerticalLayout {
+	/** Creates a new instance.
+	 */
+	public GridContainer() {
+	}
+
 	/** A builder object for instances of {@link GridContainer}.
 	 * @param <T> Bean type of the grid, that is being displayed within the
 	 * created {@link GridContainer}.
@@ -215,9 +233,8 @@ public class GridContainer<T> extends VerticalLayout {
 		private String idPrefix, noFilterText;
 
 		/** Creates a new instance. Typically, one would use
-		 * {@link GridContainer#builder(IComponentFactory, Class)}, or
-		 * {@link Grids#container(IComponentFactory, Class)}, instead of
-		 * using this constructor directly.
+		 * {@link GridContainer#builder(IComponentFactory, Class)},
+		 * rather than using this constructor directly.
 		 * 
 		 * @param pComponentFactory The component factory, which is being
 		 *   used to configure this builder, and the created container.
@@ -475,14 +492,56 @@ public class GridContainer<T> extends VerticalLayout {
 	 */
 	private FailableBiConsumer<Persistor<T,?>,T,?> editor;
 
+	/** Returns the containers component factory.
+	 * @return The containers component factory.
+	 */
 	public IComponentFactory getComponentFactory() { return componentFactory; }
+	/** Returns the containers bean type.
+	 * @return The containers bean type.
+	 */
 	public Class<T> getBeanType() { return beanType; }
+	/** Returns the map of filter values. The map keys are the bean attribute
+	 * names, on which filters are being applied. The map values are the
+	 * filter descriptions.
+	 * @return The map of filter values.
+	 */
 	public Map<String, String> getFilterValueMap() { return filterValueMap; }
+	/** Returns the containers map of column builders. The map keys are the
+	 * bean attribute names (column id's). The map values are the respective
+	 * column builders.
+	 * @return The containers map of column builders.
+	 */
 	public Map<String, Builder.Column<T, Object>> getColumns() { return columns; }
+	/** Returns the actual Vaadin {@link Grid}, that is being managed by this
+	 * container.
+	 * @return The actual Vaadin {@link Grid}, that is being managed by this
+	 * container.
+	 */
 	public Grid<T> getGrid() { return grid; }
+	/** Returns the text, that is being displayed, if all filters have been removed.
+	 * A typical example would be "All items."
+	 * @return The text, that is being displayed, if all filters have been removed,
+	 * like "All items".
+	 */
 	public String getNoFilterText() { return noFilterText; }
+	/** Returns a prefix, that is supposed to make HTML identifiers unique.
+	 * Basically, this identifies the container. In other words, this is
+	 * supposed to be unique among all containers within the application.
+	 * @return The containers id prefix, unique among all containers
+	 *   within the application.
+	 */
 	public String getIdPrefix() { return idPrefix; }
+	/**
+	 * Returns the containers editor. The editor is a window, or dialog
+	 * for displaying, or editing a beans details.
+	 * @return The containers editor.
+	 */
 	public FailableBiConsumer<Persistor<T,?>,T,?> getEditor() { return editor; }
+	/** Returns the containers persistor, which is responsible for saving beans
+	 * to the persistent storage.
+	 * @param <O> The persistors bean type.
+	 * @return The requested persistor.
+	 */
 	public <O> Persistor<T,O> getPersistor() {
 		@SuppressWarnings("unchecked")
 		final Persistor<T,O> p = (Persistor<T,O>) persistor;
@@ -526,6 +585,9 @@ public class GridContainer<T> extends VerticalLayout {
 	/** Creates a component, which contains the status field.
 	 * The purpose of the component is making the status field
 	 * visible.
+	 * @param pStatusField A text field, which is intended to
+	 *   display the current filter status.
+	 * @return The created component.
 	 */
 	protected Component newStatusComponent(Component pStatusField) {
 		final HorizontalLayout hl = new HorizontalLayout();
@@ -546,12 +608,10 @@ public class GridContainer<T> extends VerticalLayout {
 		}
 	}
 
-	/** Creates a "New" button, which uses the given
-	 * {@link Persistor} to create a new instance,
+	/** Creates a "New" button, which uses the
+	 * configured {@link #getPersistor() persistor}
+	 * to create a new instance,
 	 * which will then be edited in the editor.
-	 * @param pPersistor The persistor, which is
-	 * being used by the detail editor to create
-	 * a new, blank instance.
 	 * @return The created button,
 	 */
 	protected Button newNewButton() {
@@ -577,11 +637,6 @@ public class GridContainer<T> extends VerticalLayout {
 	 * whould be in read/write mode immediately.
 	 * Otherwise, the editor may be initially in read-only
 	 * mode.
-	 * @param pStorer A callback, which may be invoked to
-	 *   persist the bean. If the callback is null, then the
-	 *   created editor is supposed to be in read-only
-	 *   mode, and provide no means of entering read/write
-	 *   mode.
 	 * @return The created component, which is being displayed
 	 *   in a modal dialog.
 	 */
@@ -653,6 +708,13 @@ public class GridContainer<T> extends VerticalLayout {
 		return vl;
 	}
 
+	/** Creates a new text field for editing, or displaying the given columns
+	 * value in the given bean.
+	 * @param pBinder The binder, which is currently being used.
+	 * @param pBean The bean, which is being displayed, or edited.
+	 * @param pColumn The column object, that represents the bean attribute.
+	 * @return The created text field, with a validator applied.
+	 */
 	protected TextField newAttributeEditor(Binder<T> pBinder, T pBean, Column<T,Object> pColumn) {
 		final Class<?> stringClass = String.class;
 		final Class<?> colClass = pColumn.getValueType();
@@ -688,6 +750,7 @@ public class GridContainer<T> extends VerticalLayout {
 	}
 
 	/** Creates the grid, which is being displayed by the container.
+	 * @return The created grid.
 	 */
 	protected Grid<T> newGrid() {
 		final Grid<T> grid = new Grid<>();
@@ -715,11 +778,10 @@ public class GridContainer<T> extends VerticalLayout {
 	}
 	
 	/** Creates a new status field. The purpose of the status field is
-	 * the ability to display the current
-	 * {@link Grids#getFilterDiscription(Collection, String)}.
+	 * the ability to display the current filter description.
 	 * If you override this method, you should consider overriding
 	 * {@link #setFilterStatus(Component, String)}, too.
-	 * @see #setFilterStatus(Component, String).
+	 * @see #setFilterStatus(Component, String)}.
 	 * @return The created status field.
 	 */
 	protected Component newStatusField() {
@@ -734,6 +796,7 @@ public class GridContainer<T> extends VerticalLayout {
 	/** Sets the text, which is being displayed by the status field.
 	 * @param pStatusField The status field, which has been created
 	 *   by {@link #newStatusField()}.
+	 * @param pText The current filter values description.
 	 * @see #newStatusField()
 	 */
 	protected void setFilterStatus(Component pStatusField, String pText) {
@@ -771,14 +834,14 @@ public class GridContainer<T> extends VerticalLayout {
 	/** Creates a new {@link NativeLabel label}, and a new
 	 * {@link TextField filter text field},
 	 * as a means to enter a filter value for the given column.
-	 * @param pCol The column, for which a filter field is
+	 * @param pColumn The column, for which a filter field is
 	 *   being created.
 	 * @param pIdPrefix The grid's id prefix. This must be unique among
 	 *   all grids in the application.
 	 * @see GridContainer.Builder#idPrefix(String)
 	 * @return An array, which contains the created label, and the
 	 *   given filter text field, suitable for being added to the
-	 *   {@link #newFilterLayout() filters layout}.
+	 *   filters layout.
 	 */
 	protected Component[] newFilterField(Column<T,Object> pColumn, String pIdPrefix) {
 		final TextField tf = new TextField();
@@ -807,6 +870,7 @@ public class GridContainer<T> extends VerticalLayout {
 	 * @param pIdPrefix The grid's id prefix. This must be unique among
 	 *   all grids in the application.
 	 * @see GridContainer.Builder#idPrefix(String)
+	 * @return The generated HTML id.
 	 */
 	protected String newFilterFieldId(Column<T,Object> pColumn, String pIdPrefix) {
 		String prefix = Objects.notNull(pIdPrefix, "");
@@ -826,8 +890,8 @@ public class GridContainer<T> extends VerticalLayout {
 
 	/** Creates a new component, which contains the given filters layout,
 	 * and a title.
-	 * @param pFiltersLayout The horizontal layout, which has been created
-	 *   by a previous invocation of {@link #newFiltersLayout(String)}.
+	 * @param pFiltersLayout The horizontal layout, to which the
+	 *   component must be added.
 	 * @return The created component, which includes the given filters
 	 *   layout.
 	 */
@@ -839,7 +903,8 @@ public class GridContainer<T> extends VerticalLayout {
 	}
 
 	/** Creates a new instance of {@link GridContainer.Builder}.
-	 * 
+	 *
+	 * @param <T> The containers bean type.
 	 * @param pComponentFactory The component factory, which is being
 	 *   used to configure this builder, and the created container.
 	 * @param pBeanType Bean type of the grid, that is being displayed within the
