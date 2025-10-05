@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.github.jochenw.afw</groupId>
     <artifactId>afw</artifactId>
-    <version>0.9.2-SNAPSHOT</version>
+    <version>0.9.2</version>
   </parent>
   <artifactId>afw-vdn</artifactId>
   <name>AFW (Vaadin support)</name>
@@ -11,7 +11,7 @@
     <dependency>
       <groupId>com.github.jochenw.afw</groupId>
       <artifactId>afw-core</artifactId>
-      <version>0.9.2-SNAPSHOT</version>
+      <version>0.9.2</version>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
