@@ -7,12 +7,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -26,6 +34,15 @@ import com.github.jochenw.afw.core.util.Streams;
 /** Test case for the {@link ZipFileResourceRepository}.
  */
 public class ZipFileResourceRepositoryTest {
+	private final String[] URIS = {
+		"pom.xml",
+		"docs/dependencies.html",
+		"src/main/java/com/github/jochenw/afw/core/log/simple/SimpleLog.java",
+		"target/classes/com/github/jochenw/afw/core/log/simple/SimpleLog.class",
+		"src/test/java/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.java",
+		"target/test-classes/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.class"
+	};
+
 	/**
 	 * Test case for {@link ZipFileResourceRepository#list(Consumer)}.
 	 * @throws Exception The test failed.
@@ -33,7 +50,7 @@ public class ZipFileResourceRepositoryTest {
 	@Test
 	public void testList() throws Exception {
 		final Path zipFile = Paths.get("target/unit-tests/ZipFileRepositoryTest.zip");
-		createZipFile(zipFile);
+		createZipFile2(zipFile);
 		final Set<String> namespaces = new HashSet<>();
 		final Set<String> uris = new HashSet<>();
 		final Holder<IResource> pomXmlResourceHolder = new Holder<IResource>();
@@ -51,12 +68,9 @@ public class ZipFileResourceRepositoryTest {
 		assertTrue(namespaces.contains("docs"));
 		assertTrue(namespaces.contains("src/main/java/com/github/jochenw/afw/core/log/simple"));
 		assertTrue(namespaces.contains("src/test/java/com/github/jochenw/afw/core/log/simple"));
-		assertTrue(uris.contains("pom.xml"));
-		assertTrue(uris.contains("docs/dependencies.html"));
-		assertTrue(uris.contains("src/main/java/com/github/jochenw/afw/core/log/simple/SimpleLog.java"));
-		assertTrue(uris.contains("target/classes/com/github/jochenw/afw/core/log/simple/SimpleLog.class"));
-		assertTrue(uris.contains("src/test/java/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.java"));
-		assertTrue(uris.contains("target/test-classes/com/github/jochenw/afw/core/log/simple/SimpleLogFactoryTest.class"));
+		for (String uri : URIS) {
+			assertTrue("Uri not found: " + uri, uris.contains(uri));
+		}
 		final IResource res = pomXmlResourceHolder.get();
 		assertNotNull(res);
 		try (InputStream in1 = zfrr.open(res);
@@ -74,33 +88,43 @@ public class ZipFileResourceRepositoryTest {
 		}
 	}
 
-	private void createZipFile(final Path zipFile) throws IOException {
-		final Path zipFileDir = zipFile.getParent();
-		Files.createDirectories(zipFileDir);
-		Files.deleteIfExists(zipFile);
-		final DirResourceRepository drr = new DirResourceRepository(Paths.get("."));
-		try (OutputStream os = Files.newOutputStream(zipFile);
-			 ZipOutputStream zos = new ZipOutputStream(os)) {
-			final Consumer<IResource> consumer = (r) -> {
-				final String uri = r.getUri();
-				if (!uri.endsWith(".zip")) { // Do not attempt, to copy the created file into itself.
-					final ZipEntry ze = new ZipEntry(uri);
-					ze.setMethod(ZipEntry.DEFLATED);
-					try {
-						zos.putNextEntry(ze);
-						try (InputStream in = drr.open(r)) {
-							Streams.copy(in, zos);
+	private void createZipFile2(final Path pZipFile) throws IOException {
+		final Path dir = Paths.get(".").toAbsolutePath();
+		final List<Path> files = new ArrayList<>();
+		final FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				if (attrs.isRegularFile()) {
+					final Path relativePath = dir.relativize(file);
+					final String uri = relativePath.toString().replace('\\', '/');
+					for (int i = 0;  i < URIS.length;  i++) {
+						if (URIS[i].equals(uri)) {
+							files.add(relativePath);
+							break;
 						}
-						zos.closeEntry();
-					} catch (IOException e) {
-						throw new UncheckedIOException(e);
 					}
 				}
-			};
-			drr.list(consumer);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+				return FileVisitResult.CONTINUE;
+			}
+		};
+		Files.walkFileTree(dir, fv);
+		try (OutputStream os = Files.newOutputStream(pZipFile);
+				 ZipOutputStream zos = new ZipOutputStream(os)) {
+			for (Path file : files) {
+				final String uri = file.toString();
+				final ZipEntry ze = new ZipEntry(uri);
+				ze.setMethod(ZipEntry.DEFLATED);
+				try {
+					zos.putNextEntry(ze);
+					try (InputStream in = Files.newInputStream(file);
+						 BufferedInputStream bin = new BufferedInputStream(in)) {
+						Streams.copy(in, zos);
+					}
+					zos.closeEntry();
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			}
 		}
 	}
-
 }
