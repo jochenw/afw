@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.core.json;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,9 +23,9 @@ import com.github.jochenw.afw.core.util.Numbers;
  * native Java objects, like {@link Map maps}, {@link List lists}, etc.
  */
 public class JsnReader {
-	/** Private constructor, because this class contains only static methods.
+	/** Protected constructor, because this class contains mainly static methods.
 	 */
-	JsnReader() {}
+	protected JsnReader() {}
 
 	/** If the JsnReader throws an exception, then it tries hard to use
 	 * this class, which includes location information.
@@ -195,8 +196,39 @@ public class JsnReader {
 			final @NonNull JsonParser jp = Json.createParser(pIn);
 			return jp;
 		};
-		final @NonNull Context ctx = new Context(parserSupplier, pUri);
+		return read(parserSupplier, pUri);
+	}
+
+	/** Called to read a map, or a list from the Json document, as provided
+	 * by the given {@link FailableSupplier}.
+	 * @param <O> Type of the result object.
+	 * @param pParserSupplier A supplier for an instance of {@link JsonParser},
+	 *   which represents, and is being used to read the input document.
+	 * @param pUri The Json documents URI.
+	 * @return The created object, a representation of the Json
+	 *   document.
+	 */
+	public <O> O read(final @NonNull FailableSupplier<@NonNull JsonParser, ?> pParserSupplier, String pUri) {
+		final @NonNull Context ctx = new Context(pParserSupplier, pUri);
 		return read(ctx);
+	}
+
+	/** Called to read a map, or a list from the Json document, as provided
+	 * by the given {@link Reader}.
+	 * @param <O> Type of the result object.
+	 * @param pIn The {@link Reader}, which provides the Json
+	 *   document.
+	 * @param pUri The Json documents URI.
+	 * @return The created object, a representation of the Json
+	 *   document.
+	 */
+	public <O> O read(Reader pIn, String pUri) {
+		final FailableSupplier<@NonNull JsonParser,?> parserSupplier = () -> {
+			@SuppressWarnings("null")
+			final @NonNull JsonParser jp = Json.createParser(pIn);
+			return jp;
+		};
+		return read(parserSupplier, pUri);
 	}
 
 	/** Called to read a map, or a list from the Json document, as provided
