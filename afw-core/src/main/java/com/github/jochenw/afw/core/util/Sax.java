@@ -564,7 +564,7 @@ public class Sax {
 		public SaxWriter withEncoding(String pEncoding) {
 			assertMutable();
 			encoding = pEncoding;
-			return null;
+			return this;
 		}
 
 		/** Returns, whether an XML declaration should be omitted.
@@ -776,7 +776,7 @@ public class Sax {
 		 */
 		public void writeText(String pText) {
 			final TransformerHandler th = getTransformerHandler();
-			final char[] chars = pText.toCharArray();
+			final char[] chars = pText == null ? new char[0] : pText.toCharArray();
 			try {
 				th.characters(chars, 0, chars.length);
 			} catch (Throwable t) {
