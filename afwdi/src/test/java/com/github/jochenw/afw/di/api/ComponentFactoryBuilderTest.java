@@ -1,12 +1,20 @@
 package com.github.jochenw.afw.di.api;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
+import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
+import com.github.jochenw.afw.di.impl.DefaultAnnotationProvider;
 import com.github.jochenw.afw.di.simple.SimpleComponentFactory;
 
-import jakarta.inject.Inject;
 
 class ComponentFactoryBuilderTest {
 	public static class MappingSubject {
@@ -22,6 +30,24 @@ class ComponentFactoryBuilderTest {
 					
 				})
 				.build();
+		assertNotNull(cf);
+		final Configuration configuration = cf.getConfiguration();
+		assertNotNull(configuration);
+		assertNotNull(configuration.getBindings());
+		assertSame(Scopes.SINGLETON, configuration.getDefaultScope());
+		assertSame(DefaultAnnotationProvider.getInstance(), configuration.getAnnotationProvider());
+		assertNull(configuration.getParent());
+		assertFalse(configuration.getBindings().isEmpty());
+		assertEquals(1, configuration.getBindings().size());
+		final Key<Object> key = Key.of(IComponentFactory.class, "");
+		final IBinding<Object> cfBinding = configuration.getBindings().get(key);
+		assertNotNull(cfBinding);
+		assertEquals(key, cfBinding.getKey());
+		assertSame(Scopes.SINGLETON, cfBinding.getScope());
+		// Reuesting the component factory binding should retrieve the component factory itself.
+		assertSame(cf, cfBinding.getSupplier().apply(cf));
+		// Repeating the request should retrieve the same instance. (Scope SINGLETON.)
+		assertSame(cf, cfBinding.getSupplier().apply(cf)); 
 	}
 
 }

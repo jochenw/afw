@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.di.impl;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 
@@ -24,7 +25,7 @@ public class JakartaAnnotationProvider implements IAnnotationProvider {
 	}
 
 	@Override
-	public String getNamedValue(AccessibleObject pObject) {
+	public String getNamedValue(AnnotatedElement pObject) {
 		final Named named = pObject.getAnnotation(Named.class);
 		if (named == null) {
 			return null;

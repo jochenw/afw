@@ -132,7 +132,7 @@ public interface IComponentFactory {
 	 * @param pImplType Type, that is being instantiated.
 	 * @return The created instantiator.
 	 */
-	public <T> Supplier<T> newInstantiator(Class<? extends T> pImplType);
+	public <T> Supplier<T> getInstantiator(Class<? extends T> pImplType);
 
 	/** Creates a new instantiator for the given type. Internally,
 	 * the instantiator works by invoking the given constructor.
@@ -141,5 +141,5 @@ public interface IComponentFactory {
 	 * @param pConstructor Constructor, that is being invoked.
 	 * @return The created instantiator.
 	 */
-	public <T> Supplier<T> newInstantiator(Constructor<? extends T> pConstructor);
+	public <T> Supplier<T> getInstantiator(Constructor<? extends T> pConstructor);
 }

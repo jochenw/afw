@@ -2,6 +2,8 @@ package com.github.jochenw.afw.di.impl;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Objects;
 import java.util.function.Function;
@@ -90,6 +92,13 @@ public class DiUtils {
 				}
 			}
 			return supp.get();
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void assertAccessible(AccessibleObject pObject) {
+		if (!pObject.isAccessible()) {
+			pObject.setAccessible(true);
 		}
 	}
 }

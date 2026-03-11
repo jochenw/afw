@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.di.impl;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +104,7 @@ public class DefaultAnnotationProvider implements IAnnotationProvider {
 	}
 
 	@Override
-	public String getNamedValue(AccessibleObject pObject) {
+	public String getNamedValue(AnnotatedElement pObject) {
 		for (IAnnotationProvider ap : getAnnotationProviders()) {
 			final String value = ap.getNamedValue(pObject);
 			if (value != null) {

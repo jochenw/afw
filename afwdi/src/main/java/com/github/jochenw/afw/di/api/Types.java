@@ -19,8 +19,6 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * This is a helper class, that should aim in the creation of bindings for
@@ -104,7 +102,7 @@ public class Types {
 	 * @param <O> The type, which is represented by the created instance.
 	 * @return The created instance.
 	 */
-	public static <O> Types.@NonNull Type<O> of() {
+	public static <O> Types.Type<O> of() {
 		return new Types.Type<O>() {};
 	}
 }
