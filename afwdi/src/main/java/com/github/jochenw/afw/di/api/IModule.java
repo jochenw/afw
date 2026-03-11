@@ -101,6 +101,12 @@ public interface IModule {
 		 * @param pFinalizer The finalizer, which is being invoked later.
 		 */
 		public void addFinalizer(Consumer<IComponentFactory> pFinalizer);
+		/** Request that static fields, and methods should be injected in
+		 * the given classes.
+		 * @param pClasses The set of classes, for which static injection
+		 *   should be enabled.
+		 */
+		void staticInjection(Class<?>... pClasses);
 	}
 	/** Interface of a binding builder, for which the key is only temporary,
 	 * and may be adjusted by providing an annotation, or an annotation name.

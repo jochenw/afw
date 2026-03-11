@@ -4,10 +4,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -65,7 +69,7 @@ public class BinderImpl implements IBinder {
 			@SuppressWarnings("unchecked")
 			final Class<Object> cl = (Class<Object>) Objects.requireNonNull(pImplType);
 			final Function<IComponentFactory,Object> function =
-					DiUtils.deferredSupplier((cf) -> () -> cf.newInstantiator(cl));
+					DiUtils.deferredSupplier((cf) -> () -> cf.getInstantiator(cl));
 			return to((cf) -> function.apply(cf));
 		}
 
@@ -74,7 +78,7 @@ public class BinderImpl implements IBinder {
 			@SuppressWarnings("unchecked")
 			final Constructor<Object> cons = (Constructor<Object>) Objects.requireNonNull(pConstructor);
 			final Function<IComponentFactory,Object> function =
-					DiUtils.deferredSupplier((cf) -> () -> cf.newInstantiator(cons));
+					DiUtils.deferredSupplier((cf) -> () -> cf.getInstantiator(cons));
 			return to((cf) -> function.apply(cf));
 		}
 
@@ -116,6 +120,7 @@ public class BinderImpl implements IBinder {
 	private final Map<Key<Object>,IBinding<Object>> bindings = new HashMap<>();
 	private final List<BindingBuilder> builderList = new ArrayList<>();
 	private final List<Consumer<IComponentFactory>> finalizers = new ArrayList<>();
+	private Set<Class<?>> staticInjectionClasses;
 
 	/** Creates a new instance with the given default scope.
 	 * @param pDefaultScope The default scope.
@@ -171,6 +176,14 @@ public class BinderImpl implements IBinder {
 	@Override
 	public void addFinalizer(Consumer<IComponentFactory> pFinalizer) {
 		finalizers.add(Objects.requireNonNull(pFinalizer, "Finalizer"));
+	}
+
+	@Override
+	public void staticInjection(Class<?>... pClasses) {
+		if (staticInjectionClasses == null) {
+			staticInjectionClasses = new HashSet<>();
+		}
+		staticInjectionClasses.addAll(Arrays.asList(pClasses));
 	}
 
 	/** Called to validate, and apply all of the binders binding builders-
@@ -288,4 +301,16 @@ public class BinderImpl implements IBinder {
 	 * @return The list of finalizers.
 	 */
 	public List<Consumer<IComponentFactory>> getFinalizers() { return finalizers; }
+
+	/** Returns the set of classes, for which static injection
+	 * has been enabled by invocations of {@link #staticInjection(Class...)}.
+	 * @return The set of classes, for which static injection
+	 *   has been enabled.
+	 */
+	public Set<Class<?>> getStaticInjectionClasses() {
+		if (staticInjectionClasses == null) {
+			return Collections.emptySet();
+		}
+		return staticInjectionClasses;
+	}
 }

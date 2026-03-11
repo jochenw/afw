@@ -1,6 +1,7 @@
 package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -82,6 +83,51 @@ public interface IComponentFactory {
 		}
 	}
 
+	/** If a binding with the given type, and the given name, as a key
+	 * is registered: Invokes the bindings supplier, and returns the
+	 * value. Otherwise, returns null.
+	 * @param pType The bindings type.
+	 * @param pName The bindings name.
+	 * @return The requested bindings value, if available, or null.
+	 */
+	public default <T> T getInstance(Type pType, String pName) {
+		final Key<T> key = Key.of(pType, pName);
+		return getInstance(key);
+	}
+
+	/** If a binding with the given type, and the name "", as a key
+	 * is registered: Invokes the bindings supplier, and returns the
+	 * value. Otherwise, returns null.
+	 * @param pType The bindings type.
+	 * @return The requested bindings value, if available, or null.
+	 */
+	public default <T> T getInstance(Type pType) {
+		return getInstance(pType, "");
+	}
+
+	/** If a binding with the given class, and the given name, as a key
+	 * is registered: Invokes the bindings supplier, and returns the
+	 * value. Otherwise, returns null.
+	 * @param pType The bindings type.
+	 * @param pName The bindings name.
+	 * @return The requested bindings value, if available, or null.
+	 */
+	public default <T,S extends T> S getInstance(Class<T> pType, String pName) {
+		@SuppressWarnings("unchecked")
+		final S s = (S) getInstance((Type) pType, pName);
+		return s;
+	}
+
+	/** If a binding with the given class, and the name "", as a key
+	 * is registered: Invokes the bindings supplier, and returns the
+	 * value. Otherwise, returns null.
+	 * @param pType The bindings type.
+	 * @return The requested bindings value, if available, or null.
+	 */
+	public default <T,S extends T> S getInstance(Class<T> pType) {
+		return getInstance(pType, "");
+	}
+
 	/** If a binding with the given key is registered: Invokes the bindings
 	 * supplier, and returns the value. Otherwise, throws a
 	 * {@link NoSuchBindingException}.
@@ -101,6 +147,68 @@ public interface IComponentFactory {
 		}
 	}
 
+	/** If a binding with the given type, and the given name, as a key
+	 * is registered: Retrieves the bindings, invokes the supplier,
+	 * and returns the value. Otherwise, throws a
+	 * {@link NoSuchBindingException}.
+	 * @param pType The bindings type.
+	 * @param pName The bindings name.
+	 * @return The requested binding, if available.
+	 * @throws NoSuchBindingException No binding with the given key has
+	 *   been registered.
+	 * @throws NullPointerException The key parameter is null.
+	 */
+	public default <T> T requireInstance(Type pType, String pName) {
+		final Key<T> key = Key.of(pType, pName);
+		return requireInstance(key);
+	}
+
+	/** If a binding with the given type, and the name "", as a key
+	 * is registered: Retrieves the binding, invokes the supplier,
+	 * and returns the value. Otherwise, throws a
+	 * {@link NoSuchBindingException}.
+	 * @param pType The bindings type.
+	 * @return The requested binding, if available.
+	 * @throws NoSuchBindingException No binding with the given key has
+	 *   been registered.
+	 * @throws NullPointerException The key parameter is null.
+	 */
+	public default <T> T requireInstance(Type pType) {
+		final Key<T> key = Key.of(pType, "");
+		return requireInstance(key);
+	}
+
+	/** If a binding with the given type, and the given name, as a key
+	 * is registered: Retrieves the binding, invokes the supplier,
+	 * and returns the value. Otherwise, throws a
+	 * {@link NoSuchBindingException}.
+	 * @param pType The bindings type.
+	 * @param pName The bindings name.
+	 * @return The requested binding, if available.
+	 * @throws NoSuchBindingException No binding with the given key has
+	 *   been registered.
+	 * @throws NullPointerException The key parameter is null.
+	 */
+	public default <T,S extends T> S requireInstance(Class<T> pType, String pName) {
+		@SuppressWarnings("unchecked")
+		final Key<S> key = (Key<S>) Key.of(pType, pName);
+		return requireInstance(key);
+	}
+
+	/** If a binding with the given type, and the name "", as a key
+	 * is registered: Retrieves the binding, invokes the supplier,
+	 * and returns the value. Otherwise, throws a
+	 * {@link NoSuchBindingException}.
+	 * @param pType The bindings type.
+	 * @return The requested binding, if available.
+	 * @throws NoSuchBindingException No binding with the given key has
+	 *   been registered.
+	 * @throws NullPointerException The key parameter is null.
+	 */
+	public default <T,S extends T> S requireInstance(Class<T> pType) {
+		return requireInstance(pType, "");
+	}
+	
 	/** Initializes the given object by injecting values into all
 	 * the fields, and methods, that request it.
 	 * @param pObject The object, which is being initialized.

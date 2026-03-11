@@ -62,6 +62,8 @@ public class DefaultAnnotationProvider implements IAnnotationProvider {
 	 * @param pId The annotation providers id, either of "jakarta", "javax",
 	 *   "google", or "default".
 	 * @return The requested annotation provider, if available, or null.
+	 * @throws IllegalArgumentException The value of the parameter
+	 *   {@code pId} is invalid.
 	 */
 	public static IAnnotationProvider getAnnotationProvider(String pId) {
 		final String className;
@@ -79,7 +81,7 @@ public class DefaultAnnotationProvider implements IAnnotationProvider {
 	    	className = "com.github.jochenw.afw.di.impl.DefaultAnnotationProvider";
 	    	break;
 	    default:
-	    	throw new IllegalStateException("Invalid annotation provider id:"
+	    	throw new IllegalArgumentException("Invalid annotation provider id:"
 	    			+ " Expected jakarta,javax,google, or default, got " + pId);
 		}
 		try {
