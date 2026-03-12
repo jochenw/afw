@@ -38,6 +38,7 @@ public class DiUtils {
 	 *   The problem with the latter is that the compilers code flow analyzer will
 	 *   not detect, what happpens.
 	 */
+	@SuppressWarnings("javadoc")
 	public static RuntimeException show(Throwable pTh) {
 		Objects.requireNonNull(pTh, "Throwable");
 		if (pTh instanceof RuntimeException rte) {

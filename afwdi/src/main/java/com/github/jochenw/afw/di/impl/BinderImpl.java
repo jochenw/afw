@@ -69,7 +69,7 @@ public class BinderImpl implements IBinder {
 			@SuppressWarnings("unchecked")
 			final Class<Object> cl = (Class<Object>) Objects.requireNonNull(pImplType);
 			final Function<IComponentFactory,Object> function =
-					DiUtils.deferredSupplier((cf) -> () -> cf.getInstantiator(cl));
+					DiUtils.deferredSupplier((cf) -> () -> cf.getInstantiator(cl).get());
 			return to((cf) -> function.apply(cf));
 		}
 
@@ -284,6 +284,7 @@ public class BinderImpl implements IBinder {
 					final T t2 = actualSupplier.apply(pCf);
 					pCf.init(t2);
 					t = instance = t2;
+					instanceValid = true;
 				} else {
 					t = instance;
 				}

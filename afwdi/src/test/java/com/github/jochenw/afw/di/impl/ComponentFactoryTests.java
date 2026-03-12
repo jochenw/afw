@@ -128,7 +128,6 @@ public class ComponentFactoryTests {
 	 * {@link CreateJavaxMapsObject}.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
-	@SuppressWarnings("unchecked")
 	public static void testCreateJakartaMaps(Class<? extends AbstractComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
 		final IModule module = (b) -> {
@@ -139,7 +138,8 @@ public class ComponentFactoryTests {
 			b.bind(CreateJakartaMapsObject.class).in(Scopes.SINGLETON);
 			b.bind(SpareTire.class).in(Scopes.SINGLETON);
 		};
-		final IComponentFactory cf = IComponentFactory.builder(pType).javax()
+		final IComponentFactory cf = IComponentFactory.builder(pType).jakarta()
+				.defaultScope(Scopes.NO_SCOPE)
 				.module(module).build();
 		final Map<String,Object> hashMapCf1 = cf.getInstance(Map.class, "hash");
 		assertNotNull(hashMapCf1);

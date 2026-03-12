@@ -12,6 +12,9 @@ import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
 import com.github.jochenw.afw.di.impl.BinderImpl;
 import com.github.jochenw.afw.di.impl.DefaultAnnotationProvider;
 import com.github.jochenw.afw.di.impl.DiUtils;
+import com.github.jochenw.afw.di.impl.GoogleAnnotationProvider;
+import com.github.jochenw.afw.di.impl.JakartaAnnotationProvider;
+import com.github.jochenw.afw.di.impl.JavaxAnnotationProvider;
 
 /** A builder for instances of {@link IComponentFactory}.
  * @param <T> Type of the created component factory.
@@ -98,7 +101,7 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 	/** Sets the builders {@link IAnnotationProvider}, which will
 	 * be used by the created component factory.
 	 * @param pAnnotationProvider The annotation provider, which
-	 *   is being used; may be nukk, in which case the
+	 *   is being used; may be null, in which case the
 	 *   {@link DefaultAnnotationProvider#getInstance() default
 	 *   value} will be used.
 	 * @return This builder.
@@ -109,6 +112,64 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 		return this;
 	}
 
+    /** Sets the builders {@link IAnnotationProvider}, which will
+     * be used by the created component factory.
+     * @param pId The id of the {@link IAnnotationProvider},
+     *   which is going to be used. The id will be
+     *   mapped to the actual instance by invoking
+     *   {@link DefaultAnnotationProvider#getAnnotationProvider(String)}.
+     *   As of this writing, supported values are "jakarta" (Package
+     *   jakarta.inject), "javax" (Package javax.inject), "google"
+     *   (Package com.google.inject), and "default" (all three). The
+     *   latter is the default value.
+     * @return This builder.
+     */
+	public ComponentFactoryBuilder<T> annotationProvider(String pId) {
+		final String id = Objects.requireNonNull(pId, "Id");
+		assertMutable();
+		final IAnnotationProvider ap = DefaultAnnotationProvider.getAnnotationProvider(id);
+		return annotationProvider(ap);
+	}
+
+	/** Sets the builders {@link IAnnotationProvider} to the
+     * {@link GoogleAnnotationProvider}.
+     * @return This builder.
+     */
+	public ComponentFactoryBuilder<T> google() {
+		return annotationProvider("google");
+	}
+
+    /** Sets the builders {@link IAnnotationProvider} to the
+     * {@link JakartaAnnotationProvider}.
+     * @return This builder.
+     */
+	public ComponentFactoryBuilder<T> jakarta() {
+		return annotationProvider("jakarta");
+	}
+
+    /** Sets the builders {@link IAnnotationProvider} to the
+     * {@link JavaxAnnotationProvider}.
+     * @return This builder.
+     */
+	public ComponentFactoryBuilder<T> javax() {
+		return annotationProvider("javax");
+	}
+
+	/** Sets the builders parent component factory. The
+	 * component factory, that the builder creates, will
+	 * inherit all bindings from the parent (with lower
+	 * precedence, though).
+	 * @param pParent The parent component factory.
+	 * @return This builder.
+	 * @throwsNullPointerException The parameter {@code pParent} is null.
+	 */
+	public ComponentFactoryBuilder<T> parent(IComponentFactory pParent) {
+		final IComponentFactory parent = Objects.requireNonNull(pParent, "Parent");
+		assertMutable();
+		this.parent = parent;
+		return this;
+	}
+	
 	/** Sets the default scope.
 	 * @param pScope The new default scope. May be null, in which
 	 *   case {@link Scopes#SINGLETON} will be used.
@@ -206,7 +267,9 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 						binder.getBindings(),
 						getAnnotationProvider(),
 						getDefaultScope(),
-						getParent());
+						getParent(),
+						binder.getStaticInjectionClasses());
+						
 		final T acf;
 		try {
 			final Class<? extends AbstractComponentFactory> cfType = (Class<? extends AbstractComponentFactory>) type;
