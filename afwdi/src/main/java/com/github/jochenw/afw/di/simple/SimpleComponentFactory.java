@@ -1,12 +1,14 @@
 package com.github.jochenw.afw.di.simple;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,12 +19,19 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
+
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IAnnotationProvider.ProviderAdapter;
+import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.Key;
+import com.github.jochenw.afw.di.api.Scopes.Scope;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.DiUtils;
 
@@ -140,21 +149,22 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	protected Supplier<Object> newInstantiator(Constructor<?> pConstructor) {
 		@SuppressWarnings("unchecked")
 		final Constructor<Object> constructor = (Constructor<Object>) Objects.requireNonNull(pConstructor, "Constructor");
-		final AnnotatedType[] parameters = constructor.getAnnotatedParameterTypes();
+		final AnnotatedType[] parameterAnnotations = constructor.getAnnotatedParameterTypes();
+		final Type[] parameterTypes = constructor.getGenericParameterTypes();
 		@SuppressWarnings("unchecked")
-		final IBinding<Object>[] bindings = (IBinding<Object>[]) Array.newInstance(IBinding.class, parameters.length);
-		for (int i = 0;  i < parameters.length;  i++) {
+		final IBinding<Object>[] bindings = (IBinding<Object>[]) Array.newInstance(IBinding.class, parameterAnnotations.length);
+		for (int i = 0;  i < parameterAnnotations.length;  i++) {
 			final int index = i;
 			final Supplier<String> descriptor = () -> {
 				final StringBuilder sb = new StringBuilder();
 				sb.append("constructor ");
 				sb.append(constructor.getDeclaringClass().getSimpleName());
 				sb.append("(");
-				for (int j = 0;  j < parameters.length;  j++) {
+				for (int j = 0;  j < parameterAnnotations.length;  j++) {
 					if (j > 0) {
 						sb.append(", ");
 					}
-					final String parameterClassName = parameters[index].getType().getTypeName();
+					final String parameterClassName = parameterAnnotations[index].getType().getTypeName();
 					final int packageNameEnd = parameterClassName.lastIndexOf('.');
 					final String appendedClassName;
 					if (packageNameEnd == -1) {
@@ -172,7 +182,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				sb.append(") in class " + constructor.getDeclaringClass().getName());
 				return sb.toString();
 			};
-			bindings[i] = requireBinding(parameters[i], descriptor);
+			bindings[i] = requireBinding(parameterAnnotations[i], parameterTypes[i], descriptor);
 		}
 		return () -> {
 			final Object[] values = new Object[bindings.length];
@@ -213,19 +223,20 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				if (Modifier.isStatic(method.getModifiers())  &&  !staticInjectionClasses.contains(method.getDeclaringClass())) {
 					continue;
 				}
-				final AnnotatedType[] parameters = method.getAnnotatedParameterTypes();
+				final AnnotatedType[] parameterAnnotations = method.getAnnotatedParameterTypes();
+				final Type[] parameterTypes = method.getGenericParameterTypes();
 				@SuppressWarnings("unchecked")
-				final IBinding<Object>[] bindings = (IBinding<Object>[]) Array.newInstance(IBinding.class, parameters.length);
-				for (int i = 0;  i < parameters.length;  i++) {
+				final IBinding<Object>[] bindings = (IBinding<Object>[]) Array.newInstance(IBinding.class, parameterAnnotations.length);
+				for (int i = 0;  i < parameterAnnotations.length;  i++) {
 					final int index = i;
 					final Supplier<String> descriptor = () -> "parameter " + index + " in method " + method.getName()
 						+ " of class " + method.getDeclaringClass().getName();
-					bindings[i] = requireBinding(parameters[i], descriptor);
+					bindings[i] = requireBinding(parameterAnnotations[i], parameterTypes[i], descriptor);
 				}
 				final Consumer<Object> initializer = (o) -> {
 					final Object[] values = new Object[bindings.length];
 					for (int j = 0;  j < bindings.length;  j++) {
-						values[j] = bindings[j].getSupplier().apply(SimpleComponentFactory.this);
+						values[j] = bindings[j].apply(SimpleComponentFactory.this);
 					}
 					DiUtils.assertAccessible(method);
 					try {
@@ -252,11 +263,10 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				if (Modifier.isStatic(field.getModifiers())  &&  !staticInjectionClasses.contains(field.getDeclaringClass())) {
 					continue;
 				}
-				final AnnotatedType type = field.getAnnotatedType();
 				final Supplier<String> descriptor = () -> "field " + field.getName() + " in class " + field.getDeclaringClass().getName();
-				final IBinding<Object> binding = requireBinding(type, descriptor);
+				final IBinding<Object> binding = requireBinding(field, field.getGenericType(), descriptor);
 				final Consumer<Object> initializer = (o) -> {
-					final Object value = binding.getSupplier().apply(SimpleComponentFactory.this);
+					final Object value = binding.apply(SimpleComponentFactory.this);
 					DiUtils.assertAccessible(field);
 					try {
 						field.set(o, value);
@@ -271,42 +281,66 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	}
 	
 	/** Performs a lookup for a binding, which is suitable for injecting a value into the given type.
+	 * @param pAnnotations The method parameter, or fields set of annotations.
 	 * @param pType The type of the method parameter, or field, which needs a binding.
 	 * @param pDescriptor Description of the method parameter, or field, for use in
 	 *   error messages.
 	 * @return The required binding. Never null.
 	 * @throws IllegalStateException No suitable binding has been found.
 	 */
-	protected IBinding<Object> requireBinding(AnnotatedType pType, Supplier<String> pDescriptor) {
-		final Type type = pType.getType();
-		String name = annotationProvider.getNamedValue(pType);
+	protected IBinding<Object> requireBinding(AnnotatedElement pAnnotations, Type pType, Supplier<String> pDescriptor) {
+		String name = annotationProvider.getNamedValue(pAnnotations);
 		if (name == null) {
 			name = "";
 		}
+		final IBinding<Object> binding = findBinding(pType, name, pAnnotations, true);
+		if (binding == null) {
+			throw new IllegalStateException("No suitable binding found for " + pDescriptor.get());
+		}
+		return binding;
+	}
+
+	protected IBinding<Object> findBinding(Type pType, String pName, AnnotatedElement pAnnotations, boolean pPermitProvider) {
 		IBinding<Object> binding = null;
-		for (Annotation annotation : pType.getAnnotations()) {
+		for (Annotation annotation : pAnnotations.getAnnotations()) {
 			Class<? extends Annotation> annotationType = annotation.annotationType();
 			if (annotationClasses.contains(annotationType)) {
-				final Key<Object> key1 = Key.of(type, name, null, annotation);
+				final Key<Object> key1 = Key.of(pType, pName, null, annotation);
 				final IBinding<Object> bndng1 = bindings.get(key1);
 				if (bndng1 != null) {
 					return bndng1;
 				}
 				if (binding == null) {
-					final Key<Object> key2 = Key.of(type, name, annotationType, null);
+					final Key<Object> key2 = Key.of(pType, pName, annotationType, null);
 					final IBinding<Object> bndng2 = bindings.get(key2);
 					binding = bndng2;
 				}
 			}
 		}
 		if (binding == null) {
-			final Key<Object> key = Key.of(type, name);
+			final Key<Object> key = Key.of(pType, pName);
 			binding = bindings.get(key);
 			if (binding == null) {
-				throw new IllegalStateException("No suitable binding found for " + pDescriptor.get());
+				// Try to dynamically create a provider binding.
+				if (pPermitProvider  &&  pType instanceof ParameterizedType) {
+					final ParameterizedType parameterizedType = (ParameterizedType) pType;
+					final Type[] genericParameterTypes = parameterizedType.getActualTypeArguments();
+					final Type providerType = parameterizedType.getRawType();
+					if (genericParameterTypes.length == 1) {
+						final Type providedType = genericParameterTypes[0];
+						final IBinding<Object> providerLessBinding = findBinding(providedType, pName, pAnnotations, false);
+						if (providerLessBinding != null) {
+							final ISupplier<Object> supplier = annotationProvider.getProvider(providerType, binding);
+							if (supplier != null) {
+								return IBinding.of(key, supplier, providerLessBinding.getScope());
+							}
+						}
+					}
+				}
 			}
 		}
 		return binding;
+		
 	}
 	
 	@Override
@@ -330,6 +364,12 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		@SuppressWarnings("unchecked")
 		final Supplier<T> result = (Supplier<T>) supplier;
 		return result;
+	}
+
+	@Override
+	public Map<Key<Object>, IBinding<Object>> getBindings() {
+		// No need to make the map immutable, because it already is.
+		return bindings;
 	}
 
 

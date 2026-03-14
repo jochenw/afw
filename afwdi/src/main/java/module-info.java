@@ -3,8 +3,9 @@ module com.github.jochenw.afw.di {
 	exports com.github.jochenw.afw.di.api;
 
 	requires java.base;
-	requires com.google.guice;
 	requires jakarta.inject;
 	requires java.logging;
-	requires javax.inject;
+	requires java.inject;
+	requires com.google.guice;
+	requires org.apache.commons.lang3;
 }

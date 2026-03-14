@@ -2,10 +2,12 @@ package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.github.jochenw.afw.di.api.Scopes.Scope;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.simple.SimpleComponentFactory;
 
@@ -44,21 +46,33 @@ public interface IComponentFactory {
 	/** Interface of the registered binding.
 	 * @param <T> Type of the instance, which is provided by the binding.
 	 */
-	public interface IBinding<T> {
+	public interface IBinding<T> extends ISupplier<T> {
 		/** Returns the bindings key.
 		 * @return The bindings key.
 		 */
 		public Key<T> getKey();
-		/** Returns the bindings supplier.
-		 * @return The bindings supplier.
-		 */
-		public ISupplier<T> getSupplier();
 		/** Returns the bindings scope, either of {@link Scopes#SINGLETON},
 		 * {@link Scopes#EAGER_SINGLETON}, or {@link Scopes#NO_SCOPE}.
 		 * @return The bindings scope, either of {@link Scopes#SINGLETON},
 		 * {@link Scopes#EAGER_SINGLETON}, or {@link Scopes#NO_SCOPE}.
 		 */
 		public Scopes.Scope getScope();
+
+		/** Creates a new binding with the given, key, supplier, and scope.
+		 * @param pKey The created bindings key.
+		 * @param pSupplier Implementation of the created bindings
+		 * {@link IBinding#apply(IComponentFactory)} method.
+		 * @param pScope The created bindings scope.
+		 * @return The created binding.
+		 */
+		public static <T> IBinding<T> of(Key<T> pKey, ISupplier<T> pSupplier,
+				                         Scopes.Scope pScope) {
+			return new IBinding<T>() {
+				@Override public T apply(IComponentFactory pCf) { return pSupplier.apply(pCf); }
+				@Override public Key<T> getKey() { return pKey; }
+				@Override public Scope getScope() { return pScope; }
+			};
+		}
 	}
 	/** Returns the binding with the given key, if any, or null.
 	 * @param pKey The key, under which the binding has been registered.
@@ -79,7 +93,7 @@ public interface IComponentFactory {
 		if (binding == null) {
 			return null;
 		} else {
-			return binding.getSupplier().apply(this);
+			return binding.apply(this);
 		}
 	}
 
@@ -143,7 +157,7 @@ public interface IComponentFactory {
 		if (binding == null) {
 			throw new NoSuchBindingException(key, "No such binding has been registered: " + key);
 		} else {
-			return binding.getSupplier().apply(this);
+			return binding.apply(this);
 		}
 	}
 
@@ -250,4 +264,11 @@ public interface IComponentFactory {
 	 * @return The created instantiator.
 	 */
 	public <T> Supplier<T> getInstantiator(Constructor<? extends T> pConstructor);
+
+	/** Returns an immutable map with the component factories bindings.
+	 * This is mainly for test purposes, and should not be used
+	 * without very good reasons.
+	 * @return The component factories bindings.
+	 */
+	public Map<Key<Object>, IBinding<Object>> getBindings();
 }

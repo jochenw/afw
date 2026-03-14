@@ -2,6 +2,11 @@ package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Type;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 
 /** Interface of an object, that recognizes inject-related annotations of
  * a given type.
@@ -26,4 +31,14 @@ public interface IAnnotationProvider {
 	 *   annotation, if any, or null.
 	 */
 	public String getNamedValue(AnnotatedElement pObject);
+
+	/** If the given type is a valid provider type, create a valid provider
+	 * instance by using the given {@link ISupplier} to obtain the
+	 * providers result. If not, return null.
+	 * @param pProviderType Type of the created provider.
+	 * @param pSupplier The supplier, which is being used
+	 *   internally by the created provider.
+	 * @return A supplier, which returns the created provider.
+	 */
+	public ISupplier<Object> getProvider(Type pProviderType, ISupplier<Object> pSupplier);
 }

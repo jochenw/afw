@@ -2,11 +2,14 @@ package com.github.jochenw.afw.di.impl;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Type;
 
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 /** Implementation of {@link IAnnotationProvider} for Javax
  * annotations.
@@ -31,5 +34,17 @@ public class JavaxAnnotationProvider implements IAnnotationProvider {
 		} else {
 			return named.value();
 		}
+	}
+
+
+	@Override
+	public ISupplier<Object> getProvider(Type pProviderType, ISupplier<Object> pSupplier) {
+		if (pProviderType == Provider.class  ||  pProviderType.equals(Provider.class)) {
+			return (cf) -> {
+				final Provider<Object> provider = () -> pSupplier.apply(cf);
+				return provider;
+			};
+		}
+		return null;
 	}
 }

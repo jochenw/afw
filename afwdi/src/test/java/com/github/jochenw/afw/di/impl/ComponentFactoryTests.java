@@ -1,22 +1,17 @@
 package com.github.jochenw.afw.di.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.logging.Logger;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,12 +31,11 @@ import org.atinject.tck.auto.accessories.SpareTire;
 
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
 import com.github.jochenw.afw.di.api.IModule;
+import com.github.jochenw.afw.di.api.Key;
 import com.github.jochenw.afw.di.api.Scopes;
-import com.github.jochenw.afw.di.api.Types;
-import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateJakartaMapsObject;
-import com.github.jochenw.afw.di.impl.ComponentFactoryTests.CreateJavaxMapsObject;
-import com.github.jochenw.afw.di.impl.ComponentFactoryTests.TestParentObject;
+
 
 /** Implementation of various tests for the component factories.
  */
@@ -51,12 +45,12 @@ public class ComponentFactoryTests {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static class CreateJavaxMapsObject {
-		private @Inject @Named(value="hash") Map hashMap1;
-		private @Inject @Named(value="hash") Map hashMap2;
-		private @Inject @Named(value="linked") Map linkedMap1;
-		private @Inject @Named(value="linked") Map linkedMap2;
-		private @Inject @Named(value="empty") Map emptyMap1;
-		private @Inject @Named(value="empty") Map emptyMap2;
+		private @javax.inject.Inject @javax.inject.Named(value="hash") Map hashMap1;
+		private @javax.inject.Inject @javax.inject.Named(value="hash") Map hashMap2;
+		private @javax.inject.Inject @javax.inject.Named(value="linked") Map linkedMap1;
+		private @javax.inject.Inject @javax.inject.Named(value="linked") Map linkedMap2;
+		private @javax.inject.Inject @javax.inject.Named(value="empty") Map emptyMap1;
+		private @javax.inject.Inject @javax.inject.Named(value="empty") Map emptyMap2;
 		private @Inject Map map1;
 		private @Inject Map map2;
 	}
@@ -114,30 +108,62 @@ public class ComponentFactoryTests {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static class CreateJakartaMapsObject {
-		private @jakarta.inject.Inject @Named(value="hash") Map hashMap1;
-		private @jakarta.inject.Inject @Named(value="hash") Map hashMap2;
-		private @jakarta.inject.Inject @Named(value="linked") Map linkedMap1;
-		private @jakarta.inject.Inject @Named(value="linked") Map linkedMap2;
-		private @jakarta.inject.Inject @Named(value="empty") Map emptyMap1;
-		private @jakarta.inject.Inject @Named(value="empty") Map emptyMap2;
+		private @jakarta.inject.Inject @jakarta.inject.Named(value="hash") Map hashMap1;
+		private @jakarta.inject.Inject @jakarta.inject.Named(value="hash") Map hashMap2;
+		private @jakarta.inject.Inject @jakarta.inject.Named(value="linked") Map linkedMap1;
+		private @jakarta.inject.Inject @jakarta.inject.Named(value="linked") Map linkedMap2;
+		private @jakarta.inject.Inject @jakarta.inject.Named(value="empty") Map emptyMap1;
+		private @jakarta.inject.Inject @jakarta.inject.Named(value="empty") Map emptyMap2;
 		private @jakarta.inject.Inject Map map1;
 		private @jakarta.inject.Inject Map map2;
 	}
 
+	/** A test method, which tests the creation of bindings.
+	 * @param pType Type of the component factory, that is being tested.
+	 */
+	public static void testCreateJakartaMapBindings(Class<? extends AbstractComponentFactory> pType) {
+		final Map<String,Object> hashMap = new HashMap<>();
+		final IModule module = createJakartaMapsModule(hashMap);
+		final IComponentFactory cf = builder(pType, module).build();
+		final Map<Key<Object>,IBinding<Object>> bindings = cf.getBindings();
+		assertEquals(6, bindings.size());
+		assertBinding(bindings, Key.of(IComponentFactory.class, ""), Scopes.SINGLETON);
+		assertBinding(bindings, Key.of(Map.class, "hash"), Scopes.SINGLETON);
+		assertBinding(bindings, Key.of(Map.class, "linked"), Scopes.NO_SCOPE);
+		assertBinding(bindings, Key.of(Map.class, ""), Scopes.SINGLETON);
+		assertBinding(bindings, Key.of(Map.class, "empty"), Scopes.NO_SCOPE);
+		assertBinding(bindings, Key.of(CreateJakartaMapsObject.class, ""), Scopes.SINGLETON);
+		
+	}
+
+	/** Asserts, that the given set of bindings contains an entry with the given key, and scope.
+	 * @param pBindings The set of bindings, that are being tested.
+	 * @param pKey Key of the binding, that is being tested.
+	 * @param pScope The scope, that the requested binding is supposed to have.
+	 */
+	static void assertBinding(Map<Key<Object>,IBinding<Object>> pBindings, Key<?> pKey, Scopes.Scope pScope) {
+		@SuppressWarnings("unchecked")
+		final Key<Object> key = (Key<Object>) Objects.requireNonNull(pKey, "Key");
+		final Scopes.Scope scope = Objects.requireNonNull(pScope, "Scope");
+		final IBinding<Object> binding = pBindings.get(key);
+		assertNotNull(binding);
+		assertEquals(key, binding.getKey());
+		assertEquals(scope.name(), binding.getScope().name());
+	}
+
+	private static ComponentFactoryBuilder<? extends AbstractComponentFactory> builder(
+			Class<? extends AbstractComponentFactory> pType, final IModule module) {
+		return IComponentFactory.builder(pType).jakarta()
+				.defaultScope(Scopes.NO_SCOPE)
+				.module(module);
+	}
 	/** A test method, which tests proper instantiation, and injection of a
 	 * {@link CreateJavaxMapsObject}.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
 	public static void testCreateJakartaMaps(Class<? extends AbstractComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
-		final IModule module = (b) -> {
-			b.bind(Map.class, "hash").toInstance(hashMap);
-			b.bind(Map.class, "linked").toClass(LinkedHashMap.class);
-			b.bind(Map.class).toClass(HashMap.class).in(Scopes.SINGLETON);
-			b.bind(Map.class, "empty").toSupplier(() -> new Hashtable<>());
-			b.bind(CreateJakartaMapsObject.class).in(Scopes.SINGLETON);
-			b.bind(SpareTire.class).in(Scopes.SINGLETON);
-		};
+		final IModule module = createJakartaMapsModule(hashMap);
 		final IComponentFactory cf = IComponentFactory.builder(pType).jakarta()
 				.defaultScope(Scopes.NO_SCOPE)
 				.module(module).build();
@@ -170,6 +196,17 @@ public class ComponentFactoryTests {
 		assertNotNull(cmo.map1);
 		assertTrue(cmo.map1 instanceof HashMap);
 		assertSame(cmo.map1, cmo.map2);
+	}
+
+	private static IModule createJakartaMapsModule(final Map<String, Object> hashMap) {
+		final IModule module = (b) -> {
+			b.bind(Map.class, "hash").toInstance(hashMap);
+			b.bind(Map.class, "linked").toClass(LinkedHashMap.class);
+			b.bind(Map.class).toClass(HashMap.class).in(Scopes.SINGLETON);
+			b.bind(Map.class, "empty").toSupplier(() -> new Hashtable<>());
+			b.bind(CreateJakartaMapsObject.class).in(Scopes.SINGLETON);
+		};
+		return module;
 	}
 
 	/** A test class, which is used to test proper injection of the component factory
@@ -239,7 +276,7 @@ public class ComponentFactoryTests {
 				}
 			}
 		};
-		final IComponentFactory cf = IComponentFactory.builder(pType).module(module).build();
+		final IComponentFactory cf = IComponentFactory.builder(pType).jakarta().module(module).build();
 		Tck.testsFor(cf.requireInstance(Car.class), pStaticInjection, true);
 	}
 

@@ -3,11 +3,14 @@ package com.github.jochenw.afw.di.impl;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 
 
 /** Default implementation of {@link IAnnotationProvider}.
@@ -116,4 +119,14 @@ public class DefaultAnnotationProvider implements IAnnotationProvider {
 		return null;
 	}
 
+	@Override
+	public ISupplier<Object> getProvider(Type pProviderType, ISupplier<Object> pSupplier) {
+		for (IAnnotationProvider ap : getAnnotationProviders()) {
+			final ISupplier<Object> supplier = ap.getProvider(pProviderType, pSupplier);
+			if (supplier != null) {
+				return null;
+			}
+		}
+		return null;
+	}
 }

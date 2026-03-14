@@ -228,11 +228,7 @@ public class BinderImpl implements IBinder {
 			} else {
 				throw new IllegalStateException("Invalid scope: Expected SINGLETON, EAGER_SINGLETON, or NO_SCOPE, got " + scope);
 			}
-			final IBinding<Object> binding = new IBinding<Object>() {
-				@Override public Key<Object> getKey() { return key; }
-				@Override public ISupplier<Object> getSupplier() { return scopedSupplier; }
-				@Override public Scope getScope() { return scope; }
-			};
+			final IBinding<Object> binding = IBinding.of(key, scopedSupplier, scope); 
 			bindings.put(key, binding);
 			if (scope == Scopes.EAGER_SINGLETON) {
 				addFinalizer((cf) -> cf.getInstance(key));

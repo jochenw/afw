@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +16,7 @@ import com.github.jochenw.afw.di.simple.SimpleComponentFactory;
 
 
 class ComponentFactoryBuilderTest {
+	@SuppressWarnings("unused")
 	public static class MappingSubject {
 		private @jakarta.inject.Inject String jakartaInjectedField;
 		private @javax.inject.Inject String javaxInjectedField;
@@ -45,9 +45,9 @@ class ComponentFactoryBuilderTest {
 		assertEquals(key, cfBinding.getKey());
 		assertSame(Scopes.SINGLETON, cfBinding.getScope());
 		// Reuesting the component factory binding should retrieve the component factory itself.
-		assertSame(cf, cfBinding.getSupplier().apply(cf));
+		assertSame(cf, cfBinding.apply(cf));
 		// Repeating the request should retrieve the same instance. (Scope SINGLETON.)
-		assertSame(cf, cfBinding.getSupplier().apply(cf)); 
+		assertSame(cf, cfBinding.apply(cf)); 
 	}
 
 }
