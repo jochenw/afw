@@ -7,5 +7,4 @@ module com.github.jochenw.afw.di {
 	requires java.logging;
 	requires java.inject;
 	requires com.google.guice;
-	requires org.apache.commons.lang3;
 }

@@ -19,19 +19,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.reflect.TypeUtils;
-
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
-import com.github.jochenw.afw.di.api.IAnnotationProvider.ProviderAdapter;
-import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.Key;
-import com.github.jochenw.afw.di.api.Scopes.Scope;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.DiUtils;
 
