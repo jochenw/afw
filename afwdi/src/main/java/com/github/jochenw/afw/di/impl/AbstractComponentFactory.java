@@ -3,9 +3,11 @@ package com.github.jochenw.afw.di.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IBindingProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.Key;
 import com.github.jochenw.afw.di.api.Scopes;
@@ -19,6 +21,7 @@ public abstract class AbstractComponentFactory implements IComponentFactory {
 		private final Scopes.Scope defaultScope;
 		private final IComponentFactory parent;
 		private final Set<Class<?>> staticInjectionClasses;
+		private final List<IBindingProvider> bindingProviders;
 
 		/** Creates a new configuration instance with the given parameters.
 		 * @param pBindings The map of bindings.
@@ -27,16 +30,19 @@ public abstract class AbstractComponentFactory implements IComponentFactory {
 		 * @param pParent The component factories parent.
 		 * @param pStaticInjectionClasses The set of classes, that require injection of static
 		 * methods, or fields.
+		 * @param pBindingProviders A list with additional binding providers.
 		 */
 		public Configuration(Map<Key<Object>, IBinding<Object>> pBindings,
 				IAnnotationProvider pAnnotationProvider,
 				Scope pDefaultScope, IComponentFactory pParent,
-				Set<Class<?>> pStaticInjectionClasses) {
+				Set<Class<?>> pStaticInjectionClasses,
+				List<IBindingProvider> pBindingProviders) {
 			bindings = pBindings;
 			annotationProvider = pAnnotationProvider;
 			defaultScope = pDefaultScope;
 			parent = pParent;
 			staticInjectionClasses = pStaticInjectionClasses;
+			bindingProviders = pBindingProviders;
 		}
 
 		/** Returns the map of bindings.
@@ -61,6 +67,15 @@ public abstract class AbstractComponentFactory implements IComponentFactory {
 		 * methods, or fields.
 		 */
 		public Set<Class<?>> getStaticInjectionClasses() { return staticInjectionClasses; }
+
+		/** Returns the list of additional binding providers. These
+		 * are not yet initialized, and it is the component factories
+		 * responsibility to do that.
+		 * @return The list of additional binding providers.
+		 */
+		public List<IBindingProvider> getBindingProviders() {
+			return bindingProviders;
+		}
 	}
 
 	private final Configuration configuration;

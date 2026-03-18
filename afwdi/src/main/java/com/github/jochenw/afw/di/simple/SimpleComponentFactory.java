@@ -19,24 +19,36 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IBindingProvider;
+import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.Key;
+import com.github.jochenw.afw.di.impl.AbstractBindingProvider;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
+import com.github.jochenw.afw.di.impl.AtInjectBindingProvider;
 import com.github.jochenw.afw.di.impl.DiUtils;
 
 /** Simple, leightweight, but fast implementation of {@IComponentFactory}.
  */
 public class SimpleComponentFactory extends AbstractComponentFactory {
+	private final ConcurrentMap<Key<Object>,IBinding<Object>> bindings;
+	private final ConcurrentMap<Class<Object>,ClassMetaData> metaDatas = new ConcurrentHashMap<>();
+	private final Set<Class<? extends Annotation>> annotationClasses = new HashSet<>();
+	private final Set<Class<?>> staticInjectionClasses;
+	private final List<IBindingProvider> bindingProviders;
+
 	/** Creates a new instance with the given configuration.
 	 * @param pConfiguration The created instances configuration.
 	 */
-	public SimpleComponentFactory(Configuration pConfiguration) {
+	public SimpleComponentFactory(@SuppressWarnings("exports") Configuration pConfiguration) {
 		super(pConfiguration);
-		bindings = Collections.unmodifiableMap(pConfiguration.getBindings());
+		bindings = new ConcurrentHashMap<>();
+		bindings.putAll(pConfiguration.getBindings());
 		annotationProvider = pConfiguration.getAnnotationProvider();
 		staticInjectionClasses = pConfiguration.getStaticInjectionClasses();
 		pConfiguration.getBindings().keySet().forEach((k) -> {
@@ -49,12 +61,17 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				annotationClasses.add(annotation.annotationType());
 			}
 		});
+		bindingProviders = new ArrayList<>();
+		final AtInjectBindingProvider atInjectBindingProvider = new AtInjectBindingProvider();
+		bindingProviders.add(atInjectBindingProvider);
+		atInjectBindingProvider.init(pConfiguration, bindings);
+		pConfiguration.getBindingProviders().forEach((bp) -> {
+			if (bp instanceof AbstractBindingProvider abp) {
+				abp.init(pConfiguration);
+			}
+			bindingProviders.add(bp);
+		});
 	}
-
-	private final Map<Key<Object>,IBinding<Object>> bindings;
-	private final ConcurrentMap<Class<Object>,ClassMetaData> metaDatas = new ConcurrentHashMap<>();
-	private final Set<Class<? extends Annotation>> annotationClasses = new HashSet<>();
-	private final Set<Class<?>> staticInjectionClasses;
 
 	/** An object, which holds the information, that the component factory needs to
 	 * create, or initialize instances of one particular class.
@@ -179,6 +196,9 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		}
 		return () -> {
 			final Object[] values = new Object[bindings.length];
+			for (int i = 0;  i < bindings.length;  i++) {
+				values[i] = bindings[i].apply(SimpleComponentFactory.this);
+			}
 			DiUtils.assertAccessible(constructor);
 			try {
 				return constructor.newInstance(values);
@@ -208,37 +228,18 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				if (Modifier.isAbstract(method.getModifiers())) {
 					continue;
 				}
-				// Ignore methods without @Inject
-				if (!annotationProvider.isInjectable(method)) {
-					continue;
-				}
 				// Ignore static methods, unless static injection has been requested for the class.
 				if (Modifier.isStatic(method.getModifiers())  &&  !staticInjectionClasses.contains(method.getDeclaringClass())) {
 					continue;
 				}
-				final AnnotatedType[] parameterAnnotations = method.getAnnotatedParameterTypes();
-				final Type[] parameterTypes = method.getGenericParameterTypes();
-				@SuppressWarnings("unchecked")
-				final IBinding<Object>[] bindings = (IBinding<Object>[]) Array.newInstance(IBinding.class, parameterAnnotations.length);
-				for (int i = 0;  i < parameterAnnotations.length;  i++) {
-					final int index = i;
-					final Supplier<String> descriptor = () -> "parameter " + index + " in method " + method.getName()
-						+ " of class " + method.getDeclaringClass().getName();
-					bindings[i] = requireBinding(parameterAnnotations[i], parameterTypes[i], descriptor);
+				for (IBindingProvider bp : bindingProviders) {
+					if (bp.isInjectable(method)) {
+						final BiConsumer<IComponentFactory,Object> consumer = bp.createInjector(this, method);
+						final Consumer<Object> initializer = (o) -> consumer.accept(this, o);
+						pInitializerConsumer.accept(initializer);
+						break;
+					}
 				}
-				final Consumer<Object> initializer = (o) -> {
-					final Object[] values = new Object[bindings.length];
-					for (int j = 0;  j < bindings.length;  j++) {
-						values[j] = bindings[j].apply(SimpleComponentFactory.this);
-					}
-					DiUtils.assertAccessible(method);
-					try {
-						method.invoke(o, values);
-					} catch (Exception e) {
-						throw DiUtils.show(e);
-					}
-				};
-				pInitializerConsumer.accept(initializer);
 			}
 			cl = cl.getSuperclass();
 		} while (cl != null  &&  cl != Object.class);
@@ -248,26 +249,18 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		Class<Object> cl = pType;
 		do {
 			for (final Field field : cl.getDeclaredFields()) {
-				// Ignore fields without @Inject
-				if (!annotationProvider.isInjectable(field)) {
-					continue;
-				}
 				// Ignore static fields, unless static injection has been requested for the class.
 				if (Modifier.isStatic(field.getModifiers())  &&  !staticInjectionClasses.contains(field.getDeclaringClass())) {
 					continue;
 				}
-				final Supplier<String> descriptor = () -> "field " + field.getName() + " in class " + field.getDeclaringClass().getName();
-				final IBinding<Object> binding = requireBinding(field, field.getGenericType(), descriptor);
-				final Consumer<Object> initializer = (o) -> {
-					final Object value = binding.apply(SimpleComponentFactory.this);
-					DiUtils.assertAccessible(field);
-					try {
-						field.set(o, value);
-					} catch (Exception e) {
-						throw DiUtils.show(e);
+				for (IBindingProvider bp : bindingProviders) {
+					if (bp.isInjectable(field)) {
+						final BiConsumer<IComponentFactory,Object> consumer = bp.createInjector(this, field);
+						final Consumer<Object> initializer = (o) -> consumer.accept(this, o);
+						pInitializerConsumer.accept(initializer);
+						break;
 					}
-				};
-				pInitializerConsumer.accept(initializer);
+				}
 			}
 			cl = cl.getSuperclass();
 		} while (cl != null  &&  cl != Object.class);

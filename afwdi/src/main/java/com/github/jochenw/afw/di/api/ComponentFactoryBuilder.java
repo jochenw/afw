@@ -26,6 +26,7 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 	private List<IModule> modules;
 	private Scopes.Scope defaultScope;
 	private IComponentFactory parent;
+	private final List<IBindingProvider> bindingProviders = new ArrayList<>();
 
 	/** Called by methods, which change the builders state, to ensure,
 	 * that changing the state is still valid.
@@ -65,6 +66,13 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 		}
 	}
 
+	/** Returns the list of binding providers.
+	 * @return The list of binding providers.
+	 */
+	public List<IBindingProvider> getBindingProviders() {
+		return bindingProviders;
+	}
+	
 	/** Returns the default scope. Never null, because
 	 * {@link Scopes#SINGLETON} acts as the default value.
 	 * @return The default scope.
@@ -131,6 +139,17 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 		return annotationProvider(ap);
 	}
 
+	/** Adds a new instance to the list of binding providers.
+	 * @param pBindingProvider The binding provider, which is being added.
+	 * @return This builder.
+	 */
+	public ComponentFactoryBuilder<T> bindingProvider(IBindingProvider pBindingProvider) {
+		final IBindingProvider bindingProvider = Objects.requireNonNull(pBindingProvider, "BindingProvider");
+		assertMutable();
+		bindingProviders.add(bindingProvider);
+		return this;
+	}
+	
 	/** Sets the builders {@link IAnnotationProvider} to the
      * {@link GoogleAnnotationProvider}.
      * @return This builder.
@@ -268,7 +287,8 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 						getAnnotationProvider(),
 						getDefaultScope(),
 						getParent(),
-						binder.getStaticInjectionClasses());
+						binder.getStaticInjectionClasses(),
+						bindingProviders);
 						
 		final T acf;
 		try {

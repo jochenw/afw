@@ -3,6 +3,7 @@ package com.github.jochenw.afw.di.impl;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Objects;
@@ -96,10 +97,44 @@ public class DiUtils {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	/** Called to ensure, that {@link AccessibleObject#isAccessible()}
+	 * returns true for the given field, or method.
+	 * @param pObject The field, or method, which should be made
+	 * accessible.
+	 */
+	@SuppressWarnings({ "deprecation", "javadoc" })
 	public static void assertAccessible(AccessibleObject pObject) {
 		if (!pObject.isAccessible()) {
 			pObject.setAccessible(true);
+		}
+	}
+
+	/** Called to modify the given field by setting it's value to
+	 * the given.
+	 * @param pField The field, which is being updated.
+	 * @param pInstance The instance, which is holding the field.
+	 * @param pValue The new field value.
+	 */
+	public static void set(Field pField, Object pInstance, Object pValue) {
+		assertAccessible(pField);
+		try {
+			pField.set(pInstance, pValue);
+		} catch (Exception e) {
+			throw show(e);
+		}
+	}
+
+	/** Called to invoke the given method, passing the given values.
+	 * @param pMethod The method, which is being invoked.
+	 * @param pInstance The instance, which is holding the field.
+	 * @param pValues The method invocation parameters.
+	 */
+	public static void invoke(Method pMethod, Object pInstance, Object... pValues) {
+		assertAccessible(pMethod);
+		try {
+			pMethod.invoke(pInstance, pValues);
+		} catch (Exception e) {
+			throw show(e);
 		}
 	}
 }
