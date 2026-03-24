@@ -47,4 +47,18 @@ public class GoogleAnnotationProvider implements IAnnotationProvider {
 		}
 		return null;
 	}
+
+	/** Google Guice has no @PostConstruct annotation, so we will always return false.
+	 */
+	@Override
+	public boolean isAnnotatedWithPostConstruct(AccessibleObject pObject) {
+		return false;
+	}
+
+	/** Google Guice has no @PreDestroy annotation, so we will always return false.
+	 */
+	@Override
+	public boolean isAnnotatedWithPreDestroy(AccessibleObject pObject) {
+		return false;
+	}
 }

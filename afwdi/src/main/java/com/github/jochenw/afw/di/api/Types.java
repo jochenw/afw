@@ -16,8 +16,10 @@
 package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -52,7 +54,7 @@ public class Types {
 	 * @param <T> The parameter type.
 	 */
 	public static class Type<T extends Object> {
-		private final java.lang.reflect.Type rawType;
+		private final java.lang.reflect.Type type;
 
 		/**
 		 * Creates a new instance.
@@ -62,18 +64,21 @@ public class Types {
 		}
 
 		/**
-		 * Creates a new instance with the given raw type.
-		 * @param pRawType The raw type.
+		 * Creates a new instance with the given actual type.
+		 * @param pType The raw type.
 		 */
-		public Type(java.lang.reflect.Type pRawType) {
-			final java.lang.reflect.Type rt = pRawType == null ? getClass().getGenericSuperclass() : pRawType;
-			if (rt instanceof ParameterizedType) {
-				final ParameterizedType ptype = (ParameterizedType) rt;
-				final java.lang.reflect.Type[] typeArgs = ptype.getActualTypeArguments();
-				final java.lang.reflect.Type rType = typeArgs[0];
-				rawType = rType;
+		public Type(java.lang.reflect.Type pType) {
+			if (pType == null) {
+				final java.lang.reflect.Type tp = getClass().getGenericSuperclass();
+				if (tp instanceof ParameterizedType pt) {
+					final java.lang.reflect.Type[] typeArgs = pt.getActualTypeArguments();
+					final java.lang.reflect.Type rType = typeArgs[0];
+					type = rType;
+				} else {
+					throw new IllegalStateException("Unsupported type: " + pType);
+				}
 			} else {
-				throw new IllegalStateException("Unsupported type: " + rt);
+				type = pType;
 			}
 		}
 
@@ -81,7 +86,7 @@ public class Types {
 		 * @return The parameter type.
 		 */
 		public java.lang.reflect.Type getType() {
-			return rawType;
+			return type;
 		}
 	}
 
@@ -97,12 +102,4 @@ public class Types {
 	/** A predefined type for {@link Map Map&lt;String,String&gt;}
 	 */
 	public static final Type<Map<String,String>> TYPE_MAP_STRING_STRING = new Types.Type<Map<String,String>>() {};
-
-	/** Creates a new instance of {@link Types.Type}, representing the type {@code O}.
-	 * @param <O> The type, which is represented by the created instance.
-	 * @return The created instance.
-	 */
-	public static <O> Types.Type<O> of() {
-		return new Types.Type<O>() {};
-	}
 }

@@ -7,6 +7,8 @@ import java.lang.reflect.Type;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -46,5 +48,15 @@ public class JavaxAnnotationProvider implements IAnnotationProvider {
 			};
 		}
 		return null;
+	}
+
+	@Override
+	public boolean isAnnotatedWithPostConstruct(AccessibleObject pObject) {
+		return pObject.isAnnotationPresent(PostConstruct.class);
+	}
+
+	@Override
+	public boolean isAnnotatedWithPreDestroy(AccessibleObject pObject) {
+		return pObject.isAnnotationPresent(PreDestroy.class);
 	}
 }

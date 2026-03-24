@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
@@ -172,6 +173,15 @@ public interface IModule {
 		public default void toInstance(T pInstance) {
 			toSupplier(() -> pInstance).in(Scopes.SINGLETON);
 		}
+		/** Creates a supplier for the binding, which is being registered.
+		 * The created supplier will invoke the given function, and
+		 * return the result.
+		 * @param pFunction The function, which will be invoked by the
+		 *   created supplier.
+		 */
+		public default void toFunction(Function<IComponentFactory,? extends T> pFunction) {
+			to((ISupplier<? extends T>) (cf) -> pFunction.apply(cf));
+		}
 	}
 	/** Interface of a binding builder, which needs a scope. (The
 	 * default scope can be applied, if no scoping
@@ -235,14 +245,18 @@ public interface IModule {
 	 */
 	public default IModule extend(IModule... pModules) {
 		final IModule[] modules = Objects.requireNonNull(pModules, "Modules");
-		return (b) -> {
-			IModule.this.configure(b);
-			for (IModule module : modules) {
-				if (module != null) {
-					module.configure(b);
+		if (modules.length == 0) {
+			return this;
+		} else {
+			return (b) -> {
+				IModule.this.configure(b);
+				for (IModule module : modules) {
+					if (module != null) {
+						module.configure(b);
+					}
 				}
-			}
-		};
+			};
+		}
 	}
 
 	/** Returns a module, which invokes this modules
@@ -255,13 +269,17 @@ public interface IModule {
 	 */
 	public default IModule extend(Iterable<IModule> pModules) {
 		final Iterable<IModule> modules = Objects.requireNonNull(pModules, "Modules");
-		return (b) -> {
-			IModule.this.configure(b);
-			for (IModule module : modules) {
-				if (module != null) {
-					module.configure(b);
+		if (modules.iterator().hasNext()) {
+			return (b) -> {
+				IModule.this.configure(b);
+				for (IModule module : modules) {
+					if (module != null) {
+						module.configure(b);
+					}
 				}
-			}
-		};
+			};
+		} else {
+			return this;
+		}
 	}
 }

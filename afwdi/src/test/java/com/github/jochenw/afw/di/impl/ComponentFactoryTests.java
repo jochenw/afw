@@ -1,17 +1,27 @@
 package com.github.jochenw.afw.di.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,13 +38,28 @@ import org.atinject.tck.auto.Tire;
 import org.atinject.tck.auto.V8Engine;
 import org.atinject.tck.auto.accessories.Cupholder;
 import org.atinject.tck.auto.accessories.SpareTire;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
+import com.github.jochenw.afw.di.api.DefaultBindingProvider;
+import com.github.jochenw.afw.di.api.DefaultLifecycleController;
+import com.github.jochenw.afw.di.api.IBindingProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
+import com.github.jochenw.afw.di.api.ILifecycleController;
 import com.github.jochenw.afw.di.api.IModule;
+import com.github.jochenw.afw.di.api.IModule.LinkableBindingBuilder;
 import com.github.jochenw.afw.di.api.Key;
+import com.github.jochenw.afw.di.api.LogInject;
+import com.github.jochenw.afw.di.api.PropInject;
 import com.github.jochenw.afw.di.api.Scopes;
+import com.github.jochenw.afw.di.api.Types;
+import com.github.jochenw.afw.di.impl.LogInjectBindingProvider.LoggerFactory;
+import com.github.jochenw.afw.di.impl.PropInjectBindingProvider.PropertyFactory;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 
 /** Implementation of various tests for the component factories.
@@ -307,4 +332,208 @@ public class ComponentFactoryTests {
 		assertSame(cf2, cf2.requireInstance(IComponentFactory.class));
 		assertSame(cf3, cf3.requireInstance(IComponentFactory.class));
 	}
+
+	/** Test class for dynamic binding, aka using a custom {@link IBindingProvider}.
+	 */
+	public static class DynmicallyBindableComponent {
+		private boolean started;
+		private boolean stopped;
+		private @PropInject(id="myProperty") String myProperty;
+		private @PropInject String otherProperty;
+		private @LogInject(id="myLogger") Logger myLogger;
+		private @LogInject() Logger otherLogger;
+
+		/** Called to start the component.
+		 */
+		@PostConstruct
+		public void start() {
+			started = true;
+		}
+
+		/** Called to stop the component.
+		 */
+		@PreDestroy
+		public void shutdown() {
+			stopped = true;
+		}
+
+		/** Returns, whether the component has been started.
+		 * @return True, if {@link #start()} has been invoked.
+		 *   Otherwise false.
+		 */
+		public boolean isStopped() {
+			return stopped;
+		}
+
+		/** Returns, whether the component has been stopped.
+		 * @return True, if {@link #shutdown()} has been invoked.
+		 *   Otherwise false.
+		 */
+		public boolean isStarted() {
+			return started;
+		}
+
+		/** Returns the value of the "myProperty" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "myProperty" attribute.
+		 */
+		public String getMyProperty() { return myProperty; }
+		/** Returns the value of the "otherProperty" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "otherProperty" attribute.
+		 */
+		public String getOtherProperty() { return otherProperty; }
+		/** Returns the value of the "myLogger" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "myLogger" attribute.
+		 */
+		public Logger getMyLogger() { return myLogger; }
+		/** Returns the value of the "otherLogger" attribute, which has
+		 * been configured by the component factory.
+		 * @return The value of the "otherLogger" attribute.
+		 */
+		public Logger getOtherLogger() { return otherLogger; }
+	}
+
+	/** A method for testing, whether the {@link IBindingProvider} works,
+	 * as expected.
+	 * @param pComponentFactoryType Type of the component factory, that is being tested.
+	 */
+	public static void testCustomBindingProvider(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		final Properties properties = new Properties();
+		properties.put("myProperty", "myPropertyValue");
+		properties.put(DynmicallyBindableComponent.class.getName() + ".otherProperty", "otherPropertyValue");
+		// Check the state of a DynamicallyBindableComponent, that isn't properly initialized.
+		final DynmicallyBindableComponent dbc0 = new DynmicallyBindableComponent();
+		assertFalse(dbc0.isStarted());
+		assertFalse(dbc0.isStopped());
+		assertNull(dbc0.getMyProperty());
+		assertNull(dbc0.getOtherProperty());
+		assertNull(dbc0.getMyProperty());
+		assertNull(dbc0.getMyLogger());
+		assertNull(dbc0.getOtherLogger());
+		final IModule module = (b) -> {
+			b.bind(DynmicallyBindableComponent.class).in(Scopes.SINGLETON);
+			b.bind(ILifecycleController.class).toClass(DefaultLifecycleController.class).in(Scopes.SINGLETON);
+			final PropertyFactory propertyFactory = new PropertyFactory() {
+				@Override
+				public Object apply(IComponentFactory pComponentFactory, Class<?> pPropertyType, String pPropertyId,
+						String pDefaultValue, boolean pNullable) {
+					if (pPropertyType == String.class) {
+						final String value = (String) properties.get(pPropertyId);
+						if (value != null) {
+							return value;
+						}
+					}
+					return pDefaultValue;
+				}
+			};
+			final PropInjectBindingProvider<String> propInjectBindingProvider = new PropInjectBindingProvider<>(String.class, propertyFactory);
+			final LoggerFactory<Logger> loggerFactory = new LoggerFactory<Logger>() {
+				@Override
+				public Logger apply(IComponentFactory pComponentFactory, String pLoggerId, String pMName) {
+					if (pMName != null  &&  pMName.length() > 0) {
+						return Logger.getLogger(pLoggerId + ":" + pMName);
+					}
+					return Logger.getLogger(pLoggerId);
+				}
+			};
+			final LogInjectBindingProvider<Logger> logInjectBindingProvider = new LogInjectBindingProvider<>(Logger.class, loggerFactory);
+			b.bind(PropInjectBindingProvider.class).toInstance(propInjectBindingProvider);
+			b.bind(LogInjectBindingProvider.class).toInstance(logInjectBindingProvider);
+			b.addFinalizer((cf) -> {
+				cf.requireInstance(ILifecycleController.class).start();
+			});
+		};
+		final IComponentFactory cf1 = IComponentFactory.builder(pComponentFactoryType)
+				.bindingProvider(new DefaultBindingProvider<Logger,String[]>())
+				.module(module).build();
+		// Retrieve another DynamicallyBindableComponent, that is properly initialized.
+		final DynmicallyBindableComponent dbc1 = cf1.requireInstance(DynmicallyBindableComponent.class);
+		assertTrue(dbc1.isStarted());
+		assertFalse(dbc1.isStopped());
+		assertEquals("myPropertyValue", dbc1.getMyProperty());
+		assertEquals("otherPropertyValue", dbc1.getOtherProperty());
+		assertEquals("myLogger", dbc1.getMyLogger().getName());
+		assertEquals("com.github.jochenw.afw.di.impl.ComponentFactoryTests.DynmicallyBindableComponent", dbc1.getOtherLogger().getName());
+		cf1.requireInstance(ILifecycleController.class).shutdown();
+		assertTrue(dbc1.isStopped());
+		assertFalse(dbc0.isStarted());
+		assertFalse(dbc0.isStopped());
+	}
+
+	/** Test for {@link IModule#extend(IModule)}.
+	 * @param pComponentFactoryType Type of the component factory, that is being tested.
+	 */
+	public static void testModuleExtension(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		final Map<String,Object> hashMap = new HashMap<>();
+		final IModule module0 = (b) -> {
+			b.bind(Map.class).toInstance(hashMap);
+		};
+		final IModule module1 = (b) -> {
+			b.bind(Map.class, "hash").toInstance(hashMap);
+		};
+		assertSame(module0, module0.extend((IModule) null));
+		final IModule[] moduleArray = new IModule[0];
+		assertSame(module0, module0.extend(moduleArray));
+		final List<IModule> moduleList = Collections.emptyList();
+		assertSame(module0, module0.extend(moduleList));
+		final IComponentFactory cf0 = IComponentFactory.builder(pComponentFactoryType).module(module0)
+				.build();
+		final Consumer<@NonNull IModule> validator = (m) -> {
+			final IComponentFactory cf = IComponentFactory.builder(pComponentFactoryType).module(m).build();
+			assertSame(hashMap, cf0.requireInstance(Map.class));
+			assertSame(hashMap, cf.requireInstance(Map.class));
+			assertNull(cf0.getInstance(Map.class, "hash"));
+			assertSame(hashMap, cf.requireInstance(Map.class, "hash"));
+		};
+		validator.accept(module0.extend(module1));
+		validator.accept(module0.extend(new @Nullable IModule @Nullable [] {module1}));
+		validator.accept(module0.extend(Arrays.asList(module1)));
+	}
+
+	/** Test for {@link LinkableBindingBuilder#toFunction(Function)}.
+	 * @param pComponentFactoryType Type of the component factory, whivh is being tested.
+	 */
+	public static void testBindToFunction(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		final String mappedValue = "Mapped Value";
+		final IModule module = (b) -> {
+			b.bind(String.class).toInstance(mappedValue);
+			final Function<IComponentFactory,StringBuilder> sbCreator = (cf) -> {
+				final String value = cf.requireInstance(String.class);
+				return new StringBuilder(value);
+			};
+			b.bind(StringBuilder.class).toFunction(sbCreator);
+		};
+		final IComponentFactory cf = IComponentFactory.builder(pComponentFactoryType).module(module).build();
+		final StringBuilder sb = cf.requireInstance(StringBuilder.class);
+		assertNotNull(sb);
+		assertEquals(mappedValue, sb.toString());
+	}
+
+	/** Test injecting a generic object.
+	 * @param pComponentFactoryType Type of the component factory, whivh is being tested.
+	 */
+	public static void testGenerics(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+		testGenerics(pComponentFactoryType, Types.TYPE_LIST_STRING);
+	}
+
+	private static void testGenerics(Class<? extends AbstractComponentFactory> pComponentFactoryType, Types.Type<List<String>> pListType) {
+		final List<String> list = new ArrayList<>();
+		final IComponentFactory cf = IComponentFactory.builder(pComponentFactoryType).jakarta().module((b) -> {
+			b.bind(pListType).toInstance(list);
+			b.bind(ListWrapper.class);
+		}).build();
+		final ListWrapper listWrapper = cf.requireInstance(ListWrapper.class);
+		assertNotNull(listWrapper);
+		assertSame(list, listWrapper.getList());
+	}
+
+	/** Test class for {@link #testGenerics}.
+	 */
+	public static class ListWrapper {
+		private @jakarta.inject.Inject List<String> list;
+		public List<String> getList() { return list; }
+	}
+
 }

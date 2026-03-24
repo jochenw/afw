@@ -129,4 +129,24 @@ public class DefaultAnnotationProvider implements IAnnotationProvider {
 		}
 		return null;
 	}
+
+	@Override
+	public boolean isAnnotatedWithPostConstruct(AccessibleObject pObject) {
+		for (IAnnotationProvider ap : getAnnotationProviders()) {
+			if (ap.isAnnotatedWithPostConstruct(pObject)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isAnnotatedWithPreDestroy(AccessibleObject pObject) {
+		for (IAnnotationProvider ap : getAnnotationProviders()) {
+			if (ap.isAnnotatedWithPreDestroy(pObject)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

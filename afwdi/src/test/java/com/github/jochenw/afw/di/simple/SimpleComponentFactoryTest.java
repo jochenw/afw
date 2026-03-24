@@ -17,5 +17,22 @@ class SimpleComponentFactoryTest {
 	void testTck() {
 		ComponentFactoryTests.testTck(SimpleComponentFactory.class);
 	}
-
+	@Test
+	void testGenerics() {
+		ComponentFactoryTests.testGenerics(SimpleComponentFactory.class);
+	}
+	@Test
+	void testModuleExtension() {
+		ComponentFactoryTests.testModuleExtension(SimpleComponentFactory.class); }
+	@Test
+	void testModuleOverrides() {
+		ComponentFactoryTests.testModuleOverrides(SimpleComponentFactory.class);	}
+	@Test
+	void testCustomBindingProvider() {
+		ComponentFactoryTests.testCustomBindingProvider(SimpleComponentFactory.class);
+	}
+	@Test
+	void testParent() {
+		ComponentFactoryTests.testParent(SimpleComponentFactory.class);
+	}
 }

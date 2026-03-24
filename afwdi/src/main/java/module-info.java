@@ -7,4 +7,6 @@ module com.github.jochenw.afw.di {
 	requires java.logging;
 	requires java.inject;
 	requires com.google.guice;
+	requires jakarta.annotation;
+	requires java.annotation;
 }

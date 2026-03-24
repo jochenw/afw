@@ -178,7 +178,7 @@ public class PropInjectBindingProvider<P> extends AbstractBindingProvider {
 
 
 	@Override
-	public void init(Configuration pConfiguration) {
+	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
 		// Does nothing.
 	}
 

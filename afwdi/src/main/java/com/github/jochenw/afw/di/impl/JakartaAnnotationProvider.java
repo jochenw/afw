@@ -7,6 +7,8 @@ import java.lang.reflect.Type;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
@@ -46,5 +48,18 @@ public class JakartaAnnotationProvider implements IAnnotationProvider {
 			};
 		}
 		return null;
+	}
+
+
+	@Override
+	public boolean isAnnotatedWithPostConstruct(AccessibleObject pObject) {
+		return pObject.isAnnotationPresent(PostConstruct.class);
+	}
+
+	/** Google Guice has no @PreDestroy annotation, so we will always return false.
+	 */
+	@Override
+	public boolean isAnnotatedWithPreDestroy(AccessibleObject pObject) {
+		return pObject.isAnnotationPresent(PreDestroy.class);
 	}
 }

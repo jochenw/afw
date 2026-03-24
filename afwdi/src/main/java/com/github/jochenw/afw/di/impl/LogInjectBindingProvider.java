@@ -57,7 +57,7 @@ public class LogInjectBindingProvider<L> extends AbstractBindingProvider {
 		}
 		String loggerId = logInject.id();
 		if (loggerId.length() == 0) {
-			loggerId = pField.getDeclaringClass().getName();
+			loggerId = pField.getDeclaringClass().getCanonicalName();
 		}
 		final String logId = loggerId;
 		final String mName = logInject.mName();
@@ -136,7 +136,7 @@ public class LogInjectBindingProvider<L> extends AbstractBindingProvider {
 	}
 
 	@Override
-	public void init(Configuration pConfiguration) {
+	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
 		// Does nothing.
 	}
 }

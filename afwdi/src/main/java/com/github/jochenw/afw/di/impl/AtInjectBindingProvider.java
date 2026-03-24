@@ -32,9 +32,9 @@ public class AtInjectBindingProvider extends AbstractBindingProvider {
 	private final Set<Class<? extends Annotation>> annotationClasses = new HashSet<>();
 
 	/** Non-functional; the component factory is supposed to invoke
-	 * {@link #init(Configuration, ConcurrentMap)} instead.
+	 * {@link #init(IComponentFactory pComponentFactory, Configuration, ConcurrentMap)} instead.
 	 */
-	public void init(Configuration pConfiguration) {
+	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
 		throw new IllegalStateException("Not implemented, use init(Configuration, ConcurrentMap) instead.");
 	}
 
