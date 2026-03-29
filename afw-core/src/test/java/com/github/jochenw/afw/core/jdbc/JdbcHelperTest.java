@@ -266,12 +266,14 @@ public class JdbcHelperTest {
 	public void testQueryConnection() throws Exception {
 		final String sqlCreate = "CREATE TABLE table_three (id INT NOT NULL PRIMARY KEY, userId VARCHAR(16) NOT NULL)";
 		final String sqlDrop = "DROP TABLE table_three";
+		final String sqlDropIfExists = "DROP TABLE IF Exists table_three";
 		final Application application = getApplication(null);
 		@SuppressWarnings("null")
 		final JdbcHelper jh = application.getComponentFactory().requireInstance(JdbcHelper.class);
 		@SuppressWarnings("null")
 		final ConnectionProvider connectionProvider = application.getComponentFactory().requireInstance(ConnectionProvider.class);
 		try (Connection conn = connectionProvider.open()) {
+			jh.query(conn, sqlDropIfExists).run();
 			conn.prepareStatement(sqlCreate).executeUpdate();
 			jh.query(conn, sqlDrop).run();
 			jh.query(conn, sqlCreate).run();
