@@ -6,10 +6,13 @@
   <packaging>pom</packaging>
   <name>AFW (Parent Project)</name>
   <modules>
-    <module>afwdi</module>
+    <module>afw-di</module>
+    <module>afw-core</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
   </properties>
   <build>
     <defaultGoal>clean install</defaultGoal>

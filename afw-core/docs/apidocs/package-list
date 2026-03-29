@@ -1,0 +1,17 @@
+com.github.jochenw.afw.core
+com.github.jochenw.afw.core.csv
+com.github.jochenw.afw.core.el
+com.github.jochenw.afw.core.el.tree
+com.github.jochenw.afw.core.impl
+com.github.jochenw.afw.core.inject
+com.github.jochenw.afw.core.inject.guice
+com.github.jochenw.afw.core.inject.simple
+com.github.jochenw.afw.core.io
+com.github.jochenw.afw.core.log
+com.github.jochenw.afw.core.log.log4j
+com.github.jochenw.afw.core.log.simple
+com.github.jochenw.afw.core.log.slf4j
+com.github.jochenw.afw.core.plugins
+com.github.jochenw.afw.core.props
+com.github.jochenw.afw.core.servlet
+com.github.jochenw.afw.core.util
