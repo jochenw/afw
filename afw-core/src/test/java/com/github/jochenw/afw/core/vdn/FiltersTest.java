@@ -80,6 +80,7 @@ public class FiltersTest {
 		}
 	}
 
+	@SuppressWarnings("javadoc")
 	@Test
 	public void testComparator() {
 		final ComparatorBuilder<ComparableBean> cb = Filters.comparator();

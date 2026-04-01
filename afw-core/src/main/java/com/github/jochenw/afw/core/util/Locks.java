@@ -1,9 +1,7 @@
 package com.github.jochenw.afw.core.util;
 
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.StampedLock;
 
-import org.codehaus.groovy.control.ProcessingUnit;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

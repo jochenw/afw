@@ -1,16 +1,18 @@
-package com.github.jochenw.afw.di.api;
+package com.github.jochenw.afw.di.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
+import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.ILifecycleController;
+import com.github.jochenw.afw.di.api.LogInject;
+import com.github.jochenw.afw.di.api.PropInject;
 import com.github.jochenw.afw.di.api.ILifecycleController.TerminableListener;
-import com.github.jochenw.afw.di.impl.AbstractBindingProvider;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
-import com.github.jochenw.afw.di.impl.DiUtils;
-import com.github.jochenw.afw.di.impl.LogInjectBindingProvider;
-import com.github.jochenw.afw.di.impl.PropInjectBindingProvider;
 
 
 /**| (propInjectBindingProvider != null  &&  propInjectBindingProvider.isInjectable(p
@@ -99,6 +101,15 @@ public class DefaultBindingProvider<L,P> extends AbstractBindingProvider {
 			+ " in class " + pMethod.getDeclaringClass().getName());
 	}
 
+	/** Creates a new {@link Consumer consumer}, which takes as input
+	 * an instance. The created consumer will invoke the given method
+	 * on the instance, passing no parameters.
+	 * @param pMethod The method, which is being invoked.
+	 * @param pAnnotation Name of the annotation, which causes the
+	 * creation of the runnable (Either "PostConstruct", or
+	 * "PreDestroy").
+	 * @return The created consumer.
+	 */
 	protected Consumer<Object> newRunnable(Method pMethod, String pAnnotation) {
 		if (pMethod.getParameterCount() != 0) {
 			throw new IllegalStateException("The method " + pMethod
@@ -115,7 +126,14 @@ public class DefaultBindingProvider<L,P> extends AbstractBindingProvider {
 			}
 		};
 	}
-		
+
+	/** Initializes the binding provider with the given component factory, and the
+	 * given configuration.
+	 * @param pComponentFactory The component factory, to which the
+	 *   binding provider is being attached.
+	 * @param pConfiguration The component factories configuration, as created
+	 *   by the {@link ComponentFactoryBuilder}.
+	 */
 	@Override
 	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
 		annotationProvider = pConfiguration.getAnnotationProvider();

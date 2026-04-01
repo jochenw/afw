@@ -9,10 +9,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -111,6 +108,7 @@ public class JsnUtilsTest {
 		}
 	}
 
+	@SuppressWarnings("javadoc")
 	public static class JsnValue implements JsonValue {
 		@Override
 		public ValueType getValueType() {

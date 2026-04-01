@@ -22,6 +22,9 @@ import com.github.jochenw.afw.core.components.DefaultZipHandler;
 import com.github.jochenw.afw.core.components.DefaultZipHandlerTest;
 import com.github.jochenw.afw.core.components.IZipFileHandler;
 
+/** Test case for the {@link AbstractFileVisitor}.
+ * 
+ */
 public class AbstractFileVisitorTest {
 	/** Creates the list of files, that the file visitor is expected to produce.
 	 * @return The created list.

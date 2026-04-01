@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Date;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
@@ -268,11 +266,10 @@ public class JdbcHelperTest {
 		final String sqlDrop = "DROP TABLE table_three";
 		final String sqlDropIfExists = "DROP TABLE IF Exists table_three";
 		final Application application = getApplication(null);
-		@SuppressWarnings("null")
 		final JdbcHelper jh = application.getComponentFactory().requireInstance(JdbcHelper.class);
-		@SuppressWarnings("null")
 		final ConnectionProvider connectionProvider = application.getComponentFactory().requireInstance(ConnectionProvider.class);
-		try (Connection conn = connectionProvider.open()) {
+		try (@SuppressWarnings("null")
+		     @NonNull Connection conn = connectionProvider.open()) {
 			jh.query(conn, sqlDropIfExists).run();
 			conn.prepareStatement(sqlCreate).executeUpdate();
 			jh.query(conn, sqlDrop).run();

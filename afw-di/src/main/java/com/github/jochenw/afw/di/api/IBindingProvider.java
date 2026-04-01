@@ -3,9 +3,7 @@ package com.github.jochenw.afw.di.api;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
-import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
 
 /** The binding provider is a source for bindings, possibly
  * dynamically generated. It is mainly used to support

@@ -299,7 +299,7 @@ public class Objects {
 		} else if (URL.class == pType) {
 			final URL url;
 			try {
-				url = new URL(pValue);
+				url = Strings.asUrl(pValue);
 			} catch (MalformedURLException e) {
 				throw new IllegalArgumentException("Invalid URL value: " + pValue, e);
 			}

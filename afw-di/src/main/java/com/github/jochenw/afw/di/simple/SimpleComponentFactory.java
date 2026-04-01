@@ -11,7 +11,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	/** Creates a new instance with the given configuration.
 	 * @param pConfiguration The created instances configuration.
 	 */
-	public SimpleComponentFactory(@SuppressWarnings("exports") Configuration pConfiguration) {
+	public SimpleComponentFactory(Configuration pConfiguration) {
 		super(pConfiguration);
 		bindings = new ConcurrentHashMap<>();
 		bindings.putAll(pConfiguration.getBindings());
@@ -122,6 +121,15 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return binding;
 	}
 
+	/** Returns a metadata object for the given type. Internally,
+	 * this performs a lookup in the {@code metaDatas} map. If
+	 * a suitable object is found in the cache, returns it.
+	 * Otherwise, creates a new object by invoking {@link #newInitializer(Class)},
+	 * and {@link #newInstantiator(Class)}, caches, and returns it.
+	 * @param pType The type, for which a metadata object is
+	 * requested.
+	 * @return The requested object, never null.
+	 */
 	protected ClassMetaData getMetaData(Class<?> pType) {
 		@SuppressWarnings("unchecked")
 		final Class<Object> type = (Class<Object>) Objects.requireNonNull(pType, "Type");
@@ -132,6 +140,14 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		});
 	}
 
+	/** Creates a new instantiator. Internally, this works by finding a
+	 * suitable constructor, which is annotated with @Inject. If such a
+	 * constructor is found, invokes {@link #newInstantiator(Constructor)}.
+	 * Otherwise, uses the default constructor (Public, no-args). 
+	 * 
+	 * @param pType The result type of the created instantiator.
+	 * @return The created instantiator.
+	 */
 	protected Supplier<Object> newInstantiator(Class<Object> pType) {
 		for (Constructor<?> constructor : pType.getDeclaredConstructors()) {
 			if (!annotationProvider.isInjectable(constructor)) {
@@ -152,10 +168,15 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 			} catch (Exception e) {
 				throw DiUtils.show(e);
 			}
-			
 		};
 	}
 
+	/** Creates a new instantiator, which is implemented by the given
+	 * constructor.
+	 * @param pConstructor The constructor to use for creating the new
+	 *   instance.
+	 * @return The created injector.
+	 */
 	protected Supplier<Object> newInstantiator(Constructor<?> pConstructor) {
 		@SuppressWarnings("unchecked")
 		final Constructor<Object> constructor = (Constructor<Object>) Objects.requireNonNull(pConstructor, "Constructor");
@@ -208,6 +229,14 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		};
 	}
 
+	/** Creates a new initializer for an object of the given type.
+	 * Internally, this will invoke {@link #findFields(Class, Consumer)},
+	 * and {@link #findMethods(Class, Consumer)} to create initializers
+	 * that set fields, and invoke methods.
+	 * @param pType The type, on which the created initializer
+	 * operates.
+	 * @return The created initializer.
+	 */
 	protected Consumer<Object> newInitializer(Class<Object> pType) {
 		final List<Consumer<Object>> initializerList = new ArrayList<>();
 		findMethods(pType, initializerList::add);
@@ -220,6 +249,15 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		};
 	}
 
+	/** Searches for injectable methods (methods, that are annotated with @Inject).
+	 * For any such method, an initializer is being created, that invokes it,
+	 * with suitable parameters. The created initializer will then be passed
+	 * to the given consumer.
+	 * @param pType The type, for which an initializer is being created.
+	 * @param pInitializerConsumer The consumer, which receives the created
+	 *   method initializers, combining them into an initializer for instances
+	 *   of the given type.
+	 */
 	protected void findMethods(Class<Object> pType, Consumer<Consumer<Object>> pInitializerConsumer) {
 		Class<Object> cl = pType;
 		do {
@@ -245,6 +283,15 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		} while (cl != null  &&  cl != Object.class);
 	}
 
+	/** Searches for injectable fields (fields, that are annotated with @Inject).
+	 * For any such field, an initializer is being created, that sets it
+	 *   on an instance, which is being initialized. The created initializer will
+	 *   then be passed to the given consumer.
+	 * @param pType The type, for which an initializer is being created.
+	 * @param pInitializerConsumer The consumer, which receives the created
+	 *   field initializers, combining them into an initializer for instances
+	 *   of the given type.
+	 */
 	protected void findFields(Class<Object> pType, Consumer<Consumer<Object>> pInitializerConsumer) {
 		Class<Object> cl = pType;
 		do {
@@ -286,6 +333,15 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		return binding;
 	}
 
+	/** Searches for a binding, which can be used to configure a single field, or method
+	 * parameter.
+	 * @param pType The field type, or parameter type.
+	 * @param pName The bindings name, if an @Named annotation is present on the field,
+	 * or method parameter.
+	 * @param pAnnotations The field, or method parameters annotations.
+	 * @param pPermitProvider True, if a provider binding may be created dynamicalla.
+	 * @return The requested binding, if any, or null.
+	 */
 	protected IBinding<Object> findBinding(Type pType, String pName, AnnotatedElement pAnnotations, boolean pPermitProvider) {
 		IBinding<Object> binding = null;
 		for (Annotation annotation : pAnnotations.getAnnotations()) {

@@ -23,6 +23,8 @@ public interface IComponentFactory {
 	 */
 	public static class NoSuchBindingException extends RuntimeException {
 		private static final long serialVersionUID = -4852441857005934044L;
+		/** The key, that was requested, but not found.
+		 */
 		private final Key<?> key;
 
 		/** Creates a new instance with the key, that has been missing,
@@ -64,7 +66,7 @@ public interface IComponentFactory {
 		/** Creates a new binding with the given, key, supplier, and scope.
 		 * @param pKey The created bindings key.
 		 * @param pSupplier Implementation of the created bindings
-		 * {@link IBinding#apply(IComponentFactory)} method.
+		 * {@link IBinding#apply(Object)} method.
 		 * @param pScope The created bindings scope.
 		 * @return The created binding.
 		 */

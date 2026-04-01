@@ -297,7 +297,8 @@ public class StreamsTest {
 			}
 		};
 		final Holder<byte[]> contentHolder = new Holder<byte[]>();
-    	final URL url = new URL("test", "some.unknown.host", 2345, "some/file", ush);
+    	@SuppressWarnings("deprecation")
+		final URL url = new URL("test", "some.unknown.host", 2345, "some/file", ush);
     	Streams.accept(url, (in) -> {
     		final byte[] bytes = Streams.read(in);
     		contentHolder.set(bytes);

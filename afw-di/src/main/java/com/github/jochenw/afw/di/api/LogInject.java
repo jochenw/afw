@@ -21,9 +21,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.jochenw.afw.di.impl.LogInjectBindingProvider;
+
 
 /** This annotation can be used to request the injection of loggers.
- * The request is satisfied by using an {@link IOnTheFlyBinder}.
+ * The request is satisfied by using a {@link LogInjectBindingProvider}
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

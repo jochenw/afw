@@ -3,8 +3,6 @@ package com.github.jochenw.afw.di.impl;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;

@@ -411,7 +411,9 @@ public class StringsTest {
      */
     @Test
     public void testJoinStringIterableFunction() {
-    	final String actual = Strings.joinList(Arrays.asList(Person.SOME_PERSONS), ", ", Person::getName);
+    	@SuppressWarnings("null")
+		List<Person> list = (List<Person>) Arrays.asList(Person.SOME_PERSONS);
+		final String actual = Strings.joinList(list, ", ", Person::getName);
     	assertEquals(Person.SOME_PERSONS_STRING, actual);
     }
 

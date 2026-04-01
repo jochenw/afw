@@ -5,12 +5,10 @@ import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
 import com.github.jochenw.afw.di.api.IComponentFactory;
-import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
-import com.github.jochenw.afw.di.api.Key;
 import com.github.jochenw.afw.di.api.LogInject;
-import com.github.jochenw.afw.di.api.Scopes;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
+
 
 /**
  * A binding provider, which supports the @LogInject annotation.

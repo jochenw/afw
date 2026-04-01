@@ -1,5 +1,6 @@
 # Building
 
+Befora building the project for the first time, two minor
 When building this library, there is a small problem: The javax.inject jar has never been
 published as a Java 9 compliant module, but only as a Java 8 compliant jar file.
 
@@ -20,8 +21,5 @@ mvn install:install-file -Dfile=c:\tmp\jakarta.inject-api-1.0.5.jar
 ```
 
 The above must be entered on a single line, without any line breaks.
-
-
-
 
  

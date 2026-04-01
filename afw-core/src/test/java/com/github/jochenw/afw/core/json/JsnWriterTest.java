@@ -1,6 +1,5 @@
 package com.github.jochenw.afw.core.json;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -243,7 +242,7 @@ public class JsnWriterTest {
 		final List<String> keys = new ArrayList<>(pMap.keySet());
 		final List<String> orderedKeys = new ArrayList<>(pMap.keySet());
 		orderedKeys.sort(String::compareToIgnoreCase);
-		assertArrayEquals(orderedKeys.toArray(), keys.toArray());
+		Tests.assertArrayEquals(orderedKeys.toArray(), keys.toArray());
 	}
 
 	/** Validates the Json object, which has been obtained by

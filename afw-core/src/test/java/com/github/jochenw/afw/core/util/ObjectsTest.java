@@ -15,7 +15,6 @@
  */
 package com.github.jochenw.afw.core.util;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import com.github.jochenw.afw.core.data.Data;
@@ -201,7 +199,7 @@ public class ObjectsTest {
 		final Level[] levels = Objects.enumValues(Level.class);
 		final Level[] expectedLevels = Level.values();
 		assertNotNull(levels);
-		assertArrayEquals(expectedLevels, levels);
+		Tests.assertArrayEquals(expectedLevels, (Object[]) levels);
 		try {
 			Objects.enumValues(Objects.fakeNonNull());
 			fail("Expected Exception");

@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +24,6 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.atinject.tck.Tck;
 import org.atinject.tck.auto.Car;
@@ -43,7 +41,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
-import com.github.jochenw.afw.di.api.DefaultBindingProvider;
 import com.github.jochenw.afw.di.api.DefaultLifecycleController;
 import com.github.jochenw.afw.di.api.IBindingProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
@@ -85,7 +82,6 @@ public class ComponentFactoryTests {
 	 * {@link CreateJavaxMapsObject}.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
-	@SuppressWarnings("unchecked")
 	public static void testCreateJavaxMaps(Class<? extends AbstractComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
 		final IModule module = (b) -> {
@@ -388,11 +384,13 @@ public class ComponentFactoryTests {
 		 * been configured by the component factory.
 		 * @return The value of the "myLogger" attribute.
 		 */
+		@SuppressWarnings("exports")
 		public Logger getMyLogger() { return myLogger; }
 		/** Returns the value of the "otherLogger" attribute, which has
 		 * been configured by the component factory.
 		 * @return The value of the "otherLogger" attribute.
 		 */
+		@SuppressWarnings("exports")
 		public Logger getOtherLogger() { return otherLogger; }
 	}
 
@@ -536,6 +534,10 @@ public class ComponentFactoryTests {
 	 */
 	public static class ListWrapper {
 		private @jakarta.inject.Inject List<String> list;
+		/** Returns the wrapped list.
+		 * @return The wrapped list.
+		 * 
+		 */
 		public List<String> getList() { return list; }
 	}
 

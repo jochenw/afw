@@ -3,9 +3,8 @@ package com.github.jochenw.afw.di.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
 
+import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IBindingProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
@@ -14,7 +13,14 @@ import com.github.jochenw.afw.di.api.Scopes;
 import com.github.jochenw.afw.di.api.Scopes.Scope;
 
 
+
+/** Abstract base class for instances of {@link IComponentFactory}, that can
+ * be created by the {@link ComponentFactoryBuilder}.
+ */
 public abstract class AbstractComponentFactory implements IComponentFactory {
+	/** The component factories configuration, as supplied by the
+	 * {@link ComponentFactoryBuilder}.
+	 */
 	public static class Configuration {
 		private final Map<Key<Object>,IBinding<Object>> bindings;
 		private final IAnnotationProvider annotationProvider;

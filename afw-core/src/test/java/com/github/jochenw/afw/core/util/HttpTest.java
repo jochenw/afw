@@ -1,6 +1,5 @@
 package com.github.jochenw.afw.core.util;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,9 +53,11 @@ import com.github.jochenw.afw.core.log.ILog.Level;
 import com.github.jochenw.afw.core.log.simple.SimpleLogFactory;
 import com.github.jochenw.afw.core.util.Http.Request;
 import com.github.jochenw.afw.core.util.Http.TrafficLogger;
+import com.github.jochenw.afw.core.util.tests.Tests;
 
 /** Test suite for the {@link Http} class.
  */
+@SuppressWarnings("javadoc")
 public class HttpTest {
 	@Test
 	public void testSimpleGet() {
@@ -81,7 +82,7 @@ public class HttpTest {
 			assertNotNull(headers);
 			assertNotNull(headers.get("user-agent"));
 			assertNull(headers.get("content-type"));
-			assertArrayEquals(new Object[] {"Bar"}, (Object[]) headers.get("x-foo"));
+			Tests.assertArrayEquals(new Object[] {"Bar"}, (Object[]) headers.get("x-foo"));
 		});
 	}
 	@Test
@@ -93,13 +94,15 @@ public class HttpTest {
 			final Map<String,Object> headers = (Map<String,Object>) map.get("headers");
 			assertNotNull(headers);
 			assertNotNull(headers.get("user-agent"));
-			assertArrayEquals(new Object[] {"Bar"}, (Object[]) headers.get("x-foo"));
-			assertArrayEquals(new Object[] {"None"}, (Object[]) headers.get("content-type"));
+			Tests.assertArrayEquals(new Object[] {"Bar"}, (Object[]) headers.get("x-foo"));
+			Tests.assertArrayEquals(new Object[] {"None"}, (Object[]) headers.get("content-type"));
 		});
 	}
 
-	private byte[] bytesOf(String pString) {
-		return pString.getBytes(Streams.UTF_8);
+	private byte @NonNull [] bytesOf(String pString) {
+		@SuppressWarnings("null")
+		byte @NonNull[] bytes = (byte @NonNull[]) pString.getBytes(Streams.UTF_8);
+		return bytes;
 	}
 	private InputStream streamOf(String pString) {
 		return new ByteArrayInputStream(bytesOf(pString));
