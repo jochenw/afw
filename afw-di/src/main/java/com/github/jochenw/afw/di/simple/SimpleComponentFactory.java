@@ -32,7 +32,8 @@ import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.AtInjectBindingProvider;
 import com.github.jochenw.afw.di.impl.DiUtils;
 
-/** Simple, leightweight, but fast implementation of {@IComponentFactory}.
+
+/** Simple, lightweight, but fast implementation of {@link IComponentFactory}.
  */
 public class SimpleComponentFactory extends AbstractComponentFactory {
 	private final ConcurrentMap<Key<Object>,IBinding<Object>> bindings;

@@ -24,12 +24,16 @@ import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
 
 /**
  * The default implementation of a binding provider, which handles the
- * @Inject, and @Named annotations.
+ * {@code * @Inject}, and {@code @Named} annotations.
  */
 public class AtInjectBindingProvider extends AbstractBindingProvider {
 	private ConcurrentMap<Key<Object>,IBinding<Object>> bindings;
 	private IAnnotationProvider annotationProvider;
 	private final Set<Class<? extends Annotation>> annotationClasses = new HashSet<>();
+
+	/** Creates a new instance.
+	 */
+	public AtInjectBindingProvider() {}
 
 	/** Non-functional; the component factory is supposed to invoke
 	 * {@link #init(Configuration, ConcurrentMap)} instead.

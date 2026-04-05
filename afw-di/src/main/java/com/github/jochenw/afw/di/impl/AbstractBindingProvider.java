@@ -9,6 +9,10 @@ import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
  * {@link IBindingProvider}.
  */
 public abstract class AbstractBindingProvider implements IBindingProvider {
+	/** Creates a new instance.
+	 */
+	protected AbstractBindingProvider() {}
+
 	/** Initializes the binding provider by passing the 
 	 * component factories configuration.
 	 * @param pComponentFactory The component fatcory.

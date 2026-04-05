@@ -20,6 +20,10 @@ public class GoogleAnnotationProvider implements IAnnotationProvider {
 	 */
 	public static final GoogleAnnotationProvider getInstance() { return INSTANCE; }
 
+	/** Creates a new instance.
+	 */
+	protected GoogleAnnotationProvider() {}
+
 	@Override
 	public boolean isInjectable(AccessibleObject pObject) {
 		return pObject.isAnnotationPresent(Inject.class);

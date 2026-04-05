@@ -12,21 +12,21 @@ import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
  */
 public interface IAnnotationProvider {
 	/** Returns true, if the given method, constructor, or
-	 * field is annotated with an @Inject annotation.
+	 * field is annotated with an {@code @Inject} annotation.
 	 * @param pObject The method, constructor, or field,
 	 * which is being tested.
 	 * @return True, if the given object has an
-	 *   @Inject annotation.
+	 *   {@code @Inject} annotation.
 	 */
 	public boolean isInjectable(AccessibleObject pObject);
 
 	/** If the given method, method parameter, constructor,
-	 * or field, is annotated with an @Named annotation:
+	 * or field, is annotated with an {@code @Named} annotation:
 	 * Returns the value of the annotation.
 	 * Otherwise, returns null.
 	 * @param pObject The method, constructor, or field,
 	 * which is being tested.
-	 * @return The value of the given objects @Named
+	 * @return The value of the given objects {@code @Named}
 	 *   annotation, if any, or null.
 	 */
 	public String getNamedValue(AnnotatedElement pObject);

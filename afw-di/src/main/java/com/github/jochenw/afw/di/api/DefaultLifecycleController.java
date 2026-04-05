@@ -49,6 +49,10 @@ public class DefaultLifecycleController implements ILifecycleController {
 		}
 	}
 
+	/** Creates a new instance.
+	 */
+	public DefaultLifecycleController() {}
+
 	private State state = State.WAITING;
 	private final List<WrappedListener> listeners = new ArrayList<>();
 

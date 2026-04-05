@@ -180,7 +180,7 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 	 * precedence, though).
 	 * @param pParent The parent component factory.
 	 * @return This builder.
-	 * @throwsNullPointerException The parameter {@code pParent} is null.
+	 * @throws NullPointerException The parameter {@code pParent} is null.
 	 */
 	public ComponentFactoryBuilder<T> parent(IComponentFactory pParent) {
 		final IComponentFactory parent = Objects.requireNonNull(pParent, "Parent");

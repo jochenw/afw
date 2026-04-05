@@ -15,9 +15,8 @@ import com.github.jochenw.afw.di.api.ILifecycleController.TerminableListener;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
 
 
-/**| (propInjectBindingProvider != null  &&  propInjectBindingProvider.isInjectable(p
- * This binding provider implements support for @PostConstruct, @PreDestroy,
- * {@link LogInject}, and {@link PropInject}.
+/** This binding provider implements support for {@code @PostConstruct},
+ * {@code @PreDestroy}, {@link LogInject}, and {@link PropInject}.
  * @param <L> Type of the logger.
  * @param <P> Type of the property instance.
  */
@@ -26,6 +25,10 @@ public class DefaultBindingProvider<L,P> extends AbstractBindingProvider {
 	private PropInjectBindingProvider<P> propInjectBindingProvider;
     private ILifecycleController lifeCycleController;
     private IAnnotationProvider annotationProvider;
+
+    /** Creates a new instance.
+     */
+    public DefaultBindingProvider() {}
 
 	@Override
 	public boolean isInjectable(Field pField) {

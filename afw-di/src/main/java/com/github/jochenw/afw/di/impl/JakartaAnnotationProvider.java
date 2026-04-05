@@ -24,6 +24,10 @@ public class JakartaAnnotationProvider implements IAnnotationProvider {
 	 */
 	public static final JakartaAnnotationProvider getInstance() { return INSTANCE; }
 
+	/** Creates a new instance.
+	 */
+	protected JakartaAnnotationProvider() {}
+
 	@Override
 	public boolean isInjectable(AccessibleObject pObject) {
 		return pObject.isAnnotationPresent(Inject.class);

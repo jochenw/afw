@@ -53,6 +53,7 @@ public class Key<T> {
 	 * @param pAnnotation Annotation of the created key, if any, or null.
 	 * @return The created key.
 	 * @throws NullPointerException Type, or name, are null.
+	 * @param <T> Type of the created key.
 	 */
 	public static <T> Key<T> of(Type pType, String pName, Class<? extends Annotation> pAnnotationType,
                                 Annotation pAnnotation) {
@@ -65,6 +66,7 @@ public class Key<T> {
 	 * @param pName Name of the created key. Must not be null.
 	 * @return The created key.
 	 * @throws NullPointerException Type, or name, are null.
+	 * @param <T> Type of the created key.
 	 */
 	public static <T> Key<T> of(Type pType, String pName) {
 		return of(pType, pName, null, null);

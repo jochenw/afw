@@ -4,7 +4,11 @@ package com.github.jochenw.afw.di.api;
 /** This class provides the possible scpoes, that a binding can take.
  */
 public class Scopes {
-	/** Implementtion of a scope.
+	/** Private constructor, because this class contains only static fields.
+	 */
+	private Scopes() {}
+
+	/** Implementation of a scope.
 	 */
 	public static class Scope {
 		private final String name;

@@ -23,6 +23,10 @@ public class JavaxAnnotationProvider implements IAnnotationProvider {
 	 */
 	public static final JavaxAnnotationProvider getInstance() { return INSTANCE; }
 
+	/** Creates a new instance.
+	 */
+	protected JavaxAnnotationProvider() {}
+
 	@Override
 	public boolean isInjectable(AccessibleObject pObject) {
 		return pObject.isAnnotationPresent(Inject.class);

@@ -69,6 +69,7 @@ public interface IComponentFactory {
 		 * {@link IBinding#apply(Object)} method.
 		 * @param pScope The created bindings scope.
 		 * @return The created binding.
+		 * @param <T> The bindings type.
 		 */
 		public static <T> IBinding<T> of(Key<T> pKey, ISupplier<T> pSupplier,
 				                         Scopes.Scope pScope) {
@@ -83,6 +84,8 @@ public interface IComponentFactory {
 	 * @param pKey The key, under which the binding has been registered.
 	 * @return The requested binding, if available, or null.
 	 * @throws NullPointerException The key parameter is null.
+	 * @param <T> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
 	 */
 	public <T> IBinding<T> getBinding(Key<T> pKey);
 
@@ -91,6 +94,8 @@ public interface IComponentFactory {
 	 * @param pKey The key, under which the binding has been registered.
 	 * @return The requested binding, if available, or null.
 	 * @throws NullPointerException The key parameter is null.
+	 * @param <T> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
 	 */
 	public default <T> T getInstance(Key<T> pKey) {
 		final Key<T> key = Objects.requireNonNull(pKey);
@@ -108,6 +113,8 @@ public interface IComponentFactory {
 	 * @param pType The bindings type.
 	 * @param pName The bindings name.
 	 * @return The requested bindings value, if available, or null.
+	 * @param <T> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
 	 */
 	public default <T> T getInstance(Type pType, String pName) {
 		final Key<T> key = Key.of(pType, pName);
@@ -119,6 +126,8 @@ public interface IComponentFactory {
 	 * value. Otherwise, returns null.
 	 * @param pType The bindings type.
 	 * @return The requested bindings value, if available, or null.
+	 * @param <T> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
 	 */
 	public default <T> T getInstance(Type pType) {
 		return getInstance(pType, "");
@@ -130,6 +139,9 @@ public interface IComponentFactory {
 	 * @param pType The bindings type.
 	 * @param pName The bindings name.
 	 * @return The requested bindings value, if available, or null.
+	 * @param <S> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
+	 * @param <T> Type of the binding.
 	 */
 	public default <T,S extends T> S getInstance(Class<T> pType, String pName) {
 		@SuppressWarnings("unchecked")
@@ -142,6 +154,9 @@ public interface IComponentFactory {
 	 * value. Otherwise, returns null.
 	 * @param pType The bindings type.
 	 * @return The requested bindings value, if available, or null.
+	 * @param <S> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
+	 * @param <T> Type of the binding.
 	 */
 	public default <T,S extends T> S getInstance(Class<T> pType) {
 		return getInstance(pType, "");
@@ -155,6 +170,8 @@ public interface IComponentFactory {
 	 * @throws NoSuchBindingException No binding with the given key has
 	 *   been registered.
 	 * @throws NullPointerException The key parameter is null.
+	 * @param <T> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
 	 */
 	public default <T> T requireInstance(Key<T> pKey) {
 		final Key<T> key = Objects.requireNonNull(pKey);
@@ -176,6 +193,8 @@ public interface IComponentFactory {
 	 * @throws NoSuchBindingException No binding with the given key has
 	 *   been registered.
 	 * @throws NullPointerException The key parameter is null.
+	 * @param <T> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
 	 */
 	public default <T> T requireInstance(Type pType, String pName) {
 		final Key<T> key = Key.of(pType, pName);
@@ -191,6 +210,8 @@ public interface IComponentFactory {
 	 * @throws NoSuchBindingException No binding with the given key has
 	 *   been registered.
 	 * @throws NullPointerException The key parameter is null.
+	 * @param <T> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
 	 */
 	public default <T> T requireInstance(Type pType) {
 		final Key<T> key = Key.of(pType, "");
@@ -207,6 +228,9 @@ public interface IComponentFactory {
 	 * @throws NoSuchBindingException No binding with the given key has
 	 *   been registered.
 	 * @throws NullPointerException The key parameter is null.
+	 * @param <S> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
+	 * @param <T> Type of the binding.
 	 */
 	public default <T,S extends T> S requireInstance(Class<T> pType, String pName) {
 		@SuppressWarnings("unchecked")
@@ -223,6 +247,9 @@ public interface IComponentFactory {
 	 * @throws NoSuchBindingException No binding with the given key has
 	 *   been registered.
 	 * @throws NullPointerException The key parameter is null.
+	 * @param <S> Type of the objects, which the binding
+	 * {@link IBinding#apply(Object)} supplies.
+	 * @param <T> Type of the binding.
 	 */
 	public default <T,S extends T> @NonNull S requireInstance(Class<T> pType) {
 		return requireInstance(pType, "");
@@ -245,6 +272,7 @@ public interface IComponentFactory {
 	/** Creates a new builder, which creates an instance of the given
 	 * class.
 	 * @param pType Type of the created builder.
+	 * @param <T> Type of the created builder.
 	 * @return The created builder.
 	 */
 	public static <T extends AbstractComponentFactory> ComponentFactoryBuilder<T> builder(Class<T> pType) {

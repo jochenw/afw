@@ -13,6 +13,10 @@ import java.util.function.Supplier;
 /** A small utility class with reusable helper methods.
  */
 public class DiUtils {
+	/** Creates a new instance. Protected, because this class contains only static methods.
+	 */
+	protected DiUtils() {}
+
 	/** Converts a {@link Throwable} into an Exception,
 	 * which can be thrown without polluting the method
 	 * signature, and throws the converted exception.
@@ -60,6 +64,8 @@ public class DiUtils {
 	 *   be invoked when the lazy supplier is invoked for
 	 *   the first time.
 	 * @return The created, lazy, suppplier.
+	 * @param <I> Type of the lazy suppliers parameter.
+	 * @param <O> Type of the lazy suppliers output.
 	 */
 	public static <I,O> Function<I,O> deferredSupplier(Function<I,Supplier<O>> pSupplierProvider) {
 		return new DeferredSupplier<I,O>(pSupplierProvider);
