@@ -8,6 +8,11 @@ import org.jspecify.annotations.NonNull;
 /** Utility class for wowking with names in Java reflection.
  */
 public class Names {
+	/** Creates a new instance. Protected, because this class contains only
+	 * static methods.
+	 */
+	protected Names() {}
+
 	/** Creates a camel cased method property name. Example: prefix=get,
 	 * suffix=foo yields getFoo.
 	 * @param pPrefix The method names prefix, for example "get", or "is".

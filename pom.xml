@@ -60,6 +60,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.12.0</version>
+          <configuration>
+            <legacyMode>true</legacyMode> 
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -86,13 +89,14 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.10.0</version>
+            <version>3.12.0</version>
             <configuration>
               <show>protected</show>
               <nohelp>false</nohelp>
               <failOnError>true</failOnError>
               <failOnWarnings>true</failOnWarnings>
               <quiet>false</quiet>
+              <legacyMode>true</legacyMode>
             </configuration>
             <executions>
               <execution>
