@@ -14,12 +14,14 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+import com.github.jochenw.afw.di.api.AbstractBindingProvider;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IBindingProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 import com.github.jochenw.afw.di.api.Key;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
 
 
 /**
@@ -36,9 +38,11 @@ public class AtInjectBindingProvider extends AbstractBindingProvider {
 	public AtInjectBindingProvider() {}
 
 	/** Non-functional; the component factory is supposed to invoke
-	 * {@link #init(Configuration, ConcurrentMap)} instead.
+	 * {@link #init(IConfiguration, ConcurrentMap)} instead.
+	 * @param pComponentFactory The component factory, which is using the binding provider.
+	 * @param pConfiguration  The component factories configuration.
 	 */
-	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
+	public void init(IComponentFactory pComponentFactory, IConfiguration pConfiguration) {
 		throw new IllegalStateException("Not implemented, use init(Configuration, ConcurrentMap) instead.");
 	}
 
@@ -47,7 +51,7 @@ public class AtInjectBindingProvider extends AbstractBindingProvider {
 	 * @param pConfiguration The component factories configuration.
 	 * @param pBindings The component factories bindings.
 	 */
-	public void init(Configuration pConfiguration, ConcurrentMap<Key<Object>,IBinding<Object>> pBindings) {
+	public void init(IConfiguration pConfiguration, ConcurrentMap<Key<Object>,IBinding<Object>> pBindings) {
 		bindings = pBindings;
 		bindings.keySet().forEach((k) -> {
 			final Class<? extends Annotation> annotationType = k.getAnnotationType();
@@ -73,7 +77,7 @@ public class AtInjectBindingProvider extends AbstractBindingProvider {
 		final IBinding<Object> binding = requireBinding(pComponentFactory, pField.getGenericType(), pField, description);
 		return (cf,o) -> {
 			final Object value = binding.apply(cf);
-			DiUtils.set(pField, o, value);
+			IBindingProvider.set(pField, o, value);
 		};
 	}
 
@@ -99,7 +103,7 @@ public class AtInjectBindingProvider extends AbstractBindingProvider {
 			for (int i = 0;  i < parameterBindings.length;  i++) {
 				values[i] = parameterBindings[i].apply(cf);
 			}
-			DiUtils.invoke(pMethod, o, values);
+			IBindingProvider.invoke(pMethod, o, values);
 		};
 	}
 

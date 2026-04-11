@@ -2,11 +2,14 @@ package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
 import com.github.jochenw.afw.di.api.Scopes.Scope;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.simple.SimpleComponentFactory;
@@ -18,6 +21,41 @@ import org.jspecify.annotations.NonNull;
  * Interface of a dependency injection controller.
  */
 public interface IComponentFactory {
+	/** Configuration of the {@link IComponentFactory}, as created by the
+	 * {@link ComponentFactoryBuilder}.
+	 */
+	public static interface IConfiguration {
+		/** Returns the map of bindings.
+		 * @return The map of bindings.
+		 */
+		public Map<Key<Object>, IBinding<Object>> getBindings();
+		/** Returns the annotation provider.
+		 * @return The annotation provider.
+		 */
+		public IAnnotationProvider getAnnotationProvider();
+		/** Returns the default scope.
+		 * @return The default scope.
+		 */
+		public Scopes.Scope getDefaultScope();
+		/** Returns the component factories parent, if any, or null.
+		 * @return The component factories parent, if any, or null.
+		 */
+		public IComponentFactory getParent();
+		/** Returns the set of classes, that require injection of static
+		 * methods, or fields.
+		 * @return The set of classes, that require injection of static
+		 * methods, or fields.
+		 */
+		public Set<Class<?>> getStaticInjectionClasses();
+
+		/** Returns the list of additional binding providers. These
+		 * are not yet initialized, and it is the component factories
+		 * responsibility to do that.
+		 * @return The list of additional binding providers.
+		 */
+		public List<IBindingProvider> getBindingProviders();
+	}
+
 	/** Exception, which is thrown by {@link IComponentFactory#requireInstance(Key)},
 	 * if no suitable binding has been registered.
 	 */
@@ -80,6 +118,14 @@ public interface IComponentFactory {
 			};
 		}
 	}
+
+	/** Initializes the {@link IComponentFactory} by passing the configuration.
+	 * The caller is supposed to invoke this method exactly once, before
+	 * actually using the {@link IComponentFactory}.
+	 * @param pConfiguration The configuration.
+	 */
+	public void init(IConfiguration pConfiguration);
+
 	/** Returns the binding with the given key, if any, or null.
 	 * @param pKey The key, under which the binding has been registered.
 	 * @return The requested binding, if available, or null.
@@ -262,21 +308,20 @@ public interface IComponentFactory {
 	public void init(Object pObject);
 
 	/** Creates a new builder, which creates an instance of {@link IComponentFactory}.
-	 * The created instance will be a {@link SimpleComponentFactory}.
+	 * The created instance will be a {@code SimpleComponentFactory}.
 	 * @return The created builder.
 	 */
-	public static ComponentFactoryBuilder<SimpleComponentFactory> builder() {
-		return builder(SimpleComponentFactory.class);
+	public static ComponentFactoryBuilder<?> builder() {
+		return builder(() -> new SimpleComponentFactory());
 	}
 
-	/** Creates a new builder, which creates an instance of the given
-	 * class.
-	 * @param pType Type of the created builder.
+	/** Creates a new builder.
+	 * @param pSupplier Supplier for the instance, which is being created by this builder.
 	 * @param <T> Type of the created builder.
 	 * @return The created builder.
 	 */
-	public static <T extends AbstractComponentFactory> ComponentFactoryBuilder<T> builder(Class<T> pType) {
-		return new ComponentFactoryBuilder<T>(pType);
+	public static <T extends IComponentFactory> ComponentFactoryBuilder<T> builder(Supplier<T> pSupplier) {
+		return new ComponentFactoryBuilder<T>(pSupplier);
 	}
 
 	/** Creates a new instantiator for the given type. Internally,

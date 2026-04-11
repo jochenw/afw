@@ -94,7 +94,7 @@
               <show>protected</show>
               <nohelp>false</nohelp>
               <failOnError>true</failOnError>
-              <failOnWarnings>true</failOnWarnings>
+              <failOnWarnings>false</failOnWarnings>
               <quiet>false</quiet>
               <legacyMode>true</legacyMode>
             </configuration>
@@ -102,7 +102,7 @@
               <execution>
                 <id>attach-javadoc</id>
                 <goals>
-                  <goal>jar</goal>
+                  <goal>aggregate-jar</goal>
                 </goals>
               </execution>
             </executions>

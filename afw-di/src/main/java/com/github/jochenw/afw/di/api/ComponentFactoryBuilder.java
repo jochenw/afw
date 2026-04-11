@@ -1,26 +1,25 @@
 package com.github.jochenw.afw.di.api;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
+import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
+import com.github.jochenw.afw.di.api.Scopes.Scope;
 import com.github.jochenw.afw.di.impl.BinderImpl;
-import com.github.jochenw.afw.di.impl.DefaultAnnotationProvider;
-import com.github.jochenw.afw.di.impl.DiUtils;
-import com.github.jochenw.afw.di.impl.GoogleAnnotationProvider;
-import com.github.jochenw.afw.di.impl.JakartaAnnotationProvider;
-import com.github.jochenw.afw.di.impl.JavaxAnnotationProvider;
+
 
 /** A builder for instances of {@link IComponentFactory}.
  * @param <T> Type of the created component factory.
  */
-public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
-	private final Class<T> type;
+public class ComponentFactoryBuilder<T extends IComponentFactory> {
+	private final Supplier<T> supplier;
 	private IAnnotationProvider annotationProvider;
 	private boolean immutable;
 	private List<IModule> modules;
@@ -45,10 +44,11 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 	}
 
 	/** Creates a new instance with the given type.
-	 * @param pType The type of component factory, that this builder creates.
+	 * @param pSupplier A supplier for the instance,
+	 *   which is being configured.
 	 */
-	public ComponentFactoryBuilder(Class<T> pType) {
-		type = pType;
+	public ComponentFactoryBuilder(Supplier<T> pSupplier) {
+		supplier = pSupplier;
 	}
 
 
@@ -253,13 +253,6 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 	 * @return This builder.
 	 */
 	public ComponentFactoryBuilder<T> getParent(IComponentFactory pParent) {
-		if (pParent != null  &&
-			!type.isAssignableFrom(pParent.getClass())) {
-			throw new IllegalArgumentException("The parents type is "
-					+ pParent.getClass().getName()
-					+ ", but the expected type is "
-					+ type.getName());
-		}
 		assertMutable();
 		parent = pParent;
 		return this;
@@ -281,28 +274,44 @@ public class ComponentFactoryBuilder<T extends AbstractComponentFactory> {
 		 */
 		binder.bind(IComponentFactory.class).to((cf) -> cf).asSingleton();
 		binder.validate();
-		final Configuration configuration =
-				new Configuration(
-						binder.getBindings(),
-						getAnnotationProvider(),
-						getDefaultScope(),
-						getParent(),
-						binder.getStaticInjectionClasses(),
-						bindingProviders);
-						
-		final T acf;
-		try {
-			final Class<? extends AbstractComponentFactory> cfType = (Class<? extends AbstractComponentFactory>) type;
-			final Constructor<? extends AbstractComponentFactory> cons = cfType.getConstructor(Configuration.class);
-			@SuppressWarnings("unchecked")
-			final T t = (T) cons.newInstance(configuration);
-			acf = t;
-		} catch (Throwable t) {
-			throw DiUtils.show(t);
-		}
+		final IConfiguration configuration =
+				new IConfiguration() {
+					@Override
+					public Map<Key<Object>, IBinding<Object>> getBindings() {
+						return binder.getBindings();
+					}
+
+					@Override
+					public IAnnotationProvider getAnnotationProvider() {
+						return ComponentFactoryBuilder.this.getAnnotationProvider();
+					}
+
+					@Override
+					public Scope getDefaultScope() {
+						return ComponentFactoryBuilder.this.getDefaultScope();
+					}
+
+					@Override
+					public IComponentFactory getParent() {
+						return ComponentFactoryBuilder.this.getParent();
+					}
+
+					@Override
+					public Set<Class<?>> getStaticInjectionClasses() {
+						return binder.getStaticInjectionClasses();
+					}
+
+					@Override
+					public List<IBindingProvider> getBindingProviders() {
+						return bindingProviders;
+					}
+			
+		};
+		final T t = supplier.get();
+		t.init(configuration);
 		for (Consumer<IComponentFactory> finalizer : binder.getFinalizers()) {
-			finalizer.accept(acf);
+			finalizer.accept(t);
 		}
-		return acf;
+		return t;
 	}
 }

@@ -33,16 +33,16 @@ import com.github.jochenw.afw.core.props.UrlProperty;
 import com.github.jochenw.afw.core.util.Objects;
 import com.github.jochenw.afw.core.util.Streams;
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
+import com.github.jochenw.afw.di.api.DefaultAnnotationProvider;
 import com.github.jochenw.afw.di.api.DefaultLifecycleController;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.ILifecycleController;
 import com.github.jochenw.afw.di.api.IModule;
 import com.github.jochenw.afw.di.api.LogInject;
+import com.github.jochenw.afw.di.api.LogInjectBindingProvider;
 import com.github.jochenw.afw.di.api.PropInject;
+import com.github.jochenw.afw.di.api.PropInjectBindingProvider;
 import com.github.jochenw.afw.di.api.Types;
-import com.github.jochenw.afw.di.impl.DefaultAnnotationProvider;
-import com.github.jochenw.afw.di.impl.LogInjectBindingProvider;
-import com.github.jochenw.afw.di.impl.PropInjectBindingProvider;
 
 import jakarta.inject.Inject;
 

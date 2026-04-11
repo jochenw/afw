@@ -10,8 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import org.junit.jupiter.api.Test;
 
 import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
-import com.github.jochenw.afw.di.impl.DefaultAnnotationProvider;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.simple.SimpleComponentFactory;
 
 
@@ -25,13 +24,13 @@ class ComponentFactoryBuilderTest {
 
 	@Test
 	void testBindings() {
-		final SimpleComponentFactory cf = IComponentFactory.builder()
+		final SimpleComponentFactory cf = (SimpleComponentFactory) IComponentFactory.builder()
 				.module((b) -> {
 					
 				})
 				.build();
 		assertNotNull(cf);
-		final Configuration configuration = cf.getConfiguration();
+		final IConfiguration configuration = cf.getConfiguration();
 		assertNotNull(configuration);
 		assertNotNull(configuration.getBindings());
 		assertSame(Scopes.SINGLETON, configuration.getDefaultScope());

@@ -8,7 +8,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.github.jochenw.afw.di.api.DefaultAnnotationProvider;
+import com.github.jochenw.afw.di.api.GoogleAnnotationProvider;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.JakartaAnnotationProvider;
+import com.github.jochenw.afw.di.api.JavaxAnnotationProvider;
 
 class DefaultAnnotationProviderTest {
 	@SuppressWarnings("unused")

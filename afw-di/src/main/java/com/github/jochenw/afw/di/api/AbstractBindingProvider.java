@@ -1,8 +1,6 @@
-package com.github.jochenw.afw.di.impl;
+package com.github.jochenw.afw.di.api;
 
-import com.github.jochenw.afw.di.api.IBindingProvider;
-import com.github.jochenw.afw.di.api.IComponentFactory;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 
 
 /** Abstract base class for deriving implementations of
@@ -18,5 +16,5 @@ public abstract class AbstractBindingProvider implements IBindingProvider {
 	 * @param pComponentFactory The component fatcory.
 	 * @param pConfiguration The component factories configuration.
 	 */
-	public abstract void init(IComponentFactory pComponentFactory, Configuration pConfiguration);
+	public abstract void init(IComponentFactory pComponentFactory, IConfiguration pConfiguration);
 }

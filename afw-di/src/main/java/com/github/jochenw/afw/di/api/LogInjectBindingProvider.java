@@ -1,13 +1,11 @@
-package com.github.jochenw.afw.di.impl;
+package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 
-import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
-import com.github.jochenw.afw.di.api.LogInject;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
 
 
 /**
@@ -70,7 +68,7 @@ public class LogInjectBindingProvider<L> extends AbstractBindingProvider {
 		};
 		return (cf,o) -> {
 			final Object value = supplier.apply(cf);
-			DiUtils.set(pField, o, value);
+			IBindingProvider.set(pField, o, value);
 		};
 	}
 
@@ -130,12 +128,12 @@ public class LogInjectBindingProvider<L> extends AbstractBindingProvider {
 		};
 		return (cf,o) -> {
 			final Object value = supplier.apply(cf);
-			DiUtils.invoke(pMethod, o, value);
+			IBindingProvider.invoke(pMethod, o, value);
 		};
 	}
 
 	@Override
-	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
+	public void init(IComponentFactory pComponentFactory, IConfiguration pConfiguration) {
 		// Does nothing.
 	}
 }

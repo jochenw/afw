@@ -1,8 +1,11 @@
 package com.github.jochenw.afw.di.api;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
+
+import com.github.jochenw.afw.di.impl.DiUtils;
 
 
 /** The binding provider is a source for bindings, possibly
@@ -50,5 +53,46 @@ public interface IBindingProvider {
 	 * @return The generated injector; never null.
 	 */
 	public BiConsumer<IComponentFactory, Object> createInjector(IComponentFactory pComponentFactory, Method pMethod);
+
+	/** Called to ensure, that {@link AccessibleObject#isAccessible()}
+	 * returns true for the given field, or method.
+	 * @param pObject The field, or method, which should be made
+	 * accessible.
+	 */
+	@SuppressWarnings({ "deprecation", "javadoc" })
+	static void assertAccessible(AccessibleObject pObject) {
+		if (!pObject.isAccessible()) {
+			pObject.setAccessible(true);
+		}
+	}
+
+	/** Called to invoke the given method, passing the given values.
+	 * @param pMethod The method, which is being invoked.
+	 * @param pInstance The instance, which is holding the field.
+	 * @param pValues The method invocation parameters.
+	 */
+	static void invoke(Method pMethod, Object pInstance, Object... pValues) {
+		IBindingProvider.assertAccessible(pMethod);
+		try {
+			pMethod.invoke(pInstance, pValues);
+		} catch (Exception e) {
+			throw DiUtils.show(e);
+		}
+	}
+
+	/** Called to modify the given field by setting it's value to
+	 * the given.
+	 * @param pField The field, which is being updated.
+	 * @param pInstance The instance, which is holding the field.
+	 * @param pValue The new field value.
+	 */
+	static void set(Field pField, Object pInstance, Object pValue) {
+		IBindingProvider.assertAccessible(pField);
+		try {
+			pField.set(pInstance, pValue);
+		} catch (Exception e) {
+			throw DiUtils.show(e);
+		}
+	}
 
 }

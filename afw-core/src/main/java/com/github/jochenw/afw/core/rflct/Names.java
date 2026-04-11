@@ -24,4 +24,5 @@ public class Names {
 		Objects.requireNonNull(pPrefix, "Prefix");
 		Objects.requireNonNull(pSuffix, "Suffix");
 		return pPrefix + Character.toUpperCase(pSuffix.charAt(0)) + pSuffix.substring(1);
-	}}
+	}
+}

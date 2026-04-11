@@ -5,14 +5,18 @@ import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.github.jochenw.afw.di.api.AbstractBindingProvider;
 import com.github.jochenw.afw.di.api.ComponentFactoryBuilder;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
+import com.github.jochenw.afw.di.api.IBindingProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.api.ILifecycleController;
 import com.github.jochenw.afw.di.api.LogInject;
+import com.github.jochenw.afw.di.api.LogInjectBindingProvider;
 import com.github.jochenw.afw.di.api.PropInject;
+import com.github.jochenw.afw.di.api.PropInjectBindingProvider;
 import com.github.jochenw.afw.di.api.ILifecycleController.TerminableListener;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
 
 
 /** This binding provider implements support for {@code @PostConstruct},
@@ -121,7 +125,7 @@ public class DefaultBindingProvider<L,P> extends AbstractBindingProvider {
 					+ ", but requires parameters.");
 		}
 		return (o) -> {
-			DiUtils.assertAccessible(pMethod);
+			IBindingProvider.assertAccessible(pMethod);
 			try {
 				pMethod.invoke(o);
 			} catch (Exception e) {
@@ -138,7 +142,7 @@ public class DefaultBindingProvider<L,P> extends AbstractBindingProvider {
 	 *   by the {@link ComponentFactoryBuilder}.
 	 */
 	@Override
-	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
+	public void init(IComponentFactory pComponentFactory, IConfiguration pConfiguration) {
 		annotationProvider = pConfiguration.getAnnotationProvider();
 		logInjectBindingProvider = pComponentFactory.getInstance(LogInjectBindingProvider.class);
 		propInjectBindingProvider = pComponentFactory.getInstance(PropInjectBindingProvider.class);

@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.di.impl;
+package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 
 
@@ -71,16 +70,16 @@ public class DefaultAnnotationProvider implements IAnnotationProvider {
 		final String className;
 		switch(Objects.requireNonNull(pId, "Id").toLowerCase()) {
 		case "jakarta":
-	        className = "com.github.jochenw.afw.di.impl.JakartaAnnotationProvider";
+	        className = "com.github.jochenw.afw.di.api.JakartaAnnotationProvider";
 	        break;
 		case "javax":
-	    	className = "com.github.jochenw.afw.di.impl.JavaxAnnotationProvider";
+	    	className = "com.github.jochenw.afw.di.api.JavaxAnnotationProvider";
 	    	break;
 		case "google":
-	    	className = "com.github.jochenw.afw.di.impl.GoogleAnnotationProvider";
+	    	className = "com.github.jochenw.afw.di.api.GoogleAnnotationProvider";
 	    	break;
 		case "default":
-	    	className = "com.github.jochenw.afw.di.impl.DefaultAnnotationProvider";
+	    	className = "com.github.jochenw.afw.di.api.DefaultAnnotationProvider";
 	    	break;
 	    default:
 	    	throw new IllegalArgumentException("Invalid annotation provider id:"

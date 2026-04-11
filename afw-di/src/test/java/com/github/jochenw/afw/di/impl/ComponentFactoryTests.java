@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -48,13 +49,15 @@ import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
 import com.github.jochenw.afw.di.api.ILifecycleController;
 import com.github.jochenw.afw.di.api.IModule;
 import com.github.jochenw.afw.di.api.IModule.LinkableBindingBuilder;
+import com.github.jochenw.afw.di.api.LogInjectBindingProvider.LoggerFactory;
+import com.github.jochenw.afw.di.api.PropInjectBindingProvider.PropertyFactory;
 import com.github.jochenw.afw.di.api.Key;
 import com.github.jochenw.afw.di.api.LogInject;
+import com.github.jochenw.afw.di.api.LogInjectBindingProvider;
 import com.github.jochenw.afw.di.api.PropInject;
+import com.github.jochenw.afw.di.api.PropInjectBindingProvider;
 import com.github.jochenw.afw.di.api.Scopes;
 import com.github.jochenw.afw.di.api.Types;
-import com.github.jochenw.afw.di.impl.LogInjectBindingProvider.LoggerFactory;
-import com.github.jochenw.afw.di.impl.PropInjectBindingProvider.PropertyFactory;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -82,7 +85,7 @@ public class ComponentFactoryTests {
 	 * {@link CreateJavaxMapsObject}.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
-	public static void testCreateJavaxMaps(Class<? extends AbstractComponentFactory> pType) {
+	public static void testCreateJavaxMaps(Class<IComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
 		final IModule module = (b) -> {
 			b.bind(Map.class, "hash").toInstance(hashMap);
@@ -92,7 +95,8 @@ public class ComponentFactoryTests {
 			b.bind(CreateJavaxMapsObject.class).in(Scopes.SINGLETON);
 			b.bind(SpareTire.class).in(Scopes.SINGLETON);
 		};
-		final IComponentFactory cf = IComponentFactory.builder(pType).javax()
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
+		final IComponentFactory cf = IComponentFactory.builder(supplier).javax()
 				.module(module).build();
 		final Map<String,Object> hashMapCf1 = cf.getInstance(Map.class, "hash");
 		assertNotNull(hashMapCf1);
@@ -123,6 +127,16 @@ public class ComponentFactoryTests {
 		assertNotNull(cmo.map1);
 		assertTrue(cmo.map1 instanceof HashMap);
 		assertSame(cmo.map1, cmo.map2);
+	}
+
+	private static Supplier<IComponentFactory> newSupplier(Class<? extends IComponentFactory> pType) {
+		return () -> {
+			try {
+				return pType.getConstructor().newInstance();
+			} catch (Exception e) {
+				throw DiUtils.show(e);
+			}
+		};
 	}
 
 	/** A test class, which is being instantiated by the component factory,
@@ -173,9 +187,10 @@ public class ComponentFactoryTests {
 		assertEquals(scope.name(), binding.getScope().name());
 	}
 
-	private static ComponentFactoryBuilder<? extends AbstractComponentFactory> builder(
+	private static ComponentFactoryBuilder<? extends IComponentFactory> builder(
 			Class<? extends AbstractComponentFactory> pType, final IModule module) {
-		return IComponentFactory.builder(pType).jakarta()
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
+		return IComponentFactory.builder(supplier).jakarta()
 				.defaultScope(Scopes.NO_SCOPE)
 				.module(module);
 	}
@@ -183,10 +198,11 @@ public class ComponentFactoryTests {
 	 * {@link CreateJavaxMapsObject}.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
-	public static void testCreateJakartaMaps(Class<? extends AbstractComponentFactory> pType) {
+	public static void testCreateJakartaMaps(Class<? extends IComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
 		final IModule module = createJakartaMapsModule(hashMap);
-		final IComponentFactory cf = IComponentFactory.builder(pType).jakarta()
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
+		final IComponentFactory cf = IComponentFactory.builder(supplier).jakarta()
 				.defaultScope(Scopes.NO_SCOPE)
 				.module(module).build();
 		final Map<String,Object> hashMapCf1 = cf.getInstance(Map.class, "hash");
@@ -242,12 +258,13 @@ public class ComponentFactoryTests {
 	 * {@link TestParentObject}.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
-	public static void testParent(Class<? extends AbstractComponentFactory> pType) {
+	public static void testParent(Class<? extends IComponentFactory> pType) {
 		final IModule module = (b) -> {
 			b.bind(TestParentObject.class);
 		};
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
 		final IComponentFactory parentCf =
-				IComponentFactory.builder(pType)
+				IComponentFactory.builder(supplier)
 				.module(module)
 				.build();
 		assertNotNull(parentCf);
@@ -259,7 +276,7 @@ public class ComponentFactoryTests {
 		assertNotNull(tpo1.componentFactory);
 		assertSame(tpo1.componentFactory, parentCf);
 		final IComponentFactory cf =
-				IComponentFactory.builder(pType)
+				IComponentFactory.builder(supplier)
 				.module(module)
 				.build();
 		assertNotNull(cf);
@@ -280,7 +297,7 @@ public class ComponentFactoryTests {
 		testTck(pType, true);
 	}
 
-	private static void testTck(Class<? extends AbstractComponentFactory> pType, boolean pStaticInjection) {
+	private static void testTck(Class<? extends IComponentFactory> pType, boolean pStaticInjection) {
 		final IModule module = new IModule() {
 			@Override
 			public void configure(IBinder pBinder) {
@@ -298,14 +315,15 @@ public class ComponentFactoryTests {
 				}
 			}
 		};
-		final IComponentFactory cf = IComponentFactory.builder(pType).jakarta().module(module).build();
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
+		final IComponentFactory cf = IComponentFactory.builder(supplier).jakarta().module(module).build();
 		Tck.testsFor(cf.requireInstance(Car.class), pStaticInjection, true);
 	}
 
 	/** A method for testing, whether a module can override a previous modules bindings.
 	 * @param pType Type of the component factory, that is being tested.
 	 */
-	public static void testModuleOverrides(Class<? extends AbstractComponentFactory> pType) {
+	public static void testModuleOverrides(Class<? extends IComponentFactory> pType) {
 		final Object overwrittenInstance = new Object();
 		final Object overwritingInstance = new Object();
 		final IModule overwrittenModule = (b) -> {
@@ -314,14 +332,15 @@ public class ComponentFactoryTests {
 		final IModule overwritingModule = (b) -> {
 			b.bind(Object.class).toInstance(overwritingInstance);
 		};
-		final IComponentFactory cf1 = IComponentFactory.builder(pType)
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
+		final IComponentFactory cf1 = IComponentFactory.builder(supplier)
 				.module(overwrittenModule).build();
-		final IComponentFactory cf2 = IComponentFactory.builder(pType)
+		final IComponentFactory cf2 = IComponentFactory.builder(supplier)
 				.module(overwrittenModule)
 				.module(overwritingModule).build();
 		assertSame(overwrittenInstance, cf1.requireInstance(Object.class));
 		assertSame(overwritingInstance, cf2.requireInstance(Object.class));
-		final IComponentFactory cf3 = IComponentFactory.builder(pType)
+		final IComponentFactory cf3 = IComponentFactory.builder(supplier)
 				.parent(cf1).module(overwritingModule).build();
 		assertSame(overwrittenInstance, cf1.requireInstance(Object.class));
 		assertSame(overwritingInstance, cf3.requireInstance(Object.class));
@@ -396,9 +415,9 @@ public class ComponentFactoryTests {
 
 	/** A method for testing, whether the {@link IBindingProvider} works,
 	 * as expected.
-	 * @param pComponentFactoryType Type of the component factory, that is being tested.
+	 * @param pType Type of the component factory, that is being tested.
 	 */
-	public static void testCustomBindingProvider(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+	public static void testCustomBindingProvider(Class<? extends IComponentFactory> pType) {
 		final Properties properties = new Properties();
 		properties.put("myProperty", "myPropertyValue");
 		properties.put(DynmicallyBindableComponent.class.getName() + ".otherProperty", "otherPropertyValue");
@@ -446,7 +465,8 @@ public class ComponentFactoryTests {
 				cf.requireInstance(ILifecycleController.class).start();
 			});
 		};
-		final IComponentFactory cf1 = IComponentFactory.builder(pComponentFactoryType)
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
+		final IComponentFactory cf1 = IComponentFactory.builder(supplier)
 				.bindingProvider(new DefaultBindingProvider<Logger,String[]>())
 				.module(module).build();
 		// Retrieve another DynamicallyBindableComponent, that is properly initialized.
@@ -464,9 +484,9 @@ public class ComponentFactoryTests {
 	}
 
 	/** Test for {@link IModule#extend(IModule)}.
-	 * @param pComponentFactoryType Type of the component factory, that is being tested.
+	 * @param pType Type of the component factory, that is being tested.
 	 */
-	public static void testModuleExtension(Class<? extends AbstractComponentFactory> pComponentFactoryType) {
+	public static void testModuleExtension(Class<? extends IComponentFactory> pType) {
 		final Map<String,Object> hashMap = new HashMap<>();
 		final IModule module0 = (b) -> {
 			b.bind(Map.class).toInstance(hashMap);
@@ -479,10 +499,11 @@ public class ComponentFactoryTests {
 		assertSame(module0, module0.extend(moduleArray));
 		final List<IModule> moduleList = Collections.emptyList();
 		assertSame(module0, module0.extend(moduleList));
-		final IComponentFactory cf0 = IComponentFactory.builder(pComponentFactoryType).module(module0)
+		final Supplier<IComponentFactory> supplier = newSupplier(pType);
+		final IComponentFactory cf0 = IComponentFactory.builder(supplier).module(module0)
 				.build();
 		final Consumer<@NonNull IModule> validator = (m) -> {
-			final IComponentFactory cf = IComponentFactory.builder(pComponentFactoryType).module(m).build();
+			final IComponentFactory cf = IComponentFactory.builder(supplier).module(m).build();
 			assertSame(hashMap, cf0.requireInstance(Map.class));
 			assertSame(hashMap, cf.requireInstance(Map.class));
 			assertNull(cf0.getInstance(Map.class, "hash"));
@@ -506,7 +527,8 @@ public class ComponentFactoryTests {
 			};
 			b.bind(StringBuilder.class).toFunction(sbCreator);
 		};
-		final IComponentFactory cf = IComponentFactory.builder(pComponentFactoryType).module(module).build();
+		final Supplier<IComponentFactory> supplier = newSupplier(pComponentFactoryType);
+		final IComponentFactory cf = IComponentFactory.builder(supplier).module(module).build();
 		final StringBuilder sb = cf.requireInstance(StringBuilder.class);
 		assertNotNull(sb);
 		assertEquals(mappedValue, sb.toString());
@@ -521,7 +543,8 @@ public class ComponentFactoryTests {
 
 	private static void testGenerics(Class<? extends AbstractComponentFactory> pComponentFactoryType, Types.Type<List<String>> pListType) {
 		final List<String> list = new ArrayList<>();
-		final IComponentFactory cf = IComponentFactory.builder(pComponentFactoryType).jakarta().module((b) -> {
+		final Supplier<IComponentFactory> supplier = newSupplier(pComponentFactoryType);
+		final IComponentFactory cf = IComponentFactory.builder(supplier).jakarta().module((b) -> {
 			b.bind(pListType).toInstance(list);
 			b.bind(ListWrapper.class);
 		}).build();

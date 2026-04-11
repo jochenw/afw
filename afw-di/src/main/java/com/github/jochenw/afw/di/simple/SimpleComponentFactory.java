@@ -22,12 +22,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.github.jochenw.afw.di.api.AbstractBindingProvider;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IBindingProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.Key;
-import com.github.jochenw.afw.di.impl.AbstractBindingProvider;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
 import com.github.jochenw.afw.di.impl.AtInjectBindingProvider;
 import com.github.jochenw.afw.di.impl.DiUtils;
@@ -36,17 +37,23 @@ import com.github.jochenw.afw.di.impl.DiUtils;
 /** Simple, lightweight, but fast implementation of {@link IComponentFactory}.
  */
 public class SimpleComponentFactory extends AbstractComponentFactory {
-	private final ConcurrentMap<Key<Object>,IBinding<Object>> bindings;
+	private ConcurrentMap<Key<Object>,IBinding<Object>> bindings;
+	private IAnnotationProvider annotationProvider;
 	private final ConcurrentMap<Class<Object>,ClassMetaData> metaDatas = new ConcurrentHashMap<>();
 	private final Set<Class<? extends Annotation>> annotationClasses = new HashSet<>();
-	private final Set<Class<?>> staticInjectionClasses;
-	private final List<IBindingProvider> bindingProviders;
+	private Set<Class<?>> staticInjectionClasses;
+	private List<IBindingProvider> bindingProviders;
 
-	/** Creates a new instance with the given configuration.
-	 * @param pConfiguration The created instances configuration.
+	/** Creates a new instance. The created instance needs configuration
+	 * by a call to {@link #init(IConfiguration)}, before using it.
 	 */
-	public SimpleComponentFactory(Configuration pConfiguration) {
-		super(pConfiguration);
+	public SimpleComponentFactory() {
+	}
+
+	
+	@Override
+	public void init(IConfiguration pConfiguration) {
+		super.init(pConfiguration);
 		bindings = new ConcurrentHashMap<>();
 		bindings.putAll(pConfiguration.getBindings());
 		annotationProvider = pConfiguration.getAnnotationProvider();
@@ -72,6 +79,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 			bindingProviders.add(bp);
 		});
 	}
+
 
 	/** An object, which holds the information, that the component factory needs to
 	 * create, or initialize instances of one particular class.
@@ -113,7 +121,6 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 			return initializer;
 		}
 	}
-	private final IAnnotationProvider annotationProvider;
 
 	@Override
 	public <T> IBinding<T> getBinding(Key<T> pKey) {
@@ -221,7 +228,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 			for (int i = 0;  i < bindings.length;  i++) {
 				values[i] = bindings[i].apply(SimpleComponentFactory.this);
 			}
-			DiUtils.assertAccessible(constructor);
+			IBindingProvider.assertAccessible(constructor);
 			try {
 				return constructor.newInstance(values);
 			} catch (Exception e) {

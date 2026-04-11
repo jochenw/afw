@@ -1,32 +1,30 @@
-package com.github.jochenw.afw.di.impl;
+package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
 
-import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
-
-/** Implementation of {@link IAnnotationProvider} for Jakarta
+/** Implementation of {@link IAnnotationProvider} for Javax
  * annotations.
  */
-public class JakartaAnnotationProvider implements IAnnotationProvider {
-	private static final JakartaAnnotationProvider INSTANCE = new JakartaAnnotationProvider();
+public class JavaxAnnotationProvider implements IAnnotationProvider {
+	private static final JavaxAnnotationProvider INSTANCE = new JavaxAnnotationProvider();
 	/** Returns the singleton instance.
 	 * @return The singleton instance
 	 */
-	public static final JakartaAnnotationProvider getInstance() { return INSTANCE; }
+	public static final JavaxAnnotationProvider getInstance() { return INSTANCE; }
 
 	/** Creates a new instance.
 	 */
-	protected JakartaAnnotationProvider() {}
+	protected JavaxAnnotationProvider() {}
 
 	@Override
 	public boolean isInjectable(AccessibleObject pObject) {
@@ -43,6 +41,7 @@ public class JakartaAnnotationProvider implements IAnnotationProvider {
 		}
 	}
 
+
 	@Override
 	public ISupplier<Object> getProvider(Type pProviderType, ISupplier<Object> pSupplier) {
 		if (pProviderType == Provider.class  ||  pProviderType.equals(Provider.class)) {
@@ -54,14 +53,11 @@ public class JakartaAnnotationProvider implements IAnnotationProvider {
 		return null;
 	}
 
-
 	@Override
 	public boolean isAnnotatedWithPostConstruct(AccessibleObject pObject) {
 		return pObject.isAnnotationPresent(PostConstruct.class);
 	}
 
-	/** Google Guice has no @PreDestroy annotation, so we will always return false.
-	 */
 	@Override
 	public boolean isAnnotatedWithPreDestroy(AccessibleObject pObject) {
 		return pObject.isAnnotationPresent(PreDestroy.class);

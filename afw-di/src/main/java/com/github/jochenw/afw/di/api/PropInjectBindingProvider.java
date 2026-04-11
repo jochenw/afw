@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.di.impl;
+package com.github.jochenw.afw.di.api;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -7,10 +7,8 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.function.BiConsumer;
 
-import com.github.jochenw.afw.di.api.IComponentFactory;
+import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.api.IComponentFactory.ISupplier;
-import com.github.jochenw.afw.di.api.PropInject;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory.Configuration;
 
 /**
  * A binding provider, which supports the @PropInject annotation.
@@ -96,7 +94,7 @@ public class PropInjectBindingProvider<P> extends AbstractBindingProvider {
 		};
 		return (cf,o) -> {
 			final Object value = supplier.apply(cf);
-			DiUtils.set(pField, o, value);
+			IBindingProvider.set(pField, o, value);
 		};
 	}
 
@@ -173,13 +171,13 @@ public class PropInjectBindingProvider<P> extends AbstractBindingProvider {
 		};
 		return (cf,o) -> {
 			final Object value = supplier.apply(cf);
-			DiUtils.invoke(pMethod, o, value);
+			IBindingProvider.invoke(pMethod, o, value);
 		};
 	}
 
 
 	@Override
-	public void init(IComponentFactory pComponentFactory, Configuration pConfiguration) {
+	public void init(IComponentFactory pComponentFactory, IConfiguration pConfiguration) {
 		// Does nothing.
 	}
 
