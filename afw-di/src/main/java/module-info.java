@@ -3,8 +3,7 @@
  */
 module com.github.jochenw.afw.di {
 	exports com.github.jochenw.afw.di.api;
-	exports com.github.jochenw.afw.di.guice;
-	exports com.github.jochenw.afw.di.simple;
+	exports com.github.jochenw.afw.di.impl;
 
 	requires java.base;
 	requires jakarta.inject;

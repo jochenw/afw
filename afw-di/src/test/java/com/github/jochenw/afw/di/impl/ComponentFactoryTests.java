@@ -144,14 +144,22 @@ public class ComponentFactoryTests {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static class CreateJakartaMapsObject {
-		private @jakarta.inject.Inject @jakarta.inject.Named(value="hash") Map hashMap1;
-		private @jakarta.inject.Inject @jakarta.inject.Named(value="hash") Map hashMap2;
-		private @jakarta.inject.Inject @jakarta.inject.Named(value="linked") Map linkedMap1;
-		private @jakarta.inject.Inject @jakarta.inject.Named(value="linked") Map linkedMap2;
-		private @jakarta.inject.Inject @jakarta.inject.Named(value="empty") Map emptyMap1;
-		private @jakarta.inject.Inject @jakarta.inject.Named(value="empty") Map emptyMap2;
-		private @jakarta.inject.Inject Map map1;
-		private @jakarta.inject.Inject Map map2;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject @jakarta.inject.Named(value="hash") Map hashMap1;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject @jakarta.inject.Named(value="hash") Map hashMap2;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject @jakarta.inject.Named(value="linked") Map linkedMap1;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject @jakarta.inject.Named(value="linked") Map linkedMap2;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject @jakarta.inject.Named(value="empty") Map emptyMap1;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject @jakarta.inject.Named(value="empty") Map emptyMap2;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject Map map1;
+		@SuppressWarnings("javadoc")
+		public @jakarta.inject.Inject Map map2;
 	}
 
 	/** A test method, which tests the creation of bindings.
@@ -403,13 +411,11 @@ public class ComponentFactoryTests {
 		 * been configured by the component factory.
 		 * @return The value of the "myLogger" attribute.
 		 */
-		@SuppressWarnings("exports")
 		public Logger getMyLogger() { return myLogger; }
 		/** Returns the value of the "otherLogger" attribute, which has
 		 * been configured by the component factory.
 		 * @return The value of the "otherLogger" attribute.
 		 */
-		@SuppressWarnings("exports")
 		public Logger getOtherLogger() { return otherLogger; }
 	}
 

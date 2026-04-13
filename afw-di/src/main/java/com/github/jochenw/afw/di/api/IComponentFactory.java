@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
 import com.github.jochenw.afw.di.api.Scopes.Scope;
 import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
-import com.github.jochenw.afw.di.simple.SimpleComponentFactory;
+import com.github.jochenw.afw.di.impl.SimpleComponentFactory;
 
 import org.jspecify.annotations.NonNull;
 

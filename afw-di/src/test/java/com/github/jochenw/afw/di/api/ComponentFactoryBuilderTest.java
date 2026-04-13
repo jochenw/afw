@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.github.jochenw.afw.di.api.IComponentFactory.IBinding;
 import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
-import com.github.jochenw.afw.di.simple.SimpleComponentFactory;
+import com.github.jochenw.afw.di.impl.SimpleComponentFactory;
 
 
 class ComponentFactoryBuilderTest {

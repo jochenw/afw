@@ -1,4 +1,4 @@
-package com.github.jochenw.afw.di.simple;
+package com.github.jochenw.afw.di.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -29,9 +29,6 @@ import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
 import com.github.jochenw.afw.di.api.Key;
-import com.github.jochenw.afw.di.impl.AbstractComponentFactory;
-import com.github.jochenw.afw.di.impl.AtInjectBindingProvider;
-import com.github.jochenw.afw.di.impl.DiUtils;
 
 
 /** Simple, lightweight, but fast implementation of {@link IComponentFactory}.

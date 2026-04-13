@@ -1,8 +1,8 @@
-package com.github.jochenw.afw.di.simple;
+package com.github.jochenw.afw.di.impl;
 
 import org.junit.jupiter.api.Test;
 
-import com.github.jochenw.afw.di.impl.ComponentFactoryTests;
+import com.github.jochenw.afw.di.impl.SimpleComponentFactory;
 
 class SimpleComponentFactoryTest {
 	@Test
