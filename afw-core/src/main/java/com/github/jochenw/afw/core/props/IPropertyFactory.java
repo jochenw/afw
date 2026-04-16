@@ -18,6 +18,7 @@ package com.github.jochenw.afw.core.props;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
 
@@ -47,6 +48,16 @@ public interface IPropertyFactory {
      * @return A map, which contains all the properties.
      */
     Map<String,String> getPropertyMap();
+    /**
+     * Returns a property set, which contains all the properties .
+     * @return A property set, which contains all the properties .
+     */
+    default @NonNull Properties getProperties() {
+    	final Properties props = new Properties();
+    	getPropertyMap().forEach((k,v) -> props.setProperty(k,  v));
+    	return props;
+    }
+
     /** Returns a string property object with the given key,
      * and the default value null.
      * @param pKey The property objects key.

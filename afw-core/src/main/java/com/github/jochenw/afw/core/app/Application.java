@@ -43,6 +43,7 @@ import com.github.jochenw.afw.di.api.LogInjectBindingProvider;
 import com.github.jochenw.afw.di.api.PropInject;
 import com.github.jochenw.afw.di.api.PropInjectBindingProvider;
 import com.github.jochenw.afw.di.api.Types;
+import com.github.jochenw.afw.di.impl.DefaultBindingProvider;
 
 import jakarta.inject.Inject;
 
@@ -132,49 +133,63 @@ public class Application {
 	/** Returns the applications log factory.
 	 * @return The applications log factory.
 	 */
-	public ILogFactory getLogFactory() {
+	public @NonNull ILogFactory getLogFactory() {
 		synchronized(logFactoryGenerator) {
+			final @NonNull ILogFactory lf;
 			if (logFactory == null) {
-				logFactory = Objects.requireNonNull(logFactoryGenerator.apply(this), "LogFactory");
+				logFactory = lf = Objects.requireNonNull(logFactoryGenerator.apply(this), "Log Factory");
 				log = logFactory.getLog(Application.class);
+			} else {
+				lf = Objects.requireNonNull(logFactory);
 			}
-			return logFactory;
+			return lf;
 		}
 	}
 
-	/** Returns the application instances logger.
-	 * @return The application instances logger.
+	/** Returns the applications logger.
+	 * @return The applications logger.
 	 */
-	protected ILog getLog() {
-		// Make sure, that the logger is initialized.
-		getLogFactory();
-		return log;
+	protected @NonNull ILog getLog() {
+		synchronized(logFactoryGenerator) {
+			if (log == null) {
+				log = getLogFactory().getLog(Application.class);
+			}
+			return Objects.requireNonNull(log);
+		}
 	}
-	
+
 	/** Returns the applications property factory.
 	 * @return The applications property factory.
 	 */
-	public IPropertyFactory getPropertyFactory() {
-		synchronized(propertyFactoryGenerator) {
+	public @NonNull IPropertyFactory getPropertyFactory() {
+		synchronized (propertyFactoryGenerator) {
 			if (propertyFactory == null) {
-				propertyFactory = Objects.requireNonNull(propertyFactoryGenerator.apply(this, getLog()), "PropertyFactory");
+				propertyFactory = propertyFactoryGenerator.apply(this, getLog());
 			}
-			return propertyFactory;
+			return Objects.requireNonNull(propertyFactory);
 		}
 	}
 
 	/** Returns the applications component factory.
 	 * @return The applications component factory.
 	 */
-	public IComponentFactory getComponentFactory() {
-		// Make sure, that the log factory, and the property factory are initialized.
-		getLogFactory();
-		getPropertyFactory();
-		synchronized(componentFactoryGenerator) {
+	public @NonNull IComponentFactory getComponentFactory() {
+		synchronized (componentFactoryGenerator) {
 			if (componentFactory == null) {
-				componentFactory = Objects.requireNonNull(componentFactoryGenerator.apply(this, module, getLog()), "ComponentFactory");
+				final ILifecycleController lc = new DefaultLifecycleController();
+				final IModule mod = (b) -> {
+					b.bind(ILogFactory.class).toInstance(getLogFactory());
+					final IPropertyFactory pf = getPropertyFactory();
+					b.bind(IPropertyFactory.class).toInstance(pf);
+					final Properties properties = pf.getProperties();
+					b.bind(Properties.class).toInstance(properties);
+					b.bind(ILifecycleController.class).toInstance(lc);
+					b.bind(Application.class).toInstance(this);
+					b.addFinalizer((cf) -> lc.start());
+				};
+				componentFactory = componentFactoryGenerator.apply(this, mod.extend(module), log);
 			}
-			return componentFactory;
+			return Objects.requireNonNull(componentFactory);
 		}
 	}
 
@@ -320,7 +335,7 @@ public class Application {
 	 * {@link DefaultAnnotationProvider}. In other words, the
 	 * generated component factory will support Jakarta annotations, like
 	 * {@link Inject}, or {@link jakarta.annotation.PostConstruct}, Javax annotations, like
-	 * {@link javax.inject.Inject}, {@link javax.annotation.PostConstruct},
+	 * {@link javax.inject.Inject}, {@code javax.annotation.PostConstruct},
 	 * and Google annotations like {@link com.google.inject.Inject},
 	 * but also AFW annotations, like {@link LogInject}, and
 	 * {@link PropInject}.
@@ -332,14 +347,6 @@ public class Application {
 		return (app,mod,log) -> {
 			final @NonNull ILogFactory logFactory = Objects.requireNonNull(app.getLogFactory());
 			final @NonNull IPropertyFactory propertyFactory = Objects.requireNonNull(app.getPropertyFactory());
-			final ILifecycleController lc = new DefaultLifecycleController();
-			final IModule module = mod.extend((b) -> {
-				b.bind(Application.class).toInstance(app);
-				b.bind(ILogFactory.class).toInstance(logFactory);
-				b.bind(IPropertyFactory.class).to((cf) -> propertyFactory);
-				b.bind(ILifecycleController.class).toInstance(lc);
-				b.addFinalizer((cf) -> lc.start());
-			});
 			final LogInjectBindingProvider.LoggerFactory<Object> injectLoggerFactory = bindingLoggerFactory(logFactory);
 			final PropInjectBindingProvider.PropertyFactory injectPropertyFactory = bindingPropertyFactory(propertyFactory);
 			@SuppressWarnings("null")
@@ -349,8 +356,9 @@ public class Application {
 			return IComponentFactory.builder()
 					.bindingProvider(libp)
 					.bindingProvider(pibp)
+					.bindingProvider(new DefaultBindingProvider<Object,Object>())
 					.jakarta()
-					.module(module)
+					.module(mod)
 					.build();
 		};
 	}
