@@ -87,7 +87,7 @@ public class AtInjectBindingProvider extends AbstractBindingProvider {
 	}
 
 	@Override
-	public BiConsumer<IComponentFactory,Object> createInjector(IComponentFactory pComponentFactory, Method pMethod) {
+	public IMethodInjector createInjector(IComponentFactory pComponentFactory, Method pMethod) {
 		final Type[] parameterTypes = pMethod.getGenericParameterTypes();
 		final AnnotatedType[] parameterAnnotations = pMethod.getAnnotatedParameterTypes();
 		@SuppressWarnings("unchecked")

@@ -130,7 +130,7 @@ public class PropInjectBindingProvider<P> extends AbstractBindingProvider {
 	}
 
 	@Override
-	public BiConsumer<IComponentFactory,Object> createInjector(IComponentFactory pComponentFactory, Method pMethod) {
+	public IMethodInjector createInjector(IComponentFactory pComponentFactory, Method pMethod) {
 		final PropInject propInject = pMethod.getAnnotation(PropInject.class);
 		if (propInject == null) {
 			throw new IllegalStateException("Expected a PropInject annotation on method "

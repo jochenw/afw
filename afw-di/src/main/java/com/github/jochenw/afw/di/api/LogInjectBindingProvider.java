@@ -106,7 +106,7 @@ public class LogInjectBindingProvider<L> extends AbstractBindingProvider {
 	}
 
 	@Override
-	public BiConsumer<IComponentFactory,Object> createInjector(IComponentFactory pComponentFactory, Method pMethod) {
+	public IMethodInjector createInjector(IComponentFactory pComponentFactory, Method pMethod) {
 		final LogInject logInject = pMethod.getAnnotation(LogInject.class);
 		if (logInject == null) {
 			throw new IllegalStateException("Expected a LogInject annotation on method "

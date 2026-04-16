@@ -14,6 +14,10 @@ import com.github.jochenw.afw.di.impl.DiUtils;
  * {@link PropInject}, or @PostConstruct.
  */
 public interface IBindingProvider {
+	@FunctionalInterface
+	public interface IMethodInjector extends BiConsumer<IComponentFactory, Object> {
+		public default boolean isDeferred() { return false; }
+	}
 	/** Returns true, if the binding provider can create an injector for the
 	 * given field. If so, the component factory will invoke
 	 * {@link #createInjector(IComponentFactory, Field)}.
@@ -52,7 +56,7 @@ public interface IBindingProvider {
 	 *   generated.
 	 * @return The generated injector; never null.
 	 */
-	public BiConsumer<IComponentFactory, Object> createInjector(IComponentFactory pComponentFactory, Method pMethod);
+	public IMethodInjector createInjector(IComponentFactory pComponentFactory, Method pMethod);
 
 	/** Called to ensure, that {@link AccessibleObject#isAccessible()}
 	 * returns true for the given field, or method.

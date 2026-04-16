@@ -61,7 +61,7 @@ public class DefaultBindingProvider<L,P> extends AbstractBindingProvider {
 	}
 
 	@Override
-	public BiConsumer<IComponentFactory, Object> createInjector(IComponentFactory pComponentFactory, Method pMethod) {
+	public IMethodInjector createInjector(IComponentFactory pComponentFactory, Method pMethod) {
 		if (logInjectBindingProvider != null  &&  logInjectBindingProvider.isInjectable(pMethod)) {
 			return logInjectBindingProvider.createInjector(pComponentFactory, pMethod);
 		}
@@ -85,22 +85,30 @@ public class DefaultBindingProvider<L,P> extends AbstractBindingProvider {
 				throw new IllegalStateException("Cannot create a startup, or shutdown listener, for the method "
 						+ pMethod.getName() + " in class " + pMethod.getDeclaringClass().getName());
 			}
-			final BiConsumer<IComponentFactory, Object> injector = (cf,o) -> {
-				lifeCycleController.addListener(new TerminableListener() {
-					@Override
-					public void start() {
-						if (startListener != null) {
-							startListener.accept(o);
+			final IMethodInjector injector = new IMethodInjector() {
+				@Override
+				public void accept(IComponentFactory cf, Object o) {
+					lifeCycleController.addListener(new TerminableListener() {
+						@Override
+						public void start() {
+							if (startListener != null) {
+								startListener.accept(o);
+							}
 						}
-					}
 
-					@Override
-					public void shutdown() {
-						if (shutdownListener != null) {
-							shutdownListener.accept(o);
+						@Override
+						public void shutdown() {
+							if (shutdownListener != null) {
+								shutdownListener.accept(o);
+							}
 						}
-					}
-				});
+					});
+				}
+
+				@Override
+				public boolean isDeferred() {
+					return true;
+				}
 			};
 			return injector;
 		}

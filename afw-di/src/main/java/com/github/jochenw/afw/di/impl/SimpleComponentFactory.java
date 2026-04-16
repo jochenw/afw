@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import com.github.jochenw.afw.di.api.AbstractBindingProvider;
 import com.github.jochenw.afw.di.api.IAnnotationProvider;
 import com.github.jochenw.afw.di.api.IBindingProvider;
+import com.github.jochenw.afw.di.api.IBindingProvider.IMethodInjector;
 import com.github.jochenw.afw.di.api.IComponentFactory;
 import com.github.jochenw.afw.di.api.IComponentFactory.IConfiguration;
 import com.github.jochenw.afw.di.api.IComponentFactoryAware;
@@ -244,13 +245,22 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	 */
 	protected Consumer<Object> newInitializer(Class<Object> pType) {
 		final List<Consumer<Object>> initializerList = new ArrayList<>();
-		findMethods(pType, initializerList::add);
+		final List<Consumer<Object>> deferredInitializers = new ArrayList<>();
+		findMethods(pType, (i) -> {
+			final Consumer<Object> initializer = (o) -> i.accept(SimpleComponentFactory.this, o);
+			if (i.isDeferred()) {
+				deferredInitializers.add(initializer);
+			} else {
+				initializerList.add(initializer);
+			}
+		});
 		findFields(pType, initializerList::add);
 		return (o) -> {
 			initializerList.forEach((i) -> i.accept(o));
 			if (o instanceof IComponentFactoryAware) {
 				((IComponentFactoryAware) o).init(SimpleComponentFactory.this);
 			}
+			deferredInitializers.forEach((i) -> i.accept(o));
 		};
 	}
 
@@ -263,7 +273,7 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 	 *   method initializers, combining them into an initializer for instances
 	 *   of the given type.
 	 */
-	protected void findMethods(Class<Object> pType, Consumer<Consumer<Object>> pInitializerConsumer) {
+	protected void findMethods(Class<Object> pType, Consumer<IMethodInjector> pInitializerConsumer) {
 		Class<Object> cl = pType;
 		do {
 			for (final Method method : cl.getDeclaredMethods()) {
@@ -277,9 +287,8 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 				}
 				for (IBindingProvider bp : bindingProviders) {
 					if (bp.isInjectable(method)) {
-						final BiConsumer<IComponentFactory,Object> consumer = bp.createInjector(this, method);
-						final Consumer<Object> initializer = (o) -> consumer.accept(this, o);
-						pInitializerConsumer.accept(initializer);
+						final IMethodInjector injector = bp.createInjector(this, method);
+						pInitializerConsumer.accept(injector);
 						break;
 					}
 				}
