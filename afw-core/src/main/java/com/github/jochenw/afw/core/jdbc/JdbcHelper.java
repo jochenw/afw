@@ -1,5 +1,7 @@
 package com.github.jochenw.afw.core.jdbc;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
@@ -7,6 +9,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -42,6 +46,7 @@ import com.github.jochenw.afw.core.function.Functions.FailableSupplier;
 import com.github.jochenw.afw.core.function.Functions.FloatConsumer;
 import com.github.jochenw.afw.core.function.Functions.ShortConsumer;
 import com.github.jochenw.afw.core.util.Exceptions;
+import com.github.jochenw.afw.core.util.Strings;
 
 /** A helper object for working with JDBC connections.
  */
@@ -50,7 +55,9 @@ public class JdbcHelper {
 	 */
 	public JdbcHelper() {}
 
-	private static final @NonNull ZoneId UTC = Objects.requireNonNull(ZoneId.of("GMT"));
+	/** ID of the GMT (UTC) time zone.
+	 */
+	public static final @NonNull ZoneId UTC = Objects.requireNonNull(ZoneId.of("GMT"));
 	private @NonNull ZoneId dbZoneId = UTC;
 	private @NonNull ZoneId appZoneId = Objects.requireNonNull(ZoneId.systemDefault());
 
@@ -1571,5 +1578,114 @@ public class JdbcHelper {
 		classes[0] = Connection.class;
 		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		return (Connection) Proxy.newProxyInstance(cl, classes, ih);
+	}
+
+	/** Starts a transaction in the given connection, and performs the transaction
+	 * by calling the given {@code pTransaction}. If the transaction is executed
+	 * successfully, then a COMMIT is being executed. Otherwise, a ROLLBACK is done,
+	 * and an exception is thrown.
+	 * @param pConnection The connection, which is being used to run the transaction.
+	 *   Within the transaction, {@link Connection#setAutoCommit(boolean) autocommit}
+	 *   will be false. After the connection, the previous value will be restored.
+	 * @param pTransaction The transaction, which is being executed.
+	 */
+	public void transaction(Connection pConnection, FailableConsumer<Connection, ?> pTransaction) {
+		Throwable th = null;
+		boolean autoCommit = false;
+		try {
+			autoCommit = pConnection.getAutoCommit();
+			pConnection.setAutoCommit(false);
+			pTransaction.accept(pConnection);
+			pConnection.rollback();
+			if (autoCommit) {
+				pConnection.setAutoCommit(true);
+			}
+		} catch (Throwable t) {
+			th = t;
+		} finally {
+			if (th != null) {
+				try {
+					pConnection.rollback();
+				} catch (Throwable t2) {
+					// Ignore the current exception (t2). Instead, throw the cause.
+				}
+				if (autoCommit) {
+					try {
+						pConnection.setAutoCommit(true);
+					} catch (Throwable t3) {
+						// Ignore the current exception (t3). Instead, throw the cause.
+					}
+				}
+				throw Exceptions.show(th);
+			}
+		}
+	}
+
+	/** Reads the given file, which contains a series of SQL statements,
+	 * parses it, and invokes the given consumer for every statement.
+	 * @param pPath The file, which is being read.
+	 * @param pConsumer The consumer, which is supposed to process the
+	 *   SQL statements, that are read from the file.
+	 */
+	public void read(@NonNull Path pPath, @NonNull FailableConsumer<@NonNull String,?> pConsumer) {
+		try (BufferedReader br = Files.newBufferedReader(pPath)) {
+			@SuppressWarnings("null")
+			final @NonNull BufferedReader br2 = br;
+			read(br2, pConsumer);
+		} catch (IOException ioe) {
+			throw Exceptions.show(ioe);
+		}
+	}
+
+	/** Reads the input from the given {@link BufferedReader pReader},
+	 * which contains a series of SQL statements,
+	 * parses it, and invokes the given consumer for every statement.
+	 * @param pReader The file, which is being read.
+	 * @param pConsumer The consumer, which is supposed to process the
+	 *   SQL statements, that are read from the file.
+	 */
+	public void read(@NonNull BufferedReader pReader, @NonNull FailableConsumer<@NonNull String,?> pConsumer) {
+		final StringBuilder sb = new StringBuilder();
+		final Consumer<String> executor = (s) -> {
+			if (s == null) {
+				return;
+			}
+			@SuppressWarnings("null")
+			final @NonNull String stmt = s.trim();
+			if (stmt.endsWith(";")) {
+				@SuppressWarnings("null")
+				final @NonNull String stmt2 = stmt.substring(0, stmt.length()-1).trim();
+				if (!Strings.isEmpty(stmt2)) {
+					Functions.accept(pConsumer, stmt2);
+				}
+			} else {
+				if (!Strings.isEmpty(stmt)) {
+					Functions.accept(pConsumer, stmt);
+				}
+			}
+		};
+		for (;;) {
+			final String line;
+			try {
+				line = pReader.readLine();
+			} catch (IOException ioe) {
+				throw Exceptions.show(ioe);
+			}
+			if (line == null) {
+				break;
+			}
+			if (line.trim().startsWith("--")) {
+				// Ignore comment line
+				continue;
+			}
+			sb.append(line);
+			final String s = sb.toString().trim();
+			if (s.endsWith(";")) {
+				executor.accept(s);
+				sb.setLength(0);
+			}
+		}
+		String statement = sb.toString().trim();
+		executor.accept(statement);
 	}
 }
