@@ -150,7 +150,8 @@ public class AtInjectBindingProvider extends AbstractBindingProvider {
 		final Key<Object> key = Key.of(pType, name);
 		final IBinding<Object> binding = getBinding(pComponentFactory, key);
 		if (binding == null) {
-			if (pType instanceof ParameterizedType pt) {
+			if (pType instanceof ParameterizedType) {
+				final ParameterizedType pt = (ParameterizedType) pType;
 				final Type providerType = pt.getRawType();
 				final Type[] parameterTypes = pt.getActualTypeArguments();
 				final Type providedType = parameterTypes == null  ||  parameterTypes.length != 1 ? null : parameterTypes[0]; 

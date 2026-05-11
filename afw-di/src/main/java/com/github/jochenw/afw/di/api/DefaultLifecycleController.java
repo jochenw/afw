@@ -74,7 +74,8 @@ public class DefaultLifecycleController implements ILifecycleController {
 	private void start(final WrappedListener pWrappedListener) {
 		try {
 			final Listener listener = pWrappedListener.listener;
-			if (listener instanceof Startable st) {
+			if (listener instanceof Startable) {
+				final Startable st = (Startable) listener;
 				st.start();
 				pWrappedListener.state = State.STARTED;
 			}
@@ -102,7 +103,8 @@ public class DefaultLifecycleController implements ILifecycleController {
 		final Listener lst = pWrappedListener.listener;
 		if (pWrappedListener.state == State.STARTED) {
 			pWrappedListener.state = State.TERMINATED;
-			if (lst instanceof Terminable trm) {
+			if (lst instanceof Terminable) {
+				final Terminable trm = (Terminable) lst;
 				try {
 					trm.shutdown();
 				} catch (Exception e) {

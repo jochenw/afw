@@ -43,12 +43,12 @@ public class DiUtils {
 	@SuppressWarnings("javadoc")
 	public static RuntimeException show(Throwable pTh) {
 		Objects.requireNonNull(pTh, "Throwable");
-		if (pTh instanceof RuntimeException rte) {
-			throw rte;
-		} else if (pTh instanceof Error e) {
-			throw e;
-		} else if (pTh instanceof IOException ioe) {
-			throw new UncheckedIOException(ioe);
+		if (pTh instanceof RuntimeException) {
+			throw (RuntimeException) pTh;
+		} else if (pTh instanceof Error) {
+			throw (Error) pTh;
+		} else if (pTh instanceof IOException) {
+			throw new UncheckedIOException((IOException) pTh);
 		} else {
 			throw new UndeclaredThrowableException(pTh);
 		}

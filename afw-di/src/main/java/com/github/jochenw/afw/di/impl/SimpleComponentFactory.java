@@ -71,7 +71,8 @@ public class SimpleComponentFactory extends AbstractComponentFactory {
 		bindingProviders.add(atInjectBindingProvider);
 		atInjectBindingProvider.init(pConfiguration, bindings);
 		pConfiguration.getBindingProviders().forEach((bp) -> {
-			if (bp instanceof AbstractBindingProvider abp) {
+			if (bp instanceof AbstractBindingProvider) {
+				final AbstractBindingProvider abp = (AbstractBindingProvider) bp;
 				abp.init(this, pConfiguration);
 			}
 			bindingProviders.add(bp);

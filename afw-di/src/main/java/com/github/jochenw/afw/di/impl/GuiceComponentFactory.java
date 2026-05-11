@@ -69,7 +69,7 @@ public class GuiceComponentFactory extends AbstractComponentFactory {
 				final IBinding<Object> binding = en.getValue();
 				final com.google.inject.Key<Object> gKey = asGuiceKey(key);
 				final LinkedBindingBuilder<Object> lbb = b.bind(gKey);
-				final Provider<Object> provider = new Provider<>() {
+				final Provider<Object> provider = new Provider<Object>() {
 					@Override
 					public Object get() {
 						return binding.apply(GuiceComponentFactory.this);
