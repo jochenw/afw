@@ -217,10 +217,9 @@
       <version>2.0.1.MR</version>
     </dependency>
     <dependency>
-      <groupId>com.github.jochenw.javax.inject</groupId>
+      <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
-      <version>1.0.5</version>
-      <scope>provided</scope>
+      <version>1</version>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>

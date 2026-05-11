@@ -1,9 +1,22 @@
 package com.github.jochenw.afw.di.impl;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 
 class GuiceComponentFactoryTest {
+	@BeforeAll
+	static void initLogging() {
+		final Path loggingPropertiesFile = Paths.get("src/test/resources/logging.properties");
+		assertTrue(Files.isRegularFile(loggingPropertiesFile));
+		System.setProperty("java.util.logging.config.file", loggingPropertiesFile.toString());
+	}
 	@Test
 	void testCreateJakartaMapBindings() {
 		ComponentFactoryTests.testCreateJakartaMapBindings(GuiceComponentFactory.class);
